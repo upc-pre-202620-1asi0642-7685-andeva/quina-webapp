@@ -1,3 +1,9 @@
-// Las 35 tablas de docs/quina-database-schema.md se definen aquí en la siguiente
-// parte del plan 0, junto con la migración (roles, RLS y triggers).
-export {};
+// Las 35 tablas de docs/quina-database-schema.md, agrupadas por dominio.
+// RLS, triggers de inmutabilidad y roles van en una migración SQL aparte.
+export * from './identity';
+export * from './credit';
+export * from './catalog';
+export * from './sales';
+export * from './ledger';
+export * from './notifications';
+export * from './audit';

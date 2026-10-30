@@ -67,6 +67,8 @@ pnpm test           # Vitest
 pnpm test:e2e       # Playwright (e2e y accesibilidad)
 pnpm db:generate    # Drizzle Kit: genera migraciones
 pnpm db:migrate     # Drizzle Kit: aplica migraciones
+pnpm db:roles       # Activa LOGIN y contraseñas de quina_app y quina_platform desde .env
+pnpm test:db        # Pruebas de integración contra un PostgreSQL real
 ```
 
 ---

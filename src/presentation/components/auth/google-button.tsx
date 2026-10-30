@@ -1,0 +1,41 @@
+'use client';
+
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { authClient } from '@/infrastructure/auth/auth-client';
+import { Button } from '@/presentation/components/ui/button';
+
+export function GoogleButton({ callbackURL = '/app' }: { callbackURL?: string }) {
+  const t = useTranslations('Auth');
+  const [loading, setLoading] = useState(false);
+
+  async function handleGoogle() {
+    setLoading(true);
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="secondary"
+      className="w-full"
+      disabled={loading}
+      onClick={handleGoogle}
+    >
+      <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 15.65 5 12c0-3.65 3.36-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81Z"
+        />
+      </svg>
+      <span>{t('google')}</span>
+    </Button>
+  );
+}

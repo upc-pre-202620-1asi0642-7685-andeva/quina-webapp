@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
   basePath: '/app',
   // next dev no reescribe AGENTS.md: la regla equivalente ya está en su sección 3.
   agentRules: false,
+  experimental: {
+    serverActions: {
+      // El sitio público reenvía quina.andeva.tech/app/* con el Origin público.
+      allowedOrigins: ['quina.andeva.tech'],
+    },
+  },
 };
 
 export default withNextIntl(nextConfig);
