@@ -439,6 +439,24 @@ describe('bloqueo por intentos fallidos', () => {
       SELECT count(*)::int AS count FROM sessions WHERE user_id = ${user.id}`;
     expect(sessions!.count).toBe(0);
   });
+
+  it('un token de restablecimiento vencido (30 minutos) se rechaza', async () => {
+    const email = newEmail('reset-vencido');
+    await verifiedUser(email);
+
+    await auth.api.requestPasswordReset({ body: { email } });
+    const mail = await readLatestMail(email, 'password-reset', { dir: outboxDir });
+    const token = new URL(mail.url!).pathname.split('/').pop()!;
+
+    await owner`
+      UPDATE verifications SET expires_at = expires_at - interval '30 minutes'
+      WHERE identifier = ${`reset-password:${token}`}`;
+
+    const error = await apiError(
+      auth.api.resetPassword({ body: { token, newPassword: 'Nueva#2026x' } }),
+    );
+    expect(code(error)).toBe('INVALID_TOKEN');
+  });
 });
 
 describe('sesión y cookie', () => {
