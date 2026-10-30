@@ -50,7 +50,7 @@ function requireEnv(name: string): string {
 }
 
 async function main(): Promise<void> {
-  const url = process.env.DB_ROLES_URL ?? process.env.DATABASE_MIGRATION_URL;
+  const url = process.env.DB_ROLES_URL || process.env.DATABASE_MIGRATION_URL;
   if (!url) {
     throw new Error('Falta la variable de entorno DB_ROLES_URL o DATABASE_MIGRATION_URL.');
   }

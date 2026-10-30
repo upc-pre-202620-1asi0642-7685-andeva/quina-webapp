@@ -3,6 +3,7 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import { applyRolePasswords } from '../../scripts/db-roles';
 import { testEnv } from './env';
+import { assertResettableDatabase } from './reset-guard';
 
 // Deja la base de pruebas como recién creada: las tablas inmutables no se pueden
 // limpiar con DELETE, así que se borra el esquema completo y se vuelve a migrar.
@@ -15,6 +16,10 @@ export default async function setup() {
 
   const client = postgres(testEnv.ownerUrl, { max: 1, onnotice: () => {} });
   try {
+    // Comparar URLs no basta (localhost vs 127.0.0.1, ?sslmode...): se pregunta a la base
+    const [current] = await client<{ name: string }[]>`SELECT current_database() AS name`;
+    assertResettableDatabase(current!.name, process.env);
+
     await client.unsafe('DROP SCHEMA IF EXISTS drizzle CASCADE');
     await client.unsafe('DROP SCHEMA IF EXISTS public CASCADE');
     await client.unsafe('CREATE SCHEMA public');
