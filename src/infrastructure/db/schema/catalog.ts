@@ -307,6 +307,6 @@ export const inventoryMovements = pgTable(
       'chk_inventory_reason',
       sql`${t.movementType} NOT IN ('WASTE_LOSS', 'COUNT_ADJUSTMENT') OR ${t.notes} IS NOT NULL`,
     ),
-    index('idx_inventory_product_date').on(t.productId, t.createdAt.desc()),
+    index('idx_inventory_product_date').on(t.productId, t.createdAt.desc().nullsFirst()),
   ],
 );

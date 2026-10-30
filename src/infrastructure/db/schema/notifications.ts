@@ -53,8 +53,8 @@ export const notificationLogs = pgTable(
       'chk_notifications_digest',
       sql`(${t.notificationType} = 'CHARGE_DIGEST') = (${t.digestDate} IS NOT NULL AND ${t.customerId} IS NOT NULL)`,
     ),
-    index('idx_notifications_store_date').on(t.storeId, t.createdAt.desc()),
-    index('idx_notifications_customer_date').on(t.customerId, t.createdAt.desc()),
+    index('idx_notifications_store_date').on(t.storeId, t.createdAt.desc().nullsFirst()),
+    index('idx_notifications_customer_date').on(t.customerId, t.createdAt.desc().nullsFirst()),
     // Un solo resumen diario por vecino y un solo aviso por ciclo
     uniqueIndex('uq_notifications_daily_digest')
       .on(t.customerId, t.digestDate)

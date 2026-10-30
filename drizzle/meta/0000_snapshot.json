@@ -1,5 +1,5 @@
 {
-  "id": "63a40bbf-a3cd-4bc6-9553-a5aaf2aa4666",
+  "id": "df86359e-a940-4cb0-b666-e0ae8ed6b982",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -204,7 +204,7 @@
               "expression": "created_at",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -500,7 +500,7 @@
               "expression": "created_at",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -3122,7 +3122,7 @@
               "expression": "created_at",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -3673,7 +3673,7 @@
               "expression": "sale_date",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -3694,7 +3694,7 @@
               "expression": "sale_date",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -4145,7 +4145,7 @@
               "expression": "purchase_date",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -5051,7 +5051,7 @@
               "expression": "cycle_number",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -5284,7 +5284,7 @@
               "expression": "created_at",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,
@@ -5305,7 +5305,7 @@
               "expression": "created_at",
               "isExpression": false,
               "asc": false,
-              "nulls": "last"
+              "nulls": "first"
             }
           ],
           "isUnique": false,

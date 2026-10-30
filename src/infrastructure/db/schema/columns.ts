@@ -18,6 +18,7 @@ export const tstz = (name: string) => timestamp(name, { withTimezone: true });
 // Dinero: NUMERIC llega como texto y se convierte al objeto de valor Money.
 export const money = (name: string) => numeric(name, { precision: 12, scale: 2 });
 
+// Solo literales del código, nunca entrada del usuario (se interpolan con sql.raw).
 // `col IN ('A', 'B')` para los CHECK de listas cerradas.
 export const oneOf = (column: AnyPgColumn, values: readonly (string | number)[]): SQL =>
   sql`${column} in (${sql.join(

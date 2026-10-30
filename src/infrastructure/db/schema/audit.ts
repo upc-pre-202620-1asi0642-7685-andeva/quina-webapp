@@ -33,7 +33,7 @@ export const auditLogs = pgTable(
     userAgent: text('user_agent'),
     createdAt: createdAt(),
   },
-  (t) => [index('idx_audit_store_date').on(t.storeId, t.createdAt.desc())],
+  (t) => [index('idx_audit_store_date').on(t.storeId, t.createdAt.desc().nullsFirst())],
 );
 
 export const aiRecommendationQuotas = pgTable(

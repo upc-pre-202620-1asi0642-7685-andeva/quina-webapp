@@ -124,7 +124,7 @@ export const subscriptionPayments = pgTable(
       'chk_subscription_payments_status',
       oneOf(t.status, ['APPROVED', 'REJECTED', 'REFUNDED']),
     ),
-    index('idx_subscription_payments_store').on(t.storeId, t.createdAt.desc()),
+    index('idx_subscription_payments_store').on(t.storeId, t.createdAt.desc().nullsFirst()),
   ],
 );
 

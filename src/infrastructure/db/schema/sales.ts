@@ -45,8 +45,8 @@ export const sales = pgTable(
       sql`(${t.saleModality} = 'CASH' AND ${t.paymentMethod} <> 'CREDIT')
         OR (${t.saleModality} <> 'CASH' AND ${t.paymentMethod} = 'CREDIT' AND ${t.customerId} IS NOT NULL)`,
     ),
-    index('idx_sales_store_date').on(t.storeId, t.saleDate.desc()),
-    index('idx_sales_customer').on(t.customerId, t.saleDate.desc()),
+    index('idx_sales_store_date').on(t.storeId, t.saleDate.desc().nullsFirst()),
+    index('idx_sales_customer').on(t.customerId, t.saleDate.desc().nullsFirst()),
   ],
 );
 

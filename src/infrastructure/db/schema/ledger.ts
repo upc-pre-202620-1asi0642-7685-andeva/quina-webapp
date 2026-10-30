@@ -58,7 +58,7 @@ export const settlementCycles = pgTable(
     check('chk_settlement_cycles_adjustments_total', sql`${t.adjustmentsTotal} >= 0`),
     check('chk_settlement_cycles_status', oneOf(t.status, ['OPEN', 'BILLED', 'PAID', 'OVERDUE'])),
     check('chk_cycles_dates', sql`${t.paymentDueDate} > ${t.cutOffDate}`),
-    index('idx_settlement_account_cycle').on(t.creditAccountId, t.cycleNumber.desc()),
+    index('idx_settlement_account_cycle').on(t.creditAccountId, t.cycleNumber.desc().nullsFirst()),
     index('idx_settlement_store_status_due').on(t.storeId, t.status, t.paymentDueDate),
   ],
 );
@@ -145,7 +145,7 @@ export const creditCharges = pgTable(
       'chk_charges_objection',
       sql`${t.consentStatus} <> 'OBJECTED' OR ${t.objectedAt} IS NOT NULL`,
     ),
-    index('idx_charges_account_date').on(t.creditAccountId, t.purchaseDate.desc()),
+    index('idx_charges_account_date').on(t.creditAccountId, t.purchaseDate.desc().nullsFirst()),
     index('idx_charges_cycle').on(t.settlementCycleId),
     index('idx_charges_pending_digest')
       .on(t.storeId, t.createdAt)

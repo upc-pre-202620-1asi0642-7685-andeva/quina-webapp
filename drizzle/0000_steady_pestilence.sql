@@ -744,8 +744,8 @@ ALTER TABLE "settlement_cycles" ADD CONSTRAINT "settlement_cycles_credit_account
 ALTER TABLE "notification_logs" ADD CONSTRAINT "notification_logs_store_id_stores_id_fk" FOREIGN KEY ("store_id") REFERENCES "public"."stores"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notification_logs" ADD CONSTRAINT "notification_logs_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notification_logs" ADD CONSTRAINT "notification_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "idx_audit_store_date" ON "audit_logs" USING btree ("store_id","created_at" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "idx_inventory_product_date" ON "inventory_movements" USING btree ("product_id","created_at" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_audit_store_date" ON "audit_logs" USING btree ("store_id","created_at" DESC NULLS FIRST);--> statement-breakpoint
+CREATE INDEX "idx_inventory_product_date" ON "inventory_movements" USING btree ("product_id","created_at" DESC NULLS FIRST);--> statement-breakpoint
 CREATE INDEX "idx_products_store_active" ON "products" USING btree ("store_id","is_active");--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_products_store_barcode" ON "products" USING btree ("store_id","barcode") WHERE "products"."barcode" IS NOT NULL;--> statement-breakpoint
 CREATE INDEX "idx_products_store_low_stock" ON "products" USING btree ("store_id") WHERE "products"."is_service" = FALSE AND "products"."current_stock" <= "products"."minimum_stock";--> statement-breakpoint
@@ -756,22 +756,22 @@ CREATE INDEX "idx_customers_store_active" ON "customers" USING btree ("store_id"
 CREATE INDEX "idx_customers_user" ON "customers" USING btree ("user_id") WHERE "customers"."user_id" IS NOT NULL;--> statement-breakpoint
 CREATE INDEX "idx_accounts_user" ON "accounts" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_sessions_user" ON "sessions" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_subscription_payments_store" ON "subscription_payments" USING btree ("store_id","created_at" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_subscription_payments_store" ON "subscription_payments" USING btree ("store_id","created_at" DESC NULLS FIRST);--> statement-breakpoint
 CREATE INDEX "idx_users_store_role" ON "users" USING btree ("store_id","role") WHERE "users"."is_active" = TRUE;--> statement-breakpoint
 CREATE INDEX "idx_verifications_identifier" ON "verifications" USING btree ("identifier");--> statement-breakpoint
 CREATE INDEX "idx_sale_items_sale" ON "sale_items" USING btree ("sale_id");--> statement-breakpoint
-CREATE INDEX "idx_sales_store_date" ON "sales" USING btree ("store_id","sale_date" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "idx_sales_customer" ON "sales" USING btree ("customer_id","sale_date" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_sales_store_date" ON "sales" USING btree ("store_id","sale_date" DESC NULLS FIRST);--> statement-breakpoint
+CREATE INDEX "idx_sales_customer" ON "sales" USING btree ("customer_id","sale_date" DESC NULLS FIRST);--> statement-breakpoint
 CREATE INDEX "idx_charge_voids_cycle" ON "credit_charge_voids" USING btree ("applied_cycle_id");--> statement-breakpoint
-CREATE INDEX "idx_charges_account_date" ON "credit_charges" USING btree ("credit_account_id","purchase_date" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_charges_account_date" ON "credit_charges" USING btree ("credit_account_id","purchase_date" DESC NULLS FIRST);--> statement-breakpoint
 CREATE INDEX "idx_charges_cycle" ON "credit_charges" USING btree ("settlement_cycle_id");--> statement-breakpoint
 CREATE INDEX "idx_charges_pending_digest" ON "credit_charges" USING btree ("store_id","created_at") WHERE "credit_charges"."notified_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "idx_charges_consent_pending" ON "credit_charges" USING btree ("consent_deadline") WHERE "credit_charges"."consent_status" = 'PENDING';--> statement-breakpoint
 CREATE INDEX "idx_installments_account_due" ON "credit_installments" USING btree ("credit_account_id","due_date") WHERE "credit_installments"."status" = 'PENDING';--> statement-breakpoint
 CREATE INDEX "idx_allocations_payment" ON "payment_allocations" USING btree ("debt_payment_id");--> statement-breakpoint
-CREATE INDEX "idx_settlement_account_cycle" ON "settlement_cycles" USING btree ("credit_account_id","cycle_number" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_settlement_account_cycle" ON "settlement_cycles" USING btree ("credit_account_id","cycle_number" DESC NULLS FIRST);--> statement-breakpoint
 CREATE INDEX "idx_settlement_store_status_due" ON "settlement_cycles" USING btree ("store_id","status","payment_due_date");--> statement-breakpoint
-CREATE INDEX "idx_notifications_store_date" ON "notification_logs" USING btree ("store_id","created_at" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "idx_notifications_customer_date" ON "notification_logs" USING btree ("customer_id","created_at" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX "idx_notifications_store_date" ON "notification_logs" USING btree ("store_id","created_at" DESC NULLS FIRST);--> statement-breakpoint
+CREATE INDEX "idx_notifications_customer_date" ON "notification_logs" USING btree ("customer_id","created_at" DESC NULLS FIRST);--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_notifications_daily_digest" ON "notification_logs" USING btree ("customer_id","digest_date") WHERE "notification_logs"."notification_type" = 'CHARGE_DIGEST';--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_notifications_cycle_once" ON "notification_logs" USING btree ("notification_type","reference_id") WHERE "notification_logs"."notification_type" IN ('PAYMENT_REMINDER', 'CYCLE_STATEMENT', 'LATE_PAYMENT');
