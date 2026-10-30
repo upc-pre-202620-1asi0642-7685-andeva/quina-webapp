@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.13.0",
+  "packageManager": "pnpm@11.28.10",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -18,9 +18,11 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:db": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:roles": "node --env-file-if-exists=.env.local scripts/db-roles.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",

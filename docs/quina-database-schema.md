@@ -203,7 +203,7 @@ que exige Better Auth; el resto se declara como `additionalFields`.
 | `email_verified` | BOOLEAN | NOT NULL, DEFAULT FALSE | Correo validado por código OTP o por Google. |
 | `image` | TEXT | NULL | Foto de perfil (por ejemplo, la de Google). |
 | `store_id` | UUID | NULL, FK `stores(id)` ON DELETE RESTRICT | Tienda asignada (NULL para Platform Admin y vecinos). |
-| `role` | VARCHAR(20) | NOT NULL, CHECK in ('PLATFORM_ADMIN', 'STORE_OWNER', 'STORE_EMPLOYEE', 'CUSTOMER') | Rol para control de accesos RBAC. |
+| `role` | VARCHAR(20) | NOT NULL, CHECK in ('PLATFORM_ADMIN', 'STORE_OWNER', 'STORE_EMPLOYEE', 'CUSTOMER', 'PENDING_OWNER') | Rol para control de accesos RBAC. `PENDING_OWNER` es el rol de quien ya se registró pero aún no crea su tienda; al crearla pasa a `STORE_OWNER`. |
 | `phone` | VARCHAR(20) | NULL | Teléfono móvil. |
 | `preferred_locale` | VARCHAR(2) | NOT NULL, DEFAULT 'es', CHECK in ('es', 'en', 'qu') | Idioma de la interfaz; se inicializa con la cookie `quina-lang` del sitio. |
 | `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE | Estado de habilitación de la cuenta. |
@@ -214,8 +214,9 @@ que exige Better Auth; el resto se declara como `additionalFields`.
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Fecha de modificación. |
 
 > Restricción: los roles `STORE_OWNER` y `STORE_EMPLOYEE` exigen `store_id`; los
-> roles `PLATFORM_ADMIN` y `CUSTOMER` lo dejan en NULL (un vecino puede comprar
-> en varias tiendas: el vínculo está en `customers.user_id`).
+> roles `PLATFORM_ADMIN`, `CUSTOMER` y `PENDING_OWNER` lo dejan en NULL (un vecino
+> puede comprar en varias tiendas: el vínculo está en `customers.user_id`; un
+> `PENDING_OWNER` todavía no tiene tienda).
 
 #### Tabla `sessions` (Better Auth: `session`)
 Sesiones activas en base de datos. El cierre de sesión borra la fila y la cookie
@@ -954,7 +955,7 @@ CREATE TABLE users (
     email_verified BOOLEAN NOT NULL DEFAULT FALSE,
     image TEXT,
     store_id UUID REFERENCES stores(id) ON DELETE RESTRICT,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('PLATFORM_ADMIN', 'STORE_OWNER', 'STORE_EMPLOYEE', 'CUSTOMER')),
+    role VARCHAR(20) NOT NULL CHECK (role IN ('PLATFORM_ADMIN', 'STORE_OWNER', 'STORE_EMPLOYEE', 'CUSTOMER', 'PENDING_OWNER')),
     phone VARCHAR(20),
     preferred_locale VARCHAR(2) NOT NULL DEFAULT 'es' CHECK (preferred_locale IN ('es', 'en', 'qu')),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -965,7 +966,7 @@ CREATE TABLE users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT chk_users_store_role CHECK (
         (role IN ('STORE_OWNER', 'STORE_EMPLOYEE') AND store_id IS NOT NULL)
-        OR (role IN ('PLATFORM_ADMIN', 'CUSTOMER') AND store_id IS NULL)
+        OR (role IN ('PLATFORM_ADMIN', 'CUSTOMER', 'PENDING_OWNER') AND store_id IS NULL)
     )
 );
 
@@ -1586,17 +1587,25 @@ tabla con datos de una tienda tiene su política de RLS.
 | `quina_app` | Conexión de la aplicación (Drizzle y Better Auth) por el pool de Supavisor (puerto 6543). | **No** |
 | `quina_platform` | Operaciones del Administrador de Plataforma que cruzan tiendas (alta y baja de comercios, auditoría global, topes de tasas y del Nuevo RUS). Solo se usa en las Server Actions del panel de plataforma. | Sí |
 
+Los roles se crean en la **migración** como `NOLOGIN`, sin contraseña en el
+repositorio. `quina_app` nace `NOBYPASSRLS` y `quina_platform` nace `BYPASSRLS`;
+si el rol que migra no tiene ese privilegio, la migración deja `quina_platform` en
+`NOBYPASSRLS` y emite un `NOTICE`. Después, `pnpm db:roles` les activa `LOGIN` y
+fija su contraseña desde `QUINA_APP_DB_PASSWORD` y `QUINA_PLATFORM_DB_PASSWORD`
+(`.env`). Los privilegios por defecto se declaran **sin** `FOR ROLE`, para que
+valgan para el rol que ejecute las migraciones (`postgres` en Supabase, un rol
+`migrator` en local y CI).
+
 ```sql
 -- Rol de la aplicación: sin BYPASSRLS, con acceso solo a lo necesario
-CREATE ROLE quina_app LOGIN PASSWORD '<secreto>' NOBYPASSRLS;
-GRANT USAGE ON SCHEMA public TO quina_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO quina_app;
-REVOKE INSERT, UPDATE, DELETE ON credit_rate_caps, rus_categories FROM quina_app;
-
+CREATE ROLE quina_app NOLOGIN NOBYPASSRLS;
 -- Rol de plataforma: cruza tiendas, solo para el panel del administrador
-CREATE ROLE quina_platform LOGIN PASSWORD '<secreto>' BYPASSRLS;
-GRANT USAGE ON SCHEMA public TO quina_platform;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO quina_platform;
+CREATE ROLE quina_platform NOLOGIN BYPASSRLS;
+
+GRANT USAGE ON SCHEMA public TO quina_app, quina_platform;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO quina_app, quina_platform;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO quina_app, quina_platform;
+REVOKE INSERT, UPDATE, DELETE ON credit_rate_caps, rus_categories FROM quina_app;
 ```
 
 ### 5.2. Cierre de la Data API de Supabase
@@ -1644,7 +1653,10 @@ Better Auth (`users`, `sessions`, `accounts`, `verifications`, `rate_limits`)
 quedan fuera porque el inicio de sesión debe buscar por correo sin conocer la
 tienda; su protección viene del cierre de la Data API y de que solo `quina_app`
 puede leerlas. `stores` tampoco lleva política: es la raíz de los inquilinos y la
-aplicación la consulta solo por el `store_id` de la sesión.
+aplicación la consulta solo por el `store_id` de la sesión. Como `stores` no tiene
+RLS, el proceso diario (que corre como `quina_app`) puede listar las tiendas
+activas y después abrir `withTenant(storeId, ...)` por cada una; no hace falta
+ninguna función `SECURITY DEFINER`.
 
 ```sql
 CREATE OR REPLACE FUNCTION app_current_store_id() RETURNS UUID AS $$
@@ -1752,13 +1764,15 @@ import { nextCookies } from "better-auth/next-js";
 import { hash, verify } from "@node-rs/argon2";
 
 export const auth = betterAuth({
-  baseURL: process.env.APP_URL,            // https://quina.andeva.tech/app
+  // Solo el origen (https://quina.andeva.tech); la ruta va en basePath
+  baseURL: new URL(process.env.APP_URL!).origin,
+  basePath: "/app/api/auth",               // Better Auth reemplaza el basePath con la ruta de baseURL
   database: drizzleAdapter(db, { provider: "pg", schema, usePlural: true }),
   advanced: { database: { generateId: false } }, // los UUID los genera PostgreSQL
   user: {
     additionalFields: {
       storeId: { type: "string", required: false, input: false },
-      role: { type: "string", required: true, input: false },
+      role: { type: "string", required: true, input: false, defaultValue: "PENDING_OWNER" },
       phone: { type: "string", required: false },
       preferredLocale: { type: "string", required: false, defaultValue: "es" },
       isActive: { type: "boolean", required: false, input: false, defaultValue: true },
@@ -1779,6 +1793,7 @@ export const auth = betterAuth({
   rateLimit: { enabled: true, storage: "database" }, // tabla rate_limits (usePlural)
   plugins: [
     emailOTP({ otpLength: 6, expiresIn: 60 * 15, allowedAttempts: 5, storeOTP: "hashed", sendVerificationOTP }),
+    // magicLink llega con el portal del vecino (Plan 5); no se activa en el Plan 0
     magicLink({ expiresIn: 60 * 60 * 72, disableSignUp: true, sendMagicLink }),
     captcha({ provider: "cloudflare-turnstile", secretKey: process.env.TURNSTILE_SECRET_KEY! }),
     nextCookies(),

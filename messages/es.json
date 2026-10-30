@@ -8,5 +8,179 @@
     "title": "Tu cuaderno de fiados, ordenado",
     "lead": "Estamos preparando tu mostrador. Muy pronto podrás registrar tu bodega y empezar a fiar con reglas claras.",
     "status": "En construcción"
+  },
+  "Email": {
+    "greeting": "Hola:",
+    "signature": "El equipo de Quina",
+    "otp": {
+      "subject": "Tu código para entrar a Quina",
+      "intro": "Usa este código para confirmar tu correo y seguir con tu bodega:",
+      "outro": "El código vence en 15 minutos. Si no lo pediste tú, ignora este correo."
+    },
+    "reset": {
+      "subject": "Elige una contraseña nueva en Quina",
+      "intro": "Pediste cambiar la contraseña de tu cuenta de Quina. Toca el botón para elegir una nueva:",
+      "action": "Elegir mi contraseña nueva",
+      "outro": "El enlace vence en 30 minutos y se usa una sola vez. Si no fuiste tú, no hagas nada: tu contraseña sigue igual."
+    },
+    "lockout": {
+      "subject": "Cuidamos tu cuenta de Quina",
+      "intro": "Hubo 5 intentos fallidos de ingreso a tu cuenta, así que la bloqueamos por 15 minutos.",
+      "outro": "Si fuiste tú, espera 15 minutos e intenta de nuevo. Si no, cambia tu contraseña cuanto antes desde \"Olvidé mi contraseña\" para mantener tu cuenta segura."
+    }
+  },
+  "Auth": {
+    "logoAlt": "Quina",
+    "google": "Continuar con Google",
+    "or": "o con tu correo",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "login": {
+      "title": "Entra a tu bodega",
+      "subtitle": "Revisa tus fiados y cobra a tiempo.",
+      "emailLabel": "Correo electrónico",
+      "emailHint": "Usa el correo con el que registraste tu cuenta.",
+      "passwordLabel": "Contraseña",
+      "passwordHint": "Al menos 8 caracteres, con mayúscula, número y símbolo.",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Ingresar",
+      "submitting": "Ingresando…",
+      "noAccount": "¿Aún no tienes cuenta?",
+      "registerLink": "Registra tu bodega gratis"
+    },
+    "errors": {
+      "nameRequired": "Escribe tu nombre completo (mínimo 2 letras) para identificar al titular.",
+      "emailInvalid": "Escribe un correo válido, como nombre@ejemplo.com.",
+      "passwordRequired": "Escribe tu contraseña para ingresar.",
+      "passwordWeak": "Usa al menos 8 caracteres con una mayúscula, un número y un símbolo.",
+      "commercialNameRequired": "Escribe el nombre comercial de tu negocio (mínimo 2 letras).",
+      "businessTurnInvalid": "Elige el giro de tu negocio de la lista.",
+      "taxIdInvalid": "Escribe los 11 números de tu RUC o los 8 números de tu DNI.",
+      "otpInvalid": "Escribe el código de 6 números que enviamos a tu correo.",
+      "otpExpired": "El código venció. Pide uno nuevo con \"Reenviar código\".",
+      "otpTooManyAttempts": "Superaste los 5 intentos. Pide un código nuevo con \"Reenviar código\".",
+      "userAlreadyExists": "Ese correo ya tiene cuenta. Ingresa.",
+      "invalidCredentials": "El correo o la contraseña no coinciden. Revisa e inténtalo de nuevo.",
+      "accountLocked": "Cuenta temporalmente bloqueada por seguridad. Inténtalo de nuevo en 15 minutos o restablece tu contraseña.",
+      "accountDisabled": "Esta cuenta está desactivada. Comunícate con el soporte de Quina.",
+      "taxIdTaken": "Ese RUC o DNI ya está registrado en otra tienda. Revisa los dígitos.",
+      "emailTaken": "Ese correo ya está registrado en otra tienda.",
+      "captchaRequired": "Completa la verificación de seguridad antes de continuar.",
+      "rateLimited": "Demasiados intentos seguidos. Espera unos segundos e inténtalo de nuevo.",
+      "generic": "No pudimos completar la operación. Inténtalo de nuevo en unos segundos."
+    }
+  },
+  "Register": {
+    "account": {
+      "title": "Crea tu cuenta en Quina",
+      "subtitle": "Empieza gratis con 14 días de Prueba Pro. Sin tarjeta.",
+      "nameLabel": "Tu nombre completo",
+      "nameHint": "Tal como figura en tu DNI. Quedará como titular del negocio.",
+      "emailLabel": "Tu correo electrónico",
+      "emailHint": "Te enviaremos un código de 6 números para confirmarlo.",
+      "passwordLabel": "Crea una contraseña segura",
+      "passwordHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
+      "submit": "Continuar",
+      "submitting": "Creando cuenta…",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Ingresa"
+    },
+    "strength": {
+      "label": "Seguridad de la contraseña",
+      "weak": "Agrega caracteres para cumplir todas las reglas.",
+      "strong": "Contraseña segura y lista.",
+      "ruleMinLength": "Al menos 8 caracteres",
+      "ruleUppercase": "Al menos una letra mayúscula (A–Z)",
+      "ruleNumber": "Al menos un número (0–9)",
+      "ruleSymbol": "Al menos un símbolo (!@#$%…)"
+    },
+    "verify": {
+      "title": "Confirma tu correo",
+      "subtitle": "Enviamos un código de 6 números a {email}. Escríbelo para continuar.",
+      "codeLabel": "Código de verificación",
+      "codeHint": "Revisa tu bandeja de entrada o spam. El código vence en 15 minutos.",
+      "digitLabel": "Dígito {index} de 6",
+      "submit": "Confirmar código",
+      "submitting": "Verificando…",
+      "resend": "Reenviar código",
+      "resendCountdown": "Puedes reenviar el código en {seconds} s",
+      "resentNotice": "Te enviamos un código nuevo."
+    },
+    "store": {
+      "title": "Datos de tu negocio",
+      "subtitle": "Último paso: configura tu tienda para empezar a fiar con reglas claras.",
+      "commercialNameLabel": "Nombre comercial",
+      "commercialNameHint": "El nombre con el que te conocen tus vecinos (ej. Bodega Don Lucho).",
+      "businessTurnLabel": "Giro del negocio",
+      "businessTurnHint": "Elige la actividad principal de tu comercio.",
+      "turns": {
+        "BODEGA": "Bodega",
+        "BOTICA": "Botica",
+        "CARNICERIA": "Carnicería",
+        "PANADERIA": "Panadería",
+        "OTRO": "Otro comercio"
+      },
+      "taxIdLabel": "RUC o DNI del negocio",
+      "taxIdHint": "Escribe 11 dígitos si tienes RUC o 8 dígitos si trabajas con tu DNI.",
+      "ownerInfo": "Titular: {name} · Correo: {email}",
+      "submit": "Crear mi tienda",
+      "submitting": "Creando tu tienda…"
+    }
+  },
+  "Recovery": {
+    "forgot": {
+      "title": "Recupera tu contraseña",
+      "subtitle": "Te enviaremos un enlace de un solo uso para elegir una contraseña nueva.",
+      "emailLabel": "Correo de tu cuenta",
+      "emailHint": "Escribe el correo con el que ingresas a Quina.",
+      "submit": "Enviar enlace de recuperación",
+      "submitting": "Enviando…",
+      "sentMessage": "Si el correo ingresado se encuentra registrado, recibirás un enlace de recuperación en breve",
+      "backToLogin": "Volver a ingresar"
+    },
+    "reset": {
+      "title": "Elige tu nueva contraseña",
+      "subtitle": "Este enlace vence en 30 minutos y funciona una sola vez.",
+      "passwordLabel": "Nueva contraseña",
+      "passwordHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
+      "submit": "Guardar nueva contraseña",
+      "submitting": "Guardando…",
+      "invalidToken": "Este enlace ya fue usado o venció. Solicita uno nuevo para cambiar tu contraseña.",
+      "requestNewLink": "Solicitar un nuevo enlace"
+    }
+  },
+  "Dashboard": {
+    "logoAlt": "Quina",
+    "trialBadge": "Prueba Pro: 14 días",
+    "trialUntil": "Prueba Pro hasta {date}",
+    "welcome": "Tu mostrador está listo, {name}.",
+    "subtitle": "Empieza a registrar a tus vecinos y llevar tus cuentas claras.",
+    "profileLink": "Mi perfil e idioma",
+    "signOut": "Cerrar sesión"
+  },
+  "Profile": {
+    "title": "Mi perfil",
+    "subtitle": "Ajusta tu idioma y el correo con el que entras a Quina.",
+    "backToDashboard": "Volver al mostrador",
+    "localeTitle": "Idioma de Quina",
+    "localeLabel": "Idioma de la interfaz y correos",
+    "localeHint": "Cambia el idioma de las pantallas y de los correos que recibes.",
+    "locales": {
+      "es": "Castellano",
+      "en": "English",
+      "qu": "Runasimi (borrador)"
+    },
+    "saveLocale": "Guardar idioma",
+    "localeSaved": "Idioma actualizado.",
+    "emailTitle": "Cambiar correo electrónico",
+    "currentEmail": "Correo actual: {email}",
+    "newEmailLabel": "Nuevo correo electrónico",
+    "newEmailHint": "Enviaremos un código de 6 números al nuevo correo antes de cambiarlo.",
+    "sendChangeCode": "Enviar código al nuevo correo",
+    "otpLabel": "Código enviado a {email}",
+    "otpHint": "Escribe los 6 números que llegaron a tu nuevo correo.",
+    "confirmEmailChange": "Confirmar nuevo correo",
+    "emailChanged": "Tu correo fue actualizado.",
+    "signOut": "Cerrar sesión"
   }
 }

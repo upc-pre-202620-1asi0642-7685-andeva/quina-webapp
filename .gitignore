@@ -28,6 +28,13 @@ desktop.ini
 
 # Agents
 .agents/
-.github/
+.github/*
+!.github/workflows/
 .vscode/
 .claude/
+
+.superpowers/
+# Buzon de correos de desarrollo y pruebas
+.outbox/
+
+.codegraph/
