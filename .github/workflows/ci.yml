@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      APP_URL: http://localhost:3100/app
+      DATABASE_MIGRATION_URL: postgres://migrator:migrator@localhost:5432/quina_dev
+      DATABASE_URL: postgres://quina_app:quina_app_test@localhost:5432/quina_dev
+      DATABASE_TEST_URL: postgres://migrator:migrator@localhost:5432/quina_test
+      DATABASE_TEST_APP_URL: postgres://quina_app:quina_app_test@localhost:5432/quina_test
+      QUINA_APP_DB_PASSWORD: quina_app_test
+      QUINA_PLATFORM_DB_PASSWORD: quina_platform_test
+      EMAIL_TRANSPORT: outbox
+      EMAIL_FROM: Quina <hola@andeva.tech>
+      BETTER_AUTH_SECRET: test-secret-ci-con-al-menos-32-caracteres-seguros
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+      TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+      GOOGLE_CLIENT_ID: test-google-client.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: test-google-client-secret
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Type check
+        run: pnpm check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Prepare database roles and schemas
+        run: psql "postgres://postgres:postgres@localhost:5432/postgres" -v ON_ERROR_STOP=1 -f docker/initdb/01-migrator.sql
+
+      - name: Run database migrations
+        run: pnpm db:migrate
+
+      - name: Activate database roles
+        run: pnpm db:roles
+
+      - name: Integration tests (RLS & database)
+        run: pnpm test:db
+
+      - name: Build production bundle
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end & accessibility tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -28,7 +28,8 @@ desktop.ini
 
 # Agents
 .agents/
-.github/
+.github/*
+!.github/workflows/
 .vscode/
 .claude/
 
