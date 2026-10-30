@@ -263,8 +263,8 @@ coherente de herramientas en TypeScript:
 
 | Capa                 | Tecnología                  | Versión / Detalle                | Justificación técnica                                                                   |
 | :------------------- | :-------------------------- | :------------------------------- | :-------------------------------------------------------------------------------------- |
-| **Framework base**   | Next.js                     | 15+ (App Router)                 | Unifica cliente y servidor con Server Actions y soporte PWA sin backend separado.       |
-| **Lenguaje**         | TypeScript                  | 5.x (Strict mode)                | Tipado estricto compartido desde el dominio hasta los componentes de React.             |
+| **Framework base**   | Next.js                     | 16 (App Router)                  | Unifica cliente y servidor con Server Actions y soporte PWA sin backend separado.       |
+| **Lenguaje**         | TypeScript                  | 6.x (Strict mode)                | Tipado estricto compartido desde el dominio hasta los componentes de React.             |
 | **Gestor paquetes**  | pnpm                        | Estándar del workspace           | Resolución rápida, determinista y prevención de dependencias fantasma.                  |
 | **Estilos UI**       | Tailwind CSS                | v4                               | Estilos utilitarios atómicos y diseño responsivo adaptado a pantallas móviles.          |
 | **Componentes UI**   | shadcn/ui                   | Radix UI primitives              | Primitivas accesibles, ligeras y totalmente desacopladas de librerías de estilos pesadas.|
@@ -273,7 +273,7 @@ coherente de herramientas en TypeScript:
 | **Notificaciones**   | Sileo                       | `sileo`                          | Toasts con física de resortes fluida para retroalimentación instantánea en mostrador.   |
 | **Formularios**      | React Hook Form + Zod       | Estándar de tipado               | Validación estricta en dos niveles (cliente y servidor) con DTOs tipados.              |
 | **ORM y Datos**      | Drizzle ORM                 | `drizzle-orm` + `postgres-js`    | Cero arranques en frío en Vercel, transacciones SQL ACID nativas y esquemas tipados.    |
-| **Base de datos**    | Supabase PostgreSQL         | PostgreSQL 16+ (Plan Free)       | Motor transaccional relacional con Row Level Security (RLS) para multi-tenancy.         |
+| **Base de datos**    | Supabase PostgreSQL         | PostgreSQL 17 (Plan Free)        | Motor transaccional relacional con Row Level Security (RLS) para multi-tenancy.         |
 | **Autenticación**    | Better Auth                 | `better-auth` + plugins          | Sesiones en base de datos, correo y contraseña (Argon2id), Google OAuth, OTP de 6 dígitos, enlaces mágicos, Turnstile y límite de tasa en un solo paquete. |
 | **Idiomas**          | next-intl                   | `next-intl`                      | Interfaz y correos en castellano, inglés y quechua; lee la cookie `quina-lang` del sitio. |
 | **Protección bots**  | Cloudflare Turnstile        | `@marsidev/react-turnstile`      | Captcha 100 % gratuito, no intrusivo y sin retos visuales para proteger el login y altas.|
@@ -474,7 +474,7 @@ Turnstile.
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                  Base de Datos (Supabase PostgreSQL 16)                │
+│                  Base de Datos (Supabase PostgreSQL 17)                │
 │  `users`, `sessions`, `accounts`, `verifications`, `rate_limits`      │
 │    + Row Level Security (RLS) con `app.current_store_id`               │
 └────────────────────────────────────────────────────────────────────────┘
@@ -649,8 +649,8 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 - **Rutas que el sitio ya enlaza:** `/app/register` (botones "Empieza gratis"),
   `/app/login` (botón "Ingresar") y la raíz `/app` (portal). El sitio redirige
   además `/login` → `/app/login`.
-- **URLs absolutas:** `baseURL` de Better Auth y los enlaces de los correos usan
-  `https://quina.andeva.tech/app`. La URI de redirección autorizada en Google
+- **URLs absolutas:** los enlaces de los correos usan
+  `https://quina.andeva.tech/app` (`APP_URL`); Better Auth recibe solo el origen en `baseURL` y la ruta en `basePath: "/app/api/auth"`. La URI de redirección autorizada en Google
   Cloud es `https://quina.andeva.tech/app/api/auth/callback/google`.
 
 **Variables de entorno de la webapp:**
@@ -667,6 +667,11 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` | Mercado Pago: suscripciones y validación de webhooks. |
 | `GROQ_API_KEY` | Recomendaciones con IA. |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Solo Supabase Storage desde el servidor (comprobantes y QR de cobro). |
+| `QUINA_APP_DB_PASSWORD`, `QUINA_PLATFORM_DB_PASSWORD` | Contraseñas que `pnpm db:roles` asigna a los roles `quina_app` y `quina_platform`. |
+| `EMAIL_TRANSPORT` | Transporte de correo: `resend` (envía de verdad) u `outbox` (guarda los correos en la base, para desarrollo y pruebas). |
+| `EMAIL_FROM` | Remitente de los correos (`Quina <hola@andeva.tech>`). |
+| `DATABASE_TEST_URL` | Pruebas de integración: conexión del propietario, que migra y limpia la base de prueba. |
+| `DATABASE_TEST_APP_URL` | Pruebas de integración: conexión como `quina_app`, para comprobar RLS. |
 | `CRON_SECRET` | Protege el proceso programado diario. |
 
 ---
@@ -703,6 +708,10 @@ Las tareas automáticas corren en **un solo proceso diario**
 día). Se agenda a las 11:00 UTC (06:00 en Lima), exige la cabecera con
 `CRON_SECRET` y cada paso es **idempotente**: si se repite, no duplica cargos,
 cortes ni correos.
+
+El proceso corre con la conexión de la aplicación (`quina_app`, sin `BYPASSRLS`):
+lista las tiendas activas (`stores` no tiene RLS) y ejecuta cada paso dentro de
+`withTenant(storeId, ...)`, una tienda a la vez.
 
 | Orden | Paso | Qué hace |
 | :---: | :--- | :--- |
