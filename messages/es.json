@@ -1,0 +1,12 @@
+{
+  "Metadata": {
+    "title": "Quina",
+    "description": "Ordena el fiado de tu bodega: cada vecino con sus condiciones, Quina calcula lo que debe y le cobra por ti."
+  },
+  "Home": {
+    "logoAlt": "Quina",
+    "title": "Tu cuaderno de fiados, ordenado",
+    "lead": "Estamos preparando tu mostrador. Muy pronto podrás registrar tu bodega y empezar a fiar con reglas claras.",
+    "status": "En construcción"
+  }
+}

@@ -1,0 +1,11 @@
+# Documentación: se edita a mano y vive sincronizada con quina-docs
+docs/
+*.md
+
+# Generados
+.next/
+drizzle/
+playwright-report/
+test-results/
+next-env.d.ts
+pnpm-lock.yaml

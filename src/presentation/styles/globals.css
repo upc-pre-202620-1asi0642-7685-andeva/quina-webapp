@@ -1,0 +1,213 @@
+/**
+ * Quina Webapp — estilos globales (Tailwind CSS v4 + shadcn/ui)
+ * -----------------------------------------------------------------------------
+ * Copiar a src/presentation/styles/globals.css e importarlo en el layout raíz.
+ * Las reglas de uso de cada token están en DESIGN.md.
+ *
+ * Mismos colores, tipografía y tema oscuro que el sitio público
+ * (quina-website/src/styles/global.css), sin lo exclusivo del sitio
+ * (Lenis, revelados con GSAP, tamaños de titulares de marketing).
+ *
+ * La fuente Albert Sans se carga con next/font/local (variable --font-albert-sans),
+ * no con @font-face: con basePath '/app' las rutas /fonts/... apuntarían al sitio.
+ */
+
+@import 'tailwindcss';
+/* Animaciones de apertura y cierre de los componentes shadcn (diálogos, hojas, menús) */
+@import 'tw-animate-css';
+
+/* Tema oscuro con el mismo atributo que el sitio: <html data-theme="dark"> */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* =============================================================================
+   1. Tokens de Quina
+   ============================================================================= */
+
+@theme {
+  --font-sans:
+    var(--font-albert-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Marca: no cambian con el tema */
+  --color-primary: #2bdd66;
+  --color-primary-dark: #0a2e17;
+  --color-primary-soft: #e3f9ea;
+
+  /* Ámbar cálido. En el sitio se llama --color-accent; aquí cambia de nombre
+     porque shadcn/ui reserva "accent" para el fondo de hover de menús y listas. */
+  --color-amber: #ffb020;
+  --color-amber-dark: #b86e00;
+  --color-amber-soft: #fff3d6;
+
+  /* Estados funcionales: para íconos, bordes y fondos */
+  --color-success: #3ac530;
+  --color-error: #fb2c36;
+  --color-warning: #f0b100;
+
+  /* Fondo de acciones destructivas: fijo en ambos temas, 6.0:1 con texto blanco
+     (el rojo de estado solo llega a 3.8:1). */
+  --color-error-strong: #c4161f;
+
+  /* Texto de estado: los colores de arriba no llegan a 4.5:1 como texto sobre
+     fondo claro (rojo 3.8, ámbar 1.8, verde 2.3). Estos sí, en ambos temas. */
+  --color-error-ink: #c4161f;
+  --color-amber-ink: #8a5200;
+  --color-success-ink: #1d7a17;
+
+  /* Roles que cambian con el tema (valores oscuros más abajo) */
+  --color-ink: #0f1a13;
+  --color-ink-soft: #4a564e;
+  --color-paper: #f8f8fa;
+  --color-paper-deep: #eef0ec;
+  --color-surface: #ffffff;
+  --color-surface-hover: #e9ece7;
+  --color-line: #e3e6e1;
+  --color-soft: #e3f9ea;
+  --color-soft-ink: #0a2e17;
+  --color-soft-ink-2: #2d4a36;
+  --color-link-active: #12803a;
+
+  /* Radios: píldora para acciones, 12 px campos, 16 px tarjetas, 24 px hojas */
+  --radius-field: 0.75rem;
+  --radius-card: 1rem;
+  --radius-sheet: 1.5rem;
+
+  /* Elevación: solo para lo que flota (menús, diálogos, toasts) */
+  --shadow-float: 0 12px 32px rgb(0 0 0 / 0.12);
+
+  /* Movimiento */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Escala tipográfica de la app (contenida: es una herramienta, no una portada) */
+  --text-amount: 2.25rem;
+  --text-amount--line-height: 1;
+  --text-amount--letter-spacing: -0.03em;
+  --text-amount-lg: 3rem;
+  --text-amount-lg--line-height: 1;
+  --text-amount-lg--letter-spacing: -0.04em;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-ink: #eef2ef;
+  --color-ink-soft: #a7b2aa;
+  --color-paper: #161917;
+  --color-paper-deep: #1d211e;
+  --color-surface: #242926;
+  --color-surface-hover: #2d332f;
+  --color-line: #2f3531;
+  --color-soft: #0f2a19;
+  --color-soft-ink: #c9f5d6;
+  --color-soft-ink-2: #9fc9ad;
+  --color-link-active: #2bdd66;
+  --color-error-ink: #ff6b72;
+  --color-amber-ink: #ffb020;
+  --color-success-ink: #3ac530;
+}
+
+/* =============================================================================
+   2. Variables de shadcn/ui apuntando a los tokens de Quina
+   (al instalar shadcn, conservar este bloque en lugar de su paleta por defecto)
+   ============================================================================= */
+
+:root {
+  --radius: 0.75rem;
+
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-ink);
+  --primary-foreground: var(--color-primary-dark);
+  --secondary: var(--color-paper-deep);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-paper-deep);
+  --muted-foreground: var(--color-ink-soft);
+  --accent: var(--color-surface-hover);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-error-strong);
+  --border: var(--color-line);
+  --input: var(--color-line);
+  --ring: var(--color-link-active);
+
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-primary);
+  --sidebar-primary-foreground: var(--color-primary-dark);
+  --sidebar-accent: var(--color-soft);
+  --sidebar-accent-foreground: var(--color-soft-ink);
+  --sidebar-border: var(--color-line);
+  --sidebar-ring: var(--color-link-active);
+}
+
+/* --color-primary NO se mapea aquí: ya es el verde Quina definido en @theme */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* =============================================================================
+   3. Base
+   ============================================================================= */
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-primary-dark);
+  }
+
+  /* Visible en ambos temas (el verde oscuro se perdería sobre fondo oscuro) */
+  :focus-visible {
+    outline: 2px solid var(--color-link-active);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,33 @@
+# Dependencias
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Entorno: nunca se suben secretos
+.env*
+!.env.example
+
+# Pruebas
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Vercel
+.vercel/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Agents
+.agents/
+.github/
+.vscode/
+.claude/
