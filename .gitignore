@@ -35,3 +35,5 @@ desktop.ini
 .superpowers/
 # Buzon de correos de desarrollo y pruebas
 .outbox/
+
+.codegraph/
