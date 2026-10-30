@@ -102,6 +102,9 @@ export function createAuth(deps: AuthDeps) {
       encryptOAuthTokens: true,
       accountLinking: { enabled: true, trustedProviders: ['google'] },
     },
+    emailVerification: {
+      autoSignInAfterVerification: true,
+    },
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,

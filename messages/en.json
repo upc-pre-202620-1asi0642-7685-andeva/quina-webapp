@@ -28,5 +28,159 @@
       "intro": "There were 5 failed sign-in attempts on your account, so we locked it for 15 minutes.",
       "outro": "If it was you, wait 15 minutes and try again. If not, reset your password as soon as possible with \"Forgot my password\" to keep your account safe."
     }
+  },
+  "Auth": {
+    "logoAlt": "Quina",
+    "google": "Continue with Google",
+    "or": "or with your email",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "login": {
+      "title": "Sign in to your store",
+      "subtitle": "Check your credit accounts and collect on time.",
+      "emailLabel": "Email address",
+      "emailHint": "Use the email you registered your account with.",
+      "passwordLabel": "Password",
+      "passwordHint": "At least 8 characters, with an uppercase letter, number and symbol.",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have an account yet?",
+      "registerLink": "Register your store for free"
+    },
+    "errors": {
+      "nameRequired": "Enter your full name (at least 2 letters) to identify the store owner.",
+      "emailInvalid": "Enter a valid email address, such as name@example.com.",
+      "passwordRequired": "Enter your password to sign in.",
+      "passwordWeak": "Use at least 8 characters with an uppercase letter, a number and a symbol.",
+      "commercialNameRequired": "Enter the commercial name of your business (at least 2 letters).",
+      "businessTurnInvalid": "Choose your business category from the list.",
+      "taxIdInvalid": "Enter the 11 digits of your RUC or the 8 digits of your DNI.",
+      "otpInvalid": "Enter the 6-digit code we sent to your email.",
+      "otpExpired": "The code expired. Request a new one with \"Resend code\".",
+      "otpTooManyAttempts": "Too many failed attempts. Request a new code with \"Resend code\".",
+      "userAlreadyExists": "That email already has an account. Sign in.",
+      "invalidCredentials": "Email or password does not match. Check and try again.",
+      "accountLocked": "Account temporarily locked for security. Try again in 15 minutes or reset your password.",
+      "accountDisabled": "This account is disabled. Contact Quina support.",
+      "taxIdTaken": "That RUC or DNI is already registered to another store. Check the digits.",
+      "emailTaken": "That email is already registered to another store.",
+      "captchaRequired": "Complete the security check before continuing.",
+      "rateLimited": "Too many requests in a row. Wait a few seconds and try again.",
+      "generic": "We couldn't complete the operation. Please try again in a few seconds."
+    }
+  },
+  "Register": {
+    "account": {
+      "title": "Create your Quina account",
+      "subtitle": "Start free with a 14-day Pro Trial. No credit card required.",
+      "nameLabel": "Your full name",
+      "nameHint": "As shown on your ID. You will be registered as the store owner.",
+      "emailLabel": "Your email address",
+      "emailHint": "We'll send a 6-digit code to confirm it.",
+      "passwordLabel": "Create a strong password",
+      "passwordHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
+      "submit": "Continue",
+      "submitting": "Creating account…",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "strength": {
+      "label": "Password strength",
+      "weak": "Add characters to meet all password rules.",
+      "strong": "Strong password ready.",
+      "ruleMinLength": "At least 8 characters",
+      "ruleUppercase": "At least one uppercase letter (A–Z)",
+      "ruleNumber": "At least one number (0–9)",
+      "ruleSymbol": "At least one symbol (!@#$%…)"
+    },
+    "verify": {
+      "title": "Confirm your email",
+      "subtitle": "We sent a 6-digit code to {email}. Enter it to continue.",
+      "codeLabel": "Verification code",
+      "codeHint": "Check your inbox or spam folder. The code expires in 15 minutes.",
+      "digitLabel": "Digit {index} of 6",
+      "submit": "Confirm code",
+      "submitting": "Verifying…",
+      "resend": "Resend code",
+      "resendCountdown": "You can resend the code in {seconds} s",
+      "resentNotice": "We sent you a new code."
+    },
+    "store": {
+      "title": "Your store details",
+      "subtitle": "Last step: set up your store to start giving credit with clear rules.",
+      "commercialNameLabel": "Store name",
+      "commercialNameHint": "The name your neighbors know you by (e.g. Bodega Don Lucho).",
+      "businessTurnLabel": "Business category",
+      "businessTurnHint": "Choose the main activity of your store.",
+      "turns": {
+        "BODEGA": "Grocery store (Bodega)",
+        "BOTICA": "Pharmacy (Botica)",
+        "CARNICERIA": "Butcher shop",
+        "PANADERIA": "Bakery",
+        "OTRO": "Other store"
+      },
+      "taxIdLabel": "Business RUC or DNI",
+      "taxIdHint": "Enter 11 digits for RUC or 8 digits if you operate with your DNI.",
+      "ownerInfo": "Owner: {name} · Email: {email}",
+      "submit": "Create my store",
+      "submitting": "Creating your store…"
+    }
+  },
+  "Recovery": {
+    "forgot": {
+      "title": "Recover your password",
+      "subtitle": "We'll send a one-time link so you can choose a new password.",
+      "emailLabel": "Account email",
+      "emailHint": "Enter the email you use to sign in to Quina.",
+      "submit": "Send recovery link",
+      "submitting": "Sending…",
+      "sentMessage": "If the email entered is registered, you will receive a recovery link shortly",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose your new password",
+      "subtitle": "This link expires in 30 minutes and works only once.",
+      "passwordLabel": "New password",
+      "passwordHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
+      "submit": "Save new password",
+      "submitting": "Saving…",
+      "invalidToken": "This link was already used or expired. Request a new one to change your password.",
+      "requestNewLink": "Request a new link"
+    }
+  },
+  "Dashboard": {
+    "logoAlt": "Quina",
+    "trialBadge": "Pro Trial: 14 days",
+    "trialUntil": "Pro Trial until {date}",
+    "welcome": "Your counter is ready, {name}.",
+    "subtitle": "Start registering your neighbors and keeping clear accounts.",
+    "profileLink": "My profile & language",
+    "signOut": "Sign out"
+  },
+  "Profile": {
+    "title": "My profile",
+    "subtitle": "Adjust your language and the email you use to sign in to Quina.",
+    "backToDashboard": "Back to counter",
+    "localeTitle": "Quina language",
+    "localeLabel": "Interface and email language",
+    "localeHint": "Changes the language of screens and the emails you receive.",
+    "locales": {
+      "es": "Castellano",
+      "en": "English",
+      "qu": "Runasimi (draft)"
+    },
+    "saveLocale": "Save language",
+    "localeSaved": "Language updated.",
+    "emailTitle": "Change email address",
+    "currentEmail": "Current email: {email}",
+    "newEmailLabel": "New email address",
+    "newEmailHint": "We'll send a 6-digit code to the new email before changing it.",
+    "sendChangeCode": "Send code to new email",
+    "otpLabel": "Code sent to {email}",
+    "otpHint": "Enter the 6 digits sent to your new email.",
+    "confirmEmailChange": "Confirm new email",
+    "emailChanged": "Your email has been updated.",
+    "signOut": "Sign out"
   }
 }

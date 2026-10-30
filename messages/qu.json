@@ -29,5 +29,159 @@
       "intro": "Cuentaykiman yaykuyta 5 kutita pantaspa munarqanku, chayraykum 15 minutupaq wisq'asqa kachkan.",
       "outro": "Qan karqanki chayqa, 15 minutu suyay hinaspa musuqmanta yaykuy. Mana qan karqankichu chayqa, \"Pakasqa simiyta qunqarqani\" nisqawan pakasqa simiykita utqaylla tikray, cuentaykita waqaychanaykipaq."
     }
+  },
+  "Auth": {
+    "logoAlt": "Quina",
+    "google": "Googlewan puriy",
+    "or": "utaq correoykiwan",
+    "showPassword": "Pakasqa simita rikuchiy",
+    "hidePassword": "Pakasqa simita pakay",
+    "login": {
+      "title": "Tiendaykiman yaykuy",
+      "subtitle": "Manuykikunata qhaway hinaspa tiempopi cobray.",
+      "emailLabel": "Correo electrónico",
+      "emailHint": "Cuentaykita qillqachisqayki correota churay.",
+      "passwordLabel": "Pakasqa simi",
+      "passwordHint": "8 qillqamanta aswan, hatun qillqawan, yupaywan, unanchawan.",
+      "forgotPassword": "¿Pakasqa simiykita qunqarqankichu?",
+      "submit": "Yaykuy",
+      "submitting": "Yaykuchkan…",
+      "noAccount": "¿Manaraqchu cuentayki kan?",
+      "registerLink": "Tiendaykita mana qullqiwan qillqachiy"
+    },
+    "errors": {
+      "nameRequired": "Hunt'asqa sutiykita qillqay (2 qillqamanta aswan).",
+      "emailInvalid": "Allin correota qillqay, suti@ejemplo.com hina.",
+      "passwordRequired": "Yaykunaykipaq pakasqa simiykita qillqay.",
+      "passwordWeak": "8 qillqamanta aswan churay, hatun qillqawan, yupaywan, unanchawan.",
+      "commercialNameRequired": "Tiendaykipa sutinta qillqay (2 qillqamanta aswan).",
+      "businessTurnInvalid": "Tiendaykipa llamk'ayninta akllay.",
+      "taxIdInvalid": "RUCniykipa 11 yupayninta utaq DNIniykipa 8 yupayninta qillqay.",
+      "otpInvalid": "Correoykiman apachisqayku 6 yupayta qillqay.",
+      "otpExpired": "Yupayqa tukukurqanñam. \"Yupayta musuqmanta apachiy\" nisqawan hukta mañakuy.",
+      "otpTooManyAttempts": "5 kutita pantarqankiñam. \"Yupayta musuqmanta apachiy\" nisqawan musuqta mañakuy.",
+      "userAlreadyExists": "Chay correoqa cuentayuqñam. Yaykuy.",
+      "invalidCredentials": "Correo utaq pakasqa simi mana tupananchu. Qhawarispa musuqmanta ruway.",
+      "accountLocked": "Cuenta temporalmente bloqueada por seguridad. Inténtalo de nuevo en 15 minutos o restablece tu contraseña.",
+      "accountDisabled": "Kay cuentaqa sayachisqam kachkan. Quina yanapakuyman willay.",
+      "taxIdTaken": "Chay RUC utaq DNI huk tiendapi qillqasqañam kachkan.",
+      "emailTaken": "Chay correo huk tiendapi qillqasqañam kachkan.",
+      "captchaRequired": "Manaraq purichkaspa waqaychay qhawayta hunt'achiy.",
+      "rateLimited": "Achka kutita utqaylla ruwarqanki. Asllata suyaspa musuqmanta ruway.",
+      "generic": "Mana hunt'achiyta atirqanikuchu. Asllata suyaspa musuqmanta ruway."
+    }
+  },
+  "Register": {
+    "account": {
+      "title": "Quinapi cuentaykita kamariy",
+      "subtitle": "14 p'unchaw Prueba Prowan mana qullqiwan qallariy. Mana tarjetawan.",
+      "nameLabel": "Hunt'asqa sutiyki",
+      "nameHint": "DNIniykipi kasqan hina. Tienda kamachiq hinam qhipanqa.",
+      "emailLabel": "Correo electrónicoyki",
+      "emailHint": "Takyachinapaq 6 yupayuq códigota apachisqaykiku.",
+      "passwordLabel": "Allin pakasqa simita kamariy",
+      "passwordHint": "8 qillqamanta aswan, hatun qillqawan, yupaywan, unanchawan.",
+      "submit": "Puriy",
+      "submitting": "Cuentata kamarichkan…",
+      "hasAccount": "¿Cuentayki kanñachu?",
+      "loginLink": "Yaykuy"
+    },
+    "strength": {
+      "label": "Pakasqa simip kallpan",
+      "weak": "Llapan kamachikuykunata hunt'anapaq qillqakunata yapay.",
+      "strong": "Allin waqaychasqa pakasqa simi.",
+      "ruleMinLength": "8 qillqamanta aswan",
+      "ruleUppercase": "Huk hatun qillqa (A–Z)",
+      "ruleNumber": "Huk yupay (0–9)",
+      "ruleSymbol": "Huk unancha (!@#$%…)"
+    },
+    "verify": {
+      "title": "Correoykita takyachiy",
+      "subtitle": "{email} correoman 6 yupayta apachirqaniku. Purinapaq qillqay.",
+      "codeLabel": "Takyachina yupay",
+      "codeHint": "Correoykita utaq spam nisqata qhaway. Yupayqa 15 minutupi tukukun.",
+      "digitLabel": "6manta {index} yupay",
+      "submit": "Yupayta takyachiy",
+      "submitting": "Qhawarichkan…",
+      "resend": "Yupayta musuqmanta apachiy",
+      "resendCountdown": "{seconds} segundomanta musuqmanta apachiyta atinki",
+      "resentNotice": "Musuq yupayta apachirqaykiku."
+    },
+    "store": {
+      "title": "Tiendaykipa willakuyninkuna",
+      "subtitle": "Qhipa llamk'ay: tiendaykita wakichiy sut'i kamachikuykunawan manuyta qallarinapaq.",
+      "commercialNameLabel": "Tiendaq sutin",
+      "commercialNameHint": "Llaqtamasikuna riqsisusqayki suti (qhaway: Bodega Don Lucho).",
+      "businessTurnLabel": "Tiendaq llamk'aynin",
+      "businessTurnHint": "Tiendaykipa hatun llamk'ayninta akllay.",
+      "turns": {
+        "BODEGA": "Bodega",
+        "BOTICA": "Botica",
+        "CARNICERIA": "Aycha qhatu",
+        "PANADERIA": "T'anta wasi",
+        "OTRO": "Huk qhatu"
+      },
+      "taxIdLabel": "Tiendaq RUC utaq DNI",
+      "taxIdHint": "RUC kaptinqa 11 yupayta qillqay, DNIwan llamk'aptiykitaq 8 yupayta.",
+      "ownerInfo": "Kamachiq: {name} · Correo: {email}",
+      "submit": "Tiendayta kamariy",
+      "submitting": "Tiendaykita kamarichkan…"
+    }
+  },
+  "Recovery": {
+    "forgot": {
+      "title": "Pakasqa simiykita kutichikuy",
+      "subtitle": "Musuq pakasqa simita akllanaykipaq huk kutilla llamk'aq t'inkita apachisqaykiku.",
+      "emailLabel": "Cuentaykipa correon",
+      "emailHint": "Quinaman yaykunaykipaq correota qillqay.",
+      "submit": "Kutichikuna t'inkita apachiy",
+      "submitting": "Apachichkan…",
+      "sentMessage": "Qillqasqa correo qillqachisqa kaptinqa, chaylla kutichikuna t'inkita chaskinki",
+      "backToLogin": "Yaykuyman kutiy"
+    },
+    "reset": {
+      "title": "Musuq pakasqa simiykita akllay",
+      "subtitle": "Kay t'inkiqa 30 minutupi tukukun hinaspa huk kutillata llamk'an.",
+      "passwordLabel": "Musuq pakasqa simi",
+      "passwordHint": "8 qillqamanta aswan, hatun qillqawan, yupaywan, unanchawan.",
+      "submit": "Musuq pakasqa simita waqaychay",
+      "submitting": "Waqaychachkan…",
+      "invalidToken": "Kay t'inkiqa llamk'achisqañam utaq tukukurqanñam. Musuqta mañakuy.",
+      "requestNewLink": "Musuq t'inkita mañakuy"
+    }
+  },
+  "Dashboard": {
+    "logoAlt": "Quina",
+    "trialBadge": "Prueba Pro: 14 p'unchaw",
+    "trialUntil": "Prueba Pro {date} kama",
+    "welcome": "Mostradoruykiqa listom kachkan, {name}.",
+    "subtitle": "Llaqtamasikunata qillqachiyta qallariy hinaspa yupaykunata sut'ita apay.",
+    "profileLink": "Perfilniy hinaspa simi",
+    "signOut": "Lluqsiy"
+  },
+  "Profile": {
+    "title": "Perfilniy",
+    "subtitle": "Simiykita hinaspa Quinaman yaykuna correoykita allichay.",
+    "backToDashboard": "Mostradorman kutiy",
+    "localeTitle": "Quinapa simin",
+    "localeLabel": "Pantallakunapa hinaspa correokunapa simin",
+    "localeHint": "Pantallakunapa hinaspa chaskisqayki correokunapa siminta tikran.",
+    "locales": {
+      "es": "Castellano",
+      "en": "English",
+      "qu": "Runasimi (borrador)"
+    },
+    "saveLocale": "Simita waqaychay",
+    "localeSaved": "Simi musuqchasqa.",
+    "emailTitle": "Correo electrónicota tikray",
+    "currentEmail": "Kunan correo: {email}",
+    "newEmailLabel": "Musuq correo electrónico",
+    "newEmailHint": "Manaraq tikrachkaspa musuq correoman 6 yupayta apachisqaykiku.",
+    "sendChangeCode": "Musuq correoman yupayta apachiy",
+    "otpLabel": "{email} correoman apachisqa yupay",
+    "otpHint": "Musuq correoykiman chayaq 6 yupayta qillqay.",
+    "confirmEmailChange": "Musuq correota takyachiy",
+    "emailChanged": "Correoykiqa musuqchasqañam.",
+    "signOut": "Lluqsiy"
   }
 }
