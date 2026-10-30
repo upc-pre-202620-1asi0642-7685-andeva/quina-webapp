@@ -1,0 +1,2 @@
+export type Role =
+  'PLATFORM_ADMIN' | 'STORE_OWNER' | 'STORE_EMPLOYEE' | 'CUSTOMER' | 'PENDING_OWNER';
