@@ -33,3 +33,5 @@ desktop.ini
 .claude/
 
 .superpowers/
+# Buzon de correos de desarrollo y pruebas
+.outbox/

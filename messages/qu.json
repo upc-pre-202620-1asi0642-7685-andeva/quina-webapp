@@ -9,5 +9,25 @@
     "title": "Manu qillqanayki, allichasqa",
     "lead": "Mostradoruykita wakichichkaniku. Qayllallanmi tiendaykita qillqachiyta atinki, chanin kamachikuykunawan manuyta qallarinaykipaq.",
     "status": "Ruwakuchkan"
+  },
+  "Email": {
+    "greeting": "Napaykullayki:",
+    "signature": "Quina ruwaqkuna",
+    "otp": {
+      "subject": "Quinaman yaykunaykipaq yupayniyki",
+      "intro": "Kay yupayta churay, correoykita takyachinaykipaq hinaspa tiendaykita wakichiyta puriychinaykipaq:",
+      "outro": "Kay yupayqa 15 minutupi tukukun. Mana qan mañakurqankichu chayqa, kay correota ama qhawariychu."
+    },
+    "reset": {
+      "subject": "Quinapaq musuq pakasqa simita akllay",
+      "intro": "Quina cuentaykipa pakasqa simita tikrayta mañakurqanki. Kay botonta ñit'iy musuqta akllanaykipaq:",
+      "action": "Musuq pakasqa simita akllay",
+      "outro": "Kay t'inkiqa 30 minutupi tukukun, huk kutillata llamk'an. Mana qan karqankichu chayqa, amapas imatapas ruwaychu: pakasqa simiykiqa kikillanmi kachkan."
+    },
+    "lockout": {
+      "subject": "Quina cuentaykita qhawarichkaniku",
+      "intro": "Cuentaykiman yaykuyta 5 kutita pantaspa munarqanku, chayraykum 15 minutupaq wisq'asqa kachkan.",
+      "outro": "Qan karqanki chayqa, 15 minutu suyay hinaspa musuqmanta yaykuy. Mana qan karqankichu chayqa, \"Pakasqa simiyta qunqarqani\" nisqawan pakasqa simiykita utqaylla tikray, cuentaykita waqaychanaykipaq."
+    }
   }
 }

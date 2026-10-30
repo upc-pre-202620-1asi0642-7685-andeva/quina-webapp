@@ -8,5 +8,25 @@
     "title": "Tu cuaderno de fiados, ordenado",
     "lead": "Estamos preparando tu mostrador. Muy pronto podrás registrar tu bodega y empezar a fiar con reglas claras.",
     "status": "En construcción"
+  },
+  "Email": {
+    "greeting": "Hola:",
+    "signature": "El equipo de Quina",
+    "otp": {
+      "subject": "Tu código para entrar a Quina",
+      "intro": "Usa este código para confirmar tu correo y seguir con tu bodega:",
+      "outro": "El código vence en 15 minutos. Si no lo pediste tú, ignora este correo."
+    },
+    "reset": {
+      "subject": "Elige una contraseña nueva en Quina",
+      "intro": "Pediste cambiar la contraseña de tu cuenta de Quina. Toca el botón para elegir una nueva:",
+      "action": "Elegir mi contraseña nueva",
+      "outro": "El enlace vence en 30 minutos y se usa una sola vez. Si no fuiste tú, no hagas nada: tu contraseña sigue igual."
+    },
+    "lockout": {
+      "subject": "Cuidamos tu cuenta de Quina",
+      "intro": "Hubo 5 intentos fallidos de ingreso a tu cuenta, así que la bloqueamos por 15 minutos.",
+      "outro": "Si fuiste tú, espera 15 minutos e intenta de nuevo. Si no, cambia tu contraseña cuanto antes desde \"Olvidé mi contraseña\" para mantener tu cuenta segura."
+    }
   }
 }

@@ -8,5 +8,25 @@
     "title": "Your credit notebook, organized",
     "lead": "We're getting your counter ready. Soon you'll be able to register your store and start giving credit with clear rules.",
     "status": "Under construction"
+  },
+  "Email": {
+    "greeting": "Hello,",
+    "signature": "The Quina team",
+    "otp": {
+      "subject": "Your code to sign in to Quina",
+      "intro": "Use this code to confirm your email and keep setting up your store:",
+      "outro": "The code expires in 15 minutes. If you didn't ask for it, ignore this email."
+    },
+    "reset": {
+      "subject": "Choose a new password for Quina",
+      "intro": "You asked to change the password of your Quina account. Tap the button to choose a new one:",
+      "action": "Choose my new password",
+      "outro": "The link expires in 30 minutes and can be used only once. If it wasn't you, do nothing: your password stays the same."
+    },
+    "lockout": {
+      "subject": "We're protecting your Quina account",
+      "intro": "There were 5 failed sign-in attempts on your account, so we locked it for 15 minutes.",
+      "outro": "If it was you, wait 15 minutes and try again. If not, reset your password as soon as possible with \"Forgot my password\" to keep your account safe."
+    }
   }
 }

@@ -1,6 +1,6 @@
-export const locales = ['es', 'en', 'qu'] as const;
-export type Locale = (typeof locales)[number];
-export const defaultLocale: Locale = 'es';
+import { defaultLocale, locales, type Locale } from '@/core/domain/shared/locale';
+
+export { defaultLocale, locales, type Locale };
 
 /** Cookie de idioma compartida con el sitio público (mismo origen). */
 export const LOCALE_COOKIE = 'quina-lang';
