@@ -1,0 +1,25 @@
+# Base de datos local para desarrollo y pruebas de integración (`pnpm test:db`).
+# Puerto 54329 en el host para no chocar con otros PostgreSQL locales.
+# `docker/initdb` crea el rol migrator (sin superusuario, como `postgres` en Supabase)
+# y las bases quina_dev y quina_test.
+services:
+  quina-db:
+    image: postgres:17
+    container_name: quina-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - '54329:5432'
+    volumes:
+      - quina-db-data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  quina-db-data:
