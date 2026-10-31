@@ -1,0 +1,292 @@
+{
+  "_generatedBy": "scripts/finance-oracle.py",
+  "datasets": [
+    {
+      "id": "dataset-1",
+      "title": "Juego 1: compra antes del corte, tasas efectivas",
+      "terms": {
+        "currency": "PEN",
+        "cutOffDay": 20,
+        "paymentDueDay": 26,
+        "maxInstallmentMonths": 6,
+        "compensatory": {
+          "type": "EFFECTIVE",
+          "value": "0.2000",
+          "period": "ANNUAL",
+          "capitalization": null
+        },
+        "moratory": {
+          "type": "EFFECTIVE",
+          "value": "0.1500",
+          "period": "ANNUAL",
+          "capitalization": null
+        }
+      },
+      "rates": {
+        "compensatory": {
+          "tea": "0.20000000000000000000",
+          "daily": "0.00050657703570245442",
+          "monthly": "0.01530947049973121706"
+        },
+        "moratory": {
+          "tea": "0.15000000000000000000",
+          "daily": "0.00038830298780361864",
+          "monthly": "0.01171491691985328464"
+        }
+      },
+      "installmentPurchase": {
+        "principal": "120.00",
+        "purchaseInstant": "2026-09-15T15:00:00.000Z",
+        "installments": 3,
+        "cycleCutOffDate": "2026-09-20",
+        "cyclePaymentDueDate": "2026-09-26",
+        "graceDays": 11,
+        "capitalizedAmount": "120.67",
+        "installmentAmount": "41.46",
+        "rows": [
+          {
+            "number": 1,
+            "dueDate": "2026-10-26",
+            "initialBalance": "120.67",
+            "installment": "41.46",
+            "interest": "1.85",
+            "principal": "39.61",
+            "finalBalance": "81.06"
+          },
+          {
+            "number": 2,
+            "dueDate": "2026-11-26",
+            "initialBalance": "81.06",
+            "installment": "41.46",
+            "interest": "1.24",
+            "principal": "40.22",
+            "finalBalance": "40.84"
+          },
+          {
+            "number": 3,
+            "dueDate": "2026-12-26",
+            "initialBalance": "40.84",
+            "installment": "41.47",
+            "interest": "0.63",
+            "principal": "40.84",
+            "finalBalance": "0.00"
+          }
+        ]
+      },
+      "singlePaymentCycle": {
+        "cutOffDate": "2026-09-20",
+        "paymentDueDate": "2026-09-26",
+        "excludedPurchaseInstant": "2026-09-21T05:10:00.000Z",
+        "excludedCycleCutOffDate": "2026-10-20",
+        "charges": [
+          {
+            "id": "charge-1",
+            "principal": "25.50",
+            "purchaseInstant": "2026-09-03T14:00:00.000Z",
+            "days": 23,
+            "interest": "0.30"
+          },
+          {
+            "id": "charge-2",
+            "principal": "40.00",
+            "purchaseInstant": "2026-09-15T20:00:00.000Z",
+            "days": 11,
+            "interest": "0.22"
+          },
+          {
+            "id": "charge-3",
+            "principal": "10.00",
+            "purchaseInstant": "2026-09-21T03:30:00.000Z",
+            "days": 6,
+            "interest": "0.03"
+          }
+        ],
+        "purchasesTotal": "75.50",
+        "compensatoryInterestTotal": "0.55",
+        "totalDue": "76.05",
+        "latePayment": {
+          "paymentInstant": "2026-10-06T15:00:00.000Z",
+          "daysLate": 10,
+          "moratoryInterest": "0.30",
+          "amountDue": "76.35",
+          "moratoryShares": ["0.10", "0.15", "0.05"],
+          "principalPaid": "75.50",
+          "compensatoryInterestPaid": "0.55"
+        }
+      }
+    },
+    {
+      "id": "dataset-2",
+      "title": "Juego 2: compra después del corte, tasas nominales",
+      "terms": {
+        "currency": "PEN",
+        "cutOffDay": 20,
+        "paymentDueDay": 26,
+        "maxInstallmentMonths": 6,
+        "compensatory": {
+          "type": "NOMINAL",
+          "value": "0.2400",
+          "period": "ANNUAL",
+          "capitalization": "MONTHLY"
+        },
+        "moratory": {
+          "type": "NOMINAL",
+          "value": "0.1500",
+          "period": "ANNUAL",
+          "capitalization": "DAILY"
+        }
+      },
+      "rates": {
+        "compensatory": {
+          "tea": "0.26824179456254531830",
+          "daily": "0.00066030548228666263",
+          "monthly": "0.02000000000000000000"
+        },
+        "moratory": {
+          "tea": "0.16179794605739487362",
+          "daily": "0.00041666666666666667",
+          "monthly": "0.01257581535326487550"
+        }
+      },
+      "installmentPurchase": {
+        "principal": "120.00",
+        "purchaseInstant": "2026-09-22T15:00:00.000Z",
+        "installments": 3,
+        "cycleCutOffDate": "2026-10-20",
+        "cyclePaymentDueDate": "2026-10-26",
+        "graceDays": 34,
+        "capitalizedAmount": "122.72",
+        "installmentAmount": "42.55",
+        "rows": [
+          {
+            "number": 1,
+            "dueDate": "2026-11-26",
+            "initialBalance": "122.72",
+            "installment": "42.55",
+            "interest": "2.45",
+            "principal": "40.10",
+            "finalBalance": "82.62"
+          },
+          {
+            "number": 2,
+            "dueDate": "2026-12-26",
+            "initialBalance": "82.62",
+            "installment": "42.55",
+            "interest": "1.65",
+            "principal": "40.90",
+            "finalBalance": "41.72"
+          },
+          {
+            "number": 3,
+            "dueDate": "2027-01-26",
+            "initialBalance": "41.72",
+            "installment": "42.55",
+            "interest": "0.83",
+            "principal": "41.72",
+            "finalBalance": "0.00"
+          }
+        ]
+      },
+      "singlePaymentCycle": {
+        "cutOffDate": "2026-09-20",
+        "paymentDueDate": "2026-09-26",
+        "excludedPurchaseInstant": "2026-09-21T05:10:00.000Z",
+        "excludedCycleCutOffDate": "2026-10-20",
+        "charges": [
+          {
+            "id": "charge-1",
+            "principal": "25.50",
+            "purchaseInstant": "2026-09-03T14:00:00.000Z",
+            "days": 23,
+            "interest": "0.39"
+          },
+          {
+            "id": "charge-2",
+            "principal": "40.00",
+            "purchaseInstant": "2026-09-15T20:00:00.000Z",
+            "days": 11,
+            "interest": "0.29"
+          },
+          {
+            "id": "charge-3",
+            "principal": "10.00",
+            "purchaseInstant": "2026-09-21T03:30:00.000Z",
+            "days": 6,
+            "interest": "0.04"
+          }
+        ],
+        "purchasesTotal": "75.50",
+        "compensatoryInterestTotal": "0.72",
+        "totalDue": "76.22",
+        "latePayment": {
+          "paymentInstant": "2026-10-06T15:00:00.000Z",
+          "daysLate": 10,
+          "moratoryInterest": "0.32",
+          "amountDue": "76.54",
+          "moratoryShares": ["0.10", "0.16", "0.06"],
+          "principalPaid": "75.50",
+          "compensatoryInterestPaid": "0.72"
+        }
+      }
+    }
+  ],
+  "control": {
+    "terms": {
+      "currency": "PEN",
+      "cutOffDay": 20,
+      "paymentDueDay": 26,
+      "maxInstallmentMonths": 6,
+      "compensatory": {
+        "type": "EFFECTIVE",
+        "value": "0.2000",
+        "period": "ANNUAL",
+        "capitalization": null
+      },
+      "moratory": {
+        "type": "EFFECTIVE",
+        "value": "0.1500",
+        "period": "ANNUAL",
+        "capitalization": null
+      }
+    },
+    "installmentPurchase": {
+      "principal": "120.00",
+      "purchaseInstant": "2026-09-22T15:00:00.000Z",
+      "installments": 3,
+      "cycleCutOffDate": "2026-10-20",
+      "cyclePaymentDueDate": "2026-10-26",
+      "graceDays": 34,
+      "capitalizedAmount": "122.08",
+      "installmentAmount": "41.95",
+      "rows": [
+        {
+          "number": 1,
+          "dueDate": "2026-11-26",
+          "initialBalance": "122.08",
+          "installment": "41.95",
+          "interest": "1.87",
+          "principal": "40.08",
+          "finalBalance": "82.00"
+        },
+        {
+          "number": 2,
+          "dueDate": "2026-12-26",
+          "initialBalance": "82.00",
+          "installment": "41.95",
+          "interest": "1.26",
+          "principal": "40.69",
+          "finalBalance": "41.31"
+        },
+        {
+          "number": 3,
+          "dueDate": "2027-01-26",
+          "initialBalance": "41.31",
+          "installment": "41.94",
+          "interest": "0.63",
+          "principal": "41.31",
+          "finalBalance": "0.00"
+        }
+      ]
+    }
+  }
+}
