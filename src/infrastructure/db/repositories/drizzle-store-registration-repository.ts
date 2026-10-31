@@ -4,6 +4,7 @@ import type {
   CreateStoreForOwnerResult,
   StoreRegistrationRepository,
 } from '@/core/domain/ports/store-registration-repository';
+import { uniqueViolation } from '../errors';
 import { auditLogs, storeSubscriptions, stores, units, users } from '../schema';
 import { withTenant } from '../with-tenant';
 
@@ -12,15 +13,6 @@ const BASE_UNITS = [
   { code: 'KG', name: 'Kilogramo', allowDecimals: true },
   { code: 'LTR', name: 'Litro', allowDecimals: true },
 ];
-
-// Drizzle envuelve el error de PostgreSQL; SQLSTATE y restricción quedan en `cause`.
-function uniqueViolation(error: unknown): string | undefined {
-  const pg = ((error as { cause?: unknown }).cause ?? error) as {
-    code?: string;
-    constraint_name?: string;
-  };
-  return pg.code === '23505' ? (pg.constraint_name ?? '') : undefined;
-}
 
 export class DrizzleStoreRegistrationRepository implements StoreRegistrationRepository {
   async createStoreForOwner(data: CreateStoreForOwnerData): Promise<CreateStoreForOwnerResult> {

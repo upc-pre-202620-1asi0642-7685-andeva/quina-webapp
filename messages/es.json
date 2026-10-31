@@ -27,6 +27,29 @@
       "subject": "Cuidamos tu cuenta de Quina",
       "intro": "Hubo 5 intentos fallidos de ingreso a tu cuenta, así que la bloqueamos por 15 minutos.",
       "outro": "Si fuiste tú, espera 15 minutos e intenta de nuevo. Si no, cambia tu contraseña cuanto antes desde \"Olvidé mi contraseña\" para mantener tu cuenta segura."
+    },
+    "welcome": {
+      "subject": "{store} te registró en Quina",
+      "greeting": "Hola, {name}:",
+      "intro": "{store} te registró en Quina para llevar tu cuenta de fiado en orden. Quina es gratis para ti.",
+      "action": "Leer la política de privacidad",
+      "outro": "Aceptaste que {store} guarde tus datos para administrar tu cuenta, según la Ley N.° 29733. Puedes pedir verlos, corregirlos o borrarlos en la tienda."
+    },
+    "setup": {
+      "employee": {
+        "subject": "{store} te invitó a Quina",
+        "intro": "{store} te invitó a su equipo en Quina para atender el mostrador. Elige tu contraseña para entrar:"
+      },
+      "owner": {
+        "subject": "Tu bodega ya está en Quina",
+        "intro": "Registramos {store} en Quina. Elige tu contraseña para entrar y empezar a ordenar tu fiado:"
+      },
+      "admin": {
+        "subject": "Tu acceso de administración de Quina",
+        "intro": "Te dimos acceso como Administrador de Plataforma de Quina. Elige tu contraseña para entrar:"
+      },
+      "action": "Elegir mi contraseña",
+      "outro": "El enlace vence en 72 horas y se usa una sola vez. Si no esperabas este correo, ignóralo."
     }
   },
   "Auth": {

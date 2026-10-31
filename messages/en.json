@@ -27,6 +27,29 @@
       "subject": "We're protecting your Quina account",
       "intro": "There were 5 failed sign-in attempts on your account, so we locked it for 15 minutes.",
       "outro": "If it was you, wait 15 minutes and try again. If not, reset your password as soon as possible with \"Forgot my password\" to keep your account safe."
+    },
+    "welcome": {
+      "subject": "{store} registered you in Quina",
+      "greeting": "Hi {name},",
+      "intro": "{store} registered you in Quina to keep your store credit account in order. Quina is free for you.",
+      "action": "Read the privacy policy",
+      "outro": "You agreed that {store} keeps your data to manage your account, under Peruvian Law No. 29733. You can ask the store to see, correct or delete it."
+    },
+    "setup": {
+      "employee": {
+        "subject": "{store} invited you to Quina",
+        "intro": "{store} invited you to its team in Quina to serve at the counter. Choose your password to sign in:"
+      },
+      "owner": {
+        "subject": "Your store is now on Quina",
+        "intro": "We registered {store} in Quina. Choose your password to sign in and start organizing your store credit:"
+      },
+      "admin": {
+        "subject": "Your Quina admin access",
+        "intro": "You now have Platform Administrator access to Quina. Choose your password to sign in:"
+      },
+      "action": "Choose my password",
+      "outro": "The link expires in 72 hours and works only once. If you were not expecting this email, ignore it."
     }
   },
   "Auth": {

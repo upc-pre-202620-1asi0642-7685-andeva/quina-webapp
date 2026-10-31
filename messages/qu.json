@@ -28,6 +28,29 @@
       "subject": "Quina cuentaykita qhawarichkaniku",
       "intro": "Cuentaykiman yaykuyta 5 kutita pantaspa munarqanku, chayraykum 15 minutupaq wisq'asqa kachkan.",
       "outro": "Qan karqanki chayqa, 15 minutu suyay hinaspa musuqmanta yaykuy. Mana qan karqankichu chayqa, \"Pakasqa simiyta qunqarqani\" nisqawan pakasqa simiykita utqaylla tikray, cuentaykita waqaychanaykipaq."
+    },
+    "welcome": {
+      "subject": "{store} Quinapi qillqachisunki",
+      "greeting": "Allillanchu, {name}:",
+      "intro": "{store} Quinapi qillqachisunki manuykita allinta apanapaq. Quinaqa mana qullqiyuqmi qampaq.",
+      "action": "Pakasqa kamachiyta ñawinchay",
+      "outro": "{store}ta willakuyniykikunata waqaychananpaq ari nirqanki, N.° 29733 Kamachiyman hina. Tiendapi rikuyta, allichayta utaq chinkachiyta mañakuyta atinki."
+    },
+    "setup": {
+      "employee": {
+        "subject": "{store} Quinaman waqyasunki",
+        "intro": "{store} Quinapi llamkaqninkunaman waqyasunki mostradorpi yanapanaykipaq. Yaykunaykipaq contraseñaykita akllay:"
+      },
+      "owner": {
+        "subject": "Tiendaykiqa Quinapiñam",
+        "intro": "{store}ta Quinapi qillqarqayku. Yaykunaykipaq hinaspa manuykita allichanaykipaq contraseñaykita akllay:"
+      },
+      "admin": {
+        "subject": "Quinapi kamachiq yaykunayki",
+        "intro": "Quinapi Plataforma Kamachiq hina yaykunaykipaq atiyta qurqayku. Contraseñaykita akllay:"
+      },
+      "action": "Contraseñayta akllay",
+      "outro": "Kay enlaceqa 72 horapi tukukun, huk kutillapaqmi. Mana suyasqa kaptinqa, ama kasuychu."
     }
   },
   "Auth": {
