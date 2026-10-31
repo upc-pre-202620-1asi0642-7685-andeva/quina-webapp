@@ -70,6 +70,9 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: Financial oracle
+        run: pnpm test:oracle
+
       - name: Prepare database roles and schemas
         run: psql "postgres://postgres:postgres@localhost:5432/postgres" -v ON_ERROR_STOP=1 -f docker/initdb/01-migrator.sql
 
