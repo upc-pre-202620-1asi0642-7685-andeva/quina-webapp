@@ -460,7 +460,31 @@
     }
   },
   "Plans": {
-    "seePlans": "See plans"
+    "seePlans": "See plans",
+    "names": {
+      "CASERO": "Casero",
+      "BODEGA_PRO": "Bodega Pro",
+      "NEGOCIO_PLUS": "Negocio Plus"
+    },
+    "unlimited": "no limit",
+    "perMonth": "per month",
+    "annual": "or {price} per year",
+    "freeForever": "Free forever",
+    "availableIn": "on {plan}",
+    "features": {
+      "automaticNotifications": "Automatic payment reminders",
+      "receipts": "Electronic receipts and invoices",
+      "kardexAverageCost": "Inventory with average cost",
+      "reportsExport": "Downloadable reports",
+      "ai": "AI assistant"
+    },
+    "limits": {
+      "activeCreditCustomers": "Customers on credit: {max}",
+      "users": "Users: {max}",
+      "products": "Products: {max}",
+      "receiptsPerMonth": "Receipts per month: {max}",
+      "aiQueriesPerMonth": "AI queries per month: {max}"
+    }
   },
   "Privacy": {
     "customers": {
@@ -484,5 +508,92 @@
       "notFoundTitle": "This store does not exist",
       "notFound": "Check the link you were given."
     }
+  },
+  "AcceptInvite": {
+    "title": "Hi, {name}: create your password",
+    "subtitleStore": "You were added to the {store} team on Quina.",
+    "subtitlePlatform": "You were given access to Quina administration.",
+    "account": "Your account: {email}",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
+    "submit": "Create my password",
+    "submitting": "Saving…",
+    "done": "Done. You can now sign in with your email and password.",
+    "goToLogin": "Go to sign in",
+    "invalidTitle": "This link no longer works",
+    "invalid": "It was already used or it expired (it lasts 72 hours). Ask the person who invited you to send a new one."
+  },
+  "Team": {
+    "title": "Team",
+    "usage": "{seats} of {max} users on your plan",
+    "usageUnlimited": "{seats} users",
+    "membersTitle": "Who uses Quina at your store",
+    "you": "you",
+    "status": {
+      "OWNER": "Owner",
+      "ACTIVE": "Active",
+      "INVITED": "Invited",
+      "DEACTIVATED": "Deactivated"
+    },
+    "invite": {
+      "title": "Invite someone",
+      "subtitle": "They get a link to create their password. They can sell, collect payments and register customers; credit terms and prices stay with you.",
+      "name": "Name",
+      "nameHint": "First and last name, as you know them.",
+      "email": "Email",
+      "emailHint": "The invitation goes there. It expires in 72 hours.",
+      "submit": "Send invitation",
+      "sending": "Sending…",
+      "sent": "Invitation sent to {email}.",
+      "mailFailed": "They are invited, but the email to {email} did not go out. Use “Resend” in a moment.",
+      "errors": {
+        "nameInvalid": "Write their name using letters only.",
+        "emailInvalid": "Check the email; it looks incomplete.",
+        "emailTaken": "That email already has a Quina account. Use another one.",
+        "planLimit": "You reached your plan’s user limit.",
+        "generic": "Could not send the invitation. Try again."
+      }
+    },
+    "locked": {
+      "caseroTitle": "The Casero plan is just for you",
+      "fullTitle": "Your team is full",
+      "body": "To add someone, move to {plan}."
+    },
+    "member": {
+      "resend": "Resend",
+      "cancelInvite": "Cancel invitation",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "keep": "No, go back",
+      "cancelTitle": "Cancel {name}’s invitation?",
+      "cancelBody": "Their link stops working. You can invite them again whenever you want.",
+      "cancelConfirm": "Cancel invitation",
+      "deactivateTitle": "Deactivate {name}?",
+      "deactivateBody": "They are signed out of Quina on every device right away. What they recorded stays.",
+      "deactivateConfirm": "Deactivate",
+      "messages": {
+        "resent": "We sent a new link; the previous one no longer works.",
+        "mailFailed": "The email did not go out. Try again in a moment.",
+        "planLimit": "Your plan has no room to reactivate them.",
+        "generic": "Could not complete it. Try again."
+      }
+    }
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Your plan and what you are using.",
+    "currentPlan": "Your plan: {plan}",
+    "trialUntil": "Free trial until {date}. After that you move to Casero unless you choose a plan.",
+    "usage": {
+      "activeCreditCustomers": "Customers with active credit",
+      "users": "Users",
+      "products": "Products"
+    },
+    "usageOf": "{used} of {max}",
+    "usageUnlimited": "{used} · no limit",
+    "plansTitle": "Plans",
+    "plansSubtitle": "Prices in Peruvian soles.",
+    "yourPlan": "Your plan",
+    "paymentSoon": "Soon you will be able to change plans and pay from here."
   }
 }

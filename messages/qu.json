@@ -461,7 +461,31 @@
     }
   },
   "Plans": {
-    "seePlans": "Planekunata rikuy"
+    "seePlans": "Planekunata rikuy",
+    "names": {
+      "CASERO": "Casero",
+      "BODEGA_PRO": "Bodega Pro",
+      "NEGOCIO_PLUS": "Negocio Plus"
+    },
+    "unlimited": "sin límite",
+    "perMonth": "al mes",
+    "annual": "o {price} al año",
+    "freeForever": "Gratis para siempre",
+    "availableIn": "en {plan}",
+    "features": {
+      "automaticNotifications": "Avisos de pago automáticos",
+      "receipts": "Boletas y facturas electrónicas",
+      "kardexAverageCost": "Kardex con costo promedio",
+      "reportsExport": "Reportes para descargar",
+      "ai": "Asistente con IA"
+    },
+    "limits": {
+      "activeCreditCustomers": "Vecinos con fiado: {max}",
+      "users": "Usuarios: {max}",
+      "products": "Productos: {max}",
+      "receiptsPerMonth": "Comprobantes al mes: {max}",
+      "aiQueriesPerMonth": "Consultas de IA al mes: {max}"
+    }
   },
   "Privacy": {
     "customers": {
@@ -485,5 +509,92 @@
       "notFoundTitle": "Kay tiendaqa manam kanchu",
       "notFound": "Revisa el enlace que te compartieron."
     }
+  },
+  "AcceptInvite": {
+    "title": "Hola, {name}: crea tu contraseña",
+    "subtitleStore": "Te sumaron al equipo de {store} en Quina.",
+    "subtitlePlatform": "Te dieron acceso a la administración de Quina.",
+    "account": "Tu cuenta: {email}",
+    "passwordLabel": "Contraseña",
+    "passwordHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
+    "submit": "Crear mi contraseña",
+    "submitting": "Guardando…",
+    "done": "Listo. Ya puedes ingresar con tu correo y tu contraseña.",
+    "goToLogin": "Ir a ingresar",
+    "invalidTitle": "Este enlace ya no sirve",
+    "invalid": "Ya fue usado o venció (dura 72 horas). Pídele a quien te invitó que te envíe uno nuevo."
+  },
+  "Team": {
+    "title": "Llamkaqkuna",
+    "usage": "{seats} de {max} usuarios de tu plan",
+    "usageUnlimited": "{seats} usuarios",
+    "membersTitle": "Quiénes usan Quina en tu tienda",
+    "you": "tú",
+    "status": {
+      "OWNER": "Dueño",
+      "ACTIVE": "Activo",
+      "INVITED": "Invitado",
+      "DEACTIVATED": "Desactivado"
+    },
+    "invite": {
+      "title": "Invitar a alguien",
+      "subtitle": "Le llega un enlace para crear su contraseña. Podrá vender, cobrar y registrar vecinos; las condiciones de fiado y los precios siguen siendo tuyos.",
+      "name": "Nombre",
+      "nameHint": "Nombre y apellido, como lo conoces.",
+      "email": "Correo",
+      "emailHint": "Ahí le llega la invitación. Vence en 72 horas.",
+      "submit": "Enviar invitación",
+      "sending": "Enviando…",
+      "sent": "Invitación enviada a {email}.",
+      "mailFailed": "Quedó invitado, pero el correo a {email} no salió. Usa «Reenviar» en un momento.",
+      "errors": {
+        "nameInvalid": "Escribe su nombre solo con letras.",
+        "emailInvalid": "Revisa el correo; parece incompleto.",
+        "emailTaken": "Ese correo ya tiene una cuenta en Quina. Usa otro.",
+        "planLimit": "Llegaste al límite de usuarios de tu plan.",
+        "generic": "No se pudo invitar. Intenta de nuevo."
+      }
+    },
+    "locked": {
+      "caseroTitle": "El plan Casero es solo para ti",
+      "fullTitle": "Tu equipo está completo",
+      "body": "Para sumar a alguien, pasa a {plan}."
+    },
+    "member": {
+      "resend": "Reenviar",
+      "cancelInvite": "Cancelar invitación",
+      "deactivate": "Desactivar",
+      "reactivate": "Reactivar",
+      "keep": "No, volver",
+      "cancelTitle": "¿Cancelar la invitación de {name}?",
+      "cancelBody": "Su enlace deja de funcionar. Puedes invitarle de nuevo cuando quieras.",
+      "cancelConfirm": "Cancelar invitación",
+      "deactivateTitle": "¿Desactivar a {name}?",
+      "deactivateBody": "Sale de Quina en todos sus equipos al instante. Lo que registró se queda.",
+      "deactivateConfirm": "Desactivar",
+      "messages": {
+        "resent": "Le enviamos un enlace nuevo; el anterior ya no sirve.",
+        "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
+        "planLimit": "No hay cupo en tu plan para reactivarle.",
+        "generic": "No se pudo completar. Intenta de nuevo."
+      }
+    }
+  },
+  "Settings": {
+    "title": "Allichanakuna",
+    "subtitle": "Tu plan y lo que estás usando.",
+    "currentPlan": "Tu plan: {plan}",
+    "trialUntil": "Prueba gratis hasta el {date}. Después pasas a Casero si no eliges un plan.",
+    "usage": {
+      "activeCreditCustomers": "Vecinos con fiado activo",
+      "users": "Usuarios",
+      "products": "Productos"
+    },
+    "usageOf": "{used} de {max}",
+    "usageUnlimited": "{used} · sin límite",
+    "plansTitle": "Planes",
+    "plansSubtitle": "Precios en soles.",
+    "yourPlan": "Tu plan",
+    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí."
   }
 }

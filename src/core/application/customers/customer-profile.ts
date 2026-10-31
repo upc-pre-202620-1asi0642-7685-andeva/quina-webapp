@@ -1,4 +1,5 @@
 import { DocumentId, type DocumentType } from '@/core/domain/identity/document-id';
+import { EmailAddress } from '@/core/domain/identity/email-address';
 import { MobilePhone } from '@/core/domain/identity/mobile-phone';
 import { PersonName } from '@/core/domain/identity/person-name';
 import type { CustomerProfile } from '@/core/domain/ports/customer-repository';
@@ -24,8 +25,6 @@ export type CustomerProfileError =
   | 'PHONE_INVALID'
   | 'EMAIL_INVALID';
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 /** US04 crit. 1: documento válido, nombres, apellidos, celular y correo. */
 export function parseCustomerProfile(
   input: CustomerProfileInput,
@@ -38,8 +37,8 @@ export function parseCustomerProfile(
   if (!lastName.ok) return err('LAST_NAME_INVALID');
   const phone = MobilePhone.parse(input.phone);
   if (!phone.ok) return err('PHONE_INVALID');
-  const email = input.email.trim().toLowerCase();
-  if (!EMAIL.test(email) || email.length > 150) return err('EMAIL_INVALID');
+  const email = EmailAddress.parse(input.email);
+  if (!email.ok) return email;
   const address = input.address.trim().replace(/\s+/g, ' ');
 
   return ok({
@@ -47,7 +46,7 @@ export function parseCustomerProfile(
     firstName: firstName.value,
     lastName: lastName.value,
     phone: phone.value,
-    email,
+    email: email.value,
     address: address || null,
     preferredLocale: input.preferredLocale,
   });

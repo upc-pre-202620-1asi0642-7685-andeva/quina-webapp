@@ -102,3 +102,10 @@ export const PlanLimits = {
     return PLAN_TIERS.find((tier) => LIMITS[tier].features[feature]) ?? 'NEGOCIO_PLUS';
   },
 };
+
+/** Precios en soles de docs/pricing-strategy.md; el anual trae 20 % de descuento. */
+export const PLAN_PRICES: Record<PlanTier, { monthly: string; annual: string | null }> = {
+  CASERO: { monthly: '0.00', annual: null },
+  BODEGA_PRO: { monthly: '29.00', annual: '279.00' },
+  NEGOCIO_PLUS: { monthly: '69.00', annual: '660.00' },
+};
