@@ -84,6 +84,18 @@ test.describe('perfil, selector de idioma y cierre de sesión (US02, US27)', () 
     await expect(page.getByRole('heading', { name: storeName })).toHaveCount(0);
   });
 
+  test('una cuenta con correo y contraseña ve que ya tiene contraseña', async ({ page }) => {
+    await registerOwnerWithStore(page);
+    await page.goto('./profile');
+    await expect(page.getByRole('heading', { name: 'Contraseña' })).toBeVisible();
+    await expect(page.getByText('Ya ingresas con tu correo y contraseña.')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Cambiar contraseña' })).toHaveAttribute(
+      'href',
+      '/app/auth/forgot-password',
+    );
+    await expect(page.getByRole('button', { name: 'Crear contraseña' })).toHaveCount(0);
+  });
+
   for (const theme of ['light', 'dark'] as const) {
     test(`accesibilidad WCAG 2.1 AA en panel y perfil (${theme})`, async ({ page }) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme);

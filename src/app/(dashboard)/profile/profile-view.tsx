@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { locales, type Locale } from '@/core/domain/shared/locale';
 import { authClient } from '@/infrastructure/auth/auth-client';
 import { setLocaleAction } from '@/presentation/actions/locale';
+import { setPasswordAction, type SetPasswordActionState } from '@/presentation/actions/password';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { OtpInput } from '@/presentation/components/auth/otp-input';
+import { PasswordStrength } from '@/presentation/components/auth/password-strength';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
@@ -20,13 +23,16 @@ type EmailErrKey =
 export function ProfileView({
   currentEmail,
   currentLocale,
+  hasPassword,
 }: {
   currentEmail: string;
   currentLocale: Locale;
+  hasPassword: boolean;
 }) {
   const t = useTranslations('Profile');
   const tDash = useTranslations('Dashboard');
   const tErr = useTranslations('Auth.errors');
+  const tAuth = useTranslations('Auth');
   const router = useRouter();
 
   const [selectedLocale, setSelectedLocale] = useState<Locale>(currentLocale);
@@ -41,6 +47,15 @@ export function ProfileView({
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [submittingEmail, setSubmittingEmail] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordState, passwordFormAction, isPendingPassword] = useActionState<
+    SetPasswordActionState,
+    FormData
+  >(setPasswordAction, {});
+  const passwordCreated = hasPassword || passwordState.ok === true;
 
   function handleLocaleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -236,6 +251,94 @@ export function ProfileView({
               </div>
               <Button type="submit" variant="secondary" disabled={submittingEmail}>
                 {t('confirmEmailChange')}
+              </Button>
+            </form>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-4 border-t border-line pt-6">
+          <h2 className="text-lg font-semibold text-ink">{t('password.title')}</h2>
+          {passwordCreated ? (
+            <div className="flex flex-col gap-3" aria-live="polite">
+              {passwordState.ok ? (
+                <p className="text-sm font-medium text-success-ink">{t('password.created')}</p>
+              ) : null}
+              <p className="text-sm text-ink-soft">{t('password.hasPassword')}</p>
+              <Link
+                href="/auth/forgot-password"
+                className="w-fit text-sm font-semibold text-link-active underline underline-offset-4"
+              >
+                {t('password.change')}
+              </Link>
+            </div>
+          ) : (
+            <form action={passwordFormAction} noValidate className="flex flex-col gap-4">
+              <p className="text-sm text-ink-soft">{t('password.lead')}</p>
+              <FormField
+                id="profile-new-password"
+                label={t('password.newLabel')}
+                hint={t('password.newHint')}
+                error={
+                  passwordState.fieldErrors?.password
+                    ? tErr(passwordState.fieldErrors.password)
+                    : undefined
+                }
+              >
+                {(props) => (
+                  <div className="relative flex items-center">
+                    <Input
+                      {...props}
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="pr-12"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? tAuth('hidePassword') : tAuth('showPassword')}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-0 flex size-11 cursor-pointer items-center justify-center rounded-field text-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-5" aria-hidden="true" />
+                      ) : (
+                        <Eye className="size-5" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                )}
+              </FormField>
+              <PasswordStrength password={newPassword} />
+              <FormField
+                id="profile-confirm-password"
+                label={t('password.confirmLabel')}
+                hint={t('password.confirmHint')}
+                error={
+                  passwordState.fieldErrors?.confirmPassword
+                    ? tErr(passwordState.fieldErrors.confirmPassword)
+                    : undefined
+                }
+              >
+                {(props) => (
+                  <Input
+                    {...props}
+                    name="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                )}
+              </FormField>
+              {passwordState.formError ? (
+                <p role="alert" className="text-[13px] font-medium text-error-ink">
+                  {tErr(passwordState.formError)}
+                </p>
+              ) : null}
+              <Button type="submit" variant="secondary" disabled={isPendingPassword}>
+                {t('password.submit')}
               </Button>
             </form>
           )}

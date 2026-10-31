@@ -25,6 +25,7 @@ import { accountSchema } from '@/presentation/validation/auth-schemas';
 
 type ErrorKey =
   | 'nameRequired'
+  | 'nameInvalid'
   | 'emailInvalid'
   | 'passwordWeak'
   | 'userAlreadyExists'
@@ -114,6 +115,8 @@ export function RegisterForm() {
         const code = (error as { code?: string }).code;
         if (code === 'USER_ALREADY_EXISTS' || code === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL') {
           setFieldErrors({ email: 'userAlreadyExists' });
+        } else if (code === 'NAME_INVALID') {
+          setFieldErrors({ name: 'nameInvalid' });
         } else if (code === 'PASSWORD_TOO_WEAK') {
           setFieldErrors({ password: 'passwordWeak' });
         } else if (code === 'CONSENT_REQUIRED') {

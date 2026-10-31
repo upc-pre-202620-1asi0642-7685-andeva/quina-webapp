@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { authClient } from '@/infrastructure/auth/auth-client';
 import { Button } from '@/presentation/components/ui/button';
@@ -15,9 +15,17 @@ export type GoogleButtonProps = {
 // ?error= (auth.ts la rechaza con CONSENT_REQUIRED).
 const ERROR_CALLBACK_URL = '/app/register';
 
+const noSubscribe = () => () => {};
+
 export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleButtonProps) {
   const t = useTranslations('Auth');
   const [loading, setLoading] = useState(false);
+  // La cookie solo existe en el navegador: en el servidor no hay etiqueta, y se muestra al hidratar.
+  const lastUsed = useSyncExternalStore(
+    noSubscribe,
+    () => authClient.isLastUsedLoginMethod('google'),
+    () => false,
+  );
 
   async function handleGoogle() {
     if (onBeforeRedirect && !onBeforeRedirect()) return;
@@ -37,7 +45,7 @@ export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleB
     <Button
       type="button"
       variant="secondary"
-      className="w-full"
+      className="relative w-full"
       disabled={loading}
       onClick={handleGoogle}
     >
@@ -48,6 +56,11 @@ export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleB
         />
       </svg>
       <span>{t('google')}</span>
+      {lastUsed ? (
+        <span className="absolute -top-2.5 right-3 rounded-full bg-soft px-2 py-0.5 text-xs font-semibold text-soft-ink">
+          {t('lastUsed')}
+        </span>
+      ) : null}
     </Button>
   );
 }

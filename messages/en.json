@@ -32,6 +32,7 @@
   "Auth": {
     "logoAlt": "Quina",
     "google": "Continue with Google",
+    "lastUsed": "Last used",
     "or": "or with your email",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
@@ -50,6 +51,7 @@
     },
     "errors": {
       "nameRequired": "Enter your full name (at least 2 letters) to identify the store owner.",
+      "nameInvalid": "Use only letters in your name; spaces, apostrophes (') and hyphens (-) are allowed.",
       "emailInvalid": "Enter a valid email address, such as name@example.com.",
       "passwordRequired": "Enter your password to sign in.",
       "passwordWeak": "Use at least 8 characters with an uppercase letter, a number and a symbol.",
@@ -68,7 +70,9 @@
       "captchaRequired": "Complete the security check before continuing.",
       "rateLimited": "Too many requests in a row. Wait a few seconds and try again.",
       "generic": "We couldn't complete the operation. Please try again in a few seconds.",
-      "consentRequired": "Check the box to accept the Terms and conditions and the Privacy policy."
+      "consentRequired": "Check the box to accept the Terms and conditions and the Privacy policy.",
+      "passwordMismatch": "The two passwords do not match. Type them again.",
+      "passwordAlreadySet": "Your account already has a password. To change it use \"Change password\"."
     }
   },
   "Register": {
@@ -162,7 +166,7 @@
   },
   "Profile": {
     "title": "My profile",
-    "subtitle": "Adjust your language and the email you use to sign in to Quina.",
+    "subtitle": "Adjust your language, email and password.",
     "backToDashboard": "Back to counter",
     "localeTitle": "Quina language",
     "localeLabel": "Interface and email language",
@@ -183,6 +187,18 @@
     "otpHint": "Enter the 6 digits sent to your new email.",
     "confirmEmailChange": "Confirm new email",
     "emailChanged": "Your email has been updated.",
+    "password": {
+      "title": "Password",
+      "lead": "You signed in with Google. Create a password to also sign in with your email.",
+      "newLabel": "New password",
+      "newHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
+      "confirmLabel": "Repeat the password",
+      "confirmHint": "Type it again to avoid typos.",
+      "submit": "Create password",
+      "created": "Done: you can now sign in with your email and this password.",
+      "hasPassword": "You already sign in with your email and password.",
+      "change": "Change password"
+    },
     "signOut": "Sign out"
   },
   "AuthAside": {

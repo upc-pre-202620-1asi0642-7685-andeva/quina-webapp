@@ -33,6 +33,7 @@
   "Auth": {
     "logoAlt": "Quina",
     "google": "Googlewan puriy",
+    "lastUsed": "Qhipa kaq",
     "or": "utaq correoykiwan",
     "showPassword": "Pakasqa simita rikuchiy",
     "hidePassword": "Pakasqa simita pakay",
@@ -51,6 +52,7 @@
     },
     "errors": {
       "nameRequired": "Hunt'asqa sutiykita qillqay (2 qillqamanta aswan).",
+      "nameInvalid": "Sutiykita qillqakunallawan qillqay; espaciokunata, apóstrofota (') guiontapas (-) churayta atinki.",
       "emailInvalid": "Allin correota qillqay, suti@ejemplo.com hina.",
       "passwordRequired": "Yaykunaykipaq pakasqa simiykita qillqay.",
       "passwordWeak": "8 qillqamanta aswan churay, hatun qillqawan, yupaywan, unanchawan.",
@@ -69,7 +71,9 @@
       "captchaRequired": "Manaraq purichkaspa waqaychay qhawayta hunt'achiy.",
       "rateLimited": "Achka kutita utqaylla ruwarqanki. Asllata suyaspa musuqmanta ruway.",
       "generic": "Mana hunt'achiyta atirqanikuchu. Asllata suyaspa musuqmanta ruway.",
-      "consentRequired": "Casillata markay Términos y condiciones, Política de privacidad nisqakunata chaskinaykipaq."
+      "consentRequired": "Casillata markay Términos y condiciones, Política de privacidad nisqakunata chaskinaykipaq.",
+      "passwordMismatch": "Iskaynin pakasqa simikuna mana kaqllachu. Hukmanta qillqay.",
+      "passwordAlreadySet": "Cuentaykiqa pakasqa simiyuqñam. Tikranaykipaq \"Pakasqa simita tikray\" nisqata llamkachiy."
     }
   },
   "Register": {
@@ -163,7 +167,7 @@
   },
   "Profile": {
     "title": "Perfilniy",
-    "subtitle": "Simiykita hinaspa Quinaman yaykuna correoykita allichay.",
+    "subtitle": "Simiykita, correoykita, pakasqa simiykitapas allichay.",
     "backToDashboard": "Mostradorman kutiy",
     "localeTitle": "Quinapa simin",
     "localeLabel": "Pantallakunapa hinaspa correokunapa simin",
@@ -184,6 +188,18 @@
     "otpHint": "Musuq correoykiman chayaq 6 yupayta qillqay.",
     "confirmEmailChange": "Musuq correota takyachiy",
     "emailChanged": "Correoykiqa musuqchasqañam.",
+    "password": {
+      "title": "Pakasqa simi",
+      "lead": "Googlewanmi yaykurqanki. Pakasqa simita ruray correoykiwanpas yaykunaykipaq.",
+      "newLabel": "Musuq pakasqa simi",
+      "newHint": "8 sananchamanta aswan, huk hatun qillqayuq, huk yupayuq, huk unanchayuq.",
+      "confirmLabel": "Pakasqa simita kutichiy",
+      "confirmHint": "Hukmanta qillqay ama pantanaykipaq.",
+      "submit": "Pakasqa simita ruray",
+      "created": "Listo: kunanqa correoykiwan kay pakasqa simiwan yaykuyta atinki.",
+      "hasPassword": "Correoykiwan pakasqa simiykiwanmi yaykunki.",
+      "change": "Pakasqa simita tikray"
+    },
     "signOut": "Lluqsiy"
   },
   "AuthAside": {
