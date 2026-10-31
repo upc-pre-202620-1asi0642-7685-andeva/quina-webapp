@@ -52,6 +52,7 @@ test.describe('recuperación de contraseña (US02)', () => {
     await page.getByLabel('Tu nombre completo').fill('Pedro Mamani');
     await page.getByLabel('Tu correo electrónico').fill(email);
     await page.getByLabel('Crea una contraseña segura').fill(INITIAL_PASSWORD);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
     await expect(page).toHaveURL(/\/app\/register\/verify/);
     const { otp } = await readLatestMail(email, 'verification-otp');

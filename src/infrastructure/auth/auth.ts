@@ -12,6 +12,7 @@ import { db as defaultDb, type Database } from '@/infrastructure/db/connection';
 import * as schema from '@/infrastructure/db/schema';
 import { getAuthMailer } from '@/infrastructure/email/auth-mailer-factory';
 import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/presentation/i18n/resolve-locale';
+import { CONSENT_COOKIE, LEGAL_TERMS_VERSION } from './consent';
 import { createLockout, DISABLED_MESSAGE, LOCKED_MESSAGE } from './lockout-hooks';
 
 export { LOCKED_MESSAGE };
@@ -136,9 +137,33 @@ export function createAuth(deps: AuthDeps) {
         create: {
           // Todo usuario nuevo (correo o Google) espera crear su tienda
           async before(user, ctx) {
-            const cookie = readCookie(requestHeaders(ctx), LOCALE_COOKIE);
+            const headers = requestHeaders(ctx);
+            // Solo las peticiones del navegador traen cabeceras; las llamadas
+            // internas del servidor (pruebas, scripts) no pasan por la casilla.
+            if (headers && readCookie(headers, CONSENT_COOKIE) !== LEGAL_TERMS_VERSION) {
+              throw new APIError('BAD_REQUEST', {
+                code: 'CONSENT_REQUIRED',
+                message: 'Acepta los Términos y condiciones y la Política de privacidad.',
+              });
+            }
+            const cookie = readCookie(headers, LOCALE_COOKIE);
             const preferredLocale: Locale = isLocale(cookie) ? cookie : 'es';
             return { data: { ...user, role: 'PENDING_OWNER', storeId: null, preferredLocale } };
+          },
+          // Constancia inmutable de la aceptación, con IP y navegador
+          async after(user, ctx) {
+            const headers = requestHeaders(ctx);
+            if (!headers) return;
+            await deps.db.insert(schema.auditLogs).values({
+              storeId: null,
+              userId: user.id,
+              action: 'ACCEPT_TERMS',
+              entityName: 'users',
+              entityId: user.id,
+              newData: { version: LEGAL_TERMS_VERSION, documents: ['terms', 'privacy'] },
+              ipAddress: ctx ? getIP(headers, ctx.context.options) : null,
+              userAgent: headers.get('user-agent'),
+            });
           },
         },
       },
