@@ -136,8 +136,8 @@ El motor financiero aplica las reglas de cálculo que exige el enunciado:
   sobre el total exigible del ciclo vencido. Durante la mora no corre interés
   compensatorio, y las cuotas futuras que aún no vencen no entran en la base.
 
-Las fórmulas y su desarrollo se documentarán en el documento del motor
-financiero.
+Las fórmulas, su desarrollo y los dos juegos de datos de prueba están en el
+[documento del motor financiero](quina-financial-engine.md).
 
 #### Reglas de crédito
 
@@ -463,8 +463,8 @@ precisos y auditables.
 
 ### Algoritmos del motor financiero
 
-El motor matemático central se documentará en pseudocódigo y diagramas de flujo
-estructurados:
+El motor matemático central está documentado en pseudocódigo en el
+[documento del motor financiero](quina-financial-engine.md), sección 4:
 
 - **Algoritmo de capitalización por período de gracia:** capitaliza los
   intereses compensatorios generados entre la fecha de compra y la fecha de pago
