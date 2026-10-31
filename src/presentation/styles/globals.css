@@ -201,6 +201,19 @@
   }
 }
 
+/* Único movimiento del panel de marca de acceso (DESIGN.md §6.1): la ficha de
+   ejemplo sube una vez al cargar. Sin opacidad: la ficha siempre se lee con su
+   contraste completo, aun a mitad de la animación. */
+@keyframes auth-aside-card-in {
+  from {
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.auth-aside-card {
+  animation: auth-aside-card-in 450ms var(--ease-out-expo) 120ms both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

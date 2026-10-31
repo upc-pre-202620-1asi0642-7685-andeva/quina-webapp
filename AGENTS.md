@@ -36,6 +36,24 @@ Señales de alerta: dos estilos para el mismo componente, colores en hexadecimal
 dentro de componentes, una segunda tipografía o set de íconos, textos de interfaz
 fuera de los mensajes de idioma.
 
+### Skills de diseño instaladas (`.claude/skills`, `.agents/skills`)
+
+Úsalas para crear, revisar o pulir pantallas. `DESIGN.md` manda sobre ellas: si
+una skill sugiere otra tipografía, paleta o efecto, se adapta a los tokens de
+Quina o no se aplica.
+
+- `impeccable`: dirección y revisión de interfaces (`critique`, `audit`,
+  `polish`, `layout`, `clarify`). En Quina el modo es casi siempre **Operate**
+  (herramienta de mostrador); las pantallas de acceso son la única excepción
+  (DESIGN.md §6.1).
+- `emil-design-eng`, `animate`, `review-animations`: criterio de movimiento.
+  Recuerda que en la webapp el movimiento es solo funcional (DESIGN.md §8).
+- `mobile-native`: detalles para que la app se sienta nativa en el celular
+  (zoom de inputs, `100dvh`, áreas táctiles, notch).
+- `design-taste-frontend`: solo para revisar que una pantalla no se vea genérica;
+  sus direcciones de arte de portada no aplican a la herramienta.
+- `ui-ux-pro-max`: guías de accesibilidad e interacción.
+
 ---
 
 ## 3. Stack y comandos

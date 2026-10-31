@@ -6,6 +6,7 @@ import { APIError } from 'better-auth/api';
 import postgres from 'postgres';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createAuth, LOCKED_MESSAGE, type Auth } from '@/infrastructure/auth/auth';
+import { CONSENT_COOKIE, LEGAL_TERMS_VERSION } from '@/infrastructure/auth/consent';
 import { closeDb, db } from '@/infrastructure/db/connection';
 import { OutboxAuthMailer } from '@/infrastructure/email/outbox-auth-mailer';
 import { readLatestMail } from '../e2e/support/outbox';
@@ -21,6 +22,8 @@ const TURNSTILE_TEST_TOKEN = 'XXXX.DUMMY.TOKEN.XXXX';
 const APP_URL = 'http://localhost:3100/app';
 const ORIGIN = new URL(APP_URL).origin;
 const PASSWORD = 'Bodega#2026x';
+// La casilla de /register deja esta cookie (src/infrastructure/auth/consent.ts)
+const CONSENT = `${CONSENT_COOKIE}=${LEGAL_TERMS_VERSION}`;
 
 const owner = postgres(testEnv.ownerUrl, { max: 1, onnotice: () => {} });
 let outboxDir: string;
@@ -152,7 +155,7 @@ describe('registro con correo y contraseña', () => {
       auth,
       '/sign-up/email',
       { name: 'Rosa Quispe', email, password: PASSWORD },
-      { ip: nextIp(), cookie: 'quina-lang=qu' },
+      { ip: nextIp(), cookie: `quina-lang=qu; ${CONSENT}` },
     );
     expect(response.status).toBe(200);
 
@@ -204,6 +207,42 @@ describe('registro con correo y contraseña', () => {
     );
     expect(code(error)).toBe('PASSWORD_TOO_WEAK');
     expect(await userByEmail(email)).toBeUndefined();
+  });
+
+  it('sin aceptar términos y privacidad no se crea la cuenta', async () => {
+    const email = newEmail('sin-consentimiento');
+    const response = await post(
+      auth,
+      '/sign-up/email',
+      { name: 'Sin Consentimiento', email, password: PASSWORD },
+      { ip: nextIp() },
+    );
+    expect(response.status).toBe(400);
+    expect(((await response.json()) as { code: string }).code).toBe('CONSENT_REQUIRED');
+    expect(await userByEmail(email)).toBeUndefined();
+  });
+
+  it('deja constancia de la aceptación con versión, IP y navegador', async () => {
+    const email = newEmail('consentimiento');
+    const ip = nextIp();
+    const response = await post(
+      auth,
+      '/sign-up/email',
+      { name: 'Con Consentimiento', email, password: PASSWORD },
+      { ip, cookie: CONSENT },
+    );
+    expect(response.status).toBe(200);
+
+    const user = await userByEmail(email);
+    const rows = await owner<{ new_data: unknown; ip_address: string; store_id: null }[]>`
+      SELECT new_data, ip_address, store_id FROM audit_logs
+      WHERE user_id = ${user!.id} AND action = 'ACCEPT_TERMS'`;
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      new_data: { version: LEGAL_TERMS_VERSION, documents: ['terms', 'privacy'] },
+      ip_address: ip,
+      store_id: null,
+    });
   });
 
   it('sin cookie de idioma el usuario nace en castellano', async () => {

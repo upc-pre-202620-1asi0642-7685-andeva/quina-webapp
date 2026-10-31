@@ -67,7 +67,8 @@
       "emailTaken": "That email is already registered to another store.",
       "captchaRequired": "Complete the security check before continuing.",
       "rateLimited": "Too many requests in a row. Wait a few seconds and try again.",
-      "generic": "We couldn't complete the operation. Please try again in a few seconds."
+      "generic": "We couldn't complete the operation. Please try again in a few seconds.",
+      "consentRequired": "Check the box to accept the Terms and conditions and the Privacy policy."
     }
   },
   "Register": {
@@ -83,7 +84,8 @@
       "submit": "Continue",
       "submitting": "Creating account…",
       "hasAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "consentLabel": "I accept the <terms>Terms and conditions</terms> and the <privacy>Privacy policy</privacy>, and I authorize the processing of my personal data under Peruvian Law No. 29733."
     },
     "strength": {
       "label": "Password strength",
@@ -182,5 +184,29 @@
     "confirmEmailChange": "Confirm new email",
     "emailChanged": "Your email has been updated.",
     "signOut": "Sign out"
+  },
+  "AuthAside": {
+    "register": {
+      "title": "Start free with your first 15 neighbors",
+      "lead": "No card, two minutes. Your store starts with 14 days of Bodega Pro."
+    },
+    "login": {
+      "title": "Your credit notebook, in order",
+      "lead": "What you are owed, up to date and without scribbles. Sign in and keep serving."
+    },
+    "card": {
+      "label": "Example account of a neighbor",
+      "name": "Rosa Quispe",
+      "example": "Example",
+      "status": "Up to date",
+      "balance": "Amount to pay",
+      "limit": "Credit limit: {limit}",
+      "limitUsed": "Uses {percent} % of her limit",
+      "cutOff": "Cut-off date",
+      "due": "Payment date",
+      "reminder": "Payment reminder sent",
+      "reminderTo": "By email to Rosa"
+    },
+    "photoAlt": "Shopkeeper serving customers in a neighborhood store"
   }
 }

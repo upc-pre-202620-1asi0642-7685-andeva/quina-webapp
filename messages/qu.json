@@ -68,7 +68,8 @@
       "emailTaken": "Chay correo huk tiendapi qillqasqañam kachkan.",
       "captchaRequired": "Manaraq purichkaspa waqaychay qhawayta hunt'achiy.",
       "rateLimited": "Achka kutita utqaylla ruwarqanki. Asllata suyaspa musuqmanta ruway.",
-      "generic": "Mana hunt'achiyta atirqanikuchu. Asllata suyaspa musuqmanta ruway."
+      "generic": "Mana hunt'achiyta atirqanikuchu. Asllata suyaspa musuqmanta ruway.",
+      "consentRequired": "Casillata markay Términos y condiciones, Política de privacidad nisqakunata chaskinaykipaq."
     }
   },
   "Register": {
@@ -84,7 +85,8 @@
       "submit": "Puriy",
       "submitting": "Cuentata kamarichkan…",
       "hasAccount": "¿Cuentayki kanñachu?",
-      "loginLink": "Yaykuy"
+      "loginLink": "Yaykuy",
+      "consentLabel": "<terms>Términos y condiciones</terms> nisqata, <privacy>Política de privacidad</privacy> nisqatapas chaskini, Ley N.° 29733 nisqaman hina willakuyniykuna llamk’achinankupaq ari nini."
     },
     "strength": {
       "label": "Pakasqa simip kallpan",
@@ -183,5 +185,29 @@
     "confirmEmailChange": "Musuq correota takyachiy",
     "emailChanged": "Correoykiqa musuqchasqañam.",
     "signOut": "Lluqsiy"
+  },
+  "AuthAside": {
+    "register": {
+      "title": "Mana qullqiyuq qallariy ñawpaq 15 llaqtamasiykiwan",
+      "lead": "Mana tarjetayuq, iskay minutollapi. Tiendaykiqa 14 p’unchaw Bodega Prowan qallarin."
+    },
+    "login": {
+      "title": "Fiado cuadernoyki, allinta churasqa",
+      "lead": "Imaynatachus manukusunki, p’unchawpi, mana tachonniyuq. Yaykuy hinaspa atiendespa qatiy."
+    },
+    "card": {
+      "label": "Huk llaqtamasiq rikuchiy fichan",
+      "name": "Rosa Quispe",
+      "example": "Rikuchiy",
+      "status": "P’unchawpi",
+      "balance": "Kutichinan",
+      "limit": "Crédito limite: {limit}",
+      "limitUsed": "Limitenmanta {percent} % utilizan",
+      "cutOff": "Kuchuy p’unchaw",
+      "due": "Qullqi kutichiy p’unchaw",
+      "reminder": "Qullqi yuyarichiy kachasqa",
+      "reminderTo": "Correo nisqawan Rosaman"
+    },
+    "photoAlt": "Bodegueromi tiendanpi atiendeshan"
   }
 }
