@@ -162,7 +162,8 @@
     "welcome": "Your counter is ready, {name}.",
     "subtitle": "Start registering your neighbors and keeping clear accounts.",
     "profileLink": "My profile & language",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "registerCustomer": "Register neighbor"
   },
   "Profile": {
     "title": "My profile",
@@ -224,5 +225,19 @@
       "reminderTo": "By email to Rosa"
     },
     "photoAlt": "Shopkeeper serving customers in a neighborhood store"
+  },
+  "Shell": {
+    "logoAlt": "Quina",
+    "trialUntil": "Pro Trial until {date}",
+    "nav": {
+      "label": "Main navigation",
+      "home": "Home",
+      "sell": "Sell",
+      "customers": "Customers",
+      "team": "Team",
+      "settings": "Settings",
+      "more": "More",
+      "soon": "Soon"
+    }
   }
 }

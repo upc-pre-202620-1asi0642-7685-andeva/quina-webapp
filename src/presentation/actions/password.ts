@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { getAuth } from '@/infrastructure/auth/auth';
 import { setOwnPassword } from '@/infrastructure/auth/set-password';
 import { db } from '@/infrastructure/db/connection';
-import { requireOwner } from '@/presentation/auth/session';
+import { requireUser } from '@/presentation/auth/session';
 import { setPasswordSchema } from '@/presentation/validation/auth-schemas';
 
 export type SetPasswordActionState = {
@@ -17,7 +17,7 @@ export async function setPasswordAction(
   _prev: SetPasswordActionState,
   formData: FormData,
 ): Promise<SetPasswordActionState> {
-  const user = await requireOwner();
+  const user = await requireUser('/profile');
 
   const parsed = setPasswordSchema.safeParse({
     password: String(formData.get('password') ?? ''),

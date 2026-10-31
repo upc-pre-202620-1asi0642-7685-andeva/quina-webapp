@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 
 const PUBLIC_PATHS = new Set([
+  '/auth/accept-invite',
   '/login',
   '/register',
   '/register/verify',
@@ -27,7 +28,7 @@ export function proxy(request: NextRequest) {
   const normalized =
     pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 
-  if (PUBLIC_PATHS.has(normalized)) {
+  if (PUBLIC_PATHS.has(normalized) || normalized.startsWith('/privacy/')) {
     return NextResponse.next();
   }
 

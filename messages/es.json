@@ -162,7 +162,8 @@
     "welcome": "Tu mostrador está listo, {name}.",
     "subtitle": "Empieza a registrar a tus vecinos y llevar tus cuentas claras.",
     "profileLink": "Mi perfil e idioma",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "registerCustomer": "Registrar vecino"
   },
   "Profile": {
     "title": "Mi perfil",
@@ -224,5 +225,19 @@
       "reminderTo": "Por correo a Rosa"
     },
     "photoAlt": "Bodeguero atendiendo en su tienda de barrio"
+  },
+  "Shell": {
+    "logoAlt": "Quina",
+    "trialUntil": "Prueba Pro hasta el {date}",
+    "nav": {
+      "label": "Navegación principal",
+      "home": "Inicio",
+      "sell": "Vender",
+      "customers": "Clientes",
+      "team": "Equipo",
+      "settings": "Ajustes",
+      "more": "Más",
+      "soon": "Pronto"
+    }
   }
 }

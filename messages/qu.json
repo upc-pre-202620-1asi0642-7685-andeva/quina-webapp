@@ -163,7 +163,8 @@
     "welcome": "Mostradoruykiqa listom kachkan, {name}.",
     "subtitle": "Llaqtamasikunata qillqachiyta qallariy hinaspa yupaykunata sut'ita apay.",
     "profileLink": "Perfilniy hinaspa simi",
-    "signOut": "Lluqsiy"
+    "signOut": "Lluqsiy",
+    "registerCustomer": "Llaqtamasita qillqachiy"
   },
   "Profile": {
     "title": "Perfilniy",
@@ -225,5 +226,19 @@
       "reminderTo": "Correo nisqawan Rosaman"
     },
     "photoAlt": "Bodegueromi tiendanpi atiendeshan"
+  },
+  "Shell": {
+    "logoAlt": "Quina",
+    "trialUntil": "Prueba Pro {date} kama",
+    "nav": {
+      "label": "Hatun purina",
+      "home": "Qallariy",
+      "sell": "Rantiy",
+      "customers": "Llaqtamasikuna",
+      "team": "Llamkaqkuna",
+      "settings": "Allichanakuna",
+      "more": "Astawan",
+      "soon": "Qayllaña"
+    }
   }
 }
