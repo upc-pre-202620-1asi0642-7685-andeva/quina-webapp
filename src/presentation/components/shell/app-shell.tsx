@@ -21,6 +21,7 @@ export async function AppShell({
   children: React.ReactNode;
 }) {
   const t = await getTranslations('Shell');
+  const tDashboard = await getTranslations('Dashboard');
   const trial = store.trialEndsAt ? t('trialUntil', { date: formatDate(store.trialEndsAt) }) : null;
 
   return (
@@ -46,6 +47,7 @@ export async function AppShell({
               <span className="truncate font-medium text-ink">{user.name}</span>
               <span className="truncate text-xs text-ink-soft">{store.name}</span>
             </span>
+            <span className="sr-only">{tDashboard('profileLink')}</span>
           </Link>
         </div>
       </aside>
@@ -53,7 +55,17 @@ export async function AppShell({
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur lg:hidden">
           <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
-          <span className="truncate text-sm font-medium text-ink">{store.name}</span>
+          <div className="flex min-w-0 items-center gap-1">
+            <span className="truncate text-sm font-medium text-ink">{store.name}</span>
+            {/* En el celular el perfil y el idioma quedan a un toque, también para el dueño */}
+            <Link
+              href="/profile"
+              aria-label={tDashboard('profileLink')}
+              className="-mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-soft hover:bg-surface-hover hover:text-ink"
+            >
+              <CircleUserRoundIcon aria-hidden="true" className="size-6" />
+            </Link>
+          </div>
         </header>
         <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-28 lg:px-8 lg:pt-8 lg:pb-12">
           {children}

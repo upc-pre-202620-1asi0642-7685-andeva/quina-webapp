@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 import {
@@ -62,7 +62,7 @@ export async function registerCustomerAction(
   formData: FormData,
 ): Promise<CustomerFormState> {
   const user = await authorizeStore('customers.create');
-  if (!user) redirect('/login');
+  if (!user) return actionRedirect('/login');
 
   const parsed = readCustomerForm(formData);
   if (!parsed.success) return { errors: { form: 'generic' } };
@@ -100,7 +100,7 @@ export async function registerCustomerAction(
     user.role === 'STORE_OWNER'
       ? `/customers/${result.value.customerId}/terms?new=1&notice=${notice}`
       : `/customers/${result.value.customerId}?notice=${notice}`;
-  redirect(next);
+  return actionRedirect(next);
 }
 
 export async function updateCustomerAction(
@@ -109,7 +109,7 @@ export async function updateCustomerAction(
   formData: FormData,
 ): Promise<CustomerFormState> {
   const user = await authorizeStore('customers.update');
-  if (!user) redirect('/login');
+  if (!user) return actionRedirect('/login');
   if (!idSchema.safeParse(customerId).success) return { errors: { form: 'notFound' } };
 
   const parsed = readCustomerForm(formData);
@@ -127,7 +127,7 @@ export async function updateCustomerAction(
     return { errors: { [field]: key } };
   }
   revalidatePath('/customers');
-  redirect(`/customers/${customerId}?notice=saved`);
+  return actionRedirect(`/customers/${customerId}?notice=saved`);
 }
 
 export async function setCustomerActiveAction(
@@ -179,7 +179,7 @@ export async function saveCreditTermsAction(
   formData: FormData,
 ): Promise<TermsFormState> {
   const user = await authorizeStore('credit.terms');
-  if (!user) redirect('/login');
+  if (!user) return actionRedirect('/login');
   if (!idSchema.safeParse(customerId).success) return { errors: { form: 'generic' } };
 
   const parsed = termsFormSchema.safeParse(Object.fromEntries(formData));
@@ -219,7 +219,7 @@ export async function saveCreditTermsAction(
     return { errors: { [field]: key } };
   }
   revalidatePath('/customers');
-  redirect(
+  return actionRedirect(
     `/customers/${customerId}?notice=${result.value === 'OPENED' ? 'termsOpened' : 'saved'}`,
   );
 }

@@ -180,7 +180,7 @@
   },
   "Dashboard": {
     "logoAlt": "Quina",
-    "trialBadge": "Pro Trial: 14 days",
+    "trialBadge": "Pro Trial: {days, plural, one {# day} other {# days}}",
     "trialUntil": "Pro Trial until {date}",
     "welcome": "Your counter is ready, {name}.",
     "subtitle": "Start registering your neighbors and keeping clear accounts.",

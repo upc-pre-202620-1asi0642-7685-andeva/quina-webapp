@@ -1,7 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { RegisterStoreUseCase } from '@/core/application/identity/register-store';
 import { DrizzleStoreRegistrationRepository } from '@/infrastructure/db/repositories/drizzle-store-registration-repository';
 import { getSessionUser } from '@/presentation/auth/session';
@@ -17,9 +17,9 @@ export async function completeStoreAction(
   formData: FormData,
 ): Promise<RegisterStoreActionState> {
   const user = await getSessionUser();
-  if (!user) redirect('/login');
-  if (!user.emailVerified) redirect('/register/verify');
-  if (user.role === 'STORE_OWNER' && user.storeId) redirect('/');
+  if (!user) return actionRedirect('/login');
+  if (!user.emailVerified) return actionRedirect('/register/verify');
+  if (user.role === 'STORE_OWNER' && user.storeId) return actionRedirect('/');
   if (user.role !== 'PENDING_OWNER') {
     return { formError: 'generic' };
   }
@@ -72,5 +72,5 @@ export async function completeStoreAction(
     return { formError: 'generic' };
   }
 
-  redirect('/');
+  return actionRedirect('/');
 }

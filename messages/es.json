@@ -180,7 +180,7 @@
   },
   "Dashboard": {
     "logoAlt": "Quina",
-    "trialBadge": "Prueba Pro: 14 días",
+    "trialBadge": "Prueba Pro: {days, plural, one {# día} other {# días}}",
     "trialUntil": "Prueba Pro hasta {date}",
     "welcome": "Tu mostrador está listo, {name}.",
     "subtitle": "Empieza a registrar a tus vecinos y llevar tus cuentas claras.",

@@ -181,7 +181,7 @@
   },
   "Dashboard": {
     "logoAlt": "Quina",
-    "trialBadge": "Prueba Pro: 14 p'unchaw",
+    "trialBadge": "Prueba Pro: {days} p'unchaw",
     "trialUntil": "Prueba Pro {date} kama",
     "welcome": "Mostradoruykiqa listom kachkan, {name}.",
     "subtitle": "Llaqtamasikunata qillqachiyta qallariy hinaspa yupaykunata sut'ita apay.",

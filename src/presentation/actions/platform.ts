@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { z } from 'zod';
 import {
   AddRateCapUseCase,
@@ -41,7 +41,7 @@ export async function createStoreAction(
   formData: FormData,
 ): Promise<PlatformFormState<CreateStoreError>> {
   const admin = await authorizePlatform();
-  if (!admin) redirect('/login');
+  if (!admin) return actionRedirect('/login');
   const parsed = storeSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: 'generic' };
 
@@ -52,7 +52,7 @@ export async function createStoreAction(
   ).execute({ ...parsed.data, adminId: admin.id, setupUrl, now: new Date() });
   if (!result.ok) return { error: result.error };
   revalidatePath('/platform/stores');
-  redirect(
+  return actionRedirect(
     `/platform/stores/${result.value.storeId}?notice=${result.value.mailSent ? 'created' : 'createdNoMail'}`,
   );
 }
@@ -102,7 +102,7 @@ export async function addRateCapAction(
   formData: FormData,
 ): Promise<PlatformFormState<AddRateCapError> & { saved?: boolean }> {
   const admin = await authorizePlatform();
-  if (!admin) redirect('/login');
+  if (!admin) return actionRedirect('/login');
   const parsed = capSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: 'generic' };
   const result = await new AddRateCapUseCase(new DrizzleRateCapRepository()).execute({

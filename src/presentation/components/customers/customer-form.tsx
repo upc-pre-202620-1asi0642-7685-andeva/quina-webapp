@@ -268,7 +268,8 @@ export function CustomerForm({
                     href={privacyHref}
                     target="_blank"
                     rel="noopener"
-                    className="font-semibold text-link-active underline underline-offset-4"
+                    // Sobre paper-deep el verde de enlace no llega a 4.5:1 (WCAG AA)
+                    className="font-semibold text-ink underline underline-offset-4"
                   >
                     {chunks}
                   </a>
