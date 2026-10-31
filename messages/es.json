@@ -67,7 +67,8 @@
       "emailTaken": "Ese correo ya está registrado en otra tienda.",
       "captchaRequired": "Completa la verificación de seguridad antes de continuar.",
       "rateLimited": "Demasiados intentos seguidos. Espera unos segundos e inténtalo de nuevo.",
-      "generic": "No pudimos completar la operación. Inténtalo de nuevo en unos segundos."
+      "generic": "No pudimos completar la operación. Inténtalo de nuevo en unos segundos.",
+      "consentRequired": "Marca la casilla para aceptar los Términos y condiciones y la Política de privacidad."
     }
   },
   "Register": {
@@ -83,7 +84,8 @@
       "submit": "Continuar",
       "submitting": "Creando cuenta…",
       "hasAccount": "¿Ya tienes cuenta?",
-      "loginLink": "Ingresa"
+      "loginLink": "Ingresa",
+      "consentLabel": "Acepto los <terms>Términos y condiciones</terms> y la <privacy>Política de privacidad</privacy>, y autorizo el tratamiento de mis datos personales según la Ley N.° 29733."
     },
     "strength": {
       "label": "Seguridad de la contraseña",
@@ -186,17 +188,11 @@
   "AuthAside": {
     "register": {
       "title": "Empieza gratis con tus primeros 15 vecinos",
-      "lead": "Sin tarjeta y en dos minutos. Tu bodega arranca con 14 días de Bodega Pro.",
-      "point1": "Cada vecino con su límite, su fecha de corte y su fecha de pago.",
-      "point2": "Quina calcula lo que te deben, con intereses y mora si los pactas.",
-      "point3": "Los estados de cuenta y recordatorios llegan solos al correo del vecino."
+      "lead": "Sin tarjeta y en dos minutos. Tu bodega arranca con 14 días de Bodega Pro."
     },
     "login": {
       "title": "Tu cuaderno de fiados, ordenado",
-      "lead": "Lo que te deben, al día y sin tachones. Entra y sigue atendiendo.",
-      "point1": "Cada fiado queda anotado con fecha, monto y quién atendió.",
-      "point2": "La fecha de corte y la de pago se calculan solas.",
-      "point3": "Cobras sin roche: Quina avisa por correo al vecino."
+      "lead": "Lo que te deben, al día y sin tachones. Entra y sigue atendiendo."
     },
     "card": {
       "label": "Ficha de ejemplo de una vecina",
@@ -207,7 +203,10 @@
       "limit": "Límite de crédito: {limit}",
       "limitUsed": "Usa el {percent} % de su límite",
       "cutOff": "Fecha de corte",
-      "due": "Fecha de pago"
-    }
+      "due": "Fecha de pago",
+      "reminder": "Recordatorio de pago enviado",
+      "reminderTo": "Por correo a Rosa"
+    },
+    "photoAlt": "Bodeguero atendiendo en su tienda de barrio"
   }
 }

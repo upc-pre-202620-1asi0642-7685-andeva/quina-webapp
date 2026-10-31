@@ -195,22 +195,31 @@ Son la única excepción de "portada" dentro de la webapp: el comerciante aún n
 entra al mostrador, así que se permite un panel de marca. Todas usan
 `AuthShell`; ninguna arma su propio layout.
 
-- **Dos columnas desde 1024 px:** formulario a la izquierda (ancho máximo 400 px,
-  sin tarjeta alrededor, directo sobre `--color-paper`) y panel de marca a la
-  derecha, con 12 px de margen y `rounded-card`. Bajo 1024 px solo queda el
-  formulario; el panel no se muestra.
+- **Dos columnas iguales desde 1024 px:** formulario a la izquierda (ancho máximo
+  400 px, sin tarjeta alrededor, directo sobre `--color-paper`) y panel de marca
+  a la derecha, con 12 px de margen y `rounded-card`. El panel queda fijo a la
+  altura de la ventana aunque el formulario sea más alto. Bajo 1024 px solo queda
+  el formulario; el panel no se muestra.
 - **Barra superior:** isologo a la izquierda y el enlace alterno ("¿Ya tienes
   cuenta? Ingresa") a la derecha desde 640 px; en celular ese enlace baja al pie.
-- **Panel de marca:** fondo `--color-primary-dark` y texto `--color-primary-soft`
-  en ambos temas (no usa tokens de rol). Texto secundario: `--color-primary-soft`
-  al 70–75 %. Detalles, montos destacados e íconos: `--color-primary`. Bordes:
-  `--color-primary-soft` al 15 %.
+  Entre la barra y el título hay siempre al menos 48 px, también en pantallas bajas.
+- **Panel de marca:** una foto de fondo (`public/auth/bodeguero.jpg`, un bodeguero
+  real en su tienda, sin texto ni logos dentro de la imagen) con un velo de
+  `--color-primary-dark` para que el titular en `--color-primary-soft` se lea
+  sobre cualquier foto.
 - **Contenido del panel:** un titular (la promesa del sitio en registro; "Tu
-  cuaderno de fiados, ordenado" en ingreso y recuperación), la ficha de ejemplo
-  de Rosa Quispe con la etiqueta "Ejemplo" y tres beneficios con ícono. Nada de
-  testimonios, logos de clientes ni cifras que no estén en `docs/`.
+  cuaderno de fiados, ordenado" en ingreso y recuperación) y, flotando sobre la
+  foto, lo que el bodeguero ve en su celular: la ficha de ejemplo de Rosa Quispe
+  (etiqueta "Ejemplo") y el aviso "Recordatorio de pago enviado". Ambas son
+  superficies flotantes: `--color-surface`, `--shadow-float` y tokens de rol, así
+  que siguen el tema. Nada de testimonios, logos de clientes ni cifras que no
+  estén en `docs/`.
 - **Movimiento:** solo la ficha entra una vez (sube 12 px sin cambiar su opacidad, 450 ms,
   `--ease-out-expo`). Nada más se anima.
+- **Consentimiento en el registro:** casilla obligatoria, sin marcar por defecto,
+  antes del botón "Continuar", con enlaces a los Términos y condiciones y a la
+  Política de privacidad (Ley N.° 29733). También se exige antes de "Continuar
+  con Google". Si falta, el error va bajo la casilla.
 
 ---
 
