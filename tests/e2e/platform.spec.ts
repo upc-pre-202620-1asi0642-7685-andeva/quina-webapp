@@ -41,8 +41,9 @@ test.describe('plataforma (US01)', () => {
 
     await page.getByRole('link', { name: 'Crear tienda' }).click();
     const ownerEmail = uniqueEmail('dueno');
+    const ruc = uniqueRuc();
     await page.getByLabel('Nombre comercial').fill('Bodega Don Pepe');
-    await page.getByLabel('RUC o DNI').fill(uniqueRuc());
+    await page.getByLabel('RUC o DNI').fill(ruc);
     await page.getByLabel('Nombre del dueño').fill('José Huamán');
     await page.getByLabel('Correo del dueño').fill(ownerEmail);
     await expectAccessible(page);
@@ -52,6 +53,13 @@ test.describe('plataforma (US01)', () => {
     ).toBeVisible();
     await expect(page.getByText('Casero', { exact: true })).toBeVisible();
     const storeUrl = page.url();
+
+    // El Administrador la encuentra por su RUC entre todas las tiendas
+    await page.goto('./platform/stores');
+    await page.getByRole('searchbox', { name: 'Buscar tienda' }).fill(ruc);
+    await page.getByRole('button', { name: 'Buscar' }).click();
+    await expect(page.getByText('1 tienda', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Bodega Don Pepe/ })).toBeVisible();
 
     // El dueño define su contraseña y entra, en otra sesión
     const ownerContext = await browser.newContext();

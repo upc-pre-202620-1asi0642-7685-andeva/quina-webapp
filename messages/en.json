@@ -262,7 +262,8 @@
       "more": "More",
       "soon": "Soon",
       "stores": "Stores",
-      "rateCaps": "BCRP caps"
+      "rateCaps": "BCRP caps",
+      "sellSoon": "Sell, coming soon"
     }
   },
   "Customers": {
@@ -609,7 +610,12 @@
       "subtitle": "{count, plural, =0 {No stores yet} one {# store} other {# stores}}",
       "newButton": "Create store",
       "emptyTitle": "Create the first store",
-      "since": "Since {date}"
+      "since": "Since {date}",
+      "searchLabel": "Search store",
+      "searchPlaceholder": "Name, RUC, DNI or email",
+      "searchSubmit": "Search",
+      "noResults": "We found no stores matching “{query}”.",
+      "clearSearch": "See all"
     },
     "create": {
       "title": "Create store",

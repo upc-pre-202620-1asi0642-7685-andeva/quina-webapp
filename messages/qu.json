@@ -263,7 +263,8 @@
       "more": "Astawan",
       "soon": "Qayllaña",
       "stores": "Tiendas",
-      "rateCaps": "Topes BCRP"
+      "rateCaps": "Topes BCRP",
+      "sellSoon": "Rantiy, qayllaña"
     }
   },
   "Customers": {
@@ -610,7 +611,12 @@
       "subtitle": "{count, plural, =0 {Aún no hay tiendas} one {# tienda} other {# tiendas}}",
       "newButton": "Crear tienda",
       "emptyTitle": "Crea la primera tienda",
-      "since": "Desde el {date}"
+      "since": "Desde el {date}",
+      "searchLabel": "Tiendata maskay",
+      "searchPlaceholder": "Suti, RUC, DNI utaq correo",
+      "searchSubmit": "Maskay",
+      "noResults": "Mana tarinchikchu tiendakunata «{query}» nisqawan.",
+      "clearSearch": "Llapanta qhaway"
     },
     "create": {
       "title": "Crear tienda",

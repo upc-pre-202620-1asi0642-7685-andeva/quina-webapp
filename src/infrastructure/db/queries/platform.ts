@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, or } from 'drizzle-orm';
 import type { PlanTier, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import { db } from '../connection';
 import { HAS_PASSWORD } from '../repositories/drizzle-team-repository';
@@ -16,7 +16,8 @@ export type PlatformStoreItem = {
 };
 
 /** stores no tiene RLS: el Administrador las lista con quina_app (D2). */
-export async function listStores(): Promise<PlatformStoreItem[]> {
+export async function listStores(search = ''): Promise<PlatformStoreItem[]> {
+  const term = search.trim().replace(/[%_\\]/g, '');
   return db
     .select({
       id: stores.id,
@@ -28,6 +29,15 @@ export async function listStores(): Promise<PlatformStoreItem[]> {
       createdAt: stores.createdAt,
     })
     .from(stores)
+    .where(
+      term
+        ? or(
+            ilike(stores.commercialName, `%${term}%`),
+            ilike(stores.taxIdNumber, `%${term}%`),
+            ilike(stores.contactEmail, `%${term}%`),
+          )
+        : undefined,
+    )
     .orderBy(desc(stores.createdAt))
     .limit(500);
 }

@@ -58,5 +58,14 @@ test.describe('vecinos y condiciones de fiado (US04, US06)', () => {
     await expect(
       page.getByText('Rosa Quispe Mamani').filter({ visible: true }).first(),
     ).toBeVisible();
+
+    // La búsqueda se queda dentro de /app y filtra por nombre
+    await page.getByRole('searchbox', { name: 'Buscar vecino' }).fill('Ramírez');
+    await page.getByRole('button', { name: 'Buscar' }).click();
+    await expect(page).toHaveURL(/\/app\/customers\?q=Ram/);
+    await expect(page.getByText(/No encontramos vecinos/)).toBeVisible();
+    await page.getByRole('searchbox', { name: 'Buscar vecino' }).fill('quispe');
+    await page.getByRole('button', { name: 'Buscar' }).click();
+    await expect(page.getByText('1 vecino', { exact: true })).toBeVisible();
   });
 });

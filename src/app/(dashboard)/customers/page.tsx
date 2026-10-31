@@ -1,3 +1,4 @@
+import Form from 'next/form';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { ChevronRightIcon, SearchIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
@@ -46,7 +47,7 @@ export default async function CustomersPage({
         ) : null}
       </header>
 
-      <form role="search" action="/customers" className="flex gap-2">
+      <Form role="search" action="" className="flex gap-2">
         <label htmlFor="customer-search" className="sr-only">
           {t('searchLabel')}
         </label>
@@ -63,7 +64,7 @@ export default async function CustomersPage({
           <SearchIcon aria-hidden="true" />
           <span className="sr-only">{t('searchSubmit')}</span>
         </button>
-      </form>
+      </Form>
 
       {customers.length === 0 ? (
         <section className="flex flex-col items-center gap-3 rounded-card border border-line bg-surface px-6 py-12 text-center">

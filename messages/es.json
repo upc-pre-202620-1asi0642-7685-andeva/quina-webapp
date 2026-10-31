@@ -262,7 +262,8 @@
       "more": "Más",
       "soon": "Pronto",
       "stores": "Tiendas",
-      "rateCaps": "Topes BCRP"
+      "rateCaps": "Topes BCRP",
+      "sellSoon": "Vender, disponible pronto"
     }
   },
   "Customers": {
@@ -609,7 +610,12 @@
       "subtitle": "{count, plural, =0 {Aún no hay tiendas} one {# tienda} other {# tiendas}}",
       "newButton": "Crear tienda",
       "emptyTitle": "Crea la primera tienda",
-      "since": "Desde el {date}"
+      "since": "Desde el {date}",
+      "searchLabel": "Buscar tienda",
+      "searchPlaceholder": "Nombre, RUC, DNI o correo",
+      "searchSubmit": "Buscar",
+      "noResults": "No encontramos tiendas con «{query}».",
+      "clearSearch": "Ver todas"
     },
     "create": {
       "title": "Crear tienda",

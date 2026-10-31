@@ -90,15 +90,17 @@ export function BottomNav({ items }: { items: NavItem[] }) {
           if (item.key === 'sell') {
             return (
               <li key={item.key} className="flex flex-1 justify-center py-1.5">
+                {/* Mientras no exista la venta, el botón no compite en verde con la acción de la pantalla */}
                 <span
                   aria-disabled={item.soon ? 'true' : undefined}
                   className={cn(
-                    'flex h-14 min-w-14 flex-col items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-dark',
-                    item.soon && 'opacity-60',
+                    'flex h-14 min-w-14 flex-col items-center justify-center rounded-full px-4 text-xs font-semibold',
+                    item.soon ? 'bg-paper-deep text-ink-soft' : 'bg-primary text-primary-dark',
                   )}
                 >
                   <Icon aria-hidden="true" />
-                  {item.soon ? t('soon') : t(item.key)}
+                  <span aria-hidden={item.soon ? 'true' : undefined}>{t(item.key)}</span>
+                  {item.soon ? <span className="sr-only">{t('sellSoon')}</span> : null}
                 </span>
               </li>
             );
