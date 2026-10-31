@@ -182,5 +182,32 @@
     "confirmEmailChange": "Confirmar nuevo correo",
     "emailChanged": "Tu correo fue actualizado.",
     "signOut": "Cerrar sesión"
+  },
+  "AuthAside": {
+    "register": {
+      "title": "Empieza gratis con tus primeros 15 vecinos",
+      "lead": "Sin tarjeta y en dos minutos. Tu bodega arranca con 14 días de Bodega Pro.",
+      "point1": "Cada vecino con su límite, su fecha de corte y su fecha de pago.",
+      "point2": "Quina calcula lo que te deben, con intereses y mora si los pactas.",
+      "point3": "Los estados de cuenta y recordatorios llegan solos al correo del vecino."
+    },
+    "login": {
+      "title": "Tu cuaderno de fiados, ordenado",
+      "lead": "Lo que te deben, al día y sin tachones. Entra y sigue atendiendo.",
+      "point1": "Cada fiado queda anotado con fecha, monto y quién atendió.",
+      "point2": "La fecha de corte y la de pago se calculan solas.",
+      "point3": "Cobras sin roche: Quina avisa por correo al vecino."
+    },
+    "card": {
+      "label": "Ficha de ejemplo de una vecina",
+      "name": "Rosa Quispe",
+      "example": "Ejemplo",
+      "status": "Al día",
+      "balance": "Tiene por pagar",
+      "limit": "Límite de crédito: {limit}",
+      "limitUsed": "Usa el {percent} % de su límite",
+      "cutOff": "Fecha de corte",
+      "due": "Fecha de pago"
+    }
   }
 }

@@ -189,6 +189,29 @@ shadcn, no aceptar cambios a `globals.css`.
   sitio. Esto prevalece sobre el `rounded-xl` que menciona el sistema de diseño
   original.
 
+### 6.1. Pantallas de acceso (login, registro, verificación, recuperación)
+
+Son la única excepción de "portada" dentro de la webapp: el comerciante aún no
+entra al mostrador, así que se permite un panel de marca. Todas usan
+`AuthShell`; ninguna arma su propio layout.
+
+- **Dos columnas desde 1024 px:** formulario a la izquierda (ancho máximo 400 px,
+  sin tarjeta alrededor, directo sobre `--color-paper`) y panel de marca a la
+  derecha, con 12 px de margen y `rounded-card`. Bajo 1024 px solo queda el
+  formulario; el panel no se muestra.
+- **Barra superior:** isologo a la izquierda y el enlace alterno ("¿Ya tienes
+  cuenta? Ingresa") a la derecha desde 640 px; en celular ese enlace baja al pie.
+- **Panel de marca:** fondo `--color-primary-dark` y texto `--color-primary-soft`
+  en ambos temas (no usa tokens de rol). Texto secundario: `--color-primary-soft`
+  al 70–75 %. Detalles, montos destacados e íconos: `--color-primary`. Bordes:
+  `--color-primary-soft` al 15 %.
+- **Contenido del panel:** un titular (la promesa del sitio en registro; "Tu
+  cuaderno de fiados, ordenado" en ingreso y recuperación), la ficha de ejemplo
+  de Rosa Quispe con la etiqueta "Ejemplo" y tres beneficios con ícono. Nada de
+  testimonios, logos de clientes ni cifras que no estén en `docs/`.
+- **Movimiento:** solo la ficha entra una vez (sube 12 px sin cambiar su opacidad, 450 ms,
+  `--ease-out-expo`). Nada más se anima.
+
 ---
 
 ## 7. Componentes

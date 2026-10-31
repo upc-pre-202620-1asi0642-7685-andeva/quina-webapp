@@ -113,6 +113,7 @@ export function RegisterForm() {
 
   return (
     <AuthShell
+      aside="register"
       logoAlt={tAuth('logoAlt')}
       title={t('title')}
       subtitle={t('subtitle')}

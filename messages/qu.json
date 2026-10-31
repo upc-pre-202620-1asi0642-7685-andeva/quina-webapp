@@ -183,5 +183,32 @@
     "confirmEmailChange": "Musuq correota takyachiy",
     "emailChanged": "Correoykiqa musuqchasqañam.",
     "signOut": "Lluqsiy"
+  },
+  "AuthAside": {
+    "register": {
+      "title": "Mana qullqiyuq qallariy ñawpaq 15 llaqtamasiykiwan",
+      "lead": "Mana tarjetayuq, iskay minutollapi. Tiendaykiqa 14 p’unchaw Bodega Prowan qallarin.",
+      "point1": "Sapa llaqtamasi limiteniyuq, kuchuy p’unchawniyuq, qullqi kutichiy p’unchawniyuq.",
+      "point2": "Quina yupan imaynatachus manukusunki, interesniyuq moraniyuq rimanakuspaqa.",
+      "point3": "Willakuykunaqa kikinmanta chayan llaqtamasiykiq correonman."
+    },
+    "login": {
+      "title": "Fiado cuadernoyki, allinta churasqa",
+      "lead": "Imaynatachus manukusunki, p’unchawpi, mana tachonniyuq. Yaykuy hinaspa atiendespa qatiy.",
+      "point1": "Sapa fiadoqa qillqasqa p’unchawniyuq, qullqinniyuq, pichus atiendirqa.",
+      "point2": "Kuchuy p’unchawpas qullqi kutichiy p’unchawpas kikinmanta yupakun.",
+      "point3": "Mana p’inqakuspa cobray: Quina correowan llaqtamasiykiman willan."
+    },
+    "card": {
+      "label": "Huk llaqtamasiq rikuchiy fichan",
+      "name": "Rosa Quispe",
+      "example": "Rikuchiy",
+      "status": "P’unchawpi",
+      "balance": "Kutichinan",
+      "limit": "Crédito limite: {limit}",
+      "limitUsed": "Limitenmanta {percent} % utilizan",
+      "cutOff": "Kuchuy p’unchaw",
+      "due": "Qullqi kutichiy p’unchaw"
+    }
   }
 }

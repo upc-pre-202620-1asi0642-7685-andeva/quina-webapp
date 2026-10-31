@@ -182,5 +182,32 @@
     "confirmEmailChange": "Confirm new email",
     "emailChanged": "Your email has been updated.",
     "signOut": "Sign out"
+  },
+  "AuthAside": {
+    "register": {
+      "title": "Start free with your first 15 neighbors",
+      "lead": "No card, two minutes. Your store starts with 14 days of Bodega Pro.",
+      "point1": "Each neighbor with their own limit, cut-off date and payment date.",
+      "point2": "Quina works out what you are owed, with interest and late fees if you agree on them.",
+      "point3": "Statements and reminders reach your neighbor’s email on their own."
+    },
+    "login": {
+      "title": "Your credit notebook, in order",
+      "lead": "What you are owed, up to date and without scribbles. Sign in and keep serving.",
+      "point1": "Every credit sale is recorded with date, amount and who served it.",
+      "point2": "Cut-off and payment dates are calculated for you.",
+      "point3": "Collect without the awkwardness: Quina emails your neighbor."
+    },
+    "card": {
+      "label": "Example account of a neighbor",
+      "name": "Rosa Quispe",
+      "example": "Example",
+      "status": "Up to date",
+      "balance": "Amount to pay",
+      "limit": "Credit limit: {limit}",
+      "limitUsed": "Uses {percent} % of her limit",
+      "cutOff": "Cut-off date",
+      "due": "Payment date"
+    }
   }
 }

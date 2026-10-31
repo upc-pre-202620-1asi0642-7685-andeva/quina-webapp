@@ -63,7 +63,12 @@ export function StoreRegistrationForm({
   const formError = state.formError as StoreErrorKey | undefined;
 
   return (
-    <AuthShell logoAlt={tAuth('logoAlt')} title={t('title')} subtitle={t('subtitle')}>
+    <AuthShell
+      aside="register"
+      logoAlt={tAuth('logoAlt')}
+      title={t('title')}
+      subtitle={t('subtitle')}
+    >
       <p className="rounded-field bg-paper-deep px-3.5 py-2.5 text-sm text-ink-soft">
         {t('ownerInfo', { name: ownerName, email: ownerEmail })}
       </p>

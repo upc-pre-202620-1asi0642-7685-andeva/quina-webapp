@@ -100,6 +100,7 @@ function VerifyOtpContent() {
 
   return (
     <AuthShell
+      aside="register"
       logoAlt={tAuth('logoAlt')}
       title={t('title')}
       subtitle={t('subtitle', { email: email || '…' })}
