@@ -30,6 +30,18 @@ describe('authSchemas', () => {
       }
     });
 
+    it('rechaza un nombre con números o símbolos con el mensaje nameInvalid', () => {
+      const parsed = accountSchema.safeParse({
+        name: 'Juan123',
+        email: 'lucho@bodega.pe',
+        password: 'Bodega#2026',
+      });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues[0]).toMatchObject({ path: ['name'], message: 'nameInvalid' });
+      }
+    });
+
     it('rechaza nombre vacío o correo inválido', () => {
       expect(
         accountSchema.safeParse({ name: ' ', email: 'lucho@bodega.pe', password: 'Bodega#2026' })

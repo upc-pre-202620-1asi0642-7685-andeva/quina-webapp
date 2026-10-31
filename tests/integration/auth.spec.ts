@@ -209,6 +209,19 @@ describe('registro con correo y contraseña', () => {
     expect(await userByEmail(email)).toBeUndefined();
   });
 
+  it('rechaza un nombre con números y no crea la cuenta', async () => {
+    const email = newEmail('nombre');
+    const response = await post(
+      auth,
+      '/sign-up/email',
+      { name: 'Juan123', email, password: PASSWORD },
+      { ip: nextIp(), cookie: CONSENT },
+    );
+    expect(response.status).toBe(400);
+    expect(((await response.json()) as { code: string }).code).toBe('NAME_INVALID');
+    expect(await userByEmail(email)).toBeUndefined();
+  });
+
   it('sin aceptar términos y privacidad no se crea la cuenta', async () => {
     const email = newEmail('sin-consentimiento');
     const response = await post(

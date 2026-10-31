@@ -52,6 +52,7 @@
     },
     "errors": {
       "nameRequired": "Hunt'asqa sutiykita qillqay (2 qillqamanta aswan).",
+      "nameInvalid": "Sutiykita qillqakunallawan qillqay; espaciokunata, apóstrofota (') guiontapas (-) churayta atinki.",
       "emailInvalid": "Allin correota qillqay, suti@ejemplo.com hina.",
       "passwordRequired": "Yaykunaykipaq pakasqa simiykita qillqay.",
       "passwordWeak": "8 qillqamanta aswan churay, hatun qillqawan, yupaywan, unanchawan.",

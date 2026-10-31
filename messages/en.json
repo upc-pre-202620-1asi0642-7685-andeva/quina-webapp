@@ -51,6 +51,7 @@
     },
     "errors": {
       "nameRequired": "Enter your full name (at least 2 letters) to identify the store owner.",
+      "nameInvalid": "Use only letters in your name; spaces, apostrophes (') and hyphens (-) are allowed.",
       "emailInvalid": "Enter a valid email address, such as name@example.com.",
       "passwordRequired": "Enter your password to sign in.",
       "passwordWeak": "Use at least 8 characters with an uppercase letter, a number and a symbol.",

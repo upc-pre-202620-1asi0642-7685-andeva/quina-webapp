@@ -6,6 +6,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { captcha, emailOTP, lastLoginMethod } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
 import { PasswordPolicy } from '@/core/domain/identity/password-policy';
+import { PersonName } from '@/core/domain/identity/person-name';
 import type { AuthMailer } from '@/core/domain/ports/auth-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
 import { db as defaultDb, type Database } from '@/infrastructure/db/connection';
@@ -175,6 +176,8 @@ export function createAuth(deps: AuthDeps) {
         const body = (ctx.body ?? {}) as Record<string, unknown>;
         if (ctx.path === '/sign-up/email') {
           assertStrongPassword(body.password);
+          // Solo el nombre que se escribe en /register; el que llega de Google no se valida
+          assertPersonName(body.name);
           // Mensaje claro en lugar de la respuesta genérica de Better Auth
           if (typeof body.email === 'string' && (await findUser(body.email))) {
             throw new APIError('UNPROCESSABLE_ENTITY', {
@@ -225,6 +228,14 @@ export function createAuth(deps: AuthDeps) {
 }
 
 export type Auth = ReturnType<typeof createAuth>;
+
+function assertPersonName(name: unknown): void {
+  if (typeof name === 'string' && PersonName.parse(name).ok) return;
+  throw new APIError('BAD_REQUEST', {
+    code: 'NAME_INVALID',
+    message: 'Escribe tu nombre solo con letras; puedes usar espacios, apóstrofo y guion.',
+  });
+}
 
 function assertStrongPassword(password: unknown): void {
   if (typeof password !== 'string') return;

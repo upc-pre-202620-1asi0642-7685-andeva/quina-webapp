@@ -51,6 +51,7 @@
     },
     "errors": {
       "nameRequired": "Escribe tu nombre completo (mínimo 2 letras) para identificar al titular.",
+      "nameInvalid": "Escribe tu nombre solo con letras; puedes usar espacios, apóstrofo (') y guion (-).",
       "emailInvalid": "Escribe un correo válido, como nombre@ejemplo.com.",
       "passwordRequired": "Escribe tu contraseña para ingresar.",
       "passwordWeak": "Usa al menos 8 caracteres con una mayúscula, un número y un símbolo.",
