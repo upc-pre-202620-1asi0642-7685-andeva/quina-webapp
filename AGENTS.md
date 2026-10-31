@@ -87,6 +87,7 @@ pnpm db:generate    # Drizzle Kit: genera migraciones
 pnpm db:migrate     # Drizzle Kit: aplica migraciones
 pnpm db:roles       # Activa LOGIN y contraseñas de quina_app y quina_platform desde .env
 pnpm test:db        # Pruebas de integración contra un PostgreSQL real
+pnpm test:oracle    # Comprueba los juegos de datos del motor financiero con el oráculo en Python
 ```
 
 ---
