@@ -178,7 +178,7 @@ describe('vecinos (US04) contra PostgreSQL', () => {
 });
 
 describe('condiciones de crédito (US06, US26) contra PostgreSQL', () => {
-  const useCase = () => new SaveCreditTermsUseCase(new DrizzleCreditAccountRepository());
+  const saveTerms = () => new SaveCreditTermsUseCase(new DrizzleCreditAccountRepository());
 
   it('abre la cuenta con los topes sembrados y rechaza la moratoria sobre el tope', async () => {
     const { storeId, ownerId } = await storeWithOwner();
@@ -187,12 +187,12 @@ describe('condiciones de crédito (US06, US26) contra PostgreSQL', () => {
 
     const above = terms(storeId, ownerId, customerId);
     above.moratory = { type: 'EFFECTIVE', percent: '18', period: 'ANNUAL', capitalization: null };
-    expect(await useCase().execute(above)).toEqual({
+    expect(await saveTerms().execute(above)).toEqual({
       ok: false,
       error: 'MORATORY_RATE_ABOVE_CAP',
     });
 
-    expect(await useCase().execute(terms(storeId, ownerId, customerId))).toEqual({
+    expect(await saveTerms().execute(terms(storeId, ownerId, customerId))).toEqual({
       ok: true,
       value: 'OPENED',
     });
@@ -215,11 +215,11 @@ describe('condiciones de crédito (US06, US26) contra PostgreSQL', () => {
       if (created.ok) ids.push(created.value.customerId);
     }
     for (const id of ids.slice(0, 14)) {
-      expect((await useCase().execute(terms(storeId, ownerId, id))).ok).toBe(true);
+      expect((await saveTerms().execute(terms(storeId, ownerId, id))).ok).toBe(true);
     }
     const [first, second] = await Promise.all([
-      useCase().execute(terms(storeId, ownerId, ids[14]!)),
-      useCase().execute(terms(storeId, ownerId, ids[15]!)),
+      saveTerms().execute(terms(storeId, ownerId, ids[14]!)),
+      saveTerms().execute(terms(storeId, ownerId, ids[15]!)),
     ]);
     const outcomes = [first, second].map((r) => (r.ok ? r.value : r.error)).sort();
     expect(outcomes).toEqual(['OPENED', 'PLAN_LIMIT_REACHED']);
@@ -229,7 +229,7 @@ describe('condiciones de crédito (US06, US26) contra PostgreSQL', () => {
     const { storeId, ownerId } = await storeWithOwner();
     const created = await register(storeId, ownerId, dni());
     const customerId = created.ok ? created.value.customerId : '';
-    await useCase().execute(terms(storeId, ownerId, customerId));
+    await saveTerms().execute(terms(storeId, ownerId, customerId));
     await withTenant(storeId, (tx) =>
       tx
         .update(creditAccounts)
