@@ -50,6 +50,7 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
     await page.getByLabel('Tu nombre completo').fill('Lucho Quispe');
     await page.getByLabel('Tu correo electrónico').fill(email);
     await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
 
     await expect(page).toHaveURL(/\/app\/register\/verify/);
@@ -79,6 +80,7 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
     await page.getByLabel('Tu nombre completo').fill('Rosa Quispe');
     await page.getByLabel('Tu correo electrónico').fill(email);
     await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
     await expect(page).toHaveURL(/\/app\/register\/verify/);
     const firstOtp = await readLatestMail(email, 'verification-otp');
@@ -98,12 +100,14 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
     await page.getByLabel('Tu nombre completo').fill('Otro Dueño');
     await page.getByLabel('Tu correo electrónico').fill(email);
     await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
     await expect(page.getByText('Ese correo ya tiene cuenta. Ingresa.')).toBeVisible();
 
     // RUC repetido con un correo nuevo
     const secondEmail = uniqueEmail('dup-ruc');
     await page.getByLabel('Tu correo electrónico').fill(secondEmail);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
     await expect(page).toHaveURL(/\/app\/register\/verify/);
     const secondOtp = await readLatestMail(secondEmail, 'verification-otp');
@@ -131,6 +135,7 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
       await page.getByLabel('Tu nombre completo').fill('Ana Condori');
       await page.getByLabel('Tu correo electrónico').fill(email);
       await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+      await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
       await page.getByRole('button', { name: 'Continuar', exact: true }).click();
 
       await expect(page).toHaveURL(/\/app\/register\/verify/);

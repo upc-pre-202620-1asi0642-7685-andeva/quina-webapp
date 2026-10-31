@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { authClient } from '@/infrastructure/auth/auth-client';
+import { clearConsentCookie, consentCookie } from '@/infrastructure/auth/consent';
 import { AuthShell } from '@/presentation/components/auth/auth-shell';
+import { ConsentField } from '@/presentation/components/auth/consent-field';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { GoogleButton } from '@/presentation/components/auth/google-button';
 import {
@@ -28,6 +30,7 @@ type ErrorKey =
   | 'userAlreadyExists'
   | 'captchaRequired'
   | 'rateLimited'
+  | 'consentRequired'
   | 'generic';
 
 export function RegisterForm() {
@@ -35,6 +38,8 @@ export function RegisterForm() {
   const tAuth = useTranslations('Auth');
   const tErr = useTranslations('Auth.errors');
   const router = useRouter();
+  // Google devuelve aquí con ?error= cuando falta la aceptación u otro fallo
+  const googleError = useSearchParams().get('error');
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -44,7 +49,24 @@ export function RegisterForm() {
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<'name' | 'email' | 'password', ErrorKey>>
   >({});
-  const [formError, setFormError] = useState<ErrorKey | null>(null);
+  const [formError, setFormError] = useState<ErrorKey | null>(
+    googleError ? (/consent/i.test(googleError) ? 'consentRequired' : 'generic') : null,
+  );
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
+
+  function handleConsentChange(checked: boolean) {
+    setConsent(checked);
+    if (checked) setConsentError(false);
+    // auth.ts lee la cookie al crear el usuario, por correo o al volver de Google
+    document.cookie = checked ? consentCookie() : clearConsentCookie();
+  }
+
+  function requireConsent(): boolean {
+    if (consent) return true;
+    setConsentError(true);
+    return false;
+  }
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -60,13 +82,17 @@ export function RegisterForm() {
         next[key] ??= issue.message as ErrorKey;
       }
       setFieldErrors(next);
+      requireConsent();
       return;
     }
 
     if (!isPasswordStrong(parsed.data.password)) {
       setFieldErrors({ password: 'passwordWeak' });
+      requireConsent();
       return;
     }
+
+    if (!requireConsent()) return;
 
     if (!captchaToken) {
       setFormError('captchaRequired');
@@ -90,6 +116,8 @@ export function RegisterForm() {
           setFieldErrors({ email: 'userAlreadyExists' });
         } else if (code === 'PASSWORD_TOO_WEAK') {
           setFieldErrors({ password: 'passwordWeak' });
+        } else if (code === 'CONSENT_REQUIRED') {
+          setConsentError(true);
         } else if (code === 'MISSING_RESPONSE' || code === 'VERIFICATION_FAILED') {
           setFormError('captchaRequired');
         } else if (error.status === 429) {
@@ -130,7 +158,7 @@ export function RegisterForm() {
       }
     >
       <div className="flex flex-col gap-4">
-        <GoogleButton callbackURL="/app/register/store" />
+        <GoogleButton callbackURL="/app/register/store" onBeforeRedirect={requireConsent} />
         <div className="flex items-center gap-3 text-xs text-ink-soft">
           <span className="h-px flex-1 bg-line" />
           <span>{tAuth('or')}</span>
@@ -222,6 +250,12 @@ export function RegisterForm() {
         </FormField>
 
         <PasswordStrength password={password} />
+
+        <ConsentField
+          checked={consent}
+          onCheckedChange={handleConsentChange}
+          error={consentError ? tErr('consentRequired') : undefined}
+        />
 
         <TurnstileField onToken={setCaptchaToken} />
 

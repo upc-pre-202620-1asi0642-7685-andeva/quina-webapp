@@ -5,16 +5,28 @@ import { useTranslations } from 'next-intl';
 import { authClient } from '@/infrastructure/auth/auth-client';
 import { Button } from '@/presentation/components/ui/button';
 
-export function GoogleButton({ callbackURL = '/app' }: { callbackURL?: string }) {
+export type GoogleButtonProps = {
+  callbackURL?: string;
+  /** Se corre antes de ir a Google; si devuelve false, no se sale de la página. */
+  onBeforeRedirect?: () => boolean;
+};
+
+// Una cuenta nueva sin la casilla de términos aceptada vuelve a /register con
+// ?error= (auth.ts la rechaza con CONSENT_REQUIRED).
+const ERROR_CALLBACK_URL = '/app/register';
+
+export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleButtonProps) {
   const t = useTranslations('Auth');
   const [loading, setLoading] = useState(false);
 
   async function handleGoogle() {
+    if (onBeforeRedirect && !onBeforeRedirect()) return;
     setLoading(true);
     try {
       await authClient.signIn.social({
         provider: 'google',
         callbackURL,
+        errorCallbackURL: ERROR_CALLBACK_URL,
       });
     } finally {
       setLoading(false);

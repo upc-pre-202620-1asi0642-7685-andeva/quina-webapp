@@ -35,6 +35,7 @@ async function registerOwnerWithStore(page: Page) {
   await page.getByLabel('Tu nombre completo').fill('Carmen Rojas');
   await page.getByLabel('Tu correo electrónico').fill(email);
   await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+  await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   await expect(page).toHaveURL(/\/app\/register\/verify/);
 
