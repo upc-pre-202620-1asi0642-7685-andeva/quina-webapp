@@ -32,6 +32,7 @@
   "Auth": {
     "logoAlt": "Quina",
     "google": "Continuar con Google",
+    "lastUsed": "Último usado",
     "or": "o con tu correo",
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",

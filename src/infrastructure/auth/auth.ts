@@ -3,7 +3,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError, createAuthMiddleware, getIP, isAPIError } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
-import { captcha, emailOTP } from 'better-auth/plugins';
+import { captcha, emailOTP, lastLoginMethod } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
 import { PasswordPolicy } from '@/core/domain/identity/password-policy';
 import type { AuthMailer } from '@/core/domain/ports/auth-mailer';
@@ -57,6 +57,8 @@ export function createAuth(deps: AuthDeps) {
   }
 
   const plugins = [
+    // Cookie legible desde el navegador para marcar "Último usado" (sin guardar en la BD).
+    lastLoginMethod({ cookieName: 'quina-last-login' }),
     emailOTP({
       otpLength: 6,
       expiresIn: OTP_TTL_SECONDS,
