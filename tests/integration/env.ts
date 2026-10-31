@@ -15,6 +15,13 @@ export const testEnv = {
       'postgres://quina_app:quina_app_test@localhost:54329/quina_test'
     );
   },
+  // Rol de plataforma: solo escribe los topes del BCRP (D2)
+  get platformUrl(): string {
+    return (
+      process.env.DATABASE_TEST_PLATFORM_URL ??
+      'postgres://quina_platform:quina_platform_test@localhost:54329/quina_test'
+    );
+  },
   get appPassword(): string {
     return process.env.QUINA_APP_DB_PASSWORD ?? 'quina_app_test';
   },

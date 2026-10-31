@@ -27,6 +27,29 @@
       "subject": "We're protecting your Quina account",
       "intro": "There were 5 failed sign-in attempts on your account, so we locked it for 15 minutes.",
       "outro": "If it was you, wait 15 minutes and try again. If not, reset your password as soon as possible with \"Forgot my password\" to keep your account safe."
+    },
+    "welcome": {
+      "subject": "{store} registered you in Quina",
+      "greeting": "Hi {name},",
+      "intro": "{store} registered you in Quina to keep your store credit account in order. Quina is free for you.",
+      "action": "Read the privacy policy",
+      "outro": "You agreed that {store} keeps your data to manage your account, under Peruvian Law No. 29733. You can ask the store to see, correct or delete it."
+    },
+    "setup": {
+      "employee": {
+        "subject": "{store} invited you to Quina",
+        "intro": "{store} invited you to its team in Quina to serve at the counter. Choose your password to sign in:"
+      },
+      "owner": {
+        "subject": "Your store is now on Quina",
+        "intro": "We registered {store} in Quina. Choose your password to sign in and start organizing your store credit:"
+      },
+      "admin": {
+        "subject": "Your Quina admin access",
+        "intro": "You now have Platform Administrator access to Quina. Choose your password to sign in:"
+      },
+      "action": "Choose my password",
+      "outro": "The link expires in 72 hours and works only once. If you were not expecting this email, ignore it."
     }
   },
   "Auth": {
@@ -157,12 +180,13 @@
   },
   "Dashboard": {
     "logoAlt": "Quina",
-    "trialBadge": "Pro Trial: 14 days",
+    "trialBadge": "Pro Trial: {days, plural, one {# day} other {# days}}",
     "trialUntil": "Pro Trial until {date}",
     "welcome": "Your counter is ready, {name}.",
     "subtitle": "Start registering your neighbors and keeping clear accounts.",
     "profileLink": "My profile & language",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "registerCustomer": "Register neighbor"
   },
   "Profile": {
     "title": "My profile",
@@ -224,5 +248,472 @@
       "reminderTo": "By email to Rosa"
     },
     "photoAlt": "Shopkeeper serving customers in a neighborhood store"
+  },
+  "Shell": {
+    "logoAlt": "Quina",
+    "trialUntil": "Pro Trial until {date}",
+    "nav": {
+      "label": "Main navigation",
+      "home": "Home",
+      "sell": "Sell",
+      "customers": "Customers",
+      "team": "Team",
+      "settings": "Settings",
+      "more": "More",
+      "soon": "Soon",
+      "stores": "Stores",
+      "rateCaps": "BCRP caps",
+      "sellSoon": "Sell, coming soon"
+    }
+  },
+  "Customers": {
+    "list": {
+      "title": "Customers",
+      "subtitle": "Your neighbors and what you sell them on credit.",
+      "newButton": "Register neighbor",
+      "searchLabel": "Search neighbor",
+      "searchPlaceholder": "Name or document number",
+      "searchSubmit": "Search",
+      "emptyTitle": "You have no neighbors yet",
+      "emptyBody": "Register the first one to start selling on credit in order.",
+      "noResults": "We found no neighbors matching “{query}”.",
+      "clearSearch": "See all",
+      "colName": "Neighbor",
+      "colDocument": "Document",
+      "colAvailable": "Available",
+      "colStatus": "Status",
+      "count": "{count, plural, =1 {1 neighbor} other {# neighbors}}"
+    },
+    "status": {
+      "ACTIVE": "Credit active",
+      "SUSPENDED": "Credit paused",
+      "BLOCKED": "Credit blocked",
+      "noAccount": "Cash only",
+      "inactive": "Deactivated"
+    },
+    "documentTypes": {
+      "DNI": "DNI",
+      "CE": "Foreigner ID card",
+      "PASAPORTE": "Passport"
+    },
+    "form": {
+      "newTitle": "Register neighbor",
+      "newStep": "Step 1 of 2 · Neighbor details",
+      "newSubtitle": "With their details and consent, their credit is backed.",
+      "editTitle": "Edit {name}'s details",
+      "documentTypeLabel": "Document type",
+      "documentTypeHint": "The one the neighbor shows you.",
+      "documentNumberLabel": "Document number",
+      "documentNumberHint": "DNI has 8 digits; foreigner ID card 9 to 12 characters; passport 6 to 12.",
+      "firstNameLabel": "First names",
+      "firstNameHint": "As they appear on the document.",
+      "lastNameLabel": "Last names",
+      "lastNameHint": "Both, if they have two.",
+      "phoneLabel": "Mobile phone",
+      "phoneHint": "9 digits. Use it to call them when needed.",
+      "emailLabel": "Email",
+      "emailHint": "They get their purchase summary and payment reminders there.",
+      "addressLabel": "Address (optional)",
+      "addressHint": "Their home in the neighborhood, to find them.",
+      "localeLabel": "Language of their emails",
+      "localeHint": "If you don't choose, your store's language is used.",
+      "localeStore": "The store's",
+      "locales": {
+        "es": "Spanish",
+        "en": "English",
+        "qu": "Quechua"
+      },
+      "consentTitle": "Neighbor's consent",
+      "consentHint": "Read this consent to the neighbor. Without it you can't register them.",
+      "consentLabel": "The neighbor authorizes {store} to record and use their personal data to manage their credit account, under the <privacy>privacy policy</privacy> (Law No. 29733).",
+      "consentText": "The neighbor authorizes {store} to record and use their personal data to manage their credit account, under the privacy policy (Law No. 29733).",
+      "submit": "Register neighbor",
+      "submitting": "Registering…",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "errors": {
+        "documentInvalid": "Check the number: DNI has 8 digits; foreigner ID card 9 to 12 characters; passport 6 to 12.",
+        "documentTaken": "You already have a neighbor with that document. Look them up in your list.",
+        "firstNameInvalid": "Write their first names using letters only.",
+        "lastNameInvalid": "Write their last names using letters only.",
+        "phoneInvalid": "Enter a 9-digit mobile number that starts with 9.",
+        "emailInvalid": "Enter a valid email, like rosa@correo.pe.",
+        "consentRequired": "Check the neighbor's consent to register them.",
+        "notFound": "That neighbor doesn't exist in your store.",
+        "generic": "We couldn't save. Try again."
+      }
+    },
+    "detail": {
+      "back": "Back to customers",
+      "created": "We registered {name} and sent them a welcome email.",
+      "createdNoMail": "We registered {name}, but couldn't send the welcome email.",
+      "saved": "We saved the changes.",
+      "termsOpened": "Done: {name} can now buy on credit.",
+      "contactTitle": "Neighbor details",
+      "document": "Document",
+      "phone": "Mobile phone",
+      "email": "Email",
+      "address": "Address",
+      "noAddress": "No address",
+      "since": "Neighbor since",
+      "creditTitle": "Credit",
+      "limit": "Limit",
+      "balance": "Owed",
+      "available": "Available",
+      "compensatory": "Credit interest",
+      "moratory": "Late interest",
+      "cutOff": "Cut-off",
+      "payment": "Payment",
+      "dayOfMonth": "Day {day} of each month",
+      "maxMonths": "Max installments",
+      "months": "{count, plural, =1 {1 installment} other {# installments}}",
+      "noAccount": "Buys in cash only. Set their terms to sell them on credit.",
+      "noAccountEmployee": "Buys in cash only. Only the owner can set their terms.",
+      "edit": "Edit details",
+      "setTerms": "Set terms",
+      "changeTerms": "Change terms",
+      "suspend": "Pause credit",
+      "resume": "Resume credit",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate neighbor",
+      "deactivateTitle": "Deactivate {name}?",
+      "deactivateBody": "They won't be able to buy on credit. Their data and history are kept.",
+      "suspendTitle": "Pause {name}'s credit?",
+      "suspendBody": "They can't buy on credit until you resume it. What they owe doesn't change.",
+      "confirm": "Yes, continue",
+      "cancel": "Cancel",
+      "errors": {
+        "hasBalance": "They still owe money: their account must reach zero first.",
+        "planLimit": "You reached your plan's limit of neighbors with active credit.",
+        "generic": "We couldn't make the change. Try again."
+      }
+    },
+    "terms": {
+      "title": "Credit terms",
+      "step": "Step 2 of 2 · Terms",
+      "subtitle": "Agree on them with {name}. They only apply to purchases from today on.",
+      "currencyLabel": "Currency",
+      "currencyHint": "The currency you give credit in.",
+      "currencies": {
+        "PEN": "Soles (S/)",
+        "USD": "Dollars (US$)"
+      },
+      "creditLimitLabel": "Credit limit",
+      "creditLimitHint": "The most they can owe, for example 150.",
+      "compensatoryTitle": "Credit interest (compensatory)",
+      "moratoryTitle": "Late interest (moratory)",
+      "rateTypeLabel": "Rate type",
+      "rateTypeHint": "Effective: already includes compounding. Nominal: you also choose how often it compounds.",
+      "rateTypes": {
+        "EFFECTIVE": "Effective",
+        "NOMINAL": "Nominal"
+      },
+      "percentLabel": "Rate (%)",
+      "compensatoryPercentHint": "Use 0 for trusted neighbors. BCRP cap today: {cap} % effective annual.",
+      "moratoryPercentHint": "Only applies if they pay late. BCRP cap today: {cap} % effective annual.",
+      "noCapHint": "There is no BCRP cap in force for this currency.",
+      "periodLabel": "Rate period",
+      "periodHint": "Whether the rate is annual, monthly or daily.",
+      "capitalizationLabel": "Compounding",
+      "capitalizationHint": "How often interest is added to the debt.",
+      "periods": {
+        "ANNUAL": "Annual",
+        "MONTHLY": "Monthly",
+        "DAILY": "Daily"
+      },
+      "cutOffDayLabel": "Cut-off day",
+      "cutOffDayHint": "From 1 to 28. That day the month's purchases are closed.",
+      "paymentDueDayLabel": "Payment day",
+      "paymentDueDayHint": "From 1 to 28. Until that day they pay without late interest.",
+      "maxMonthsLabel": "Max installments",
+      "maxMonthsHint": "From 1 to 24 months, for installment purchases.",
+      "submitOpen": "Open credit",
+      "submitUpdate": "Save terms",
+      "submitting": "Saving…",
+      "cashOnly": "Cash only for now",
+      "cancel": "Cancel",
+      "rateEffective": "{percent} % effective {period}",
+      "rateNominal": "{percent} % nominal {period}, compounded {capitalization}",
+      "periodAdjective": {
+        "ANNUAL": "annual",
+        "MONTHLY": "monthly",
+        "DAILY": "daily"
+      },
+      "capitalizationAdverb": {
+        "ANNUAL": "annually",
+        "MONTHLY": "monthly",
+        "DAILY": "daily"
+      },
+      "evidence": "Terms agreed with {name}: limit {limit}; compensatory interest {compensatory}; moratory interest {moratory}; cut-off on day {cutOff}; payment on day {payment}; up to {months} installments.",
+      "errors": {
+        "limitInvalid": "Enter an amount greater than zero, with up to 2 decimals.",
+        "percentInvalid": "Enter a percentage like 3.5, with up to 2 decimals.",
+        "aboveCap": "It exceeds the BCRP cap: {cap} % effective annual.",
+        "noCap": "There is no BCRP cap in force for this currency. Tell the Quina administrator.",
+        "needsCapitalization": "Choose how often the nominal rate compounds.",
+        "capitalizationLonger": "Compounding can't be longer than the rate period.",
+        "dayOutOfRange": "Choose a day from 1 to 28.",
+        "monthsOutOfRange": "Choose 1 to 24 installments.",
+        "currencyLocked": "They owe money: you can't change the currency until they pay.",
+        "customerInactive": "The neighbor is deactivated: reactivate them to give credit.",
+        "planLimit": "You reached your plan's limit of neighbors with active credit.",
+        "generic": "We couldn't save the terms. Try again."
+      }
+    }
+  },
+  "Plans": {
+    "seePlans": "See plans",
+    "names": {
+      "CASERO": "Casero",
+      "BODEGA_PRO": "Bodega Pro",
+      "NEGOCIO_PLUS": "Negocio Plus"
+    },
+    "unlimited": "no limit",
+    "perMonth": "per month",
+    "annual": "or {price} per year",
+    "freeForever": "Free forever",
+    "availableIn": "on {plan}",
+    "features": {
+      "automaticNotifications": "Automatic payment reminders",
+      "receipts": "Electronic receipts and invoices",
+      "kardexAverageCost": "Inventory with average cost",
+      "reportsExport": "Downloadable reports",
+      "ai": "AI assistant"
+    },
+    "limits": {
+      "activeCreditCustomers": "Customers on credit: {max}",
+      "users": "Users: {max}",
+      "products": "Products: {max}",
+      "receiptsPerMonth": "Receipts per month: {max}",
+      "aiQueriesPerMonth": "AI queries per month: {max}"
+    }
+  },
+  "Privacy": {
+    "customers": {
+      "title": "{store}'s privacy policy for its customers",
+      "draft": "Legal draft: this text is pending review by a lawyer.",
+      "version": "Version {version}",
+      "intro": "{store} uses Quina to keep track of its customers' store credit. Here we explain what data about you it keeps, why, and how you can ask to correct or delete it, under Peruvian Law No. 29733 on Personal Data Protection.",
+      "ownerTitle": "Who is responsible for your data?",
+      "owner": "The data controller is {store}, {taxIdType} {taxId}. You can write to {email}.",
+      "ownerAddress": "Address: {address}.",
+      "processorTitle": "What role does Quina play?",
+      "processor": "Quina, a product by Andeva, is the data processor: it keeps the data on secure servers on behalf of the store, does not use it for anything else and never sells it.",
+      "dataTitle": "What data is kept?",
+      "data": "Your ID document, first and last names, mobile phone, email, address if you gave it, your preferred language, your credit terms (limit, rates, cut-off and payment dates) and the record of your credit purchases and payments.",
+      "purposeTitle": "What is it used for?",
+      "purpose": "Only to manage your store credit account: record your purchases and payments, calculate your installments and interest, send you your statement and payment reminders, and let you check your account.",
+      "retentionTitle": "For how long?",
+      "retention": "While you have an account with the store and, afterwards, for as long as the law requires sales and payment records to be kept.",
+      "rightsTitle": "Your rights",
+      "rights": "You can ask to access your data, correct it, cancel it or object to its use. Write to the store at {email} or ask at the counter. If you get no answer, you can go to the National Authority for Personal Data Protection of the Ministry of Justice.",
+      "notFoundTitle": "This store does not exist",
+      "notFound": "Check the link you were given."
+    }
+  },
+  "AcceptInvite": {
+    "title": "Hi, {name}: create your password",
+    "subtitleStore": "You were added to the {store} team on Quina.",
+    "subtitlePlatform": "You were given access to Quina administration.",
+    "account": "Your account: {email}",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
+    "submit": "Create my password",
+    "submitting": "Saving…",
+    "done": "Done. You can now sign in with your email and password.",
+    "goToLogin": "Go to sign in",
+    "invalidTitle": "This link no longer works",
+    "invalid": "It was already used or it expired (it lasts 72 hours). Ask the person who invited you to send a new one."
+  },
+  "Team": {
+    "title": "Team",
+    "usage": "{seats} of {max} users on your plan",
+    "usageUnlimited": "{seats} users",
+    "membersTitle": "Who uses Quina at your store",
+    "you": "you",
+    "status": {
+      "OWNER": "Owner",
+      "ACTIVE": "Active",
+      "INVITED": "Invited",
+      "DEACTIVATED": "Deactivated"
+    },
+    "invite": {
+      "title": "Invite someone",
+      "subtitle": "They get a link to create their password. They can sell, collect payments and register customers; credit terms and prices stay with you.",
+      "name": "Name",
+      "nameHint": "First and last name, as you know them.",
+      "email": "Email",
+      "emailHint": "The invitation goes there. It expires in 72 hours.",
+      "submit": "Send invitation",
+      "sending": "Sending…",
+      "sent": "Invitation sent to {email}.",
+      "mailFailed": "They are invited, but the email to {email} did not go out. Use “Resend” in a moment.",
+      "errors": {
+        "nameInvalid": "Write their name using letters only.",
+        "emailInvalid": "Check the email; it looks incomplete.",
+        "emailTaken": "That email already has a Quina account. Use another one.",
+        "planLimit": "You reached your plan’s user limit.",
+        "generic": "Could not send the invitation. Try again."
+      }
+    },
+    "locked": {
+      "caseroTitle": "The Casero plan is just for you",
+      "fullTitle": "Your team is full",
+      "body": "To add someone, move to {plan}."
+    },
+    "member": {
+      "resend": "Resend",
+      "cancelInvite": "Cancel invitation",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "keep": "No, go back",
+      "cancelTitle": "Cancel {name}’s invitation?",
+      "cancelBody": "Their link stops working. You can invite them again whenever you want.",
+      "cancelConfirm": "Cancel invitation",
+      "deactivateTitle": "Deactivate {name}?",
+      "deactivateBody": "They are signed out of Quina on every device right away. What they recorded stays.",
+      "deactivateConfirm": "Deactivate",
+      "messages": {
+        "resent": "We sent a new link; the previous one no longer works.",
+        "mailFailed": "The email did not go out. Try again in a moment.",
+        "planLimit": "Your plan has no room to reactivate them.",
+        "generic": "Could not complete it. Try again."
+      }
+    }
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Your plan and what you are using.",
+    "currentPlan": "Your plan: {plan}",
+    "trialUntil": "Free trial until {date}. After that you move to Casero unless you choose a plan.",
+    "usage": {
+      "activeCreditCustomers": "Customers with active credit",
+      "users": "Users",
+      "products": "Products"
+    },
+    "usageOf": "{used} of {max}",
+    "usageUnlimited": "{used} · no limit",
+    "plansTitle": "Plans",
+    "plansSubtitle": "Prices in Peruvian soles.",
+    "yourPlan": "Your plan",
+    "paymentSoon": "Soon you will be able to change plans and pay from here."
+  },
+  "Platform": {
+    "shellName": "Quina Platform",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "stores": {
+      "title": "Stores",
+      "subtitle": "{count, plural, =0 {No stores yet} one {# store} other {# stores}}",
+      "newButton": "Create store",
+      "emptyTitle": "Create the first store",
+      "since": "Since {date}",
+      "searchLabel": "Search store",
+      "searchPlaceholder": "Name, RUC, DNI or email",
+      "searchSubmit": "Search",
+      "noResults": "We found no stores matching “{query}”.",
+      "clearSearch": "See all"
+    },
+    "create": {
+      "title": "Create store",
+      "subtitle": "It starts on the Casero plan, active. The owner gets a link to create their password.",
+      "commercialName": "Business name",
+      "commercialNameHint": "As the neighborhood knows it.",
+      "businessTurn": "Business type",
+      "businessTurnHint": "The store’s main activity.",
+      "taxId": "RUC or DNI",
+      "taxIdHint": "11 digits for a RUC; 8 for a DNI.",
+      "locale": "Language",
+      "localeHint": "For emails to the owner and their customers.",
+      "ownerName": "Owner’s name",
+      "ownerNameHint": "Registered as the store’s owner.",
+      "ownerEmail": "Owner’s email",
+      "ownerEmailHint": "The link goes there. It expires in 72 hours.",
+      "submit": "Create store",
+      "submitting": "Creating…",
+      "cancel": "Cancel",
+      "errors": {
+        "COMMERCIAL_NAME_INVALID": "Write the business name.",
+        "TAX_ID_INVALID": "Write 11 digits (RUC) or 8 (DNI).",
+        "TAX_ID_TAKEN": "There is already a store with that RUC or DNI.",
+        "NAME_INVALID": "Write the name using letters only.",
+        "EMAIL_INVALID": "Check the email; it looks incomplete.",
+        "EMAIL_TAKEN": "That email already has a Quina account.",
+        "generic": "Could not create the store. Try again."
+      }
+    },
+    "detail": {
+      "back": "Back to stores",
+      "created": "Store created. We sent the link to {email}.",
+      "createdNoMail": "Store created, but the email to {email} did not go out. Use “Resend link”.",
+      "taxId": "RUC or DNI",
+      "businessTurn": "Business type",
+      "owner": "Owner",
+      "ownerAccess": "Owner access",
+      "ownerPending": "Has not created a password yet",
+      "ownerReady": "Signs in with a password",
+      "ownerMissing": "No owner",
+      "plan": "Plan",
+      "planTrial": "{plan} trial until {date}",
+      "since": "Created on",
+      "resend": "Resend link",
+      "suspend": "Suspend store",
+      "reactivate": "Reactivate store",
+      "keep": "No, go back",
+      "suspendTitle": "Suspend {name}?",
+      "suspendBody": "All its users are signed out of Quina right away and cannot sign in again until you reactivate it. Its data is kept.",
+      "suspendConfirm": "Suspend",
+      "messages": {
+        "resent": "We sent the owner a new link; the previous one no longer works.",
+        "mailFailed": "The email did not go out. Try again in a moment.",
+        "suspended": "Store suspended.",
+        "reactivated": "Store reactivated.",
+        "generic": "Could not complete it. Try again."
+      }
+    },
+    "caps": {
+      "title": "BCRP caps",
+      "subtitle": "Maximum interest rates for credit outside the financial system. Quina rejects terms above them.",
+      "historyTitle": "Validity periods",
+      "kinds": {
+        "COMPENSATORY": "Compensatory",
+        "MORATORY": "Late payment"
+      },
+      "currencies": {
+        "PEN": "Soles",
+        "USD": "Dollars"
+      },
+      "rate": "{percent} % effective annual",
+      "inForce": "In force since {from}",
+      "period": "From {from} to {to}",
+      "form": {
+        "title": "New validity period",
+        "subtitle": "When you save it, the previous period for the same rate and currency closes the day before.",
+        "kind": "Interest type",
+        "kindHint": "Compensatory: for credit. Late payment: for arrears.",
+        "currency": "Currency",
+        "currencyHint": "The BCRP publishes one cap per currency.",
+        "percent": "Cap (% effective annual)",
+        "percentHint": "As published by the BCRP, for example 114.13.",
+        "validFrom": "In force from",
+        "validFromHint": "Must be after the current period.",
+        "source": "Source",
+        "sourceHint": "BCRP circular and publication date.",
+        "submit": "Save period",
+        "submitting": "Saving…",
+        "saved": "Period saved.",
+        "errors": {
+          "RATE_PERCENT_INVALID": "Write a percentage, for example 114.13.",
+          "RATE_NOT_POSITIVE": "The cap must be greater than 0.",
+          "DATE_INVALID": "Choose a date.",
+          "NOT_AFTER_CURRENT": "It must start after the current period.",
+          "SOURCE_REQUIRED": "Write the circular the cap comes from.",
+          "generic": "Could not save. Try again."
+        }
+      }
+    }
   }
 }

@@ -27,6 +27,29 @@
       "subject": "Cuidamos tu cuenta de Quina",
       "intro": "Hubo 5 intentos fallidos de ingreso a tu cuenta, así que la bloqueamos por 15 minutos.",
       "outro": "Si fuiste tú, espera 15 minutos e intenta de nuevo. Si no, cambia tu contraseña cuanto antes desde \"Olvidé mi contraseña\" para mantener tu cuenta segura."
+    },
+    "welcome": {
+      "subject": "{store} te registró en Quina",
+      "greeting": "Hola, {name}:",
+      "intro": "{store} te registró en Quina para llevar tu cuenta de fiado en orden. Quina es gratis para ti.",
+      "action": "Leer la política de privacidad",
+      "outro": "Aceptaste que {store} guarde tus datos para administrar tu cuenta, según la Ley N.° 29733. Puedes pedir verlos, corregirlos o borrarlos en la tienda."
+    },
+    "setup": {
+      "employee": {
+        "subject": "{store} te invitó a Quina",
+        "intro": "{store} te invitó a su equipo en Quina para atender el mostrador. Elige tu contraseña para entrar:"
+      },
+      "owner": {
+        "subject": "Tu bodega ya está en Quina",
+        "intro": "Registramos {store} en Quina. Elige tu contraseña para entrar y empezar a ordenar tu fiado:"
+      },
+      "admin": {
+        "subject": "Tu acceso de administración de Quina",
+        "intro": "Te dimos acceso como Administrador de Plataforma de Quina. Elige tu contraseña para entrar:"
+      },
+      "action": "Elegir mi contraseña",
+      "outro": "El enlace vence en 72 horas y se usa una sola vez. Si no esperabas este correo, ignóralo."
     }
   },
   "Auth": {
@@ -157,12 +180,13 @@
   },
   "Dashboard": {
     "logoAlt": "Quina",
-    "trialBadge": "Prueba Pro: 14 días",
+    "trialBadge": "Prueba Pro: {days, plural, one {# día} other {# días}}",
     "trialUntil": "Prueba Pro hasta {date}",
     "welcome": "Tu mostrador está listo, {name}.",
     "subtitle": "Empieza a registrar a tus vecinos y llevar tus cuentas claras.",
     "profileLink": "Mi perfil e idioma",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "registerCustomer": "Registrar vecino"
   },
   "Profile": {
     "title": "Mi perfil",
@@ -224,5 +248,472 @@
       "reminderTo": "Por correo a Rosa"
     },
     "photoAlt": "Bodeguero atendiendo en su tienda de barrio"
+  },
+  "Shell": {
+    "logoAlt": "Quina",
+    "trialUntil": "Prueba Pro hasta el {date}",
+    "nav": {
+      "label": "Navegación principal",
+      "home": "Inicio",
+      "sell": "Vender",
+      "customers": "Clientes",
+      "team": "Equipo",
+      "settings": "Ajustes",
+      "more": "Más",
+      "soon": "Pronto",
+      "stores": "Tiendas",
+      "rateCaps": "Topes BCRP",
+      "sellSoon": "Vender, disponible pronto"
+    }
+  },
+  "Customers": {
+    "list": {
+      "title": "Clientes",
+      "subtitle": "Tus vecinos y lo que les fías.",
+      "newButton": "Registrar vecino",
+      "searchLabel": "Buscar vecino",
+      "searchPlaceholder": "Nombre o número de documento",
+      "searchSubmit": "Buscar",
+      "emptyTitle": "Aún no tienes vecinos",
+      "emptyBody": "Registra al primero para empezar a fiarle con orden.",
+      "noResults": "No encontramos vecinos con “{query}”.",
+      "clearSearch": "Ver todos",
+      "colName": "Vecino",
+      "colDocument": "Documento",
+      "colAvailable": "Disponible",
+      "colStatus": "Estado",
+      "count": "{count, plural, =1 {1 vecino} other {# vecinos}}"
+    },
+    "status": {
+      "ACTIVE": "Fiado activo",
+      "SUSPENDED": "Fiado en pausa",
+      "BLOCKED": "Fiado bloqueado",
+      "noAccount": "Solo al contado",
+      "inactive": "De baja"
+    },
+    "documentTypes": {
+      "DNI": "DNI",
+      "CE": "Carné de extranjería",
+      "PASAPORTE": "Pasaporte"
+    },
+    "form": {
+      "newTitle": "Registrar vecino",
+      "newStep": "Paso 1 de 2 · Datos del vecino",
+      "newSubtitle": "Con sus datos y su autorización, su fiado queda respaldado.",
+      "editTitle": "Editar datos de {name}",
+      "documentTypeLabel": "Tipo de documento",
+      "documentTypeHint": "El que te muestra el vecino.",
+      "documentNumberLabel": "Número de documento",
+      "documentNumberHint": "DNI de 8 dígitos; carné de extranjería de 9 a 12 caracteres; pasaporte de 6 a 12.",
+      "firstNameLabel": "Nombres",
+      "firstNameHint": "Como figuran en su documento.",
+      "lastNameLabel": "Apellidos",
+      "lastNameHint": "Los dos, si los tiene.",
+      "phoneLabel": "Celular",
+      "phoneHint": "9 dígitos. Lo usas para llamarle si hace falta.",
+      "emailLabel": "Correo",
+      "emailHint": "Ahí le llegan el resumen de lo que compra y los avisos de pago.",
+      "addressLabel": "Dirección (opcional)",
+      "addressHint": "Su casa en el barrio, para ubicarlo.",
+      "localeLabel": "Idioma de sus correos",
+      "localeHint": "Si no eliges, se usa el idioma de tu tienda.",
+      "localeStore": "El de la tienda",
+      "locales": {
+        "es": "Castellano",
+        "en": "Inglés",
+        "qu": "Quechua"
+      },
+      "consentTitle": "Autorización del vecino",
+      "consentHint": "Léele esta autorización. Sin su permiso no se puede registrar.",
+      "consentLabel": "El vecino autoriza a {store} a registrar y usar sus datos personales para administrar su cuenta de fiado, según la <privacy>política de privacidad</privacy> (Ley N.° 29733).",
+      "consentText": "El vecino autoriza a {store} a registrar y usar sus datos personales para administrar su cuenta de fiado, según la política de privacidad (Ley N.° 29733).",
+      "submit": "Registrar vecino",
+      "submitting": "Registrando…",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "errors": {
+        "documentInvalid": "Revisa el número: el DNI tiene 8 dígitos; el carné de extranjería, de 9 a 12 caracteres; el pasaporte, de 6 a 12.",
+        "documentTaken": "Ya tienes un vecino con ese documento. Búscalo en tu lista.",
+        "firstNameInvalid": "Escribe sus nombres solo con letras.",
+        "lastNameInvalid": "Escribe sus apellidos solo con letras.",
+        "phoneInvalid": "Escribe un celular de 9 dígitos que empiece con 9.",
+        "emailInvalid": "Escribe un correo válido, como rosa@correo.pe.",
+        "consentRequired": "Marca la autorización del vecino para registrarlo.",
+        "notFound": "Ese vecino no existe en tu tienda.",
+        "generic": "No pudimos guardar. Intenta de nuevo."
+      }
+    },
+    "detail": {
+      "back": "Volver a clientes",
+      "created": "Registramos a {name}. Le enviamos un correo de bienvenida.",
+      "createdNoMail": "Registramos a {name}, pero no pudimos enviarle el correo de bienvenida.",
+      "saved": "Guardamos los cambios.",
+      "termsOpened": "Listo: {name} ya puede comprar al fiado.",
+      "contactTitle": "Datos del vecino",
+      "document": "Documento",
+      "phone": "Celular",
+      "email": "Correo",
+      "address": "Dirección",
+      "noAddress": "Sin dirección",
+      "since": "Vecino desde",
+      "creditTitle": "Fiado",
+      "limit": "Límite",
+      "balance": "Por cobrar",
+      "available": "Disponible",
+      "compensatory": "Interés por fiar",
+      "moratory": "Interés por atraso",
+      "cutOff": "Corte",
+      "payment": "Pago",
+      "dayOfMonth": "Día {day} de cada mes",
+      "maxMonths": "Cuotas máximas",
+      "months": "{count, plural, =1 {1 cuota} other {# cuotas}}",
+      "noAccount": "Compra solo al contado. Pacta sus condiciones para fiarle.",
+      "noAccountEmployee": "Compra solo al contado. Solo el dueño puede pactar sus condiciones.",
+      "edit": "Editar datos",
+      "setTerms": "Pactar condiciones",
+      "changeTerms": "Cambiar condiciones",
+      "suspend": "Pausar fiado",
+      "resume": "Reanudar fiado",
+      "deactivate": "Dar de baja",
+      "reactivate": "Reactivar vecino",
+      "deactivateTitle": "¿Dar de baja a {name}?",
+      "deactivateBody": "Ya no podrá comprar al fiado. Sus datos y su historial se conservan.",
+      "suspendTitle": "¿Pausar el fiado de {name}?",
+      "suspendBody": "No podrá comprar al fiado hasta que lo reanudes. Lo que ya debe no cambia.",
+      "confirm": "Sí, continuar",
+      "cancel": "Cancelar",
+      "errors": {
+        "hasBalance": "Tiene saldo por pagar: primero su cuenta debe quedar en cero.",
+        "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
+        "generic": "No pudimos hacer el cambio. Intenta de nuevo."
+      }
+    },
+    "terms": {
+      "title": "Condiciones de fiado",
+      "step": "Paso 2 de 2 · Condiciones",
+      "subtitle": "Acuérdalas con {name}. Solo valen para sus compras desde hoy.",
+      "currencyLabel": "Moneda",
+      "currencyHint": "La moneda en que le fías.",
+      "currencies": {
+        "PEN": "Soles (S/)",
+        "USD": "Dólares (US$)"
+      },
+      "creditLimitLabel": "Límite de fiado",
+      "creditLimitHint": "Lo máximo que puede deber, por ejemplo 150.",
+      "compensatoryTitle": "Interés por fiar (compensatorio)",
+      "moratoryTitle": "Interés por atraso (moratorio)",
+      "rateTypeLabel": "Tipo de tasa",
+      "rateTypeHint": "Efectiva: ya incluye la capitalización. Nominal: además eliges cada cuánto se capitaliza.",
+      "rateTypes": {
+        "EFFECTIVE": "Efectiva",
+        "NOMINAL": "Nominal"
+      },
+      "percentLabel": "Tasa (%)",
+      "compensatoryPercentHint": "Pon 0 para vecinos de confianza. Tope del BCRP hoy: {cap} % efectivo anual.",
+      "moratoryPercentHint": "Solo corre si paga tarde. Tope del BCRP hoy: {cap} % efectivo anual.",
+      "noCapHint": "No hay un tope del BCRP vigente para esta moneda.",
+      "periodLabel": "Periodo de la tasa",
+      "periodHint": "Si la tasa es anual, mensual o diaria.",
+      "capitalizationLabel": "Capitalización",
+      "capitalizationHint": "Cada cuánto se suman los intereses a la deuda.",
+      "periods": {
+        "ANNUAL": "Anual",
+        "MONTHLY": "Mensual",
+        "DAILY": "Diaria"
+      },
+      "cutOffDayLabel": "Día de corte",
+      "cutOffDayHint": "Del 1 al 28. Ese día se cierran las compras del mes.",
+      "paymentDueDayLabel": "Día de pago",
+      "paymentDueDayHint": "Del 1 al 28. Hasta ese día paga sin interés por atraso.",
+      "maxMonthsLabel": "Cuotas máximas",
+      "maxMonthsHint": "De 1 a 24 meses, para compras en cuotas.",
+      "submitOpen": "Abrir fiado",
+      "submitUpdate": "Guardar condiciones",
+      "submitting": "Guardando…",
+      "cashOnly": "Solo al contado por ahora",
+      "cancel": "Cancelar",
+      "rateEffective": "{percent} % efectiva {period}",
+      "rateNominal": "{percent} % nominal {period}, capitalizable {capitalization}",
+      "periodAdjective": {
+        "ANNUAL": "anual",
+        "MONTHLY": "mensual",
+        "DAILY": "diaria"
+      },
+      "capitalizationAdverb": {
+        "ANNUAL": "anualmente",
+        "MONTHLY": "mensualmente",
+        "DAILY": "diariamente"
+      },
+      "evidence": "Condiciones pactadas con {name}: límite {limit}; interés compensatorio {compensatory}; interés moratorio {moratory}; corte el día {cutOff}; pago el día {payment}; hasta {months} cuotas.",
+      "errors": {
+        "limitInvalid": "Escribe un monto mayor que cero, con hasta 2 decimales.",
+        "percentInvalid": "Escribe un porcentaje como 3.5, con hasta 2 decimales.",
+        "aboveCap": "Supera el tope del BCRP: {cap} % efectivo anual.",
+        "noCap": "No hay un tope del BCRP vigente para esta moneda. Avísale al administrador de Quina.",
+        "needsCapitalization": "Elige cada cuánto se capitaliza la tasa nominal.",
+        "capitalizationLonger": "La capitalización no puede ser más larga que el periodo de la tasa.",
+        "dayOutOfRange": "Elige un día del 1 al 28.",
+        "monthsOutOfRange": "Elige de 1 a 24 cuotas.",
+        "currencyLocked": "Tiene deuda pendiente: no puedes cambiar la moneda hasta que pague.",
+        "customerInactive": "El vecino está de baja: reactívalo para fiarle.",
+        "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
+        "generic": "No pudimos guardar las condiciones. Intenta de nuevo."
+      }
+    }
+  },
+  "Plans": {
+    "seePlans": "Ver planes",
+    "names": {
+      "CASERO": "Casero",
+      "BODEGA_PRO": "Bodega Pro",
+      "NEGOCIO_PLUS": "Negocio Plus"
+    },
+    "unlimited": "sin límite",
+    "perMonth": "al mes",
+    "annual": "o {price} al año",
+    "freeForever": "Gratis para siempre",
+    "availableIn": "en {plan}",
+    "features": {
+      "automaticNotifications": "Avisos de pago automáticos",
+      "receipts": "Boletas y facturas electrónicas",
+      "kardexAverageCost": "Kardex con costo promedio",
+      "reportsExport": "Reportes para descargar",
+      "ai": "Asistente con IA"
+    },
+    "limits": {
+      "activeCreditCustomers": "Vecinos con fiado: {max}",
+      "users": "Usuarios: {max}",
+      "products": "Productos: {max}",
+      "receiptsPerMonth": "Comprobantes al mes: {max}",
+      "aiQueriesPerMonth": "Consultas de IA al mes: {max}"
+    }
+  },
+  "Privacy": {
+    "customers": {
+      "title": "Política de privacidad de {store} para sus vecinos",
+      "draft": "Borrador legal: este texto está pendiente de revisión por un abogado.",
+      "version": "Versión {version}",
+      "intro": "{store} usa Quina para llevar el fiado de sus vecinos. Aquí te contamos qué datos tuyos guarda, para qué y cómo puedes pedir que los corrijan o borren, según la Ley N.° 29733 de Protección de Datos Personales.",
+      "ownerTitle": "¿Quién es responsable de tus datos?",
+      "owner": "El titular del banco de datos es {store}, con {taxIdType} {taxId}. Puedes escribirle a {email}.",
+      "ownerAddress": "Dirección: {address}.",
+      "processorTitle": "¿Qué papel tiene Quina?",
+      "processor": "Quina, un producto de Andeva, es el encargado del tratamiento: guarda los datos en servidores seguros por cuenta de la tienda y no los usa para nada más ni los vende.",
+      "dataTitle": "¿Qué datos se guardan?",
+      "data": "Tu documento de identidad, nombres y apellidos, celular, correo, dirección si la diste, tu idioma preferido, las condiciones de tu fiado (límite, tasas, fechas de corte y pago) y el registro de tus compras al fiado y tus pagos.",
+      "purposeTitle": "¿Para qué se usan?",
+      "purpose": "Solo para administrar tu cuenta de fiado: anotar tus compras y pagos, calcular tus cuotas e intereses, enviarte tu estado de cuenta y avisos de pago, y dejarte consultar tu cuenta.",
+      "retentionTitle": "¿Por cuánto tiempo?",
+      "retention": "Mientras tengas una cuenta con la tienda y, después, el tiempo que la ley exija conservar los registros de ventas y pagos.",
+      "rightsTitle": "Tus derechos",
+      "rights": "Puedes pedir acceder a tus datos, corregirlos, cancelarlos u oponerte a su uso. Escríbele a la tienda a {email} o pídeselo en el mostrador. Si no te atienden, puedes acudir a la Autoridad Nacional de Protección de Datos Personales del Ministerio de Justicia.",
+      "notFoundTitle": "Esta tienda no existe",
+      "notFound": "Revisa el enlace que te compartieron."
+    }
+  },
+  "AcceptInvite": {
+    "title": "Hola, {name}: crea tu contraseña",
+    "subtitleStore": "Te sumaron al equipo de {store} en Quina.",
+    "subtitlePlatform": "Te dieron acceso a la administración de Quina.",
+    "account": "Tu cuenta: {email}",
+    "passwordLabel": "Contraseña",
+    "passwordHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
+    "submit": "Crear mi contraseña",
+    "submitting": "Guardando…",
+    "done": "Listo. Ya puedes ingresar con tu correo y tu contraseña.",
+    "goToLogin": "Ir a ingresar",
+    "invalidTitle": "Este enlace ya no sirve",
+    "invalid": "Ya fue usado o venció (dura 72 horas). Pídele a quien te invitó que te envíe uno nuevo."
+  },
+  "Team": {
+    "title": "Equipo",
+    "usage": "{seats} de {max} usuarios de tu plan",
+    "usageUnlimited": "{seats} usuarios",
+    "membersTitle": "Quiénes usan Quina en tu tienda",
+    "you": "tú",
+    "status": {
+      "OWNER": "Dueño",
+      "ACTIVE": "Activo",
+      "INVITED": "Invitado",
+      "DEACTIVATED": "Desactivado"
+    },
+    "invite": {
+      "title": "Invitar a alguien",
+      "subtitle": "Le llega un enlace para crear su contraseña. Podrá vender, cobrar y registrar vecinos; las condiciones de fiado y los precios siguen siendo tuyos.",
+      "name": "Nombre",
+      "nameHint": "Nombre y apellido, como lo conoces.",
+      "email": "Correo",
+      "emailHint": "Ahí le llega la invitación. Vence en 72 horas.",
+      "submit": "Enviar invitación",
+      "sending": "Enviando…",
+      "sent": "Invitación enviada a {email}.",
+      "mailFailed": "Quedó invitado, pero el correo a {email} no salió. Usa «Reenviar» en un momento.",
+      "errors": {
+        "nameInvalid": "Escribe su nombre solo con letras.",
+        "emailInvalid": "Revisa el correo; parece incompleto.",
+        "emailTaken": "Ese correo ya tiene una cuenta en Quina. Usa otro.",
+        "planLimit": "Llegaste al límite de usuarios de tu plan.",
+        "generic": "No se pudo invitar. Intenta de nuevo."
+      }
+    },
+    "locked": {
+      "caseroTitle": "El plan Casero es solo para ti",
+      "fullTitle": "Tu equipo está completo",
+      "body": "Para sumar a alguien, pasa a {plan}."
+    },
+    "member": {
+      "resend": "Reenviar",
+      "cancelInvite": "Cancelar invitación",
+      "deactivate": "Desactivar",
+      "reactivate": "Reactivar",
+      "keep": "No, volver",
+      "cancelTitle": "¿Cancelar la invitación de {name}?",
+      "cancelBody": "Su enlace deja de funcionar. Puedes invitarle de nuevo cuando quieras.",
+      "cancelConfirm": "Cancelar invitación",
+      "deactivateTitle": "¿Desactivar a {name}?",
+      "deactivateBody": "Sale de Quina en todos sus equipos al instante. Lo que registró se queda.",
+      "deactivateConfirm": "Desactivar",
+      "messages": {
+        "resent": "Le enviamos un enlace nuevo; el anterior ya no sirve.",
+        "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
+        "planLimit": "No hay cupo en tu plan para reactivarle.",
+        "generic": "No se pudo completar. Intenta de nuevo."
+      }
+    }
+  },
+  "Settings": {
+    "title": "Ajustes",
+    "subtitle": "Tu plan y lo que estás usando.",
+    "currentPlan": "Tu plan: {plan}",
+    "trialUntil": "Prueba gratis hasta el {date}. Después pasas a Casero si no eliges un plan.",
+    "usage": {
+      "activeCreditCustomers": "Vecinos con fiado activo",
+      "users": "Usuarios",
+      "products": "Productos"
+    },
+    "usageOf": "{used} de {max}",
+    "usageUnlimited": "{used} · sin límite",
+    "plansTitle": "Planes",
+    "plansSubtitle": "Precios en soles.",
+    "yourPlan": "Tu plan",
+    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí."
+  },
+  "Platform": {
+    "shellName": "Plataforma Quina",
+    "status": {
+      "active": "Activa",
+      "suspended": "Suspendida"
+    },
+    "stores": {
+      "title": "Tiendas",
+      "subtitle": "{count, plural, =0 {Aún no hay tiendas} one {# tienda} other {# tiendas}}",
+      "newButton": "Crear tienda",
+      "emptyTitle": "Crea la primera tienda",
+      "since": "Desde el {date}",
+      "searchLabel": "Buscar tienda",
+      "searchPlaceholder": "Nombre, RUC, DNI o correo",
+      "searchSubmit": "Buscar",
+      "noResults": "No encontramos tiendas con «{query}».",
+      "clearSearch": "Ver todas"
+    },
+    "create": {
+      "title": "Crear tienda",
+      "subtitle": "Nace en el plan Casero, activa. Al dueño le llega un enlace para crear su contraseña.",
+      "commercialName": "Nombre comercial",
+      "commercialNameHint": "Como la conocen en el barrio.",
+      "businessTurn": "Giro",
+      "businessTurnHint": "La actividad principal del comercio.",
+      "taxId": "RUC o DNI",
+      "taxIdHint": "11 dígitos si es RUC; 8 si es DNI.",
+      "locale": "Idioma",
+      "localeHint": "De los correos al dueño y a sus vecinos.",
+      "ownerName": "Nombre del dueño",
+      "ownerNameHint": "Queda como titular de la tienda.",
+      "ownerEmail": "Correo del dueño",
+      "ownerEmailHint": "Ahí le llega el enlace. Vence en 72 horas.",
+      "submit": "Crear tienda",
+      "submitting": "Creando…",
+      "cancel": "Cancelar",
+      "errors": {
+        "COMMERCIAL_NAME_INVALID": "Escribe el nombre comercial.",
+        "TAX_ID_INVALID": "Escribe 11 dígitos (RUC) u 8 (DNI).",
+        "TAX_ID_TAKEN": "Ya hay una tienda con ese RUC o DNI.",
+        "NAME_INVALID": "Escribe el nombre solo con letras.",
+        "EMAIL_INVALID": "Revisa el correo; parece incompleto.",
+        "EMAIL_TAKEN": "Ese correo ya tiene una cuenta en Quina.",
+        "generic": "No se pudo crear la tienda. Intenta de nuevo."
+      }
+    },
+    "detail": {
+      "back": "Volver a tiendas",
+      "created": "Tienda creada. Enviamos el enlace a {email}.",
+      "createdNoMail": "Tienda creada, pero el correo a {email} no salió. Usa «Reenviar enlace».",
+      "taxId": "RUC o DNI",
+      "businessTurn": "Giro",
+      "owner": "Dueño",
+      "ownerAccess": "Acceso del dueño",
+      "ownerPending": "Aún no crea su contraseña",
+      "ownerReady": "Ya ingresa con su contraseña",
+      "ownerMissing": "Sin dueño",
+      "plan": "Plan",
+      "planTrial": "{plan} de prueba hasta el {date}",
+      "since": "Creada el",
+      "resend": "Reenviar enlace",
+      "suspend": "Suspender tienda",
+      "reactivate": "Reactivar tienda",
+      "keep": "No, volver",
+      "suspendTitle": "¿Suspender {name}?",
+      "suspendBody": "Todos sus usuarios salen de Quina al instante y no pueden volver a ingresar hasta que la reactives. Sus datos se conservan.",
+      "suspendConfirm": "Suspender",
+      "messages": {
+        "resent": "Enviamos un enlace nuevo al dueño; el anterior ya no sirve.",
+        "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
+        "suspended": "Tienda suspendida.",
+        "reactivated": "Tienda reactivada.",
+        "generic": "No se pudo completar. Intenta de nuevo."
+      }
+    },
+    "caps": {
+      "title": "Topes del BCRP",
+      "subtitle": "Tasas máximas de interés para créditos fuera del sistema financiero. Quina rechaza las condiciones que los superen.",
+      "historyTitle": "Vigencias",
+      "kinds": {
+        "COMPENSATORY": "Compensatorio",
+        "MORATORY": "Moratorio"
+      },
+      "currencies": {
+        "PEN": "Soles",
+        "USD": "Dólares"
+      },
+      "rate": "{percent} % efectivo anual",
+      "inForce": "Vigente desde el {from}",
+      "period": "Del {from} al {to}",
+      "form": {
+        "title": "Nueva vigencia",
+        "subtitle": "Al guardarla, la vigencia anterior de la misma tasa y moneda se cierra el día previo.",
+        "kind": "Tipo de interés",
+        "kindHint": "Compensatorio: por fiar. Moratorio: por atraso.",
+        "currency": "Moneda",
+        "currencyHint": "El BCRP publica un tope por moneda.",
+        "percent": "Tope (% efectivo anual)",
+        "percentHint": "Tal como lo publica el BCRP, por ejemplo 114.13.",
+        "validFrom": "Vigente desde",
+        "validFromHint": "Debe ser posterior a la vigencia actual.",
+        "source": "Fuente",
+        "sourceHint": "Circular del BCRP y fecha de publicación.",
+        "submit": "Guardar vigencia",
+        "submitting": "Guardando…",
+        "saved": "Vigencia guardada.",
+        "errors": {
+          "RATE_PERCENT_INVALID": "Escribe un porcentaje, por ejemplo 114.13.",
+          "RATE_NOT_POSITIVE": "El tope debe ser mayor que 0.",
+          "DATE_INVALID": "Elige una fecha.",
+          "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
+          "SOURCE_REQUIRED": "Escribe la circular de la que sale el tope.",
+          "generic": "No se pudo guardar. Intenta de nuevo."
+        }
+      }
+    }
   }
 }

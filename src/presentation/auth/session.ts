@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
@@ -5,7 +6,7 @@ import { isRole, type Role } from '@/core/domain/identity/roles';
 import type { Locale } from '@/core/domain/shared/locale';
 import { getAuth } from '@/infrastructure/auth/auth';
 import { db } from '@/infrastructure/db/connection';
-import { users } from '@/infrastructure/db/schema';
+import { stores, users } from '@/infrastructure/db/schema';
 import { isLocale } from '@/presentation/i18n/resolve-locale';
 
 export type SessionUser = {
@@ -24,9 +25,15 @@ const PUBLIC_AUTH_PATHS = new Set([
   '/register/verify',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/auth/accept-invite',
 ]);
 
 const ALL_AUTH_PATHS = new Set([...PUBLIC_AUTH_PATHS, '/register/store']);
+
+/** Páginas que cualquiera puede leer, con o sin sesión (política de privacidad del vecino). */
+const OPEN_PREFIXES = ['/privacy/'];
+
+const PLATFORM_PREFIX = '/platform';
 
 function normalizePath(path: string): string {
   const withoutBase = path.startsWith('/app/') ? path.slice(4) : path === '/app' ? '/' : path;
@@ -35,12 +42,17 @@ function normalizePath(path: string): string {
   return clean || '/';
 }
 
+const isPlatformPath = (path: string) =>
+  path === PLATFORM_PREFIX || path.startsWith(`${PLATFORM_PREFIX}/`);
+
 /**
  * Decide a qué ruta redirigir según el estado del usuario y la ruta actual.
  * Devuelve `null` cuando el usuario puede permanecer en `path`.
  */
 export function nextRouteFor(user: SessionUser | null, path: string): string | null {
   const clean = normalizePath(path);
+
+  if (OPEN_PREFIXES.some((prefix) => clean.startsWith(prefix))) return null;
 
   if (!user) {
     return PUBLIC_AUTH_PATHS.has(clean) ? null : '/login';
@@ -54,14 +66,23 @@ export function nextRouteFor(user: SessionUser | null, path: string): string | n
     return clean === '/register/store' ? null : '/register/store';
   }
 
-  if (ALL_AUTH_PATHS.has(clean)) {
+  // El Administrador de Plataforma solo usa su panel y su perfil
+  if (user.role === 'PLATFORM_ADMIN') {
+    return isPlatformPath(clean) || clean === '/profile' ? null : PLATFORM_PREFIX;
+  }
+
+  if (ALL_AUTH_PATHS.has(clean) || isPlatformPath(clean)) {
     return '/';
   }
 
   return null;
 }
 
-export async function getSessionUser(): Promise<SessionUser | null> {
+/**
+ * Usuario de la sesión, releído de la base en cada petición (una sola vez gracias
+ * a `cache`). Devuelve `null` si el usuario o su tienda están dados de baja (US01).
+ */
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session?.user) return null;
 
@@ -75,11 +96,15 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       storeId: users.storeId,
       preferredLocale: users.preferredLocale,
       isActive: users.isActive,
+      storeActive: stores.isActive,
     })
     .from(users)
+    // LEFT JOIN: el Administrador, el vecino y el dueño pendiente no tienen tienda
+    .leftJoin(stores, eq(stores.id, users.storeId))
     .where(eq(users.id, session.user.id));
 
   if (!row || !row.isActive || !isRole(row.role)) return null;
+  if (row.storeId && row.storeActive === false) return null;
 
   return {
     id: row.id,
@@ -90,14 +115,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     storeId: row.storeId,
     preferredLocale: isLocale(row.preferredLocale) ? row.preferredLocale : 'es',
   };
-}
+});
 
-export async function requireOwner(): Promise<SessionUser & { storeId: string }> {
+/** Usuario con acceso al panel en `path`; si no corresponde, redirige. */
+export async function requireUser(path = '/'): Promise<SessionUser> {
   const user = await getSessionUser();
-  const target = nextRouteFor(user, '/');
+  const target = nextRouteFor(user, path);
   if (target) redirect(target);
-  if (!user || user.role !== 'STORE_OWNER' || !user.storeId) {
-    redirect('/login');
-  }
-  return { ...user, storeId: user.storeId };
+  if (!user) redirect('/login');
+  return user;
 }

@@ -288,6 +288,46 @@ coherente de herramientas en TypeScript:
 En consonancia con los principios de arquitectura limpia y desarrollo ágil, se
 evaluaron y descartaron alternativas complejas:
 
+### Decisiones del Plan 2 (tienda y vecinos)
+
+Tomadas el 31 de octubre de 2026 al construir US01, US04, US05, US06 y la base de
+US26. Resuelven huecos o contradicciones entre el enunciado y las historias:
+
+- **Moneda:** las condiciones de fiado admiten soles y dólares, y los topes del
+  BCRP se validan por moneda. Cómo se vende a una cuenta en dólares con precios
+  en soles se decide en el Plan 3.
+- **Un usuario, una tienda:** un correo que ya tiene cuenta no puede invitarse a
+  otra tienda; se rechaza con un mensaje claro.
+- **Empleado:** registra vecinos (datos y consentimiento) y ve el disponible.
+  Solo el dueño pacta o cambia límite, tasas, corte, pago y estado de la cuenta.
+- **Topes del BCRP:** se cargan como semilla con su circular y el Administrador
+  agrega nuevas vigencias desde su panel. Sin tope vigente para la moneda y el
+  tipo de tasa, las condiciones se rechazan (falla cerrado).
+- **Tienda creada por el Administrador (US01.3):** nace en Casero, activa y sin
+  prueba. La prueba de Bodega Pro es solo para el autoservicio (US24 y US25).
+- **Suspender una tienda (US01.5):** `stores.is_active = false` y se borran las
+  sesiones de sus usuarios en la misma transacción; la sesión de una tienda
+  inactiva se rechaza. Reactivar es lo inverso. Ambas quedan en auditoría.
+- **Estados del empleado:** *invitado* (sin contraseña), *activo* (con
+  contraseña) y *desactivado* (`is_active = false`, sin sesiones). El límite de
+  usuarios del plan cuenta al dueño y a las filas activas, invitados incluidos;
+  la prueba cuenta como Bodega Pro. Cancelar una invitación borra al invitado,
+  que nunca operó.
+- **Vecino de contado:** un vecino puede existir sin cuenta de fiado. El límite
+  de 15 de Casero cuenta solo cuentas `ACTIVE` (US26.3). Dar de baja a un vecino
+  exige saldo cero y suspende su cuenta.
+- **Consentimiento (Ley N.º 29733):** se captura en el mostrador, con la IP y el
+  navegador del equipo de la tienda como evidencia. Al abrir o cambiar
+  condiciones se guarda además un consentimiento `CREDIT_TERMS` con su resumen.
+- **Política de datos por tienda (US04.2):** página pública
+  `/app/privacy/customers/[storeId]`, con la tienda como titular del banco de
+  datos y Quina como encargado. Es un borrador pendiente de revisión legal.
+- **Documentos:** DNI de 8 dígitos, carné de extranjería de 9 a 12 caracteres y
+  pasaporte de 6 a 12, en mayúsculas.
+- **Fuera de alcance:** solo lectura al bajar de plan (US26.7) va al Plan 7; el
+  límite de 50 productos y `sales.employee_id` (US05.6), al Plan 3; el bloqueo
+  automático por mora, al Plan 4.
+
 ### Por qué Drizzle ORM frente a Prisma
 - **Sin binarios pesados en serverless:** Prisma requiere un motor en Rust
   (~40 MB) que penaliza los arranques en frío en funciones serverless de Vercel.
@@ -330,10 +370,16 @@ quina-webapp/
 │   │   ├── (auth)/register/              # /app/register: registro autoservicio (US24)
 │   │   ├── (dashboard)/                  # Vistas de mostrador del comerciante
 │   │   │   ├── sales/                    # Despacho en 3 toques
-│   │   │   ├── customers/                # Gestión de cuentas y créditos
+│   │   │   ├── customers/                # Vecinos, consentimiento y condiciones de fiado (US04, US06)
+│   │   │   ├── team/                     # Empleados e invitaciones (US05)
+│   │   │   ├── settings/                 # Uso del plan y funciones bloqueadas (US26)
+│   │   │   ├── profile/                  # Perfil, idioma y contraseña
 │   │   │   ├── inventory/                # Catálogo, kardex y compras
 │   │   │   ├── portfolio/                # Panel de cartera y cobranza
 │   │   │   └── reports/                  # Reportes financieros e IA
+│   │   ├── (platform)/platform/          # /app/platform: tiendas y topes del BCRP (US01)
+│   │   ├── auth/accept-invite/           # Público: definir la contraseña con el enlace de cuenta
+│   │   ├── privacy/customers/[storeId]/  # Público: política de datos de los vecinos de cada tienda
 │   │   ├── (customer)/portal/            # /app/portal: consulta gratuita del vecino
 │   │   ├── api/auth/[...all]/            # Route Handler de Better Auth
 │   │   ├── api/webhooks/                 # Mercado Pago y rebotes de Resend
@@ -616,6 +662,27 @@ pensadas para el vecino:
 | **3. Acceso por DNI + Código OTP (Sin contraseña)** | Si Doña Rosa entra desde otro teléfono, ingresa su número de DNI. El sistema le envía un código de 6 números a su correo. Lo copia, lo pega y entra. | El servidor busca los correos registrados para ese DNI (puede estar en varias tiendas) y envía un código a cada correo distinto con el inicio de sesión por OTP del plugin `emailOTP`: 6 dígitos, 15 minutos, 5 intentos y límite de tasa. La respuesta en pantalla es siempre la misma, sin revelar tiendas ni correos, y la sesión solo ve las tiendas que tienen el correo validado. |
 | **4. Contraseña personalizada (Opcional)** | Si el cliente desea fijar una contraseña permanente para ingresar tradicionalmente con correo y clave, puede configurarla en su perfil cuando lo desee. | Almacenamiento seguro bajo Argon2id, totalmente voluntario para el vecino. |
 
+### 7.8. Enlaces de cuenta: dueño creado por el Administrador, empleados y primer Administrador
+
+Quien no se registra solo (el dueño de una tienda creada por el Administrador, un
+empleado invitado o el primer Administrador de Plataforma) recibe un **enlace de
+cuenta** para crear su contraseña:
+
+- El usuario se inserta con Drizzle como *invitado*, sin contraseña. No se usa
+  `signUpEmail`, cuyo hook fuerza el rol `PENDING_OWNER`.
+- El token es aleatorio, de un solo uso y vale **72 horas**. En `verifications` se
+  guarda solo su hash SHA-256, con `identifier = account-setup:<userId>`.
+- La ruta pública `/app/auth/accept-invite?token=…` canjea el token: primero lo
+  borra (reclamo atómico, para que dos envíos no lo usen dos veces), valida la
+  contraseña con la política de la sección 7.1 y crea la cuenta `credential` con
+  el `$context` de Better Auth (`password.hash` e `internalAdapter.linkAccount`).
+  Marca `email_verified = true` y deja auditoría `SET_PASSWORD`.
+- El dueño puede reenviar o cancelar la invitación de un empleado desde
+  `/app/team`, y el Administrador, reenviar el enlace al dueño desde la ficha de la
+  tienda.
+- El primer Administrador se crea con `pnpm db:admin`, que lee `ADMIN_EMAIL` y
+  `ADMIN_NAME` e imprime el enlace.
+
 ---
 
 ## 8. Persistencia relacional y esquema PostgreSQL
@@ -652,6 +719,12 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 - **URLs absolutas:** los enlaces de los correos usan
   `https://quina.andeva.tech/app` (`APP_URL`); Better Auth recibe solo el origen en `baseURL` y la ruta en `basePath: "/app/api/auth"`. La URI de redirección autorizada en Google
   Cloud es `https://quina.andeva.tech/app/api/auth/callback/google`.
+- **Redirecciones de Server Actions:** Next 16 agrega `basePath` al `redirect` de
+  una acción solo cuando llega por `fetch`. Si el formulario se envía antes de
+  cargar JavaScript, el 303 saldría de `/app`. Por eso las acciones usan
+  `actionRedirect` (`src/presentation/lib/action-redirect.ts`), que completa la
+  ruta en ese caso. Los formularios de búsqueda usan `next/form` con
+  `action=""`, que se queda en la misma ruta con o sin JavaScript.
 
 **Variables de entorno de la webapp:**
 
@@ -660,6 +733,8 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `APP_URL` | URL pública de la webapp (`https://quina.andeva.tech/app`). |
 | `DATABASE_URL` | Conexión de la aplicación con el rol `quina_app` por Supavisor (puerto 6543). |
 | `DATABASE_MIGRATION_URL` | Conexión directa con el rol `postgres` (puerto 5432), solo para Drizzle Kit. |
+| `DATABASE_PLATFORM_URL` | Conexión con el rol `quina_platform`, usada solo para escribir `credit_rate_caps`. |
+| `ADMIN_EMAIL`, `ADMIN_NAME` | Correo y nombre del primer Administrador de Plataforma, para `pnpm db:admin`. |
 | `BETTER_AUTH_SECRET` | Secreto para firmar sesiones y cifrar tokens de OAuth. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Credenciales de Google OAuth 2.0. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Claves de Cloudflare Turnstile. |
@@ -672,6 +747,7 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `EMAIL_FROM` | Remitente de los correos (`Quina <hola@andeva.tech>`). |
 | `DATABASE_TEST_URL` | Pruebas de integración: conexión del propietario, que migra y limpia la base de prueba. |
 | `DATABASE_TEST_APP_URL` | Pruebas de integración: conexión como `quina_app`, para comprobar RLS. |
+| `DATABASE_TEST_PLATFORM_URL` | Pruebas de integración: conexión como `quina_platform`. |
 | `CRON_SECRET` | Protege el proceso programado diario. |
 
 ---
@@ -686,7 +762,7 @@ cookie `quina-lang`. La webapp continúa esa elección:
   repositorio. La configuración de `next-intl` vive en `src/presentation/i18n/`.
   Ningún texto de interfaz se escribe suelto en los componentes.
 - **Sin idioma en la URL:** igual que la cookie compartida, el idioma no forma
-  parte de la ruta (`/app/ventas`, no `/app/es/ventas`).
+  parte de la ruta (`/app/sales`, no `/app/es/sales`; las rutas van en inglés, como en la sección 5).
 - **Orden de resolución:** `users.preferred_locale` (si hay sesión) → cookie
   `quina-lang` → cabecera `Accept-Language` → castellano. Al registrarse, el
   idioma de la cookie se guarda en `users.preferred_locale`.

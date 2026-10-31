@@ -59,4 +59,29 @@ describe('nextRouteFor (guardia de rutas)', () => {
     expect(nextRouteFor(baseUser, '/auth/forgot-password')).toBe('/');
     expect(nextRouteFor(baseUser, '/auth/reset-password')).toBe('/');
   });
+
+  it('la invitación es pública y la política del vecino es abierta para todos', () => {
+    expect(nextRouteFor(null, '/auth/accept-invite?token=abc')).toBeNull();
+    expect(nextRouteFor(null, '/privacy/customers/s-1')).toBeNull();
+    expect(nextRouteFor(baseUser, '/privacy/customers/s-1')).toBeNull();
+    expect(nextRouteFor(baseUser, '/auth/accept-invite')).toBe('/');
+  });
+
+  it('el empleado entra al panel pero no a la plataforma', () => {
+    const employee: SessionUser = { ...baseUser, role: 'STORE_EMPLOYEE' };
+    expect(nextRouteFor(employee, '/')).toBeNull();
+    expect(nextRouteFor(employee, '/customers')).toBeNull();
+    expect(nextRouteFor(employee, '/platform')).toBe('/');
+    expect(nextRouteFor(baseUser, '/platform/stores')).toBe('/');
+  });
+
+  it('el Administrador de Plataforma solo usa /platform y su perfil', () => {
+    const admin: SessionUser = { ...baseUser, role: 'PLATFORM_ADMIN', storeId: null };
+    expect(nextRouteFor(admin, '/')).toBe('/platform');
+    expect(nextRouteFor(admin, '/customers')).toBe('/platform');
+    expect(nextRouteFor(admin, '/login')).toBe('/platform');
+    expect(nextRouteFor(admin, '/platform')).toBeNull();
+    expect(nextRouteFor(admin, '/platform/stores/new')).toBeNull();
+    expect(nextRouteFor(admin, '/profile')).toBeNull();
+  });
 });

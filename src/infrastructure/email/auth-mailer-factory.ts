@@ -1,12 +1,18 @@
 import type { AuthMailer } from '@/core/domain/ports/auth-mailer';
+import type { NotificationMailer } from '@/core/domain/ports/notification-mailer';
+import { LoggedNotificationMailer } from './logged-notification-mailer';
 import { OutboxAuthMailer } from './outbox-auth-mailer';
 import { ResendAuthMailer } from './resend-auth-mailer';
 
 const DEFAULT_FROM = 'Quina <hola@andeva.tech>';
 
-let cached: AuthMailer | undefined;
+/** Cada transporte envía los correos de acceso y los avisos de la tienda. */
+export type Mailer = AuthMailer & NotificationMailer;
 
-export function createAuthMailer(env: NodeJS.ProcessEnv = process.env): AuthMailer {
+let cached: Mailer | undefined;
+let notifications: NotificationMailer | undefined;
+
+export function createAuthMailer(env: NodeJS.ProcessEnv = process.env): Mailer {
   const transport = env.EMAIL_TRANSPORT || (env.NODE_ENV === 'production' ? 'resend' : 'outbox');
 
   if (transport === 'outbox') {
@@ -27,7 +33,13 @@ export function createAuthMailer(env: NodeJS.ProcessEnv = process.env): AuthMail
   throw new Error(`Unknown EMAIL_TRANSPORT: ${transport}`);
 }
 
-export function getAuthMailer(): AuthMailer {
+export function getAuthMailer(): Mailer {
   cached ??= createAuthMailer();
   return cached;
+}
+
+/** Avisos de la tienda: cada envío queda en `notification_logs`, también si falla. */
+export function getNotificationMailer(): NotificationMailer {
+  notifications ??= new LoggedNotificationMailer(getAuthMailer());
+  return notifications;
 }

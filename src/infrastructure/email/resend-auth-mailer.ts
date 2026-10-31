@@ -1,7 +1,13 @@
 import { Resend } from 'resend';
 import type { AuthMailKind, AuthMailer } from '@/core/domain/ports/auth-mailer';
+import type { NotificationMailer } from '@/core/domain/ports/notification-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
-import { renderAuthEmail, type EmailData } from './templates';
+import {
+  renderAuthEmail,
+  renderNotificationEmail,
+  type EmailData,
+  type RenderedEmail,
+} from './templates';
 
 type SendPayload = { from: string; to: string; subject: string; html: string; text: string };
 type SendResult = { error?: { message: string; name?: string } | null };
@@ -11,7 +17,7 @@ export interface ResendLikeClient {
   emails: { send(payload: SendPayload): Promise<SendResult> };
 }
 
-export class ResendAuthMailer implements AuthMailer {
+export class ResendAuthMailer implements AuthMailer, NotificationMailer {
   private readonly client: ResendLikeClient;
   private readonly from: string;
 
@@ -32,13 +38,31 @@ export class ResendAuthMailer implements AuthMailer {
     return this.send(input.to, 'lockout-alert', input.locale, {});
   }
 
-  private async send(
-    to: string,
-    kind: AuthMailKind,
-    locale: Locale,
-    data: EmailData,
+  sendCustomerWelcome(
+    input: Parameters<NotificationMailer['sendCustomerWelcome']>[0],
   ): Promise<void> {
-    const { subject, html, text } = renderAuthEmail(kind, locale, data);
+    const email = renderNotificationEmail('customer-welcome', input.locale, {
+      url: input.privacyUrl,
+      name: input.customerName,
+      storeName: input.storeName,
+    });
+    return this.deliver(input.to, 'customer-welcome', email);
+  }
+
+  sendAccountSetup(input: Parameters<NotificationMailer['sendAccountSetup']>[0]): Promise<void> {
+    return this.deliver(
+      input.to,
+      'account-setup',
+      renderNotificationEmail('account-setup', input.locale, input),
+    );
+  }
+
+  private send(to: string, kind: AuthMailKind, locale: Locale, data: EmailData): Promise<void> {
+    return this.deliver(to, kind, renderAuthEmail(kind, locale, data));
+  }
+
+  private async deliver(to: string, kind: string, email: RenderedEmail): Promise<void> {
+    const { subject, html, text } = email;
     const result = await this.client.emails.send({ from: this.from, to, subject, html, text });
     if (result.error) {
       throw new Error(`Resend failed to send ${kind} email: ${result.error.message}`);
