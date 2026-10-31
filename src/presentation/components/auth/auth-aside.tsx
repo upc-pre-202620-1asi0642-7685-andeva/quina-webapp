@@ -26,15 +26,18 @@ export function AuthAside({ variant }: { variant: AuthAsideVariant }) {
   return (
     // Fijo a la altura de la ventana: el formulario de registro es más alto y se desplaza solo
     <aside className="relative hidden overflow-hidden rounded-card bg-primary-dark lg:sticky lg:top-3 lg:block lg:h-[calc(100dvh-1.5rem)]">
-      <Image
-        src={photo}
-        alt={t('photoAlt')}
-        fill
-        priority
-        sizes="50vw"
-        placeholder="blur"
-        className="object-cover"
-      />
+      {/* Contenedor posicionado propio: next/image con fill no acepta un padre sticky */}
+      <div className="absolute inset-0">
+        <Image
+          src={photo}
+          alt={t('photoAlt')}
+          fill
+          priority
+          sizes="50vw"
+          placeholder="blur"
+          className="object-cover"
+        />
+      </div>
       {/* Velo de marca: el título se lee sobre cualquier foto */}
       <div
         aria-hidden="true"

@@ -105,6 +105,8 @@ Incluye verificación de correo con código OTP de 6 dígitos numéricos, protec
 contra bots con Cloudflare Turnstile (100 % gratuito y no intrusivo), política
 anti-fuerza bruta con bloqueo automático temporal tras 5 fallos consecutivos y
 recuperación de contraseña mediante enlace tokenizado de un solo uso.
+Un correo es una sola cuenta: si el dueño entró con Google y luego quiere
+ingresar con contraseña, la crea desde su perfil sin duplicar el usuario.
 
 **Criterios de Aceptación (Confirmation):**
 1. La pantalla de login incluye acceso tradicional, botón **"Continuar con Google"**
@@ -123,6 +125,15 @@ recuperación de contraseña mediante enlace tokenizado de un solo uso.
 6. La sesión se guarda en la tabla `sessions` y viaja en una cookie `HttpOnly`,
    `SameSite=Lax` y `Secure`; el cierre de sesión borra la sesión en el servidor y
    la cookie deja de ser válida de inmediato.
+7. Un correo es un solo usuario: registrarse con contraseña usando un correo que
+   ya entró con Google se rechaza con *"Ese correo ya tiene cuenta. Ingresa."*.
+   Quien entró con Google puede **crear una contraseña** desde su perfil, con la
+   política del criterio 3 y una confirmación; queda en la auditoría
+   (`SET_PASSWORD`). Si ya tiene contraseña, el perfil le ofrece cambiarla con el
+   enlace del criterio 5, que también sirve para crearla.
+8. El botón *"Continuar con Google"* muestra la etiqueta **"Último usado"** cuando
+   Google fue el último método con el que se ingresó en ese navegador (cookie
+   legible de 30 días, sin datos personales).
 
 ---
 
@@ -242,6 +253,10 @@ de Plataforma (US01) se mantiene para los casos que exige el enunciado.
 1. La pantalla `/app/register` pide nombre, correo, contraseña segura, nombre
    comercial, giro del negocio y RUC (11 dígitos) o DNI (8 dígitos); también
    permite empezar con **"Continuar con Google"** y luego completar la tienda.
+   Hasta completar la tienda el usuario es `PENDING_OWNER` y cualquier ruta lo
+   lleva a `/app/register/store`. El nombre acepta solo letras (con tildes y ñ),
+   espacios, apóstrofo y guion, y se valida en el navegador y en el servidor; el
+   nombre que llega de Google se toma tal cual.
 2. El formulario está protegido con Cloudflare Turnstile y límite de tasa.
 3. El correo se verifica con un código OTP de 6 dígitos antes de operar (US02).
 4. En una sola transacción crea la tienda, el usuario `STORE_OWNER`, la
@@ -251,6 +266,12 @@ de Plataforma (US01) se mantiene para los casos que exige el enunciado.
 6. Rechaza con un mensaje claro un RUC/DNI o un correo ya registrados.
 7. El recorrido completo, desde abrir el formulario hasta ver el mostrador
    listo, toma menos de dos minutos en las pruebas de usabilidad.
+8. Antes de *"Continuar"* (y antes de *"Continuar con Google"*) el dueño marca una
+   casilla obligatoria, desmarcada por defecto, que acepta los **Términos y
+   condiciones** y la **Política de privacidad** y autoriza el tratamiento de sus
+   datos (Ley N.° 29733). El servidor no crea la cuenta sin ella y deja
+   constancia inmutable en `audit_logs` (`ACCEPT_TERMS`, versión de los
+   documentos, IP y navegador).
 
 ---
 
@@ -867,6 +888,8 @@ planes y selecciona el Plan Bodega Pro (S/ 29/mes o S/ 279/año) o Negocio Plus
 (S/ 69/mes o S/ 660/año). Paga mediante Mercado Pago y su cuenta se actualiza
 automáticamente. La suscripción recurrente se cobra con tarjeta: Yape no admite
 cobros automáticos, así que solo se ofrece para un pago único del plan anual.
+Puede suscribirse en cualquier momento, también durante la prueba Pro de 14 días
+(US25), sin esperar a que termine.
 
 **Criterios de Aceptación (Confirmation):**
 1. Muestra con transparencia los planes: Plan Casero (Gratis), Plan Bodega Pro
@@ -878,6 +901,9 @@ cobros automáticos, así que solo se ofrece para un pago único del plan anual.
 5. Permite descargar comprobantes de pago de la suscripción desde el panel.
 6. Permite cancelar la renovación automática conservando funciones Pro hasta el fin
    del ciclo.
+7. Mientras Quina sea un proyecto académico, producción usa las credenciales de
+   **prueba (sandbox)** de Mercado Pago con compradores de prueba: el flujo es real
+   de punta a punta, pero no se cobra dinero.
 
 ---
 
@@ -895,7 +921,12 @@ cobros automáticos, así que solo se ofrece para un pago único del plan anual.
 La estrategia de precios define que cada tienda nueva recibe 14 días de Bodega
 Pro sin tarjeta, y el sitio lo anuncia en el botón *"Prueba Pro 14 días"*. Al
 terminar, si no se suscribe, la tienda vuelve al Plan Casero sin perder nada de
-lo registrado.
+lo registrado. Quien no quiere esperar puede contratar Bodega Pro en cualquier
+momento, también durante la prueba, con Mercado Pago (US23).
+
+En la demostración académica, la prueba de una tienda de producción se puede
+alargar con un ajuste de datos manual de `store_subscriptions.trial_ends_at`
+(no es un cambio de esquema), que se deja registrado en la auditoría.
 
 **Criterios de Aceptación (Confirmation):**
 1. Al registrarse (US24), la suscripción queda en estado `TRIALING` con el plan
@@ -956,6 +987,7 @@ Negocio Plus admite usuarios y comprobantes ilimitados y 100 consultas de IA.
 | **Registro autoservicio del comerciante** | US24 |
 | **Idiomas: castellano, inglés y quechua** | US27 |
 | **Autenticación segura y captcha Turnstile** | US02 |
+| **Aceptación de Términos y Política de privacidad al registrarse** | US24 |
 | **Catálogo de productos/servicios y precios duales** | US03 |
 | **Historial de cambios de precios (`product_price_history`)** | US03 |
 | **Clientes y consentimiento Ley N.° 29733** | US04 |

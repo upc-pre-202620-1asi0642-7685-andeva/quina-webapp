@@ -76,7 +76,36 @@ test.describe('ingreso, bloqueo y Google OAuth (US02)', () => {
     await expect.poll(() => googleUrl).toContain('accounts.google.com');
   });
 
+  test('marca "Último usado" en Google solo si fue el último ingreso', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('./login');
+    await expect(page.getByText('Último usado')).toBeHidden();
+
+    await context.addCookies([
+      { name: 'quina-last-login', value: 'google', url: 'http://localhost:3100' },
+    ]);
+    await page.reload();
+    await expect(
+      page.getByRole('button', { name: 'Continuar con Google' }).getByText('Último usado'),
+    ).toBeVisible();
+  });
+
   for (const theme of ['light', 'dark'] as const) {
+    test(`accesibilidad con "Último usado" en login (${theme})`, async ({ page, context }) => {
+      await context.addCookies([
+        { name: 'quina-last-login', value: 'google', url: 'http://localhost:3100' },
+      ]);
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await page.goto('./login');
+      await expect(page.getByText('Último usado')).toBeVisible();
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    });
+
     test(`accesibilidad WCAG 2.1 AA en login (${theme})`, async ({ page }) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
       await page.goto('./login');

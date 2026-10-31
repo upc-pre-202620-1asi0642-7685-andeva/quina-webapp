@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PasswordPolicy } from '@/core/domain/identity/password-policy';
+import { PersonName } from '@/core/domain/identity/person-name';
 import { TaxId } from '@/core/domain/identity/tax-id';
 
 export const BUSINESS_TURNS = ['BODEGA', 'BOTICA', 'CARNICERIA', 'PANADERIA', 'OTRO'] as const;
@@ -16,7 +17,17 @@ const passwordField = z
   .refine((value) => PasswordPolicy.check(value).ok, { message: 'passwordWeak' });
 
 export const accountSchema = z.object({
-  name: z.string().trim().min(2, { message: 'nameRequired' }).max(150, { message: 'nameRequired' }),
+  name: z.string().transform((raw, ctx) => {
+    const parsed = PersonName.parse(raw);
+    if (!parsed.ok) {
+      ctx.addIssue({
+        code: 'custom',
+        message: parsed.error === 'NAME_REQUIRED' ? 'nameRequired' : 'nameInvalid',
+      });
+      return z.NEVER;
+    }
+    return parsed.value;
+  }),
   email: emailField,
   password: passwordField,
 });
@@ -50,6 +61,14 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   password: passwordField,
 });
+
+// Crear contraseña desde el perfil (cuentas que entraron con Google)
+export const setPasswordSchema = z
+  .object({ password: passwordField, confirmPassword: z.string() })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'passwordMismatch',
+    path: ['confirmPassword'],
+  });
 
 export type AccountInput = z.infer<typeof accountSchema>;
 export type StoreInput = z.infer<typeof storeSchema>;

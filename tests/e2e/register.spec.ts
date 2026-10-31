@@ -122,6 +122,19 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
     ).toBeVisible();
   });
 
+  test('un nombre con números muestra el error bajo el campo', async ({ page }) => {
+    await page.goto('./register');
+    await page.getByLabel('Tu nombre completo').fill('Juan123');
+    await page.getByLabel('Tu correo electrónico').fill(uniqueEmail('nombre'));
+    await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
+    await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+    await expect(page.getByLabel('Tu nombre completo')).toHaveAccessibleDescription(
+      /solo con letras/,
+    );
+    await expect(page).toHaveURL(/\/app\/register\/?$/);
+  });
+
   for (const theme of ['light', 'dark'] as const) {
     test(`accesibilidad WCAG 2.1 AA en registro, verificación y tienda (${theme})`, async ({
       page,
