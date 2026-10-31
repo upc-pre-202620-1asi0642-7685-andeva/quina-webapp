@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 import {
   EllipsisIcon,
   HouseIcon,
+  LandmarkIcon,
+  StoreIcon,
   SettingsIcon,
   ShoppingBasketIcon,
   UserCogIcon,
@@ -22,6 +24,8 @@ const ICONS: Record<NavKey, LucideIcon> = {
   team: UserCogIcon,
   settings: SettingsIcon,
   more: EllipsisIcon,
+  stores: StoreIcon,
+  rateCaps: LandmarkIcon,
 };
 
 function isActive(pathname: string, href: string): boolean {

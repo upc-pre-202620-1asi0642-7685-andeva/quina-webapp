@@ -22,6 +22,7 @@ export default defineConfig({
     testTimeout: 20_000,
     hookTimeout: 60_000,
     // La aplicación (db, withTenant) se conecta como quina_app a la base de pruebas
-    env: { DATABASE_URL: testEnv.appUrl },
+    // y como quina_platform solo para los topes del BCRP
+    env: { DATABASE_URL: testEnv.appUrl, DATABASE_PLATFORM_URL: testEnv.platformUrl },
   },
 });

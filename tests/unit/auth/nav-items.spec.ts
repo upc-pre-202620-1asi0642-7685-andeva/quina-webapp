@@ -22,6 +22,13 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
     expect(bottom.at(-1)?.href).toBe('/profile');
   });
 
+  it('el Administrador de Plataforma solo ve tiendas y topes (US01)', () => {
+    expect(keys(sidebarItems('PLATFORM_ADMIN'))).toEqual(['stores', 'rateCaps']);
+    const bottom = bottomItems('PLATFORM_ADMIN');
+    expect(keys(bottom)).toEqual(['stores', 'rateCaps', 'more']);
+    expect(bottom.at(-1)?.href).toBe('/profile');
+  });
+
   it('"Vender" se marca como próximo hasta el Plan 3', () => {
     expect(sidebarItems('STORE_OWNER').find((item) => item.key === 'sell')?.soon).toBe(true);
   });

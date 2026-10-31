@@ -25,7 +25,7 @@ const employeeOf = (storeId: string, userId: string) =>
  */
 export const HAS_PASSWORD = sql<boolean>`exists (select 1 from accounts credential where credential.user_id = "users"."id" and credential.provider_id = 'credential')`;
 
-const withoutPassword = sql`not ${HAS_PASSWORD}`;
+export const WITHOUT_PASSWORD = sql`not ${HAS_PASSWORD}`;
 
 /**
  * Bloquea la suscripción (FOR UPDATE) y cuenta los usuarios activos de la tienda,
@@ -100,7 +100,7 @@ export class DrizzleTeamRepository implements TeamRepository {
     const [row] = await this.database
       .select({ name: users.name, email: users.email })
       .from(users)
-      .where(and(employeeOf(storeId, userId), eq(users.isActive, true), withoutPassword));
+      .where(and(employeeOf(storeId, userId), eq(users.isActive, true), WITHOUT_PASSWORD));
     return row ?? null;
   }
 
@@ -110,7 +110,7 @@ export class DrizzleTeamRepository implements TeamRepository {
       async (tx) => {
         const removed = await tx
           .delete(users)
-          .where(and(employeeOf(data.storeId, data.userId), withoutPassword))
+          .where(and(employeeOf(data.storeId, data.userId), WITHOUT_PASSWORD))
           .returning({ email: users.email });
         if (removed.length === 0) return 'NOT_FOUND';
         await tx

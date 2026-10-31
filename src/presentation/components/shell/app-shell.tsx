@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { CircleUserRoundIcon } from 'lucide-react';
-import type { StoreUser } from '@/presentation/auth/guards';
+import type { Role } from '@/core/domain/identity/roles';
 import { formatDate } from '@/presentation/lib/format-date';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
 import { bottomItems, sidebarItems } from './nav-items';
@@ -10,13 +10,13 @@ import { BottomNav, SidebarNav } from './shell-nav';
 
 export type ShellStore = { name: string; trialEndsAt: Date | null };
 
-/** Marco del panel de la tienda: barra lateral desde 1024 px y barra inferior en celular. */
+/** Marco del panel (tienda o plataforma): barra lateral desde 1024 px y barra inferior en celular. */
 export async function AppShell({
   user,
   store,
   children,
 }: {
-  user: StoreUser;
+  user: { name: string; role: Role };
   store: ShellStore;
   children: React.ReactNode;
 }) {
@@ -26,7 +26,10 @@ export async function AppShell({
   return (
     <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[256px_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface p-4 lg:flex">
-        <Link href="/" className="px-4 pt-2">
+        <Link
+          href={user.role === 'PLATFORM_ADMIN' ? '/platform/stores' : '/'}
+          className="px-4 pt-2"
+        >
           <Image src={isologo} alt={t('logoAlt')} priority className="h-8 w-auto" />
         </Link>
         <SidebarNav items={sidebarItems(user.role)} />

@@ -23,10 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       : null;
 
   return (
-    <AppShell
-      user={{ ...user, role: user.role, storeId: user.storeId }}
-      store={{ name: store.name, trialEndsAt }}
-    >
+    <AppShell user={{ name: user.name, role: user.role }} store={{ name: store.name, trialEndsAt }}>
       {children}
     </AppShell>
   );

@@ -260,7 +260,9 @@
       "team": "Team",
       "settings": "Settings",
       "more": "More",
-      "soon": "Soon"
+      "soon": "Soon",
+      "stores": "Stores",
+      "rateCaps": "BCRP caps"
     }
   },
   "Customers": {
@@ -595,5 +597,117 @@
     "plansSubtitle": "Prices in Peruvian soles.",
     "yourPlan": "Your plan",
     "paymentSoon": "Soon you will be able to change plans and pay from here."
+  },
+  "Platform": {
+    "shellName": "Quina Platform",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "stores": {
+      "title": "Stores",
+      "subtitle": "{count, plural, =0 {No stores yet} one {# store} other {# stores}}",
+      "newButton": "Create store",
+      "emptyTitle": "Create the first store",
+      "since": "Since {date}"
+    },
+    "create": {
+      "title": "Create store",
+      "subtitle": "It starts on the Casero plan, active. The owner gets a link to create their password.",
+      "commercialName": "Business name",
+      "commercialNameHint": "As the neighborhood knows it.",
+      "businessTurn": "Business type",
+      "businessTurnHint": "The store’s main activity.",
+      "taxId": "RUC or DNI",
+      "taxIdHint": "11 digits for a RUC; 8 for a DNI.",
+      "locale": "Language",
+      "localeHint": "For emails to the owner and their customers.",
+      "ownerName": "Owner’s name",
+      "ownerNameHint": "Registered as the store’s owner.",
+      "ownerEmail": "Owner’s email",
+      "ownerEmailHint": "The link goes there. It expires in 72 hours.",
+      "submit": "Create store",
+      "submitting": "Creating…",
+      "cancel": "Cancel",
+      "errors": {
+        "COMMERCIAL_NAME_INVALID": "Write the business name.",
+        "TAX_ID_INVALID": "Write 11 digits (RUC) or 8 (DNI).",
+        "TAX_ID_TAKEN": "There is already a store with that RUC or DNI.",
+        "NAME_INVALID": "Write the name using letters only.",
+        "EMAIL_INVALID": "Check the email; it looks incomplete.",
+        "EMAIL_TAKEN": "That email already has a Quina account.",
+        "generic": "Could not create the store. Try again."
+      }
+    },
+    "detail": {
+      "back": "Back to stores",
+      "created": "Store created. We sent the link to {email}.",
+      "createdNoMail": "Store created, but the email to {email} did not go out. Use “Resend link”.",
+      "taxId": "RUC or DNI",
+      "businessTurn": "Business type",
+      "owner": "Owner",
+      "ownerAccess": "Owner access",
+      "ownerPending": "Has not created a password yet",
+      "ownerReady": "Signs in with a password",
+      "ownerMissing": "No owner",
+      "plan": "Plan",
+      "planTrial": "{plan} trial until {date}",
+      "since": "Created on",
+      "resend": "Resend link",
+      "suspend": "Suspend store",
+      "reactivate": "Reactivate store",
+      "keep": "No, go back",
+      "suspendTitle": "Suspend {name}?",
+      "suspendBody": "All its users are signed out of Quina right away and cannot sign in again until you reactivate it. Its data is kept.",
+      "suspendConfirm": "Suspend",
+      "messages": {
+        "resent": "We sent the owner a new link; the previous one no longer works.",
+        "mailFailed": "The email did not go out. Try again in a moment.",
+        "suspended": "Store suspended.",
+        "reactivated": "Store reactivated.",
+        "generic": "Could not complete it. Try again."
+      }
+    },
+    "caps": {
+      "title": "BCRP caps",
+      "subtitle": "Maximum interest rates for credit outside the financial system. Quina rejects terms above them.",
+      "historyTitle": "Validity periods",
+      "kinds": {
+        "COMPENSATORY": "Compensatory",
+        "MORATORY": "Late payment"
+      },
+      "currencies": {
+        "PEN": "Soles",
+        "USD": "Dollars"
+      },
+      "rate": "{percent} % effective annual",
+      "inForce": "In force since {from}",
+      "period": "From {from} to {to}",
+      "form": {
+        "title": "New validity period",
+        "subtitle": "When you save it, the previous period for the same rate and currency closes the day before.",
+        "kind": "Interest type",
+        "kindHint": "Compensatory: for credit. Late payment: for arrears.",
+        "currency": "Currency",
+        "currencyHint": "The BCRP publishes one cap per currency.",
+        "percent": "Cap (% effective annual)",
+        "percentHint": "As published by the BCRP, for example 114.13.",
+        "validFrom": "In force from",
+        "validFromHint": "Must be after the current period.",
+        "source": "Source",
+        "sourceHint": "BCRP circular and publication date.",
+        "submit": "Save period",
+        "submitting": "Saving…",
+        "saved": "Period saved.",
+        "errors": {
+          "RATE_PERCENT_INVALID": "Write a percentage, for example 114.13.",
+          "RATE_NOT_POSITIVE": "The cap must be greater than 0.",
+          "DATE_INVALID": "Choose a date.",
+          "NOT_AFTER_CURRENT": "It must start after the current period.",
+          "SOURCE_REQUIRED": "Write the circular the cap comes from.",
+          "generic": "Could not save. Try again."
+        }
+      }
+    }
   }
 }

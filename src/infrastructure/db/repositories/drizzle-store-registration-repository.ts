@@ -8,7 +8,8 @@ import { uniqueViolation } from '../errors';
 import { auditLogs, storeSubscriptions, stores, units, users } from '../schema';
 import { withTenant } from '../with-tenant';
 
-const BASE_UNITS = [
+/** Unidades con las que nace toda tienda (US24 y US01). */
+export const BASE_UNITS = [
   { code: 'UND', name: 'Unidad', allowDecimals: false },
   { code: 'KG', name: 'Kilogramo', allowDecimals: true },
   { code: 'LTR', name: 'Litro', allowDecimals: true },

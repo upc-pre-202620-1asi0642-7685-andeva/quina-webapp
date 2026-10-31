@@ -260,7 +260,9 @@
       "team": "Equipo",
       "settings": "Ajustes",
       "more": "Más",
-      "soon": "Pronto"
+      "soon": "Pronto",
+      "stores": "Tiendas",
+      "rateCaps": "Topes BCRP"
     }
   },
   "Customers": {
@@ -595,5 +597,117 @@
     "plansSubtitle": "Precios en soles.",
     "yourPlan": "Tu plan",
     "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí."
+  },
+  "Platform": {
+    "shellName": "Plataforma Quina",
+    "status": {
+      "active": "Activa",
+      "suspended": "Suspendida"
+    },
+    "stores": {
+      "title": "Tiendas",
+      "subtitle": "{count, plural, =0 {Aún no hay tiendas} one {# tienda} other {# tiendas}}",
+      "newButton": "Crear tienda",
+      "emptyTitle": "Crea la primera tienda",
+      "since": "Desde el {date}"
+    },
+    "create": {
+      "title": "Crear tienda",
+      "subtitle": "Nace en el plan Casero, activa. Al dueño le llega un enlace para crear su contraseña.",
+      "commercialName": "Nombre comercial",
+      "commercialNameHint": "Como la conocen en el barrio.",
+      "businessTurn": "Giro",
+      "businessTurnHint": "La actividad principal del comercio.",
+      "taxId": "RUC o DNI",
+      "taxIdHint": "11 dígitos si es RUC; 8 si es DNI.",
+      "locale": "Idioma",
+      "localeHint": "De los correos al dueño y a sus vecinos.",
+      "ownerName": "Nombre del dueño",
+      "ownerNameHint": "Queda como titular de la tienda.",
+      "ownerEmail": "Correo del dueño",
+      "ownerEmailHint": "Ahí le llega el enlace. Vence en 72 horas.",
+      "submit": "Crear tienda",
+      "submitting": "Creando…",
+      "cancel": "Cancelar",
+      "errors": {
+        "COMMERCIAL_NAME_INVALID": "Escribe el nombre comercial.",
+        "TAX_ID_INVALID": "Escribe 11 dígitos (RUC) u 8 (DNI).",
+        "TAX_ID_TAKEN": "Ya hay una tienda con ese RUC o DNI.",
+        "NAME_INVALID": "Escribe el nombre solo con letras.",
+        "EMAIL_INVALID": "Revisa el correo; parece incompleto.",
+        "EMAIL_TAKEN": "Ese correo ya tiene una cuenta en Quina.",
+        "generic": "No se pudo crear la tienda. Intenta de nuevo."
+      }
+    },
+    "detail": {
+      "back": "Volver a tiendas",
+      "created": "Tienda creada. Enviamos el enlace a {email}.",
+      "createdNoMail": "Tienda creada, pero el correo a {email} no salió. Usa «Reenviar enlace».",
+      "taxId": "RUC o DNI",
+      "businessTurn": "Giro",
+      "owner": "Dueño",
+      "ownerAccess": "Acceso del dueño",
+      "ownerPending": "Aún no crea su contraseña",
+      "ownerReady": "Ya ingresa con su contraseña",
+      "ownerMissing": "Sin dueño",
+      "plan": "Plan",
+      "planTrial": "{plan} de prueba hasta el {date}",
+      "since": "Creada el",
+      "resend": "Reenviar enlace",
+      "suspend": "Suspender tienda",
+      "reactivate": "Reactivar tienda",
+      "keep": "No, volver",
+      "suspendTitle": "¿Suspender {name}?",
+      "suspendBody": "Todos sus usuarios salen de Quina al instante y no pueden volver a ingresar hasta que la reactives. Sus datos se conservan.",
+      "suspendConfirm": "Suspender",
+      "messages": {
+        "resent": "Enviamos un enlace nuevo al dueño; el anterior ya no sirve.",
+        "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
+        "suspended": "Tienda suspendida.",
+        "reactivated": "Tienda reactivada.",
+        "generic": "No se pudo completar. Intenta de nuevo."
+      }
+    },
+    "caps": {
+      "title": "Topes del BCRP",
+      "subtitle": "Tasas máximas de interés para créditos fuera del sistema financiero. Quina rechaza las condiciones que los superen.",
+      "historyTitle": "Vigencias",
+      "kinds": {
+        "COMPENSATORY": "Compensatorio",
+        "MORATORY": "Moratorio"
+      },
+      "currencies": {
+        "PEN": "Soles",
+        "USD": "Dólares"
+      },
+      "rate": "{percent} % efectivo anual",
+      "inForce": "Vigente desde el {from}",
+      "period": "Del {from} al {to}",
+      "form": {
+        "title": "Nueva vigencia",
+        "subtitle": "Al guardarla, la vigencia anterior de la misma tasa y moneda se cierra el día previo.",
+        "kind": "Tipo de interés",
+        "kindHint": "Compensatorio: por fiar. Moratorio: por atraso.",
+        "currency": "Moneda",
+        "currencyHint": "El BCRP publica un tope por moneda.",
+        "percent": "Tope (% efectivo anual)",
+        "percentHint": "Tal como lo publica el BCRP, por ejemplo 114.13.",
+        "validFrom": "Vigente desde",
+        "validFromHint": "Debe ser posterior a la vigencia actual.",
+        "source": "Fuente",
+        "sourceHint": "Circular del BCRP y fecha de publicación.",
+        "submit": "Guardar vigencia",
+        "submitting": "Guardando…",
+        "saved": "Vigencia guardada.",
+        "errors": {
+          "RATE_PERCENT_INVALID": "Escribe un porcentaje, por ejemplo 114.13.",
+          "RATE_NOT_POSITIVE": "El tope debe ser mayor que 0.",
+          "DATE_INVALID": "Elige una fecha.",
+          "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
+          "SOURCE_REQUIRED": "Escribe la circular de la que sale el tope.",
+          "generic": "No se pudo guardar. Intenta de nuevo."
+        }
+      }
+    }
   }
 }
