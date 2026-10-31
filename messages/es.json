@@ -70,7 +70,9 @@
       "captchaRequired": "Completa la verificación de seguridad antes de continuar.",
       "rateLimited": "Demasiados intentos seguidos. Espera unos segundos e inténtalo de nuevo.",
       "generic": "No pudimos completar la operación. Inténtalo de nuevo en unos segundos.",
-      "consentRequired": "Marca la casilla para aceptar los Términos y condiciones y la Política de privacidad."
+      "consentRequired": "Marca la casilla para aceptar los Términos y condiciones y la Política de privacidad.",
+      "passwordMismatch": "Las dos contraseñas no coinciden. Escríbelas de nuevo.",
+      "passwordAlreadySet": "Tu cuenta ya tiene contraseña. Para cambiarla usa \"Cambiar contraseña\"."
     }
   },
   "Register": {
@@ -164,7 +166,7 @@
   },
   "Profile": {
     "title": "Mi perfil",
-    "subtitle": "Ajusta tu idioma y el correo con el que entras a Quina.",
+    "subtitle": "Ajusta tu idioma, tu correo y tu contraseña.",
     "backToDashboard": "Volver al mostrador",
     "localeTitle": "Idioma de Quina",
     "localeLabel": "Idioma de la interfaz y correos",
@@ -185,6 +187,18 @@
     "otpHint": "Escribe los 6 números que llegaron a tu nuevo correo.",
     "confirmEmailChange": "Confirmar nuevo correo",
     "emailChanged": "Tu correo fue actualizado.",
+    "password": {
+      "title": "Contraseña",
+      "lead": "Entraste con Google. Crea una contraseña para ingresar también con tu correo.",
+      "newLabel": "Nueva contraseña",
+      "newHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
+      "confirmLabel": "Repite la contraseña",
+      "confirmHint": "Escríbela otra vez para evitar errores de tipeo.",
+      "submit": "Crear contraseña",
+      "created": "Listo: ya puedes ingresar con tu correo y esta contraseña.",
+      "hasPassword": "Ya ingresas con tu correo y contraseña.",
+      "change": "Cambiar contraseña"
+    },
     "signOut": "Cerrar sesión"
   },
   "AuthAside": {

@@ -62,6 +62,14 @@ export const resetPasswordSchema = z.object({
   password: passwordField,
 });
 
+// Crear contraseña desde el perfil (cuentas que entraron con Google)
+export const setPasswordSchema = z
+  .object({ password: passwordField, confirmPassword: z.string() })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'passwordMismatch',
+    path: ['confirmPassword'],
+  });
+
 export type AccountInput = z.infer<typeof accountSchema>;
 export type StoreInput = z.infer<typeof storeSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

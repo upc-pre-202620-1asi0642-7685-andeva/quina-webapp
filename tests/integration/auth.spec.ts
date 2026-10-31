@@ -7,6 +7,7 @@ import postgres from 'postgres';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createAuth, LOCKED_MESSAGE, type Auth } from '@/infrastructure/auth/auth';
 import { CONSENT_COOKIE, LEGAL_TERMS_VERSION } from '@/infrastructure/auth/consent';
+import { setOwnPassword } from '@/infrastructure/auth/set-password';
 import { closeDb, db } from '@/infrastructure/db/connection';
 import { OutboxAuthMailer } from '@/infrastructure/email/outbox-auth-mailer';
 import { readLatestMail } from '../e2e/support/outbox';
@@ -573,5 +574,57 @@ describe('sesión y cookie', () => {
     expect(session).toMatch(/;\s*HttpOnly/i);
     expect(session).toMatch(/;\s*SameSite=Lax/i);
     expect(session).toMatch(/;\s*Path=\/(;|$)/);
+  });
+});
+
+describe('crear contraseña desde el perfil', () => {
+  /** Dueño con tienda y sesión abierta que solo tiene cuenta de Google. */
+  async function googleOnlyOwner() {
+    const email = newEmail('crea-clave');
+    const user = await verifiedUser(email);
+    const storeId = await storeFor(user.id);
+    const response = await post(
+      auth,
+      '/sign-in/email',
+      { email, password: PASSWORD },
+      { ip: nextIp() },
+    );
+    expect(response.status).toBe(200);
+    // Quitar la contraseña y dejar solo Google, como quien se registró con Google
+    await owner`DELETE FROM accounts WHERE user_id = ${user.id} AND provider_id = 'credential'`;
+    await owner`
+      INSERT INTO accounts (id, user_id, account_id, provider_id)
+      VALUES (${randomUUID()}, ${user.id}, ${`google-${randomUUID()}`}, 'google')`;
+    return { email, user, storeId, headers: new Headers({ cookie: cookieHeader(response) }) };
+  }
+
+  it('una cuenta solo con Google crea su contraseña, ingresa con ella y queda en la auditoría', async () => {
+    const { email, user, storeId, headers } = await googleOnlyOwner();
+    const NEW_PASSWORD = 'Google#2026y';
+
+    const result = await setOwnPassword(
+      { auth, db },
+      { headers, newPassword: NEW_PASSWORD, userId: user.id, storeId, ip: '203.0.113.7' },
+    );
+    expect(result).toBe('OK');
+
+    const [account] = await owner<{ password: string }[]>`
+      SELECT password FROM accounts WHERE user_id = ${user.id} AND provider_id = 'credential'`;
+    expect(account!.password).toMatch(/^\$argon2id\$v=19\$m=65536,t=3,p=4\$/);
+    await expect(signIn(email, NEW_PASSWORD)).resolves.toMatchObject({ user: { email } });
+
+    const audits = await owner<{ store_id: string; ip_address: string }[]>`
+      SELECT store_id, ip_address FROM audit_logs
+      WHERE user_id = ${user.id} AND action = 'SET_PASSWORD'`;
+    expect(audits).toEqual([{ store_id: storeId, ip_address: '203.0.113.7' }]);
+  });
+
+  it('si ya tiene contraseña no la reemplaza', async () => {
+    const { user, storeId, headers } = await googleOnlyOwner();
+    const input = { headers, newPassword: 'Google#2026y', userId: user.id, storeId };
+    expect(await setOwnPassword({ auth, db }, input)).toBe('OK');
+    expect(await setOwnPassword({ auth, db }, { ...input, newPassword: 'Otra#2026zz' })).toBe(
+      'PASSWORD_ALREADY_SET',
+    );
   });
 });

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { accountSchema, loginSchema, storeSchema } from '@/presentation/validation/auth-schemas';
+import {
+  accountSchema,
+  loginSchema,
+  setPasswordSchema,
+  storeSchema,
+} from '@/presentation/validation/auth-schemas';
 
 describe('authSchemas', () => {
   describe('accountSchema', () => {
@@ -51,6 +56,40 @@ describe('authSchemas', () => {
         accountSchema.safeParse({ name: 'Lucho', email: 'no-es-correo', password: 'Bodega#2026' })
           .success,
       ).toBe(false);
+    });
+  });
+
+  describe('setPasswordSchema', () => {
+    it('acepta una contraseña segura repetida igual', () => {
+      expect(
+        setPasswordSchema.safeParse({ password: 'Google#2026y', confirmPassword: 'Google#2026y' })
+          .success,
+      ).toBe(true);
+    });
+
+    it('rechaza una contraseña débil en el campo password', () => {
+      const parsed = setPasswordSchema.safeParse({ password: 'google', confirmPassword: 'google' });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues[0]).toMatchObject({
+          path: ['password'],
+          message: 'passwordWeak',
+        });
+      }
+    });
+
+    it('rechaza si la confirmación no coincide', () => {
+      const parsed = setPasswordSchema.safeParse({
+        password: 'Google#2026y',
+        confirmPassword: 'Google#2026z',
+      });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues[0]).toMatchObject({
+          path: ['confirmPassword'],
+          message: 'passwordMismatch',
+        });
+      }
     });
   });
 
