@@ -9,6 +9,7 @@ import { closeDb, db } from '@/infrastructure/db/connection';
 import { withTenant } from '@/infrastructure/db/with-tenant';
 import {
   auditLogs,
+  creditRateCaps,
   customers,
   rusCategories,
   stores,
@@ -228,6 +229,36 @@ describe('permisos de quina_app', () => {
 
   it('puede leer rus_categories', async () => {
     await expect(db.select().from(rusCategories)).resolves.toBeDefined();
+  });
+
+  it('lee los topes BCRP sembrados: compensatoria y moratoria en PEN y USD', async () => {
+    const caps = await db
+      .select({
+        kind: creditRateCaps.rateKind,
+        currency: creditRateCaps.currency,
+        max: creditRateCaps.maxEffectiveAnnualRate,
+        validTo: creditRateCaps.validTo,
+      })
+      .from(creditRateCaps)
+      .where(eq(creditRateCaps.validFrom, '2026-05-01'));
+    const byKey = Object.fromEntries(caps.map((c) => [`${c.kind}:${c.currency}`, c]));
+    expect(byKey['COMPENSATORY:PEN']).toMatchObject({ max: '1.1413', validTo: null });
+    expect(byKey['COMPENSATORY:USD']).toMatchObject({ max: '0.9984', validTo: null });
+    expect(byKey['MORATORY:PEN']).toMatchObject({ max: '0.1711', validTo: null });
+    expect(byKey['MORATORY:USD']).toMatchObject({ max: '0.1497', validTo: null });
+  });
+
+  it('no puede escribir en credit_rate_caps (tabla de plataforma)', async () => {
+    const state = await sqlState(
+      db.insert(creditRateCaps).values({
+        rateKind: 'COMPENSATORY',
+        currency: 'PEN',
+        maxEffectiveAnnualRate: '9.9999',
+        validFrom: '2030-01-01',
+        sourceReference: 'prueba',
+      }),
+    );
+    expect(state).toBe('42501');
   });
 
   it('los roles tienen los atributos esperados', async () => {

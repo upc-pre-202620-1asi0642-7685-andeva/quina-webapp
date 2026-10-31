@@ -9,7 +9,8 @@ export type SetOwnPasswordInput = {
   headers: Headers;
   newPassword: string;
   userId: string;
-  storeId: string;
+  /** `null` para el Administrador de Plataforma, que no tiene tienda. */
+  storeId: string | null;
   ip?: string | undefined;
   userAgent?: string | undefined;
 };
@@ -40,21 +41,22 @@ export async function setOwnPassword(
     throw error;
   }
 
-  // audit_logs es de solo inserción y con RLS: sin .returning()
-  await withTenant(
-    input.storeId,
-    (tx) =>
-      tx.insert(auditLogs).values({
-        storeId: input.storeId,
-        userId: input.userId,
-        action: 'SET_PASSWORD',
-        entityName: 'users',
-        entityId: input.userId,
-        newData: { provider: 'credential' },
-        ipAddress: input.ip?.slice(0, 45) ?? null,
-        userAgent: input.userAgent ?? null,
-      }),
-    deps.db,
-  );
+  // audit_logs es de solo inserción y con RLS: sin .returning(). Las filas de
+  // plataforma (store_id NULL) se insertan sin contexto de tienda.
+  const audit = {
+    storeId: input.storeId,
+    userId: input.userId,
+    action: 'SET_PASSWORD',
+    entityName: 'users',
+    entityId: input.userId,
+    newData: { provider: 'credential' },
+    ipAddress: input.ip?.slice(0, 45) ?? null,
+    userAgent: input.userAgent ?? null,
+  };
+  if (input.storeId) {
+    await withTenant(input.storeId, (tx) => tx.insert(auditLogs).values(audit), deps.db);
+  } else {
+    await deps.db.insert(auditLogs).values(audit);
+  }
   return 'OK';
 }

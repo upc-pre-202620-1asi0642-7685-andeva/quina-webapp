@@ -1,6 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { AuthMailKind } from '@/core/domain/ports/auth-mailer';
 import type { OutboxMail } from '@/infrastructure/email/outbox-auth-mailer';
 
 export type { OutboxMail };
@@ -10,7 +9,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /** Devuelve el correo más reciente para `to` y `kind`; reintenta cada 100 ms hasta `timeoutMs`. */
 export async function readLatestMail(
   to: string,
-  kind: AuthMailKind,
+  kind: OutboxMail['kind'],
   options: { dir?: string; timeoutMs?: number } = {},
 ): Promise<OutboxMail> {
   const dir = options.dir ?? path.join(process.cwd(), '.outbox');
@@ -30,7 +29,7 @@ export async function readLatestMail(
 async function findLatest(
   dir: string,
   to: string,
-  kind: AuthMailKind,
+  kind: OutboxMail['kind'],
 ): Promise<OutboxMail | undefined> {
   let files: string[];
   try {

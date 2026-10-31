@@ -1,5 +1,9 @@
 import { createTranslator } from 'next-intl';
 import type { AuthMailKind } from '@/core/domain/ports/auth-mailer';
+import type {
+  AccountSetupAudience,
+  NotificationMailKind,
+} from '@/core/domain/ports/notification-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
 import es from '../../../messages/es.json';
 import en from '../../../messages/en.json';
@@ -9,6 +13,14 @@ const messages = { es, en, qu } as const;
 
 export type RenderedEmail = { subject: string; html: string; text: string };
 export type EmailData = { otp?: string; url?: string };
+
+export type NotificationEmailData = {
+  url: string;
+  /** Nombre de quien recibe el correo. */
+  name: string;
+  storeName: string | null;
+  audience?: AccountSetupAudience;
+};
 
 // Los correos no soportan variables CSS: el verde de marca va literal (DESIGN.md 2.2).
 const BRAND_GREEN = '#2bdd66';
@@ -54,7 +66,21 @@ export function renderAuthEmail(
     outro = t('lockout.outro');
   }
 
-  const greeting = t('greeting');
+  return layout(locale, { subject, greeting: t('greeting'), intro, highlight, action, outro });
+}
+
+type EmailParts = {
+  subject: string;
+  greeting: string;
+  intro: string;
+  outro: string;
+  highlight?: string | undefined;
+  action?: { label: string; url: string } | undefined;
+};
+
+function layout(locale: Locale, parts: EmailParts): RenderedEmail {
+  const { subject, greeting, intro, outro, highlight, action } = parts;
+  const t = createTranslator({ locale, messages: messages[locale], namespace: 'Email' });
   const signature = t('signature');
 
   const codeBlock = highlight
@@ -83,4 +109,32 @@ ${codeBlock}${button}<p style="margin:0 0 24px;font-size:14px;line-height:1.5;co
   textParts.push('', outro, '', signature);
 
   return { subject, html, text: textParts.join('\n') };
+}
+
+export function renderNotificationEmail(
+  kind: NotificationMailKind,
+  locale: Locale,
+  data: NotificationEmailData,
+): RenderedEmail {
+  const t = createTranslator({ locale, messages: messages[locale], namespace: 'Email' });
+  const store = data.storeName ?? 'Quina';
+
+  if (kind === 'customer-welcome') {
+    return layout(locale, {
+      subject: t('welcome.subject', { store }),
+      greeting: t('welcome.greeting', { name: data.name }),
+      intro: t('welcome.intro', { store }),
+      action: { label: t('welcome.action'), url: data.url },
+      outro: t('welcome.outro', { store }),
+    });
+  }
+
+  const audience = data.audience ?? 'employee';
+  return layout(locale, {
+    subject: t(`setup.${audience}.subject`, { store }),
+    greeting: t('welcome.greeting', { name: data.name }),
+    intro: t(`setup.${audience}.intro`, { store }),
+    action: { label: t('setup.action'), url: data.url },
+    outro: t('setup.outro'),
+  });
 }

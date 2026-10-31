@@ -62,5 +62,23 @@ export default defineConfig(
     files: [DECIMAL_MODULE],
     rules: { 'no-restricted-imports': ['error', { patterns: corePatterns }] },
   },
+  {
+    // D2: quina_platform solo escribe los topes del BCRP
+    files: ['src/app/**', 'src/presentation/**', 'src/infrastructure/**'],
+    ignores: ['src/infrastructure/db/repositories/drizzle-rate-cap-repository.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/infrastructure/db/platform-connection', '**/platform-connection'],
+              message: 'quina_platform solo se usa en drizzle-rate-cap-repository.ts (D2).',
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettier,
 );

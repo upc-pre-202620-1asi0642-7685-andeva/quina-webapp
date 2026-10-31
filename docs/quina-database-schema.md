@@ -1585,7 +1585,7 @@ tabla con datos de una tienda tiene su política de RLS.
 | :--- | :--- | :---: |
 | `postgres` | Migraciones de Drizzle Kit (`drizzle-kit migrate`) y mantenimiento. Nunca lo usa la aplicación en tiempo de ejecución. | Sí |
 | `quina_app` | Conexión de la aplicación (Drizzle y Better Auth) por el pool de Supavisor (puerto 6543). | **No** |
-| `quina_platform` | Operaciones del Administrador de Plataforma que cruzan tiendas (alta y baja de comercios, auditoría global, topes de tasas y del Nuevo RUS). Solo se usa en las Server Actions del panel de plataforma. | Sí |
+| `quina_platform` | Escritura de las tablas globales sin RLS que la aplicación no debe tocar: hoy, los topes de tasas del BCRP (`credit_rate_caps`) y, más adelante, los del Nuevo RUS. Solo lo usa el repositorio de topes (`DATABASE_PLATFORM_URL`). El alta, la suspensión y la lectura de tiendas usan `quina_app` con `withTenant` de la tienda nueva, porque `stores`, `users` y `sessions` no tienen RLS. | Sí (en Supabase puede quedar `NOBYPASSRLS`; para estas tablas da igual) |
 
 Los roles se crean en la **migración** como `NOLOGIN`, sin contraseña en el
 repositorio. `quina_app` nace `NOBYPASSRLS` y `quina_platform` nace `BYPASSRLS`;

@@ -23,7 +23,8 @@
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:roles": "node --env-file-if-exists=.env.local scripts/db-roles.ts"
+    "db:roles": "node --env-file-if-exists=.env.local scripts/db-roles.ts",
+    "db:admin": "node --env-file-if-exists=.env.local scripts/create-platform-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",

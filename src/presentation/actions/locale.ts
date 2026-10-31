@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { locales, type Locale } from '@/core/domain/shared/locale';
@@ -19,7 +19,7 @@ export async function setLocaleAction(
   rawLocale: string,
 ): Promise<{ ok: boolean; locale?: Locale }> {
   const user = await getSessionUser();
-  if (!user) redirect('/login');
+  if (!user) return actionRedirect('/login');
 
   const parsed = localeSchema.safeParse(rawLocale);
   if (!parsed.success) return { ok: false };
