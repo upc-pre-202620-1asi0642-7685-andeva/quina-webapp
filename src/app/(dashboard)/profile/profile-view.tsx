@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { ArrowLeftIcon, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { locales, type Locale } from '@/core/domain/shared/locale';
 import { authClient } from '@/infrastructure/auth/auth-client';
@@ -15,6 +15,7 @@ import { OtpInput } from '@/presentation/components/auth/otp-input';
 import { PasswordStrength } from '@/presentation/components/auth/password-strength';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { cn } from '@/presentation/lib/utils';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
 
 type EmailErrKey =
@@ -24,11 +25,18 @@ export function ProfileView({
   currentEmail,
   currentLocale,
   hasPassword,
+  variant = 'store',
 }: {
   currentEmail: string;
   currentLocale: Locale;
   hasPassword: boolean;
+  /**
+   * Portal del vecino (US14.5): vuelve al portal y no cambia el correo, porque
+   * el correo es lo que lo une a sus tiendas (Plan 5, D1).
+   */
+  variant?: 'store' | 'portal';
 }) {
+  const portal = variant === 'portal';
   const t = useTranslations('Profile');
   const tDash = useTranslations('Dashboard');
   const tErr = useTranslations('Auth.errors');
@@ -132,62 +140,51 @@ export function ProfileView({
     setSigningOut(true);
     try {
       await authClient.signOut();
-      window.location.replace('/app/login');
+      window.location.replace(portal ? '/app/portal/login' : '/app/login');
     } finally {
       setSigningOut(false);
     }
   }
 
-  return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-6 px-4 py-10">
-      <header className="flex items-center justify-between gap-4">
-        <Image src={isologo} alt={tDash('logoAlt')} priority className="h-9 w-auto" />
-        <Link
-          href="/"
-          className="inline-flex h-11 items-center rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink hover:bg-surface-hover"
-        >
-          {t('backToDashboard')}
-        </Link>
-      </header>
+  const content = (
+    <section className="flex flex-col gap-6 rounded-card border border-line bg-surface p-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('title')}</h1>
+        <p className={cn('text-ink-soft', portal ? 'text-base' : 'text-sm')}>
+          {t(portal ? 'subtitlePortal' : 'subtitle')}
+        </p>
+      </div>
 
-      <section className="flex flex-col gap-6 rounded-card border border-line bg-surface p-6">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('title')}</h1>
-          <p className="text-sm text-ink-soft">{t('subtitle')}</p>
+      <form onSubmit={handleLocaleSubmit} className="flex flex-col gap-4 border-t border-line pt-6">
+        <h2 className="text-lg font-semibold text-ink">{t('localeTitle')}</h2>
+        <FormField id="profile-locale" label={t('localeLabel')} hint={t('localeHint')}>
+          {(props) => (
+            <select
+              {...props}
+              name="locale"
+              value={selectedLocale}
+              onChange={(e) => setSelectedLocale(e.target.value as Locale)}
+              className="h-11 w-full rounded-field border border-line bg-surface px-3.5 py-2 text-base text-ink outline-none focus-visible:border-link-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
+            >
+              {locales.map((loc) => (
+                <option key={loc} value={loc}>
+                  {t(`locales.${loc}`)}
+                </option>
+              ))}
+            </select>
+          )}
+        </FormField>
+        <div className="flex items-center gap-3" aria-live="polite">
+          <Button type="submit" variant="primary" disabled={isPendingLocale}>
+            {t('saveLocale')}
+          </Button>
+          {localeSaved ? (
+            <span className="text-sm font-medium text-success-ink">{t('localeSaved')}</span>
+          ) : null}
         </div>
+      </form>
 
-        <form
-          onSubmit={handleLocaleSubmit}
-          className="flex flex-col gap-4 border-t border-line pt-6"
-        >
-          <h2 className="text-lg font-semibold text-ink">{t('localeTitle')}</h2>
-          <FormField id="profile-locale" label={t('localeLabel')} hint={t('localeHint')}>
-            {(props) => (
-              <select
-                {...props}
-                name="locale"
-                value={selectedLocale}
-                onChange={(e) => setSelectedLocale(e.target.value as Locale)}
-                className="h-11 w-full rounded-field border border-line bg-surface px-3.5 py-2 text-base text-ink outline-none focus-visible:border-link-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
-              >
-                {locales.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {t(`locales.${loc}`)}
-                  </option>
-                ))}
-              </select>
-            )}
-          </FormField>
-          <div className="flex items-center gap-3" aria-live="polite">
-            <Button type="submit" variant="primary" disabled={isPendingLocale}>
-              {t('saveLocale')}
-            </Button>
-            {localeSaved ? (
-              <span className="text-sm font-medium text-success-ink">{t('localeSaved')}</span>
-            ) : null}
-          </div>
-        </form>
-
+      {portal ? null : (
         <div className="flex flex-col gap-4 border-t border-line pt-6">
           <h2 className="text-lg font-semibold text-ink">{t('emailTitle')}</h2>
           <p className="text-sm text-ink-soft">{t('currentEmail', { email: emailDisplay })}</p>
@@ -255,101 +252,134 @@ export function ProfileView({
             </form>
           )}
         </div>
+      )}
 
-        <div className="flex flex-col gap-4 border-t border-line pt-6">
-          <h2 className="text-lg font-semibold text-ink">{t('password.title')}</h2>
-          {passwordCreated ? (
-            <div className="flex flex-col gap-3" aria-live="polite">
-              {passwordState.ok ? (
-                <p className="text-sm font-medium text-success-ink">{t('password.created')}</p>
-              ) : null}
-              <p className="text-sm text-ink-soft">{t('password.hasPassword')}</p>
-              <Link
-                href="/auth/forgot-password"
-                className="w-fit text-sm font-semibold text-link-active underline underline-offset-4"
-              >
-                {t('password.change')}
-              </Link>
-            </div>
-          ) : (
-            <form action={passwordFormAction} noValidate className="flex flex-col gap-4">
-              <p className="text-sm text-ink-soft">{t('password.lead')}</p>
-              <FormField
-                id="profile-new-password"
-                label={t('password.newLabel')}
-                hint={t('password.newHint')}
-                error={
-                  passwordState.fieldErrors?.password
-                    ? tErr(passwordState.fieldErrors.password)
-                    : undefined
-                }
-              >
-                {(props) => (
-                  <div className="relative flex items-center">
-                    <Input
-                      {...props}
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="pr-12"
-                    />
-                    <button
-                      type="button"
-                      aria-label={showPassword ? tAuth('hidePassword') : tAuth('showPassword')}
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-0 flex size-11 cursor-pointer items-center justify-center rounded-field text-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="size-5" aria-hidden="true" />
-                      ) : (
-                        <Eye className="size-5" aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                )}
-              </FormField>
-              <PasswordStrength password={newPassword} />
-              <FormField
-                id="profile-confirm-password"
-                label={t('password.confirmLabel')}
-                hint={t('password.confirmHint')}
-                error={
-                  passwordState.fieldErrors?.confirmPassword
-                    ? tErr(passwordState.fieldErrors.confirmPassword)
-                    : undefined
-                }
-              >
-                {(props) => (
+      <div className="flex flex-col gap-4 border-t border-line pt-6">
+        <h2 className="text-lg font-semibold text-ink">{t('password.title')}</h2>
+        {passwordCreated ? (
+          <div className="flex flex-col gap-3" aria-live="polite">
+            {passwordState.ok ? (
+              <p className="text-sm font-medium text-success-ink">{t('password.created')}</p>
+            ) : null}
+            <p className="text-sm text-ink-soft">{t('password.hasPassword')}</p>
+            <Link
+              href="/auth/forgot-password"
+              className="w-fit text-sm font-semibold text-link-active underline underline-offset-4"
+            >
+              {t('password.change')}
+            </Link>
+          </div>
+        ) : (
+          <form action={passwordFormAction} noValidate className="flex flex-col gap-4">
+            <p className="text-sm text-ink-soft">
+              {t(portal ? 'password.leadPortal' : 'password.lead')}
+            </p>
+            <FormField
+              id="profile-new-password"
+              label={t('password.newLabel')}
+              hint={t('password.newHint')}
+              error={
+                passwordState.fieldErrors?.password
+                  ? tErr(passwordState.fieldErrors.password)
+                  : undefined
+              }
+            >
+              {(props) => (
+                <div className="relative flex items-center">
                   <Input
                     {...props}
-                    name="confirmPassword"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="pr-12"
                   />
-                )}
-              </FormField>
-              {passwordState.formError ? (
-                <p role="alert" className="text-[13px] font-medium text-error-ink">
-                  {tErr(passwordState.formError)}
-                </p>
-              ) : null}
-              <Button type="submit" variant="secondary" disabled={isPendingPassword}>
-                {t('password.submit')}
-              </Button>
-            </form>
-          )}
-        </div>
+                  <button
+                    type="button"
+                    aria-label={showPassword ? tAuth('hidePassword') : tAuth('showPassword')}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-0 flex size-11 cursor-pointer items-center justify-center rounded-field text-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              )}
+            </FormField>
+            <PasswordStrength password={newPassword} />
+            <FormField
+              id="profile-confirm-password"
+              label={t('password.confirmLabel')}
+              hint={t('password.confirmHint')}
+              error={
+                passwordState.fieldErrors?.confirmPassword
+                  ? tErr(passwordState.fieldErrors.confirmPassword)
+                  : undefined
+              }
+            >
+              {(props) => (
+                <Input
+                  {...props}
+                  name="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              )}
+            </FormField>
+            {passwordState.formError ? (
+              <p role="alert" className="text-[13px] font-medium text-error-ink">
+                {tErr(passwordState.formError)}
+              </p>
+            ) : null}
+            <Button type="submit" variant="secondary" disabled={isPendingPassword}>
+              {t('password.submit')}
+            </Button>
+          </form>
+        )}
+      </div>
 
-        <div className="border-t border-line pt-6">
-          <Button type="button" variant="secondary" onClick={handleSignOut} disabled={signingOut}>
-            {t('signOut')}
-          </Button>
-        </div>
-      </section>
+      <div className="border-t border-line pt-6">
+        <Button type="button" variant="secondary" onClick={handleSignOut} disabled={signingOut}>
+          {t('signOut')}
+        </Button>
+      </div>
+    </section>
+  );
+
+  // Portal (DESIGN.md §6.2): va dentro de PortalShell, que ya pone el logo y el marco
+  if (portal) {
+    return (
+      <>
+        <Link
+          href="/portal"
+          className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline"
+        >
+          <ArrowLeftIcon aria-hidden="true" className="size-5" />
+          {t('backToPortal')}
+        </Link>
+        {content}
+      </>
+    );
+  }
+
+  return (
+    <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-6 px-4 py-10">
+      <header className="flex items-center justify-between gap-4">
+        <Image src={isologo} alt={tDash('logoAlt')} priority className="h-9 w-auto" />
+        <Link
+          href="/"
+          className="inline-flex h-11 items-center rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink hover:bg-surface-hover"
+        >
+          {t('backToDashboard')}
+        </Link>
+      </header>
+      {content}
     </main>
   );
 }

@@ -91,6 +91,9 @@ export function renderCollectionsEmail(mail: CollectionsMail): RenderedEmail {
   const yape = mail.storeYape ? [t('collections.yape', { yape: mail.storeYape })] : [];
   const detail = detailOf(rowsOf(mail, t), t('collections.total'), total);
   const greeting = t('welcome.greeting', { name: mail.customerName });
+  const action = mail.portalUrl
+    ? { label: t('collections.portalButton'), url: mail.portalUrl }
+    : undefined;
 
   switch (mail.kind) {
     case 'charge-digest':
@@ -99,7 +102,8 @@ export function renderCollectionsEmail(mail: CollectionsMail): RenderedEmail {
         greeting,
         intro: t('collections.digest.intro', { store }),
         detail,
-        outro: t('collections.digest.outro'),
+        action,
+        outro: t(mail.portalUrl ? 'collections.digest.outroPortal' : 'collections.digest.outro'),
         notes: [
           ...(mail.balance
             ? [t('collections.balance', { amount: formatMailMoney(mail.balance, mail.currency) })]
@@ -113,6 +117,7 @@ export function renderCollectionsEmail(mail: CollectionsMail): RenderedEmail {
         greeting,
         intro: t('collections.statement.intro', { cutOff }),
         detail,
+        action,
         outro: t('collections.statement.outro', { amount: total, dueDate }),
         notes: [...yape, contact],
       });
@@ -121,6 +126,7 @@ export function renderCollectionsEmail(mail: CollectionsMail): RenderedEmail {
         subject: t('collections.reminder.subject', { store, dueDate }),
         greeting,
         intro: t('collections.reminder.intro', { store, dueDate, amount: total }),
+        action,
         outro: t('collections.reminder.outro'),
         notes: [...yape, contact],
       });
@@ -129,6 +135,7 @@ export function renderCollectionsEmail(mail: CollectionsMail): RenderedEmail {
         subject: t('collections.late.subject', { store }),
         greeting,
         intro: t('collections.late.intro', { dueDate, amount: total }),
+        action,
         outro: t('collections.late.outro', { store }),
         notes: [...yape, contact],
       });

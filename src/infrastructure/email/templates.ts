@@ -54,6 +54,12 @@ export function renderAuthEmail(
     intro = t('otp.intro');
     highlight = data.otp;
     outro = t('otp.outro');
+  } else if (kind === 'portal-otp') {
+    if (!data.otp) throw new Error('portal-otp requires data.otp');
+    subject = t('portalOtp.subject');
+    intro = t('portalOtp.intro');
+    highlight = data.otp;
+    outro = t('portalOtp.outro');
   } else if (kind === 'password-reset') {
     if (!data.url) throw new Error('password-reset requires data.url');
     subject = t('reset.subject');

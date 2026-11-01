@@ -17,6 +17,11 @@
       "intro": "Use this code to confirm your email and keep setting up your store:",
       "outro": "The code expires in 15 minutes. If you didn't ask for it, ignore this email."
     },
+    "portalOtp": {
+      "subject": "Your code to see your store credit account",
+      "intro": "Use this code to open your account and see what you owe, your payment dates and your installments:",
+      "outro": "The code expires in 15 minutes. If you did not ask for it, ignore this email: nobody can get in without it."
+    },
     "reset": {
       "subject": "Choose a new password for Quina",
       "intro": "You asked to change the password of your Quina account. Tap the button to choose a new one:",
@@ -72,7 +77,8 @@
       "digest": {
         "subject": "{store}: your purchases on credit",
         "intro": "These are your purchases on credit at {store}:",
-        "outro": "You have 48 hours from this email to tell us if something is wrong. If you don't, the charges are considered accepted."
+        "outro": "You have 48 hours from this email to tell us if something is wrong. If you don't, the charges are considered accepted.",
+        "outroPortal": "You have 48 hours from this email to tell us if something is wrong: flag it in your portal or write to the store. If you do not, the charges are accepted."
       },
       "statement": {
         "subject": "{store}: your statement as of {cutOff}",
@@ -93,7 +99,8 @@
         "subject": "{store}: payment receipt {receipt}",
         "intro": "We received your payment on {date} by {method}. This is your receipt {receipt}:",
         "outro": "Thank you for paying. That cycle of your account is settled."
-      }
+      },
+      "portalButton": "See my statement"
     }
   },
   "Auth": {
@@ -114,7 +121,9 @@
       "submit": "Sign in",
       "submitting": "Signing in…",
       "noAccount": "Don't have an account yet?",
-      "registerLink": "Register your store for free"
+      "registerLink": "Register your store for free",
+      "customerQuestion": "Are you a customer checking your store credit?",
+      "customerLink": "See your account"
     },
     "errors": {
       "nameRequired": "Enter your full name (at least 2 letters) to identify the store owner.",
@@ -278,9 +287,12 @@
       "submit": "Create password",
       "created": "Done: you can now sign in with your email and this password.",
       "hasPassword": "You already sign in with your email and password.",
-      "change": "Change password"
+      "change": "Change password",
+      "leadPortal": "If you like, create a password to also sign in with your email."
     },
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "backToPortal": "Back to my account",
+    "subtitlePortal": "Adjust your language and password."
   },
   "AuthAside": {
     "register": {
@@ -302,9 +314,14 @@
       "cutOff": "Cut-off date",
       "due": "Payment date",
       "reminder": "Payment reminder sent",
-      "reminderTo": "By email to Rosa"
+      "reminderTo": "By email to Rosa",
+      "balancePortal": "What you owe"
     },
-    "photoAlt": "Shopkeeper serving customers in a neighborhood store"
+    "photoAlt": "Shopkeeper serving customers in a neighborhood store",
+    "portal": {
+      "title": "Your account, clear and simple",
+      "lead": "See what you owe and your payment dates from your phone. Free and with no passwords."
+    }
   },
   "Shell": {
     "logoAlt": "Quina",
@@ -657,7 +674,63 @@
     "plansTitle": "Plans",
     "plansSubtitle": "Prices in Peruvian soles.",
     "yourPlan": "Your plan",
-    "paymentSoon": "Soon you will be able to change plans and pay from here."
+    "paymentSoon": "Soon you will be able to change plans and pay from here.",
+    "payment": {
+      "title": "Payment details",
+      "subtitle": "Your customers see them in their account to pay you by Yape, Plin or bank transfer. Fill in only the ones you use.",
+      "yapeNumber": {
+        "label": "Yape",
+        "hint": "9-digit mobile number where you receive Yape."
+      },
+      "plinNumber": {
+        "label": "Plin",
+        "hint": "9-digit mobile number where you receive Plin."
+      },
+      "bankName": {
+        "label": "Bank",
+        "hint": "For example: BCP, Interbank, BBVA. Required if you add an account."
+      },
+      "bankAccountNumber": {
+        "label": "Account number",
+        "hint": "The account where you receive transfers from the same bank."
+      },
+      "bankCci": {
+        "label": "CCI",
+        "hint": "20-digit interbank account code, for transfers from another bank."
+      },
+      "qr": {
+        "title": "QR code",
+        "label": "Picture of your Yape or Plin QR",
+        "hint": "JPG, PNG or WEBP up to 2 MB. Only your customers see it in their account.",
+        "currentAlt": "Store payment QR code",
+        "remove": "Remove the QR"
+      },
+      "save": "Save payment details",
+      "saving": "Saving…",
+      "saved": "Done. Your customers now see these details in their account.",
+      "errors": {
+        "form": "We could not save the details. Try again in a few seconds.",
+        "yapeNumber": {
+          "INVALID": "Enter a 9-digit mobile number that starts with 9."
+        },
+        "plinNumber": {
+          "INVALID": "Enter a 9-digit mobile number that starts with 9."
+        },
+        "bankName": {
+          "INVALID": "Enter the bank name (up to 60 letters); it is required if you add an account or CCI."
+        },
+        "bankAccountNumber": {
+          "INVALID": "Use only digits (and dashes if your bank uses them), 6 to 30."
+        },
+        "bankCci": {
+          "INVALID": "The CCI has exactly 20 digits."
+        },
+        "qr": {
+          "IMAGE_TYPE": "Upload a JPG, PNG or WEBP image.",
+          "IMAGE_TOO_LARGE": "The image is larger than 2 MB. Take a lighter screenshot."
+        }
+      }
+    }
   },
   "Platform": {
     "shellName": "Quina Platform",
@@ -1215,6 +1288,115 @@
         "AUTOMATIC": "Your plan already sends these notices on its own.",
         "GENERIC": "They couldn't be sent. Try again."
       }
+    }
+  },
+  "Portal": {
+    "login": {
+      "title": "Check your store credit account",
+      "subtitle": "See what you owe, your payment dates and your installments. It is free and needs no password.",
+      "typeLabel": "Document type",
+      "typeHint": "The same one you gave at the store.",
+      "numberLabel": "Document number",
+      "numberHint": "We will send a 6-digit code to the email your store registered.",
+      "send": "Send code",
+      "sending": "Sending…",
+      "sent": "If your document is registered at a store, we sent a code to your email. Check your spam folder too.",
+      "codeLabel": "6-digit code",
+      "codeHint": "The code expires in 15 minutes.",
+      "verify": "See my account",
+      "verifying": "Checking…",
+      "again": "Ask for another code or change document",
+      "passwordQuestion": "Did you create a password?",
+      "passwordLink": "Sign in with your email",
+      "merchantQuestion": "Do you own a store?",
+      "merchantLink": "Sign in here",
+      "notice": {
+        "link": "That link was already used or expired. Sign in with your document or with Google.",
+        "google": "We could not find that Google email at any store. Sign in with your document or ask your store to check your email."
+      },
+      "errors": {
+        "DOCUMENT_INVALID": "Check the number: a DNI has 8 digits; a foreigner card or passport has letters and digits.",
+        "CAPTCHA_REQUIRED": "Complete the security check before continuing.",
+        "CODE_INVALID": "The code does not match or has expired. Check it or ask for another one.",
+        "GENERIC": "We could not finish that. Try again in a few seconds."
+      },
+      "or": "or with your ID document"
+    },
+    "shell": {
+      "home": "My accounts",
+      "logoAlt": "Quina",
+      "profile": "My profile"
+    },
+    "home": {
+      "title": "My store credit accounts",
+      "subtitle": "Choose the store you want to check.",
+      "balance": "What you owe today",
+      "noCredit": "No credit yet",
+      "noStores": "Your email {email} is no longer registered at any store. Ask your store to check your email."
+    },
+    "account": {
+      "allStores": "All my stores",
+      "hello": "Hi, {name}",
+      "summaryTitle": "Your account summary",
+      "balance": "What you owe today",
+      "toPay": "To pay",
+      "payBy": "Pay by {date}",
+      "seeStatement": "See the details",
+      "nothingDue": "You have nothing to pay. This month’s purchases are added on the next cut-off date.",
+      "nextCutOff": "Next cut-off date",
+      "creditLimit": "Your credit limit",
+      "blocked": "For now the store cannot give you more credit. Talk to the store owner.",
+      "noCredit": "This store has not opened a credit account for you yet.",
+      "callStore": "Call the store: {phone}"
+    },
+    "payment": {
+      "title": "How to pay",
+      "empty": "Your store has not added its payment details yet. Pay at the store.",
+      "yape": "Yape",
+      "plin": "Plin",
+      "bank": "Bank",
+      "account": "Account number",
+      "cci": "CCI",
+      "qrAlt": "QR code to pay the store"
+    },
+    "installments": {
+      "title": "My installments",
+      "purchase": "Purchase on {date} for {amount}",
+      "progress": "{paid} of {total} installments paid",
+      "caption": "Purchase installments: number, due date, amount, principal, interest and status",
+      "number": "No.",
+      "dueDate": "Due",
+      "installment": "Installment",
+      "principal": "Principal",
+      "interest": "Interest",
+      "status": "Status",
+      "statuses": {
+        "PENDING": "Upcoming",
+        "PAID": "Paid",
+        "OVERDUE": "Overdue"
+      },
+      "row": "Installment {number} of {total}",
+      "dueOn": "Due {date}",
+      "breakdown": "Principal {principal} · Interest {interest}"
+    },
+    "cycle": {
+      "back": "Back to my account",
+      "objected": "Done. The store will review your note before charging you for it."
+    },
+    "charge": {
+      "object": "I do not recognize this charge",
+      "objectTitle": "What happened with this charge?",
+      "objectBody": "Tell the store why you do not recognize it. It will not be charged until they review it.",
+      "objectLabel": "Your note",
+      "waiting": "The store is reviewing your note.",
+      "objectSubmit": "Send to the store"
+    },
+    "enter": {
+      "title": "Your statement is waiting",
+      "subtitle": "Tap the button to open your store credit account. No password needed.",
+      "submit": "See my statement",
+      "otherSession": "Another account is signed in on this device ({email}). Continuing will sign it out.",
+      "missing": "This link is incomplete. Sign in with your ID document."
     }
   }
 }

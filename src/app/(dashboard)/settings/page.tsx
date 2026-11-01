@@ -7,8 +7,12 @@ import {
   type CountedResource,
   type Feature,
 } from '@/core/domain/billing/plan-limits';
+import { can } from '@/core/domain/identity/permissions';
 import { loadPlanUsage } from '@/infrastructure/db/queries/plan-usage';
+import { getStorePayment } from '@/infrastructure/db/queries/store-payment';
+import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
 import { requireStoreUser } from '@/presentation/auth/guards';
+import { PaymentDetailsForm } from '@/presentation/components/settings/payment-details-form';
 import { formatMoney } from '@/presentation/components/money';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
@@ -22,6 +26,9 @@ const FEATURES: Feature[] = [
   'reportsExport',
   'ai',
 ];
+
+// La URL firmada del QR dura lo que una visita a la página
+const QR_URL_SECONDS = 15 * 60;
 
 export default async function SettingsPage() {
   const user = await requireStoreUser('/settings', 'settings.billing');
@@ -37,6 +44,12 @@ export default async function SettingsPage() {
       ? store.subscription.trialEndsAt
       : null;
   const unlimited = (max: number | null) => (max === null ? tPlans('unlimited') : String(max));
+  const payment = can(user.role, 'store.payment_details')
+    ? await getStorePayment(user.storeId)
+    : null;
+  const qrUrl = payment?.qrPath
+    ? await getPrivateFileStorage().signedUrl(payment.qrPath, QR_URL_SECONDS)
+    : null;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -124,6 +137,23 @@ export default async function SettingsPage() {
           })}
         </ul>
       </section>
+
+      {/* Plan 5, P3: lo que el vecino ve en su portal para pagar */}
+      {payment ? (
+        <section
+          id="payment"
+          aria-labelledby="payment-title"
+          className="flex scroll-mt-24 flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
+        >
+          <div className="flex flex-col gap-1">
+            <h2 id="payment-title" className="text-lg font-semibold text-ink">
+              {t('payment.title')}
+            </h2>
+            <p className="text-sm text-ink-soft">{t('payment.subtitle')}</p>
+          </div>
+          <PaymentDetailsForm initial={payment} qrUrl={qrUrl} />
+        </section>
+      ) : null}
 
       <section id="plans" className="flex scroll-mt-24 flex-col gap-4">
         <div className="flex flex-col gap-1">

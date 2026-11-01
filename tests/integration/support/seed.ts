@@ -108,9 +108,14 @@ export async function product(
 /** Vecino con las condiciones del juego de datos 1 (corte 20, pago 26). */
 export async function neighbor(
   ctx: Ctx,
-  overrides: { creditLimit?: string; email?: string; preferredLocale?: string } = {},
+  overrides: {
+    creditLimit?: string;
+    email?: string;
+    preferredLocale?: string;
+    documentNumber?: string;
+  } = {},
 ) {
-  const dni = String(randomInt(1e8)).padStart(8, '0');
+  const dni = overrides.documentNumber ?? String(randomInt(1e8)).padStart(8, '0');
   return withTenant(ctx.storeId, async (tx) => {
     const [customer] = await tx
       .insert(customers)
@@ -141,7 +146,7 @@ export async function neighbor(
         paymentDueDay: 26,
       })
       .returning({ id: creditAccounts.id });
-    return { customerId: customer!.id, accountId: account!.id };
+    return { customerId: customer!.id, accountId: account!.id, dni };
   });
 }
 

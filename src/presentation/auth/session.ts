@@ -26,6 +26,9 @@ const PUBLIC_AUTH_PATHS = new Set([
   '/auth/forgot-password',
   '/auth/reset-password',
   '/auth/accept-invite',
+  // Portal del vecino (Plan 5): ingreso con documento y canje del enlace mágico
+  '/portal/login',
+  '/portal/enter',
 ]);
 
 const ALL_AUTH_PATHS = new Set([...PUBLIC_AUTH_PATHS, '/register/store']);
@@ -42,8 +45,13 @@ function normalizePath(path: string): string {
   return clean || '/';
 }
 
+const PORTAL_PREFIX = '/portal';
+
 const isPlatformPath = (path: string) =>
   path === PLATFORM_PREFIX || path.startsWith(`${PLATFORM_PREFIX}/`);
+
+const isPortalPath = (path: string) =>
+  path === PORTAL_PREFIX || path.startsWith(`${PORTAL_PREFIX}/`);
 
 /**
  * Decide a qué ruta redirigir según el estado del usuario y la ruta actual.
@@ -55,12 +63,18 @@ export function nextRouteFor(user: SessionUser | null, path: string): string | n
   if (OPEN_PREFIXES.some((prefix) => clean.startsWith(prefix))) return null;
 
   if (!user) {
-    return PUBLIC_AUTH_PATHS.has(clean) ? null : '/login';
+    if (PUBLIC_AUTH_PATHS.has(clean)) return null;
+    return isPortalPath(clean) ? '/portal/login' : '/login';
   }
 
   if (!user.emailVerified) {
     return clean === '/register/verify' ? null : '/register/verify';
   }
+
+  // D8: el portal se abre por el correo verificado, sea cual sea el rol (P2)
+  if (isPortalPath(clean)) return clean === '/portal/login' ? PORTAL_PREFIX : null;
+
+  if (user.role === 'CUSTOMER') return PORTAL_PREFIX;
 
   if (user.role === 'PENDING_OWNER') {
     return clean === '/register/store' ? null : '/register/store';

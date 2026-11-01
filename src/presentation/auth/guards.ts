@@ -1,6 +1,33 @@
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { can, type Permission } from '@/core/domain/identity/permissions';
+import type { PortalLink } from '@/core/domain/ports/portal-directory';
+import { createPortalDirectory } from '@/infrastructure/db/portal/drizzle-portal-directory';
 import { getSessionUser, requireUser, type SessionUser } from '@/presentation/auth/session';
+
+export type PortalUser = { user: SessionUser; links: PortalLink[] };
+
+/** Tiendas del correo verificado, una vez por petición (Plan 5, D1). */
+const portalLinksOf = cache((email: string) => createPortalDirectory().linksForEmail(email));
+
+/**
+ * Página del portal del vecino. El acceso sale del correo verificado, no del rol
+ * (P2); `links` puede venir vacío si ninguna tienda tiene ya ese correo.
+ */
+export async function requirePortalUser(path: string): Promise<PortalUser> {
+  const user = await requireUser(path);
+  return { user, links: await portalLinksOf(user.email) };
+}
+
+/** Para Server Actions del portal: el vínculo con esa tienda, o null. */
+export async function authorizePortal(
+  storeId: string,
+): Promise<{ user: SessionUser; link: PortalLink } | null> {
+  const user = await getSessionUser();
+  if (!user?.emailVerified) return null;
+  const link = (await portalLinksOf(user.email)).find((l) => l.storeId === storeId);
+  return link ? { user, link } : null;
+}
 
 /** Dueño o empleado con su tienda. */
 export type StoreUser = SessionUser & {

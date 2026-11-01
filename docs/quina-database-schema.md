@@ -1709,6 +1709,19 @@ CREATE POLICY tenant_isolation ON audit_logs FOR ALL TO quina_app
 > que le pertenece y además filtra por su `customer_id`. Un vecino con cuenta en
 > dos bodegas elige la tienda y solo ve los datos de esa tienda.
 
+### 5.5. Funciones del portal (`SECURITY DEFINER`)
+
+Antes de entrar, el portal no sabe en qué tiendas está el vecino y la RLS de
+`customers` devolvería 0 filas. Dos funciones de la migración
+`0003_portal_access` cruzan tiendas y devuelven **solo** lo necesario. Corren
+con `SET search_path = public, pg_temp`, sin `EXECUTE` para `PUBLIC` y con
+`GRANT EXECUTE` a `quina_app`.
+
+| Función | Devuelve | Uso |
+| :--- | :--- | :--- |
+| `portal_customer_links(p_email TEXT)` | `store_id`, `customer_id`, `preferred_locale` (el del vecino o el de la tienda) de vecinos activos en tiendas activas, comparando el correo sin mayúsculas | Qué tiendas ve la sesión; si el correo puede darse de alta como `CUSTOMER` |
+| `portal_emails_for_document(p_type TEXT, p_number TEXT)` | Los correos distintos, en minúsculas, de vecinos activos con ese documento | A qué correos se manda el código de ingreso por documento |
+
 ---
 
 ## 6. Mapeo a Drizzle ORM y configuración de Better Auth (TypeScript)

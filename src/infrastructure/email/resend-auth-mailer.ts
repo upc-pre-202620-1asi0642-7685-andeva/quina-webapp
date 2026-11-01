@@ -30,6 +30,10 @@ export class ResendAuthMailer implements AuthMailer, NotificationMailer {
     return this.send(input.to, 'verification-otp', input.locale, { otp: input.otp });
   }
 
+  sendPortalOtp(input: { to: string; otp: string; locale: Locale }): Promise<void> {
+    return this.send(input.to, 'portal-otp', input.locale, { otp: input.otp });
+  }
+
   sendPasswordReset(input: { to: string; url: string; locale: Locale }): Promise<void> {
     return this.send(input.to, 'password-reset', input.locale, { url: input.url });
   }

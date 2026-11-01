@@ -22,12 +22,14 @@ export async function addProduct(
 
 /** Vecino con fiado abierto: límite en soles y tasas debajo del tope del BCRP. */
 export async function addCreditNeighbor(page: Page, firstName: string, limit: string) {
+  const dni = uniqueDni();
+  const email = uniqueEmail('vecina');
   await page.goto('./customers/new');
-  await page.getByLabel('Número de documento').fill(uniqueDni());
+  await page.getByLabel('Número de documento').fill(dni);
   await page.getByLabel('Nombres', { exact: true }).fill(firstName);
   await page.getByLabel('Apellidos').fill('Quispe');
   await page.getByLabel('Celular').fill('987654321');
-  await page.getByLabel('Correo', { exact: true }).fill(uniqueEmail('vecina'));
+  await page.getByLabel('Correo', { exact: true }).fill(email);
   await page.getByRole('checkbox', { name: /El vecino autoriza/ }).check();
   await page.getByRole('button', { name: 'Registrar vecino' }).click();
   await expect(page).toHaveURL(/\/terms\?new=1/);
@@ -37,6 +39,7 @@ export async function addCreditNeighbor(page: Page, firstName: string, limit: st
   await rates.nth(1).fill('15');
   await page.getByRole('button', { name: 'Abrir fiado' }).click();
   await expect(page.getByText(`Listo: ${firstName} ya puede comprar al fiado.`)).toBeVisible();
+  return { dni, email };
 }
 
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 1024;

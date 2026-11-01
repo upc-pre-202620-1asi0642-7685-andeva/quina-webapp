@@ -18,6 +18,11 @@
       "intro": "Kay yupayta churay, correoykita takyachinaykipaq hinaspa tiendaykita wakichiyta puriychinaykipaq:",
       "outro": "Kay yupayqa 15 minutupi tukukun. Mana qan mañakurqankichu chayqa, kay correota ama qhawariychu."
     },
+    "portalOtp": {
+      "subject": "Fiado cuentaykita qhawanaykipaq codigoyki",
+      "intro": "Kay codigowan cuentaykiman yaykuy, imata manukusqaykita, pagana púnchawniykita, cuotaykitapas qhawanaykipaq:",
+      "outro": "Codigoqa 15 minutollapi tukukun. Mana qan mañakurqanki chayqa, kay correota saqiy: mana pipas yaykunmanchu mana kaywanqa."
+    },
     "reset": {
       "subject": "Quinapaq musuq pakasqa simita akllay",
       "intro": "Quina cuentaykipa pakasqa simita tikrayta mañakurqanki. Kay botonta ñit'iy musuqta akllanaykipaq:",
@@ -73,7 +78,8 @@
       "digest": {
         "subject": "{store}: manupi rantisqaykikuna",
         "intro": "Kaykunam {store} nisqapi manupi rantisqaykikuna:",
-        "outro": "Kay correomanta 48 hora kapusunki imapas mana allin kaqta willanaykipaq. Mana willaptiykiqa, manukuna chaskisqa hina kanqa."
+        "outro": "Kay correomanta 48 hora kapusunki imapas mana allin kaqta willanaykipaq. Mana willaptiykiqa, manukuna chaskisqa hina kanqa.",
+        "outroPortal": "Kay correomanta 48 horasniyki kan mana allin kaqta willanaykipaq: portalniykipi observay utaq tiendaman qillqay. Mana willawaptiykiqa, cargokunaqa chaskisqa kanqa."
       },
       "statement": {
         "subject": "{store}: {cutOff} kama yupaynikiy",
@@ -94,7 +100,8 @@
         "subject": "{store}: qullqisqa willay {receipt}",
         "intro": "{date} p'unchawpi {method} nisqawan qullqiykita chaskiyku. Kaymi {receipt} willayniyki:",
         "outro": "Qullqisqaykimanta añay. Chay yupaynikiyqa tukusqañam."
-      }
+      },
+      "portalButton": "Cuentayta qhaway"
     }
   },
   "Auth": {
@@ -115,7 +122,9 @@
       "submit": "Yaykuy",
       "submitting": "Yaykuchkan…",
       "noAccount": "¿Manaraqchu cuentayki kan?",
-      "registerLink": "Tiendaykita mana qullqiwan qillqachiy"
+      "registerLink": "Tiendaykita mana qullqiwan qillqachiy",
+      "customerQuestion": "¿Vecinochu kanki, fiadoykita qhawayta munankichu?",
+      "customerLink": "Cuentaykita qhaway"
     },
     "errors": {
       "nameRequired": "Hunt'asqa sutiykita qillqay (2 qillqamanta aswan).",
@@ -279,9 +288,12 @@
       "submit": "Pakasqa simita ruray",
       "created": "Listo: kunanqa correoykiwan kay pakasqa simiwan yaykuyta atinki.",
       "hasPassword": "Correoykiwan pakasqa simiykiwanmi yaykunki.",
-      "change": "Pakasqa simita tikray"
+      "change": "Pakasqa simita tikray",
+      "leadPortal": "Munaspaqa, contraseñata ruway correoykiwanpas yaykunaykipaq."
     },
-    "signOut": "Lluqsiy"
+    "signOut": "Lluqsiy",
+    "backToPortal": "Cuentayman kutiy",
+    "subtitlePortal": "Simiykita, contraseñaykitapas allichay."
   },
   "AuthAside": {
     "register": {
@@ -303,9 +315,14 @@
       "cutOff": "Kuchuy p’unchaw",
       "due": "Qullqi kutichiy p’unchaw",
       "reminder": "Qullqi yuyarichiy kachasqa",
-      "reminderTo": "Correo nisqawan Rosaman"
+      "reminderTo": "Correo nisqawan Rosaman",
+      "balancePortal": "Manukusqayki"
     },
-    "photoAlt": "Bodegueromi tiendanpi atiendeshan"
+    "photoAlt": "Bodegueromi tiendanpi atiendeshan",
+    "portal": {
+      "title": "Cuentaykikuna sut’i, mana cuadernowan",
+      "lead": "Celularniykipi qhaway imatachus manukunki, pagana p’unchawniykikunatapas. Mana qullqiyuq, mana contraseñayuq."
+    }
   },
   "Shell": {
     "logoAlt": "Quina",
@@ -658,7 +675,63 @@
     "plansTitle": "Planes",
     "plansSubtitle": "Precios en soles.",
     "yourPlan": "Tu plan",
-    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí."
+    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
+    "payment": {
+      "title": "Cobrana datokuna",
+      "subtitle": "Vecinoykikunaqa cuentankupi qhawanku Yapewan, Plinwan utaq transferenciawan pagasunankupaq. Llamk’achisqaykillata hunt’ay.",
+      "yapeNumber": {
+        "label": "Yape",
+        "hint": "Yapeta chaskinaykipaq 9 yupayniyuq celular."
+      },
+      "plinNumber": {
+        "label": "Plin",
+        "hint": "Plinta chaskinaykipaq 9 yupayniyuq celular."
+      },
+      "bankName": {
+        "label": "Banco",
+        "hint": "Kayhina: BCP, Interbank, BBVA. Cuentata churaspaqa churanaykim."
+      },
+      "bankAccountNumber": {
+        "label": "Cuenta yupay",
+        "hint": "Kikin bancomanta transferenciata chaskina cuenta."
+      },
+      "bankCci": {
+        "label": "CCI",
+        "hint": "Huk bancomanta transferenciapaq 20 yupayniyuq codigo."
+      },
+      "qr": {
+        "title": "QR codigo",
+        "label": "Yape utaq Plin QR fotoyki",
+        "hint": "JPG, PNG utaq WEBP, 2 MB kama. Vecinoykikunalla cuentankupi qhawanku.",
+        "currentAlt": "Tiendaq cobrana QR codigon",
+        "remove": "QR-ta qichuy"
+      },
+      "save": "Cobrana datokunata waqaychay",
+      "saving": "Waqaychachkan…",
+      "saved": "Listo. Vecinoykikunaqa kay datokunata cuentankupi qhawankuña.",
+      "errors": {
+        "form": "Mana waqaychayta atirqanchikchu. Huk ratullamanta wakmanta ruway.",
+        "yapeNumber": {
+          "INVALID": "9 yupayniyuq, 9 nisqawan qallariq celularta qillqay."
+        },
+        "plinNumber": {
+          "INVALID": "9 yupayniyuq, 9 nisqawan qallariq celularta qillqay."
+        },
+        "bankName": {
+          "INVALID": "Bancoq sutinta qillqay (60 letra kama); cuentata utaq CCI-ta churaspaqa churanaykim."
+        },
+        "bankAccountNumber": {
+          "INVALID": "Yupaykunallata qillqay (guionkunatapas), 6 manta 30 kama."
+        },
+        "bankCci": {
+          "INVALID": "CCI-qa 20 yupayniyuqmi."
+        },
+        "qr": {
+          "IMAGE_TYPE": "JPG, PNG utaq WEBP imagenta churay.",
+          "IMAGE_TOO_LARGE": "Imagenqa 2 MB-manta aswan llasaq. Aswan pisi llasaq capturata hurquy."
+        }
+      }
+    }
   },
   "Platform": {
     "shellName": "Plataforma Quina",
@@ -1216,6 +1289,115 @@
         "AUTOMATIC": "Planniykiqa kay willakuykunata kikinmantam kachan.",
         "GENERIC": "Mana kachakurqachu. Yapamanta ruray."
       }
+    }
+  },
+  "Portal": {
+    "login": {
+      "title": "Fiado cuentaykita qhaway",
+      "subtitle": "Imata manukusqaykita, pagana púnchawniykita, cuotaykitapas qhaway. Mana qullqiyuqchu, mana contraseñata munanchu.",
+      "typeLabel": "Documento laya",
+      "typeHint": "Tiendapi qusqayki kikin.",
+      "numberLabel": "Documento yupay",
+      "numberHint": "Tiendayki qillqasqan correoman 6 yupayniyuq codigota apachisqayku.",
+      "send": "Codigota apachiy",
+      "sending": "Apachichkan…",
+      "sent": "Documentoyki huk tiendapi qillqasqa kaptinqa, correoykiman codigota apachiyku. Spam carpetatapas qhaway.",
+      "codeLabel": "6 yupayniyuq codigo",
+      "codeHint": "Codigoqa 15 minutollapi tukukun.",
+      "verify": "Cuentayta qhaway",
+      "verifying": "Qhawachkan…",
+      "again": "Huk codigota mañakuy utaq documentota tikray",
+      "passwordQuestion": "¿Contraseñata ruwarqankichu?",
+      "passwordLink": "Correoykiwan yaykuy",
+      "merchantQuestion": "¿Tiendayki kanchu?",
+      "merchantLink": "Kaypi yaykuy",
+      "notice": {
+        "link": "Chay enlaceqa ñam llamk’achisqa utaq tukusqa. Documentoykiwan utaq Googlewan yaykuy.",
+        "google": "Mana tarinchikchu chay Google correota mayqin tiendapipas. Documentoykiwan yaykuy utaq tiendaykita correoykita qhawanankupaq mañakuy."
+      },
+      "errors": {
+        "DOCUMENT_INVALID": "Yupayta qhaway: DNIqa 8 yupayniyuq; carnetqa pasaportepas letrayuq yupayniyuqpas.",
+        "CAPTCHA_REQUIRED": "Manaraq qatipachkaspa seguridad qhawaykuyta tukuy.",
+        "CODE_INVALID": "Codigoqa mana tupanchu utaq tukusqa. Qhaway utaq hukta mañakuy.",
+        "GENERIC": "Mana tukuyta atirqanchikchu. Huk ratullamanta wakmanta ruway."
+      },
+      "or": "utaq documentoykiwan"
+    },
+    "shell": {
+      "home": "Cuentaykuna",
+      "logoAlt": "Quina",
+      "profile": "Perfilniy"
+    },
+    "home": {
+      "title": "Fiado cuentaykuna",
+      "subtitle": "Qhawayta munasqayki tiendata akllay.",
+      "balance": "Kunan manukusqayki",
+      "noCredit": "Manaraq fiadoyuqchu",
+      "noStores": "Correoyki {email} manaña mayqin tiendapipas qillqasqachu. Tiendaykita correoykita qhawanankupaq mañakuy."
+    },
+    "account": {
+      "allStores": "Llapan tiendaykuna",
+      "hello": "Allillanchu, {name}",
+      "summaryTitle": "Cuentaykiq pisichasqan",
+      "balance": "Kunan manukusqayki",
+      "toPay": "Paganaykipaq",
+      "payBy": "{date} kama pagay",
+      "seeStatement": "Detalleta qhaway",
+      "nothingDue": "Mana imatapas paganaykichu. Kay killapi rantisqaykiqa hamuq corte púnchawpi yapakunqa.",
+      "nextCutOff": "Hamuq corte púnchaw",
+      "creditLimit": "Fiado limiteyki",
+      "blocked": "Kunanqa tiendaqa manaña aswanta fiasunkichu. Caseroykiwan rimay.",
+      "noCredit": "Kay tiendaqa manaraq fiado cuentata kicharqasunkichu.",
+      "callStore": "Tiendaman waqyay: {phone}"
+    },
+    "payment": {
+      "title": "Imaynata pagana",
+      "empty": "Tiendaykiqa manaraq cobrana datonkunata churarqanchu. Tiendapi pagay.",
+      "yape": "Yape",
+      "plin": "Plin",
+      "bank": "Banco",
+      "account": "Cuenta yupay",
+      "cci": "CCI",
+      "qrAlt": "Tiendaman paganapaq QR codigo"
+    },
+    "installments": {
+      "title": "Cuotaykuna",
+      "purchase": "{date} rantisqa, {amount}",
+      "progress": "{total} cuotamanta {paid} pagasqa",
+      "caption": "Rantiq cuotankuna: yupay, tukukuynin, qullqi, capital, interés, imayna kasqanpas",
+      "number": "N.°",
+      "dueDate": "Tukukun",
+      "installment": "Cuota",
+      "principal": "Capital",
+      "interest": "Interés",
+      "status": "Imayna",
+      "statuses": {
+        "PENDING": "Hamuchkan",
+        "PAID": "Pagasqa",
+        "OVERDUE": "Tukusqa"
+      },
+      "row": "{total} cuotamanta {number} kaq",
+      "dueOn": "{date} tukukun",
+      "breakdown": "Capital {principal} · Interés {interest}"
+    },
+    "cycle": {
+      "back": "Cuentayman kutiy",
+      "objected": "Listo. Tiendaqa manaraq cobrasuchkaspa observacionniykita qhawanqa."
+    },
+    "charge": {
+      "object": "Kay cargota mana riqsinichu",
+      "objectTitle": "¿Imataq kay cargowan karqan?",
+      "objectBody": "Tiendaman willay imarayku mana riqsinkichu. Mana cobrasunkichu qhawanankukama.",
+      "objectLabel": "Observacionniyki",
+      "waiting": "Tiendaqa observacionniykita qhawachkan.",
+      "objectSubmit": "Tiendaman apachiy"
+    },
+    "enter": {
+      "title": "Cuentayki suyasunki",
+      "subtitle": "Botonta ñit’iy fiado cuentaykiman yaykunaykipaq. Mana contraseñata munankichu.",
+      "submit": "Cuentayta qhaway",
+      "otherSession": "Kay equipopi huk cuentam kichasqa kachkan ({email}). Yaykuspaqa chay sesionqa wichqakunqa.",
+      "missing": "Kay enlaceqa mana hunt’asqachu. Documentoykiwan yaykuy."
     }
   }
 }

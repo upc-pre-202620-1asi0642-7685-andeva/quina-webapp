@@ -33,6 +33,8 @@ repositorio se sirve debajo de `https://quina.andeva.tech/app`.
 | Olvidé mi contraseña | `https://quina.andeva.tech/app/auth/forgot-password` |
 | Restablecer contraseña (enlace del correo) | `https://quina.andeva.tech/app/auth/reset-password?token=...` |
 | Portal del vecino | `https://quina.andeva.tech/app/portal` |
+| Ingreso del vecino (documento + código, Google) | `https://quina.andeva.tech/app/portal/login` |
+| Enlace mágico de los correos de cobranza | `https://quina.andeva.tech/app/portal/enter?token=...` |
 | API de autenticación (Better Auth) | `https://quina.andeva.tech/app/api/auth/*` |
 | Webhooks (Mercado Pago, Resend) | `https://quina.andeva.tech/app/api/webhooks/*` |
 | Proceso programado diario | `https://quina.andeva.tech/app/api/cron/daily` |
@@ -437,6 +439,44 @@ Tomadas el 31 de octubre de 2026 al construir US10, US11, US12 y US13:
   cron acepta la cabecera `x-quina-now`. Los envíos y avisos usan la hora del
   proceso, así las 48 h y los "Avisos de hoy" siguen la fecha simulada.
 
+### Decisiones del Plan 5 (portal del vecino)
+
+Tomadas el 1 de noviembre de 2026 al construir US14:
+
+- **P1, RLS:** el portal no conoce la tienda de antemano. Dos funciones
+  `SECURITY DEFINER` (`portal_customer_links` y `portal_emails_for_document`)
+  devuelven solo ids, idiomas y correos; todo lo demás pasa por `withTenant` de
+  la tienda del vínculo y filtra por su `customer_id`.
+- **P2 y D1, acceso por correo:** el portal se abre por el **correo verificado**,
+  no por el rol, y se recalcula en cada petición. Un dueño que también es vecino
+  entra a `/portal`. `customers.user_id` no se usa. Si el dueño cambia el correo
+  del vecino, el acceso viejo se corta solo.
+- **D7, alta:** sin la cookie de consentimiento del comerciante, un correo que
+  alguna tienda registró crea un `CUSTOMER` con el idioma de esa tienda y sin
+  `ACCEPT_TERMS` (su consentimiento se tomó en la tienda). Otro correo se
+  rechaza.
+- **P3, datos de cobro:** el dueño carga Yape, Plin, banco, cuenta, CCI y un QR
+  en `/settings` (permiso `store.payment_details`). El QR va al bucket privado
+  `store-files` y se muestra con una URL firmada de 15 minutos.
+- **P4 y D5, enlace mágico:** el resumen diario, el estado de cuenta, el
+  recordatorio y el aviso de mora llevan "Ver mi estado de cuenta" (el
+  comprobante no). El enlace dura 72 h, se guarda con hash y apunta a
+  `/portal/enter`, que lo canjea por POST: los antivirus que abren los enlaces
+  no lo gastan. Si en el equipo había otra sesión, se avisa y se cierra. Si el
+  enlace no se pudo crear, el correo sale igual.
+- **P5, D4 y D6, documento + código:** DNI, CE o pasaporte con Turnstile; como
+  máximo un código por correo cada 60 s y la misma respuesta siempre. El código
+  se compara con el hash de cada correo candidato y `signInEmailOTP` se llama una
+  sola vez con el que coincide; si ninguno coincide, se suma un intento a todos.
+  Así un error no gasta los 5 intentos de los otros correos.
+- **P7 y D10, observar:** el vecino observa un cargo `PENDING` dentro de su
+  plazo. Queda `OBJECTED` con auditoría `OBJECT_CHARGE` (`byCustomer`), igual
+  que en el Plan 4, y sin correo al dueño.
+- **D11, comprobantes:** son el detalle de cada compra del ciclo (productos e
+  importes) más los recibos `R-000001` del vecino.
+- **Contraseña:** opcional, desde `/portal/profile` con `PasswordPolicy`. El
+  vecino que ya tiene una entra por `/login`.
+
 ### Por qué Drizzle ORM frente a Prisma
 - **Sin binarios pesados en serverless:** Prisma requiere un motor en Rust
   (~40 MB) que penaliza los arranques en frío en funciones serverless de Vercel.
@@ -489,7 +529,11 @@ quina-webapp/
 │   │   ├── (platform)/platform/          # /app/platform: tiendas y topes del BCRP (US01)
 │   │   ├── auth/accept-invite/           # Público: definir la contraseña con el enlace de cuenta
 │   │   ├── privacy/customers/[storeId]/  # Público: política de datos de los vecinos de cada tienda
-│   │   ├── (customer)/portal/            # /app/portal: consulta gratuita del vecino
+│   │   ├── (customer)/portal/            # /app/portal: consulta gratuita del vecino (US14)
+│   │   │   ├── login/                    # Documento + código, Google
+│   │   │   ├── enter/                    # Canje del enlace mágico por POST
+│   │   │   ├── profile/                  # Idioma, contraseña opcional y salir
+│   │   │   └── (account)/[storeId]/      # Cuenta, ciclos (cycles/) y recibos (payments/)
 │   │   ├── api/auth/[...all]/            # Route Handler de Better Auth
 │   │   ├── api/webhooks/                 # Mercado Pago y rebotes de Resend
 │   │   ├── api/cron/daily/               # Proceso programado diario (Vercel Cron)
@@ -766,9 +810,9 @@ pensadas para el vecino:
 
 | Mecanismo de acceso | Experiencia del vecino (Doña Rosa) | Seguridad técnica |
 | :--- | :--- | :--- |
-| **1. Magic Link directo en notificaciones (1 clic)** | Cuando Doña Rosa recibe su resumen diario de cargos o el aviso de corte, el correo trae el botón *"Ver mi estado de cuenta"*. Al tocarlo en su celular, entra directamente a su cuenta sin ingresar ninguna clave. | Plugin `magicLink` de Better Auth: enlace de un solo uso con expiración de 72 horas guardado en `verifications`; solo funciona para vecinos ya registrados por una tienda (`disableSignUp`). |
+| **1. Magic Link directo en notificaciones (1 clic)** | Cuando Doña Rosa recibe su resumen diario, el estado de cuenta, el recordatorio o el aviso de mora, el correo trae el botón *"Ver mi estado de cuenta"*. Lo toca, toca otra vez el botón de la página y entra sin ninguna clave. | Plugin `magicLink` de Better Auth: un solo uso, 72 horas, guardado con hash en `verifications`. El correo apunta a `/portal/enter`, que canjea el token por POST (decisión D5 del Plan 5). El alta solo se permite a correos que alguna tienda registró (D7). |
 | **2. Continuar con Google (1 toque)** | El 95 % de celulares Android en el Perú tienen cuenta Gmail configurada. Al ingresar a `quina.andeva.tech`, Doña Rosa toca el botón de Google y su teléfono valida su identidad al instante. | Google OAuth 2.0 estándar vinculado al correo del cliente registrado en la tienda. |
-| **3. Acceso por DNI + Código OTP (Sin contraseña)** | Si Doña Rosa entra desde otro teléfono, ingresa su número de DNI. El sistema le envía un código de 6 números a su correo. Lo copia, lo pega y entra. | El servidor busca los correos registrados para ese DNI (puede estar en varias tiendas) y envía un código a cada correo distinto con el inicio de sesión por OTP del plugin `emailOTP`: 6 dígitos, 15 minutos, 5 intentos y límite de tasa. La respuesta en pantalla es siempre la misma, sin revelar tiendas ni correos, y la sesión solo ve las tiendas que tienen el correo validado. |
+| **3. Acceso por DNI + Código OTP (Sin contraseña)** | Si Doña Rosa entra desde otro teléfono, ingresa su número de DNI. El sistema le envía un código de 6 números a su correo. Lo copia, lo pega y entra. | El servidor busca los correos registrados para ese DNI, CE o pasaporte con `portal_emails_for_document` (puede estar en varias tiendas) y envía un código a cada correo distinto con el inicio de sesión por OTP del plugin `emailOTP`: 6 dígitos, 15 minutos, 5 intentos, Turnstile y un código por correo cada 60 s. La respuesta en pantalla es siempre la misma, sin revelar tiendas ni correos, y la sesión solo ve las tiendas que tienen el correo validado. |
 | **4. Contraseña personalizada (Opcional)** | Si el cliente desea fijar una contraseña permanente para ingresar tradicionalmente con correo y clave, puede configurarla en su perfil cuando lo desee. | Almacenamiento seguro bajo Argon2id, totalmente voluntario para el vecino. |
 
 ### 7.8. Enlaces de cuenta: dueño creado por el Administrador, empleados y primer Administrador

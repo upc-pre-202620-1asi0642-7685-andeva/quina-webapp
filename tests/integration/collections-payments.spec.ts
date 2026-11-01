@@ -190,6 +190,7 @@ describe('cobro de un ciclo (US13)', () => {
     await daily(CRON_SEP_21);
     await new ResolveChargeUseCase(new DrizzleChargeResolutionRepository()).object({
       storeId: ctx.storeId,
+      userId: ctx.ownerId,
       chargeId: sale.chargeId,
       note: 'No lo reconoce',
       now: SEP_25,
