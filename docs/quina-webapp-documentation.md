@@ -328,6 +328,62 @@ US26. Resuelven huecos o contradicciones entre el enunciado y las historias:
   límite de 50 productos y `sales.employee_id` (US05.6), al Plan 3; el bloqueo
   automático por mora, al Plan 4.
 
+### Decisiones del Plan 3 (mostrador)
+
+Tomadas el 31 de octubre de 2026 al construir US03, US07 y US08:
+
+- **D1, stock sin compras:** el producto nace con un stock inicial opcional, que
+  entra al kardex como `COUNT_ADJUSTMENT` con la nota "Stock inicial". Hasta que
+  lleguen las compras (US15), el dueño corrige el stock con un conteo físico, que
+  también es un `COUNT_ADJUSTMENT` y exige motivo.
+- **D2, costo sin US16:** cada venta congela `current_average_cost` (0 mientras
+  no haya compras) en `unit_cost_snapshot`, en el kardex y en `total_cost` y
+  `profit_margin`. Cuando llegue US16, los números se vuelven reales sin tocar
+  el mostrador.
+- **D3, cuotas:** el fiado admite pago único (`SINGLE_PAYMENT_CREDIT`) y cuotas
+  (`INSTALLMENTS_CREDIT`, método francés de US09). Las cuotas solo se ofrecen si
+  todos los productos tienen `allows_installments` y si el número no supera
+  `max_installment_months`. El límite consume el capital de la compra, sin
+  intereses futuros (decisión financiera 1).
+- **D4, cuentas en dólares:** el fiado a una cuenta en USD se bloquea con un
+  aviso, porque el catálogo está en soles y no hay tipo de cambio.
+- **D5, permisos:** el permiso `catalog.manage` (crear, editar, dar de baja y
+  ajustar stock) es solo del dueño. El empleado ve el catálogo y el stock, pero no
+  los costos. Ambos venden (`sales.create`).
+- **D6, caja de hoy:** sin tabla propia. Es una tarjeta en Inicio, solo para el
+  dueño, que suma las ventas al contado del día en Lima por medio de pago. El
+  fiado no entra en la caja.
+- **D7, tres toques:** vecino, producto y "Fiar S/ X". Escribir el nombre no
+  cuenta como toque. En el celular, cobrar y fiar están en la barra inferior,
+  sin abrir la hoja del carrito.
+- **D8, ciclo:** el cargo busca su ciclo por (cuenta, año, mes) con `cycleFor`.
+  Si no existe, lo abre `OPEN` con el número siguiente; si existe y ya no está
+  `OPEN`, la venta se rechaza. Los totales del ciclo se calculan en el corte
+  (Plan 4). La modalidad de la venta se traduce a la del cargo
+  (`SINGLE_PAYMENT` o `INSTALLMENTS`, con cuotas, gracia y monto capitalizado).
+- **D9, bloqueos del fiado:** vecino sin cuenta o inactivo, cuenta `SUSPENDED` o
+  `BLOCKED`, algún ciclo `OVERDUE` (US08.8) y monto mayor que el disponible
+  ("Excede el límite disponible por S/ X.XX").
+- **D10, límite de productos:** los 50 de Casero cuentan productos y servicios
+  activos; dar de baja libera cupo. Se valida con la suscripción bloqueada.
+- **D11, imágenes:** bucket público `product-images`, ruta
+  `{storeId}/{productId}-{uuid}.{ext}`, JPG, PNG o WEBP de hasta 2 MB, subidas
+  desde el servidor. En local y en e2e se usa un adaptador de disco.
+- **D12, cantidades:** enteras si la unidad no admite decimales; hasta 3
+  decimales a granel. Cada subtotal es cantidad por precio, redondeado a céntimos.
+- **D13, contado:** el vecino es opcional. Lo recibido y el vuelto solo aplican al
+  efectivo; vacío vale como pago exacto. Yape, Plin y tarjeta no llevan vuelto.
+- **D14, concurrencia:** todo ocurre en una transacción dentro de `withTenant`.
+  Primero se bloquea la cuenta del vecino (serializa ciclo y disponible) y luego
+  los productos, ordenados por id para evitar bloqueos cruzados. El kardex
+  registra `SALE_EXIT` con cantidad negativa y la venta como referencia. El
+  cajero (`sales.user_id_cashier`, US05.6) sale de la sesión, nunca del
+  formulario.
+- **Pendiente para el Plan 4:** en cuotas, la deuda sube el capital de la compra,
+  pero el capital de las filas de `credit_installments` incluye la gracia
+  capitalizada. Al pagar cada cuota se libera la parte proporcional del capital
+  original.
+
 ### Por qué Drizzle ORM frente a Prisma
 - **Sin binarios pesados en serverless:** Prisma requiere un motor en Rust
   (~40 MB) que penaliza los arranques en frío en funciones serverless de Vercel.

@@ -36,5 +36,7 @@ desktop.ini
 .superpowers/
 # Buzon de correos de desarrollo y pruebas
 .outbox/
+# Imágenes del catálogo en desarrollo y pruebas (STORAGE_TRANSPORT=local)
+public/uploads/
 
 .codegraph/

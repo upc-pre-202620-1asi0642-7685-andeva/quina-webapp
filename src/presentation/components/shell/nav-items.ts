@@ -2,7 +2,15 @@ import { can, type Permission } from '@/core/domain/identity/permissions';
 import type { Role } from '@/core/domain/identity/roles';
 
 export type NavKey =
-  'home' | 'sell' | 'customers' | 'team' | 'settings' | 'more' | 'stores' | 'rateCaps';
+  | 'home'
+  | 'sell'
+  | 'customers'
+  | 'inventory'
+  | 'team'
+  | 'settings'
+  | 'more'
+  | 'stores'
+  | 'rateCaps';
 
 export type NavItem = {
   key: NavKey;
@@ -16,8 +24,9 @@ type NavDefinition = NavItem & { permission?: Permission };
 /** Barra lateral de escritorio (DESIGN.md §5). */
 const SIDEBAR: NavDefinition[] = [
   { key: 'home', href: '/' },
-  { key: 'sell', href: '/sales', permission: 'sales.create', soon: true },
+  { key: 'sell', href: '/sales', permission: 'sales.create' },
   { key: 'customers', href: '/customers', permission: 'customers.read' },
+  { key: 'inventory', href: '/inventory', permission: 'stock.read' },
   { key: 'team', href: '/team', permission: 'team.manage' },
   { key: 'settings', href: '/settings', permission: 'settings.billing' },
 ];
@@ -26,7 +35,7 @@ const SIDEBAR: NavDefinition[] = [
 const BOTTOM: NavDefinition[] = [
   { key: 'home', href: '/' },
   { key: 'customers', href: '/customers', permission: 'customers.read' },
-  { key: 'sell', href: '/sales', permission: 'sales.create', soon: true },
+  { key: 'sell', href: '/sales', permission: 'sales.create' },
   { key: 'more', href: '/settings', permission: 'settings.billing' },
 ];
 

@@ -53,7 +53,7 @@ export async function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden">
           <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
           <div className="flex min-w-0 items-center gap-1">
             <span className="truncate text-sm font-medium text-ink">{store.name}</span>
