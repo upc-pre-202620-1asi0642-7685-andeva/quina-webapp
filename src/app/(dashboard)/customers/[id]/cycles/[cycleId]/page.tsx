@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { can } from '@/core/domain/identity/permissions';
 import { getCycleDetail } from '@/infrastructure/db/queries/collections';
 import { requireStoreUser } from '@/presentation/auth/guards';
-import { ChargeLine } from '@/presentation/components/collections/charge-line';
+import { CycleStatement } from '@/presentation/components/collections/cycle-statement';
 import {
   CycleStatusBadge,
   cycleBadgeStatus,
@@ -96,174 +96,13 @@ export default async function CyclePage({
         </div>
       </dl>
 
-      {!billed ? (
-        <p className="rounded-field bg-paper-deep p-3 text-sm text-ink-soft">
-          {t('cycle.openNotice', { date: formatDate(cycle.cutOffDate) })}
-        </p>
-      ) : null}
-
-      <section
-        aria-labelledby="lines-title"
-        className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
-      >
-        <h2 id="lines-title" className="text-lg font-semibold text-ink">
-          {t('cycle.linesTitle')}
-        </h2>
-        {cycle.lines.length === 0 ? (
-          <p className="text-sm text-ink-soft">{t('cycle.noLines')}</p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-line">
-            {cycle.lines.map((line, index) => (
-              <li key={`${line.kind}-${line.chargeId}-${index}`} className="py-3">
-                <ChargeLine
-                  line={line}
-                  currency={currency}
-                  customerId={id}
-                  cycleId={cycle.id}
-                  permissions={permissions}
-                  now={now}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <dl className="flex flex-col gap-2 border-t border-line pt-4 text-sm">
-          <Total label={t('cycle.purchases')} amount={cycle.purchasesTotal} currency={currency} />
-          {billed ? (
-            <Total
-              label={t('cycle.interest')}
-              amount={cycle.compensatoryInterestTotal}
-              currency={currency}
-            />
-          ) : null}
-          <Total
-            label={t('cycle.installments')}
-            amount={cycle.installmentsTotal}
-            currency={currency}
-          />
-          {cycle.adjustmentsTotal !== '0.00' ? (
-            <Total
-              label={t('cycle.adjustments')}
-              amount={cycle.adjustmentsTotal}
-              currency={currency}
-              negative
-            />
-          ) : null}
-          {cycle.moratoryInterestTotal !== '0.00' ? (
-            <Total
-              label={t('cycle.moratory')}
-              amount={cycle.moratoryInterestTotal}
-              currency={currency}
-            />
-          ) : null}
-          <div className="flex items-center justify-between gap-3 pt-2 text-base font-semibold text-ink">
-            <dt>{billed ? t('cycle.totalDue') : t('cycle.openTotal')}</dt>
-            <dd>
-              <Money amount={cycle.totalDue} currency={currency} />
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      {cycle.installmentPurchases.length > 0 ? (
-        <section
-          aria-labelledby="installment-purchases-title"
-          className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
-        >
-          <div className="flex flex-col gap-1">
-            <h2 id="installment-purchases-title" className="text-lg font-semibold text-ink">
-              {t('cycle.installmentPurchasesTitle')}
-            </h2>
-            <p className="text-sm text-ink-soft">{t('cycle.installmentPurchasesHint')}</p>
-          </div>
-          <ul className="flex flex-col divide-y divide-line">
-            {cycle.installmentPurchases.map((purchase) => (
-              <li key={purchase.chargeId} className="py-3">
-                <ChargeLine
-                  line={{
-                    kind: 'purchase',
-                    chargeId: purchase.chargeId,
-                    date: purchase.date,
-                    items: purchase.items,
-                    principal: purchase.principal,
-                    days: null,
-                    interest: null,
-                    amount: purchase.principal,
-                    chargeStatus: purchase.chargeStatus,
-                    consentStatus: purchase.consentStatus,
-                    consentDeadline: purchase.consentDeadline,
-                    objectionNote: purchase.objectionNote,
-                    resolutionNote: null,
-                    voidReason: purchase.voidReason,
-                  }}
-                  installments={purchase.installments}
-                  currency={currency}
-                  customerId={id}
-                  cycleId={cycle.id}
-                  permissions={permissions}
-                  now={now}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {cycle.payments.length > 0 ? (
-        <section
-          aria-labelledby="payments-title"
-          className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:p-6"
-        >
-          <h2 id="payments-title" className="text-lg font-semibold text-ink">
-            {t('cycle.paymentsTitle')}
-          </h2>
-          <ul className="flex flex-col divide-y divide-line">
-            {cycle.payments.map((payment) => (
-              <li key={payment.id}>
-                <Link
-                  href={`/payments/${payment.id}`}
-                  className="flex min-h-12 items-center justify-between gap-3 py-2 text-sm hover:bg-surface-hover"
-                >
-                  <span className="font-medium text-ink">
-                    {t('cycle.receipt', {
-                      number: payment.receiptNumber,
-                      date: formatDate(payment.paymentDate),
-                    })}
-                  </span>
-                  <Money
-                    amount={payment.amountPaid}
-                    currency={currency}
-                    className="font-semibold"
-                  />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-    </div>
-  );
-}
-
-function Total({
-  label,
-  amount,
-  currency,
-  negative = false,
-}: {
-  label: string;
-  amount: string;
-  currency: 'PEN' | 'USD';
-  negative?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-ink-soft">
-      <dt>{label}</dt>
-      <dd className="text-ink">
-        {negative ? '− ' : ''}
-        <Money amount={amount} currency={currency} />
-      </dd>
+      <CycleStatement
+        cycle={cycle}
+        customerId={id}
+        permissions={permissions}
+        now={now}
+        paymentHref={(paymentId) => `/payments/${paymentId}`}
+      />
     </div>
   );
 }

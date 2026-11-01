@@ -110,10 +110,13 @@ async function anyInstallmentBilled(
 }
 
 export class DrizzleChargeResolutionRepository implements ChargeResolutionRepository {
-  object(input: { storeId: string; chargeId: string; note: string; now: Date }) {
+  object(input: Parameters<ChargeResolutionRepository['object']>[0]) {
     return withTenant(input.storeId, async (tx) => {
       const loaded = await load(tx, input.chargeId);
-      if (!loaded) return err('CHARGE_NOT_FOUND' as const);
+      // El vecino solo ve sus cargos: uno ajeno se trata como inexistente
+      if (!loaded || (input.customerId && loaded.account.customerId !== input.customerId)) {
+        return err('CHARGE_NOT_FOUND' as const);
+      }
       const allowed = objectCharge(loaded.resolvable, input.now);
       if (!allowed.ok) return allowed;
       await tx
@@ -125,6 +128,14 @@ export class DrizzleChargeResolutionRepository implements ChargeResolutionReposi
           updatedAt: input.now,
         })
         .where(eq(creditCharges.id, input.chargeId));
+      await tx.insert(auditLogs).values({
+        storeId: input.storeId,
+        userId: input.userId,
+        action: 'OBJECT_CHARGE',
+        entityName: 'credit_charges',
+        entityId: input.chargeId,
+        newData: { note: input.note, byCustomer: Boolean(input.customerId) },
+      });
       return ok(undefined);
     });
   }

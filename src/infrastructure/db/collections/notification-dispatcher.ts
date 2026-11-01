@@ -10,6 +10,8 @@ import type { DispatchResult } from '@/core/domain/ports/daily-process';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import type { Locale } from '@/core/domain/shared/locale';
 import { Money, type Currency } from '@/core/domain/shared/money';
+import { getAuth } from '../../auth/auth';
+import { createPortalLink } from '../../auth/portal-link';
 import { getCollectionsMailer } from '../../email/collections-mailers';
 import {
   creditAccounts,
@@ -42,6 +44,20 @@ const SKIPPED = 'SKIPPED';
 const RETRY_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 const CONSENT_WINDOW_MS = 48 * 60 * 60 * 1000;
 
+/** Crea el enlace mágico al portal del vecino; `null` si no se pudo. */
+export type PortalLinkCreator = (email: string, storeId: string) => Promise<string | null>;
+
+const defaultPortalLink: PortalLinkCreator = (email, storeId) =>
+  createPortalLink(getAuth(), process.env.APP_URL ?? 'http://localhost:3000/app', email, storeId);
+
+/** US14.2: el comprobante no lleva enlace (P4). */
+const WITH_PORTAL_LINK = new Set<CollectionsMailKind>([
+  'charge-digest',
+  'cycle-statement',
+  'payment-reminder',
+  'late-payment',
+]);
+
 type Built = { mail: CollectionsMail; onSent?: (tx: Tx, sentAt: Date) => Promise<void> };
 
 const iso = (instant: Date) => BusinessDate.toISO(BusinessDate.fromInstant(instant));
@@ -59,6 +75,7 @@ export class NotificationDispatcher {
   constructor(
     private readonly mailer: () => CollectionsMailer = getCollectionsMailer,
     private readonly pauseMs: number = process.env.EMAIL_TRANSPORT === 'outbox' ? 0 : 550,
+    private readonly portalLink: PortalLinkCreator = defaultPortalLink,
   ) {}
 
   async dispatchStore(storeId: string, now: Date, deadline: Date): Promise<DispatchResult> {
@@ -138,6 +155,11 @@ export class NotificationDispatcher {
     if (!built) {
       await mark(storeId, row.id, { status: 'FAILED', errorMessage: SKIPPED });
       return 'SKIPPED';
+    }
+    if (WITH_PORTAL_LINK.has(built.mail.kind)) {
+      // Sin enlace el correo igual sale: el vecino puede entrar con su documento
+      const portalUrl = await this.portalLink(built.mail.to, storeId).catch(() => null);
+      if (portalUrl) built.mail.portalUrl = portalUrl;
     }
     try {
       const { providerMessageId } = await this.mailer().send(built.mail);

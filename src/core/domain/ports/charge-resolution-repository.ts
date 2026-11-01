@@ -9,10 +9,16 @@ export type ChargeNotFound = 'CHARGE_NOT_FOUND';
  * de una sola transacción.
  */
 export interface ChargeResolutionRepository {
-  /** El dueño o el empleado registran lo que el vecino reportó (decisión P4). */
+  /**
+   * El dueño o el empleado registran lo que el vecino reportó (decisión P4), o el
+   * propio vecino desde su portal (Plan 5): entonces `customerId` limita el cargo a
+   * su cuenta. `userId` queda en la auditoría.
+   */
   object(input: {
     storeId: string;
     chargeId: string;
+    userId: string;
+    customerId?: string;
     note: string;
     now: Date;
   }): Promise<Result<void, ObjectionError | ChargeNotFound>>;

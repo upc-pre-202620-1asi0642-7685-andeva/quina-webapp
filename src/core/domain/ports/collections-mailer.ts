@@ -43,6 +43,8 @@ export type CollectionsMail = {
   receiptNumber?: string;
   paymentMethod?: 'CASH' | 'YAPE' | 'PLIN' | 'TRANSFER';
   paidAt?: string;
+  /** Enlace mágico al portal del vecino (US14.2); no va en el comprobante. */
+  portalUrl?: string;
 };
 
 export interface CollectionsMailer {
