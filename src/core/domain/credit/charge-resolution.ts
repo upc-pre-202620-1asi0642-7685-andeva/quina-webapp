@@ -74,8 +74,10 @@ export type VoidPlan = {
 export function planVoid(charge: ResolvableCharge): Result<VoidPlan, VoidError> {
   if (charge.status === 'VOIDED') return err('CHARGE_ALREADY_VOIDED');
   if (charge.consentStatus !== 'OBJECTED') return err('CHARGE_NOT_OBJECTED');
-  if (charge.status === 'PAID' || charge.cycleStatus === 'PAID') return err('CHARGE_HAS_PAYMENTS');
+  if (charge.status === 'PAID') return err('CHARGE_HAS_PAYMENTS');
 
+  // La compra en cuotas no se cobra en su ciclo (que puede cerrar en cero y
+  // quedar pagado, D12): lo que importa es si alguna cuota ya se liquidó
   if (charge.modality === 'INSTALLMENTS') {
     if (charge.anyInstallmentBilled) return err('INSTALLMENT_ALREADY_BILLED');
     return ok(
@@ -87,6 +89,7 @@ export function planVoid(charge: ResolvableCharge): Result<VoidPlan, VoidError> 
     );
   }
 
+  if (charge.cycleStatus === 'PAID') return err('CHARGE_HAS_PAYMENTS');
   const billed = charge.cycleStatus !== 'OPEN';
   const amount =
     billed && charge.liquidatedInterest

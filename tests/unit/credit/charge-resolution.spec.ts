@@ -112,6 +112,18 @@ describe('planVoid (US11.7, decisiones P2 y P3)', () => {
       error: 'INSTALLMENT_ALREADY_BILLED',
     });
   });
+
+  it('el ciclo de la compra en cuotas puede quedar pagado en cero y aun así se anula (D12, P3)', () => {
+    const plan = planVoid(
+      single({
+        modality: 'INSTALLMENTS',
+        consentStatus: 'OBJECTED',
+        principal: pen('120.00'),
+        cycleStatus: 'PAID',
+      }),
+    );
+    expect(plan.ok && plan.value.voidedAmount.toFixed2()).toBe('120.00');
+  });
 });
 
 describe('blocksPayment (D8)', () => {

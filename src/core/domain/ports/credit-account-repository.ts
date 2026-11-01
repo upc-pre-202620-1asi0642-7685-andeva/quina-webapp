@@ -39,7 +39,9 @@ export type SaveTermsResult =
   | 'NOT_FOUND'
   | 'CUSTOMER_INACTIVE'
   | 'PLAN_LIMIT_REACHED'
-  | 'CURRENCY_LOCKED';
+  | 'CURRENCY_LOCKED'
+  // Plan 4, P7: con un ciclo abierto con compras o uno sin pagar no cambian los días
+  | 'DAYS_LOCKED';
 
 export type SetAccountStatusData = {
   storeId: string;

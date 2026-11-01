@@ -60,3 +60,34 @@ export function cycleContains(cycle: BillingCycle, instant: Date): boolean {
     BusinessDate.compare(day, cycle.cutOffDate) <= 0
   );
 }
+
+/**
+ * Último ciclo cuyo corte ya pasó al empezar el día `today` de Lima. El
+ * proceso diario corre de madrugada: el corte del 20 se liquida el 21, porque
+ * las compras hasta las 23:59:59 del 20 entran a ese ciclo (US10 crit. 1).
+ */
+export function lastClosedCycle(today: BusinessDate, days: CycleDays): BillingCycle {
+  const thisMonth = BusinessDate.of(today.year, today.month, days.cutOffDay);
+  const closing =
+    BusinessDate.compare(thisMonth, today) < 0 ? thisMonth : BusinessDate.addMonths(thisMonth, -1);
+  return cycleClosingIn(closing.year, closing.month, days);
+}
+
+/**
+ * Ciclo cuya fecha de pago es `paymentDate`: ahí vence la cuota francesa con
+ * ese vencimiento (US10 crit. 3). Devuelve null si no es un día de pago.
+ */
+export function cycleWithPaymentOn(
+  paymentDate: BusinessDate,
+  days: CycleDays,
+): BillingCycle | null {
+  for (const offset of [0, -1]) {
+    const month = BusinessDate.addMonths(
+      BusinessDate.of(paymentDate.year, paymentDate.month, 1),
+      offset,
+    );
+    const cycle = cycleClosingIn(month.year, month.month, days);
+    if (BusinessDate.compare(cycle.paymentDueDate, paymentDate) === 0) return cycle;
+  }
+  return null;
+}
