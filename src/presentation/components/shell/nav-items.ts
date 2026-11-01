@@ -5,6 +5,7 @@ export type NavKey =
   | 'home'
   | 'sell'
   | 'customers'
+  | 'collections'
   | 'inventory'
   | 'team'
   | 'settings'
@@ -26,6 +27,7 @@ const SIDEBAR: NavDefinition[] = [
   { key: 'home', href: '/' },
   { key: 'sell', href: '/sales', permission: 'sales.create' },
   { key: 'customers', href: '/customers', permission: 'customers.read' },
+  { key: 'collections', href: '/collections', permission: 'payments.create' },
   { key: 'inventory', href: '/inventory', permission: 'stock.read' },
   { key: 'team', href: '/team', permission: 'team.manage' },
   { key: 'settings', href: '/settings', permission: 'settings.billing' },

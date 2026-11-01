@@ -533,7 +533,7 @@ originales no se borran: la anulación es un movimiento de ajuste.
 | `credit_charge_id` | UUID | NOT NULL, UNIQUE, FK `credit_charges(id)` ON DELETE RESTRICT | Cargo anulado (una sola anulación por cargo). |
 | `sale_id` | UUID | NOT NULL, FK `sales(id)` ON DELETE RESTRICT | Venta de origen, para devolver el stock. |
 | `user_id` | UUID | NOT NULL, FK `users(id)` ON DELETE RESTRICT | Dueño que anuló (solo `STORE_OWNER`). |
-| `applied_cycle_id` | UUID | NOT NULL, FK `settlement_cycles(id)` ON DELETE RESTRICT | Ciclo donde se descuenta: el del cargo si sigue abierto o, si ya se liquidó, el siguiente ciclo abierto. |
+| `applied_cycle_id` | UUID | NOT NULL, FK `settlement_cycles(id)` ON DELETE RESTRICT | Ciclo donde se descuenta: siempre el del propio cargo mientras no esté pagado (Plan 4, decisión P2). Si ya se liquidó, se recalculan sus `adjustments_total` y `total_due`. |
 | `voided_amount` | NUMERIC(12, 2) | NOT NULL, CHECK (voided_amount > 0) | Monto descontado: capital más los intereses ya liquidados del cargo. |
 | `reason` | TEXT | NOT NULL | Motivo de la anulación. |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Fecha de la anulación. |
