@@ -9,6 +9,7 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
       'home',
       'sell',
       'customers',
+      'inventory',
       'team',
       'settings',
     ]);
@@ -16,7 +17,12 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
   });
 
   it('el empleado no ve equipo ni ajustes y su "Más" va al perfil', () => {
-    expect(keys(sidebarItems('STORE_EMPLOYEE'))).toEqual(['home', 'sell', 'customers']);
+    expect(keys(sidebarItems('STORE_EMPLOYEE'))).toEqual([
+      'home',
+      'sell',
+      'customers',
+      'inventory',
+    ]);
     const bottom = bottomItems('STORE_EMPLOYEE');
     expect(keys(bottom)).toEqual(['home', 'customers', 'sell', 'more']);
     expect(bottom.at(-1)?.href).toBe('/profile');
@@ -29,7 +35,9 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
     expect(bottom.at(-1)?.href).toBe('/profile');
   });
 
-  it('"Vender" se marca como próximo hasta el Plan 3', () => {
-    expect(sidebarItems('STORE_OWNER').find((item) => item.key === 'sell')?.soon).toBe(true);
+  it('"Vender" ya lleva al mostrador desde el Plan 3', () => {
+    const sell = sidebarItems('STORE_EMPLOYEE').find((item) => item.key === 'sell');
+    expect(sell).toEqual({ key: 'sell', href: '/sales' });
+    expect(bottomItems('STORE_EMPLOYEE').find((item) => item.key === 'sell')?.soon).toBeUndefined();
   });
 });

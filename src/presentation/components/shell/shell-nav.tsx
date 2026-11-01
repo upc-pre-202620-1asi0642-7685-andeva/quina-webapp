@@ -7,6 +7,7 @@ import {
   EllipsisIcon,
   HouseIcon,
   LandmarkIcon,
+  PackageIcon,
   StoreIcon,
   SettingsIcon,
   ShoppingBasketIcon,
@@ -21,6 +22,7 @@ const ICONS: Record<NavKey, LucideIcon> = {
   home: HouseIcon,
   sell: ShoppingBasketIcon,
   customers: UsersIcon,
+  inventory: PackageIcon,
   team: UserCogIcon,
   settings: SettingsIcon,
   more: EllipsisIcon,
@@ -88,20 +90,31 @@ export function BottomNav({ items }: { items: NavItem[] }) {
         {items.map((item) => {
           const Icon = ICONS[item.key];
           if (item.key === 'sell') {
+            const sellClass =
+              'flex h-14 min-w-14 flex-col items-center justify-center rounded-full px-4 text-xs font-semibold';
             return (
               <li key={item.key} className="flex flex-1 justify-center py-1.5">
-                {/* Mientras no exista la venta, el botón no compite en verde con la acción de la pantalla */}
-                <span
-                  aria-disabled={item.soon ? 'true' : undefined}
-                  className={cn(
-                    'flex h-14 min-w-14 flex-col items-center justify-center rounded-full px-4 text-xs font-semibold',
-                    item.soon ? 'bg-paper-deep text-ink-soft' : 'bg-primary text-primary-dark',
-                  )}
-                >
-                  <Icon aria-hidden="true" />
-                  <span aria-hidden={item.soon ? 'true' : undefined}>{t(item.key)}</span>
-                  {item.soon ? <span className="sr-only">{t('sellSoon')}</span> : null}
-                </span>
+                {item.soon ? (
+                  // Mientras no exista la venta, el botón no compite en verde con la acción de la pantalla
+                  <span aria-disabled="true" className={cn(sellClass, 'bg-paper-deep text-ink-soft')}>
+                    <Icon aria-hidden="true" />
+                    <span aria-hidden="true">{t(item.key)}</span>
+                    <span className="sr-only">{t('sellSoon')}</span>
+                  </span>
+                ) : (
+                  // DESIGN.md §5: "Vender" va al centro y en verde
+                  <Link
+                    href={item.href}
+                    aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+                    className={cn(
+                      sellClass,
+                      'bg-primary text-primary-dark outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active',
+                    )}
+                  >
+                    <Icon aria-hidden="true" />
+                    {t(item.key)}
+                  </Link>
+                )}
               </li>
             );
           }

@@ -179,6 +179,27 @@
     color: var(--color-ink);
   }
 
+  /* Celular: sin el destello gris al tocar ni texto inflado al girar */
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Controles: el toque responde al instante y una pulsación larga no selecciona su texto */
+  button,
+  a,
+  [role='button'],
+  [role='option'] {
+    touch-action: manipulation;
+  }
+
+  button,
+  [role='button'],
+  [role='option'] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;

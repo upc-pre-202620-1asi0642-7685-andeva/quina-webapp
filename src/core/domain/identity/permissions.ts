@@ -11,6 +11,8 @@ export const PERMISSIONS = [
   'sales.create',
   'payments.create',
   'stock.read',
+  // Plan 3, D5: alta, edición, baja y ajuste de stock del catálogo (solo el dueño)
+  'catalog.manage',
   'catalog.prices',
   'purchases.manage',
   'reports.view',
