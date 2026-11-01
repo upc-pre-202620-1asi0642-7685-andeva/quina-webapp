@@ -7,8 +7,11 @@ import { RatePercent } from '@/core/domain/credit/rate-percent';
 import type { RateInput } from '@/core/domain/finance/rate';
 import { can } from '@/core/domain/identity/permissions';
 import { Money as MoneyValue, type Currency } from '@/core/domain/shared/money';
+import { listCycles } from '@/infrastructure/db/queries/collections';
 import { getCustomer } from '@/infrastructure/db/queries/customers';
 import { requireStoreUser } from '@/presentation/auth/guards';
+import { AccountCycles } from '@/presentation/components/collections/account-cycles';
+import { CyclePayButton } from '@/presentation/components/collections/cycle-pay-button';
 import { CustomerActions } from '@/presentation/components/customers/customer-actions';
 import { customerStatus, StatusBadge } from '@/presentation/components/customers/status-badge';
 import { Money } from '@/presentation/components/money';
@@ -32,6 +35,7 @@ export default async function CustomerPage({
   if (!customer) notFound();
 
   const t = await getTranslations('Customers');
+  const tCollections = await getTranslations('Collections');
   const { notice } = await searchParams;
   const name = `${customer.firstName} ${customer.lastName}`;
   const canTerms = can(user.role, 'credit.terms');
@@ -56,6 +60,11 @@ export default async function CustomerPage({
         MoneyValue.of(account.currentBalance, currency),
       )
     : null;
+  const cycles = customer.accountId ? await listCycles(user.storeId, customer.accountId) : [];
+  const now = new Date();
+  const payable =
+    can(user.role, 'payments.create') &&
+    cycles.some((c) => c.status === 'BILLED' || c.status === 'OVERDUE');
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -70,6 +79,12 @@ export default async function CustomerPage({
       {shownNotice ? (
         <Notice tone={shownNotice === 'createdNoMail' ? 'warning' : 'success'}>
           <p>{t(`detail.${shownNotice}`, { name: customer.firstName })}</p>
+        </Notice>
+      ) : null}
+
+      {customer.emailBouncedAt ? (
+        <Notice tone="warning">
+          <p>{tCollections('bounce', { date: formatDate(customer.emailBouncedAt) })}</p>
         </Notice>
       ) : null}
 
@@ -160,6 +175,17 @@ export default async function CustomerPage({
           />
         ) : null}
       </section>
+
+      {account ? (
+        <>
+          {payable ? (
+            <div className="flex justify-end">
+              <CyclePayButton customerId={id} />
+            </div>
+          ) : null}
+          <AccountCycles customerId={id} cycles={cycles} currency={currency} now={now} />
+        </>
+      ) : null}
 
       <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-ink">{t('detail.contactTitle')}</h2>

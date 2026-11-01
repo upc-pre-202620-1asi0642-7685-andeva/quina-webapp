@@ -47,7 +47,7 @@ export async function registerOwnerWithStore(page: Page) {
   await page.getByLabel('RUC o DNI del negocio').fill(ruc);
   await page.getByRole('button', { name: 'Crear mi tienda' }).click();
   await expect(page).toHaveURL(/\/app\/?$/);
-  return { email, storeName };
+  return { email, storeName, ruc };
 }
 
 export async function signIn(page: Page, email: string, password = STRONG_PASSWORD) {
