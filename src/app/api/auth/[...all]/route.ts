@@ -14,7 +14,12 @@ function withBasePath(request: Request): Request {
   return new Request(url, request);
 }
 
+// El enlace mágico solo lo crea el servidor (createPortalLink, Plan 5 D5): por HTTP no existe.
+const SERVER_ONLY = new Set([`${ROUTE_PATH}/sign-in/magic-link`]);
+
 // La instancia se resuelve en cada petición: así el build no exige las variables.
-export const { GET, POST, PATCH, PUT, DELETE } = toNextJsHandler((request: Request) =>
-  getAuth().handler(withBasePath(request)),
+export const { GET, POST, PATCH, PUT, DELETE } = toNextJsHandler(async (request: Request) =>
+  SERVER_ONLY.has(new URL(request.url).pathname)
+    ? new Response(null, { status: 404 })
+    : getAuth().handler(withBasePath(request)),
 );
