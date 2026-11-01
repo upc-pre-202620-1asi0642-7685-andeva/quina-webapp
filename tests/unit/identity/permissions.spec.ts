@@ -32,6 +32,7 @@ describe('can', () => {
       'rus.view',
       'team.manage',
       'settings.billing',
+      'store.payment_details',
     ] as const) {
       expect(can('STORE_EMPLOYEE', permission)).toBe(false);
     }

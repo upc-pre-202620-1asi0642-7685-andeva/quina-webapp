@@ -207,6 +207,17 @@ export function LoginForm() {
           {submitting ? t('submitting') : t('submit')}
         </Button>
       </form>
+
+      {/* Plan 5, P6: el vecino entra por su propio ingreso, sin contraseña */}
+      <p className="text-sm text-ink-soft">
+        {t('customerQuestion')}{' '}
+        <Link
+          href="/portal/login"
+          className="font-medium text-link-active underline-offset-4 hover:underline"
+        >
+          {t('customerLink')}
+        </Link>
+      </p>
     </AuthShell>
   );
 }

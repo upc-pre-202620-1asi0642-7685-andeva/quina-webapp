@@ -509,8 +509,9 @@ saturar al vecino y mantiene el volumen dentro de la capa gratuita de Resend.
    anterior: nombre del comercio, fecha/hora de cada compra, productos con precios
    y saldo deudor acumulado.
 3. Incluye el texto legal de 48 horas para observaciones y el contacto de la
-   tienda (teléfono o WhatsApp) para reportarlas. El enlace al portal llega con
-   el Plan 5 (decisión P4).
+   tienda (teléfono o WhatsApp) para reportarlas. Desde el Plan 5 el correo
+   trae también el botón "Ver mi estado de cuenta", con un enlace mágico de
+   72 horas al portal, donde el vecino puede observar el cargo.
 4. Las 48 horas se cuentan desde el envío del resumen; si no hay objeción, el
    cargo pasa a `ACCEPTED` (conforme tácito). Si el vecino lo observa, el dueño
    o el empleado registran la observación y el cargo queda `OBJECTED` con su
@@ -624,7 +625,8 @@ pago de su casero (número de Yape o cuenta bancaria).
 3. Permite acceso en un toque con **"Continuar con Google"** (OAuth 2.0) si el correo
    coincide con el registrado por la tienda.
 4. Permite acceso sin contraseña ingresando el **DNI** del cliente y validando un
-   **código OTP** de 6 dígitos despachado a su correo electrónico. Si el DNI está
+   **código OTP** de 6 dígitos despachado a su correo electrónico (también con
+   carné de extranjería o pasaporte, decisión P5 del Plan 5). Si el DNI está
    registrado en varias tiendas con correos distintos, se envía un código a cada
    correo y la pantalla responde siempre lo mismo, sin revelar tiendas ni correos.
    Al ingresar, el vecino ve solo las cuentas de las tiendas que tienen el correo

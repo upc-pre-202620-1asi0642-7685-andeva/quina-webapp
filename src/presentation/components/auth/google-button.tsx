@@ -7,6 +7,8 @@ import { Button } from '@/presentation/components/ui/button';
 
 export type GoogleButtonProps = {
   callbackURL?: string;
+  /** A dónde vuelve si Google falla o la cuenta no se puede crear (?error=). */
+  errorCallbackURL?: string;
   /** Se corre antes de ir a Google; si devuelve false, no se sale de la página. */
   onBeforeRedirect?: () => boolean;
 };
@@ -17,7 +19,11 @@ const ERROR_CALLBACK_URL = '/app/register';
 
 const noSubscribe = () => () => {};
 
-export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleButtonProps) {
+export function GoogleButton({
+  callbackURL = '/app',
+  errorCallbackURL = ERROR_CALLBACK_URL,
+  onBeforeRedirect,
+}: GoogleButtonProps) {
   const t = useTranslations('Auth');
   const [loading, setLoading] = useState(false);
   // La cookie solo existe en el navegador: en el servidor no hay etiqueta, y se muestra al hidratar.
@@ -34,7 +40,7 @@ export function GoogleButton({ callbackURL = '/app', onBeforeRedirect }: GoogleB
       await authClient.signIn.social({
         provider: 'google',
         callbackURL,
-        errorCallbackURL: ERROR_CALLBACK_URL,
+        errorCallbackURL,
       });
     } finally {
       setLoading(false);

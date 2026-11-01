@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { formatDate } from '@/presentation/lib/format-date';
 import photo from '../../../../public/auth/bodeguero.jpg';
 
-export type AuthAsideVariant = 'register' | 'login';
+export type AuthAsideVariant = 'register' | 'login' | 'portal';
 
 // Ficha de ejemplo: la misma vecina que muestra la portada del sitio (DESIGN.md §1).
 // Son valores ilustrativos y la tarjeta lo dice con su etiqueta "Ejemplo".
@@ -75,7 +75,9 @@ export function AuthAside({ variant }: { variant: AuthAsideVariant }) {
             </header>
 
             <dl className="mt-5 flex flex-col gap-1">
-              <dt className="text-[13px] text-ink-soft">{t('card.balance')}</dt>
+              <dt className="text-[13px] text-ink-soft">
+                {t(variant === 'portal' ? 'card.balancePortal' : 'card.balance')}
+              </dt>
               <dd className="text-amount font-bold tabular-nums">{EXAMPLE.balance}</dd>
             </dl>
 
