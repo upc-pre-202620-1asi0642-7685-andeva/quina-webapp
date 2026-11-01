@@ -34,6 +34,10 @@ export class OutboxAuthMailer implements AuthMailer, NotificationMailer {
     return this.write(input.to, 'verification-otp', input.locale, { otp: input.otp });
   }
 
+  sendPortalOtp(input: { to: string; otp: string; locale: Locale }): Promise<void> {
+    return this.write(input.to, 'portal-otp', input.locale, { otp: input.otp });
+  }
+
   sendPasswordReset(input: { to: string; url: string; locale: Locale }): Promise<void> {
     return this.write(input.to, 'password-reset', input.locale, { url: input.url });
   }

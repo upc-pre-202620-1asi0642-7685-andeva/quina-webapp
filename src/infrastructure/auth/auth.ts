@@ -3,17 +3,20 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError, createAuthMiddleware, getIP, isAPIError } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
-import { captcha, emailOTP, lastLoginMethod } from 'better-auth/plugins';
+import { captcha, emailOTP, lastLoginMethod, magicLink } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
+import { decideNewUserRole } from '@/core/domain/identity/new-user-role';
 import { PasswordPolicy } from '@/core/domain/identity/password-policy';
 import { PersonName } from '@/core/domain/identity/person-name';
 import type { AuthMailer } from '@/core/domain/ports/auth-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
 import { db as defaultDb, type Database } from '@/infrastructure/db/connection';
+import { createPortalDirectory } from '@/infrastructure/db/portal/drizzle-portal-directory';
 import * as schema from '@/infrastructure/db/schema';
 import { getAuthMailer } from '@/infrastructure/email/auth-mailer-factory';
 import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/presentation/i18n/resolve-locale';
 import { CONSENT_COOKIE, LEGAL_TERMS_VERSION } from './consent';
+import { MAGIC_LINK_TTL_SECONDS, magicLinkToken } from './portal-link';
 import { createLockout, DISABLED_MESSAGE, LOCKED_MESSAGE } from './lockout-hooks';
 
 export { LOCKED_MESSAGE };
@@ -48,6 +51,7 @@ export type AuthDeps = {
 export function createAuth(deps: AuthDeps) {
   const origin = new URL(deps.appUrl).origin;
   const lockout = createLockout({ db: deps.db, mailer: deps.mailer });
+  const directory = createPortalDirectory(deps.db);
 
   async function findUser(email: string): Promise<{ preferredLocale: string } | undefined> {
     const [row] = await deps.db
@@ -68,12 +72,27 @@ export function createAuth(deps: AuthDeps) {
       overrideDefaultEmailVerification: true,
       sendVerificationOnSignUp: true,
       changeEmail: { enabled: true },
-      async sendVerificationOTP({ email, otp }, ctx) {
+      async sendVerificationOTP({ email, otp, type }, ctx) {
+        // El código de ingreso es del vecino (US14.4): su idioma sale de la tienda
+        const portalLocale =
+          type === 'sign-in' ? (await directory.linksForEmail(email))[0]?.locale : undefined;
         const locale = resolveLocale({
-          userPreference: (await findUser(email))?.preferredLocale,
+          userPreference: (await findUser(email))?.preferredLocale ?? portalLocale,
           ...localeHints(requestHeaders(ctx)),
         });
-        await deps.mailer.sendVerificationOtp({ to: email, otp, locale });
+        if (type === 'sign-in') await deps.mailer.sendPortalOtp({ to: email, otp, locale });
+        else await deps.mailer.sendVerificationOtp({ to: email, otp, locale });
+      },
+    }),
+    // US14.2: el enlace va dentro de los correos de cobranza; el alta la decide el hook (D7)
+    magicLink({
+      expiresIn: MAGIC_LINK_TTL_SECONDS,
+      storeToken: 'hashed',
+      disableSignUp: false,
+      sendMagicLink({ token }) {
+        const box = magicLinkToken.getStore();
+        if (!box) throw new Error('El enlace mágico solo se crea desde createPortalLink.');
+        box.token = token;
       },
     }),
     captcha({
@@ -138,25 +157,36 @@ export function createAuth(deps: AuthDeps) {
     databaseHooks: {
       user: {
         create: {
-          // Todo usuario nuevo (correo o Google) espera crear su tienda
+          // El dueño que se registra espera crear su tienda; el vecino solo entra
+          // si una tienda lo registró con ese correo (Plan 5, D7)
           async before(user, ctx) {
             const headers = requestHeaders(ctx);
             // Solo las peticiones del navegador traen cabeceras; las llamadas
             // internas del servidor (pruebas, scripts) no pasan por la casilla.
-            if (headers && readCookie(headers, CONSENT_COOKIE) !== LEGAL_TERMS_VERSION) {
+            const consented =
+              !headers || readCookie(headers, CONSENT_COOKIE) === LEGAL_TERMS_VERSION;
+            const links = await directory.linksForEmail(user.email);
+            const role = decideNewUserRole({
+              path: ctx?.path,
+              consented,
+              isCustomer: links.length > 0,
+            });
+            if (role === 'CONSENT_REQUIRED') {
               throw new APIError('BAD_REQUEST', {
                 code: 'CONSENT_REQUIRED',
                 message: 'Acepta los Términos y condiciones y la Política de privacidad.',
               });
             }
             const cookie = readCookie(headers, LOCALE_COOKIE);
-            const preferredLocale: Locale = isLocale(cookie) ? cookie : 'es';
-            return { data: { ...user, role: 'PENDING_OWNER', storeId: null, preferredLocale } };
+            const preferredLocale: Locale =
+              role === 'CUSTOMER' ? links[0]!.locale : isLocale(cookie) ? cookie : 'es';
+            return { data: { ...user, role, storeId: null, preferredLocale } };
           },
-          // Constancia inmutable de la aceptación, con IP y navegador
+          // Constancia inmutable de la aceptación, con IP y navegador. El vecino no
+          // aceptó los términos del comerciante: su consentimiento está en la tienda (D3)
           async after(user, ctx) {
             const headers = requestHeaders(ctx);
-            if (!headers) return;
+            if (!headers || (user as { role?: string }).role !== 'PENDING_OWNER') return;
             await deps.db.insert(schema.auditLogs).values({
               storeId: null,
               userId: user.id,
@@ -186,7 +216,11 @@ export function createAuth(deps: AuthDeps) {
             });
           }
         }
-        if (ctx.path === '/reset-password' || ctx.path === '/change-password') {
+        if (
+          ctx.path === '/reset-password' ||
+          ctx.path === '/change-password' ||
+          ctx.path === '/set-password'
+        ) {
           assertStrongPassword(body.newPassword);
         }
         if (ctx.path === '/sign-in/email' && typeof body.email === 'string') {

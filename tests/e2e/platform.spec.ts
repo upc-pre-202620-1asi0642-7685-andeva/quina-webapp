@@ -36,7 +36,8 @@ test.describe('plataforma (US01)', () => {
     await expect(page.getByText('Listo. Ya puedes ingresar')).toBeVisible();
 
     await signIn(page, adminEmail);
-    await expect(page).toHaveURL(/\/app\/platform\/stores/);
+    // En next dev, /, /platform y /platform/stores se compilan en cadena la primera vez
+    await expect(page).toHaveURL(/\/app\/platform\/stores/, { timeout: 45_000 });
     await expectAccessible(page);
 
     await page.getByRole('link', { name: 'Crear tienda' }).click();
@@ -93,7 +94,8 @@ test.describe('plataforma (US01)', () => {
     await page.getByRole('button', { name: 'Crear mi contraseña' }).click();
     await expect(page.getByText('Listo. Ya puedes ingresar')).toBeVisible();
     await signIn(page, adminEmail);
-    await expect(page).toHaveURL(/\/app\/platform\/stores/);
+    // En next dev, /, /platform y /platform/stores se compilan en cadena la primera vez
+    await expect(page).toHaveURL(/\/app\/platform\/stores/, { timeout: 45_000 });
     await page.goto('./platform/rate-caps');
     await expect(page.getByText('114.13 % efectivo anual')).toBeVisible();
     await expectAccessible(page);

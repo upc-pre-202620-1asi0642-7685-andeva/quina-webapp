@@ -8,6 +8,8 @@ const PUBLIC_PATHS = new Set([
   '/register/verify',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/portal/login',
+  '/portal/enter',
 ]);
 
 // Chequeo optimista en el borde: excluye api, _next, brand y archivos estáticos.
@@ -35,7 +37,9 @@ export function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   if (!sessionCookie) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
+    // El vecino sin sesión va a su propio ingreso (Plan 5)
+    const portal = normalized === '/portal' || normalized.startsWith('/portal/');
+    loginUrl.pathname = portal ? '/portal/login' : '/login';
     loginUrl.search = '';
     return NextResponse.redirect(loginUrl);
   }

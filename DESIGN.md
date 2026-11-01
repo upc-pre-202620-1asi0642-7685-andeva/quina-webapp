@@ -221,6 +221,30 @@ entra al mostrador, así que se permite un panel de marca. Todas usan
   Política de privacidad (Ley N.° 29733). También se exige antes de "Continuar
   con Google". Si falta, el error va bajo la casilla.
 
+### 6.2. Portal del vecino
+
+Lo usa Doña Rosa desde su celular, una o dos veces al mes. Es modo **Operate**
+como el mostrador, con los mismos tokens, pero un escalón más grande:
+
+- **Escala:** el cuerpo usa 18 px (`text-lg`) y las cifras clave (lo que debe
+  hoy, lo que tiene por pagar) 32–40 px (`text-3xl`/`text-4xl`). No hay una
+  segunda tipografía ni colores propios.
+- **Áreas táctiles:** las acciones del portal (ver el detalle, "No reconozco este
+  cargo", "Ver mi estado de cuenta") usan el botón `lg` de 56 px.
+- **Marco:** `PortalShell`, una columna de 672 px como máximo, con el isologo
+  (vuelve a "Mis cuentas") y "Mi perfil" (idioma, contraseña y salir). Sin la
+  navegación del comerciante.
+- **Ingreso:** `/portal/login` y `/portal/enter` usan `AuthShell` (§6.1) con el
+  panel `aside="portal"`: el titular y la ficha le hablan al vecino ("Lo que
+  debes"), no al bodeguero. En `/portal/enter` el token se canjea al tocar el
+  botón, nunca al abrir la página.
+- **Componentes compartidos:** `CycleStatement`, `ChargeLine` y `AccountCycles`
+  suben un escalón en el portal (cuerpo 18 px, detalle 16 px, títulos de sección
+  20 px) y el perfil vive dentro de `PortalShell`. Las secciones del portal
+  usan el mismo título: `text-xl`, sin ícono.
+- **Solo lectura,** salvo observar un cargo, la contraseña y el idioma. Los textos
+  hablan de "lo que debes" y "por pagar", nunca de "saldo deudor" ni "liquidación".
+
 ---
 
 ## 7. Componentes

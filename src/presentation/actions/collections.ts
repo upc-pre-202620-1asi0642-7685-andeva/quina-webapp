@@ -59,6 +59,7 @@ export async function objectChargeAction(input: ChargeInput): Promise<ChargeActi
     const result = await resolver().object({
       storeId: user.storeId,
       chargeId: parsed.data.chargeId,
+      userId: user.id,
       note: parsed.data.note,
       now: new Date(),
     });

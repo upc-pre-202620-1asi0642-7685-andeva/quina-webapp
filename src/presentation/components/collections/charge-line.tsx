@@ -12,6 +12,7 @@ import {
   voidChargeAction,
   type ChargeActionResult,
 } from '@/presentation/actions/collections';
+import { objectChargeFromPortalAction } from '@/presentation/actions/portal';
 import { formatMoney, Money } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
@@ -55,6 +56,7 @@ export function ChargeLine({
   cycleId,
   permissions,
   now,
+  portalStoreId,
 }: {
   line: CycleDetailLine;
   /** Solo compras en cuotas: cuántas cuotas tiene. */
@@ -65,12 +67,20 @@ export function ChargeLine({
   permissions: { object: boolean; resolve: boolean };
   /** Hora del servidor al pintar la página: decide si sigue abierta la ventana de 48 h. */
   now: Date;
+  /** Portal del vecino (US14.9): el propio vecino observa; los textos le hablan a él. */
+  portalStoreId?: string;
 }) {
   const t = useTranslations('Collections.charge');
+  const tPortal = useTranslations('Portal.charge');
+  // DESIGN.md §6.2: el portal usa un escalón más de letra
+  const large = Boolean(portalStoreId);
+  const body = large ? 'text-lg' : 'text-sm';
+  const small = large ? 'text-base' : 'text-[13px]';
+  const note = large ? 'text-base' : 'text-sm';
 
   if (line.kind === 'installment') {
     return (
-      <div className="flex items-start justify-between gap-3 text-sm">
+      <div className={cn('flex items-start justify-between gap-3', body)}>
         <div className="flex flex-col gap-0.5">
           <span className="font-medium text-ink">
             {t('installment', { number: line.number, total: line.total })}
@@ -89,7 +99,7 @@ export function ChargeLine({
 
   if (line.kind === 'void') {
     return (
-      <div className="flex items-start justify-between gap-3 text-sm">
+      <div className={cn('flex items-start justify-between gap-3', body)}>
         <span className="font-medium text-ink">{t('voidLine')}</span>
         <span className="font-semibold whitespace-nowrap text-ink">
           − <Money amount={line.amount} currency={currency} />
@@ -110,13 +120,13 @@ export function ChargeLine({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-3 text-sm">
+      <div className={cn('flex items-start justify-between gap-3', body)}>
         <div className="flex min-w-0 flex-col gap-1">
           <span className={cn('font-medium text-ink', voided && 'line-through')}>
             {t('purchase', { date: formatDate(line.date) })}
             {installments ? ` · ${t('inInstallments', { count: installments })}` : ''}
           </span>
-          <ul className="flex flex-col text-ink-soft">
+          <ul className={cn('flex flex-col text-ink-soft', large && 'text-base')}>
             {line.items.map((item, index) => (
               <li key={index} className="flex justify-between gap-3">
                 <span className="truncate">
@@ -143,31 +153,36 @@ export function ChargeLine({
       <div className="flex flex-wrap items-center gap-2">
         <span
           className={cn(
-            'inline-flex items-center rounded-full px-2.5 py-0.5 text-[13px] font-medium',
+            'inline-flex items-center rounded-full px-2.5 py-0.5 font-medium',
+            small,
             CONSENT_STYLES[consent],
           )}
         >
           {t(`consent.${consent}`)}
         </span>
         {line.consentStatus === 'PENDING' && line.consentDeadline && !voided ? (
-          <span className="text-[13px] text-ink-soft">
+          <span className={cn('text-ink-soft', small)}>
             {t('deadline', { date: formatDate(line.consentDeadline) })}
           </span>
         ) : null}
       </div>
 
       {line.objectionNote ? (
-        <p className="text-sm text-ink-soft">{t('objectionNote', { note: line.objectionNote })}</p>
+        <p className={cn('text-ink-soft', note)}>
+          {t('objectionNote', { note: line.objectionNote })}
+        </p>
       ) : null}
       {line.voidReason ? (
-        <p className="text-sm text-ink-soft">{t('voidReason', { note: line.voidReason })}</p>
+        <p className={cn('text-ink-soft', note)}>{t('voidReason', { note: line.voidReason })}</p>
       ) : line.resolutionNote ? (
-        <p className="text-sm text-ink-soft">
+        <p className={cn('text-ink-soft', note)}>
           {t('resolutionNote', { note: line.resolutionNote })}
         </p>
       ) : null}
       {permissions.object && !permissions.resolve && open && line.consentStatus === 'OBJECTED' ? (
-        <p className="text-sm text-ink-soft">{t('askOwner')}</p>
+        <p className={cn('text-ink-soft', note)}>
+          {portalStoreId ? tPortal('waiting') : t('askOwner')}
+        </p>
       ) : null}
 
       {canObject || canResolve ? (
@@ -177,6 +192,7 @@ export function ChargeLine({
           cycleId={cycleId}
           canObject={canObject}
           canResolve={canResolve}
+          portalStoreId={portalStoreId}
         />
       ) : null}
     </div>
@@ -189,14 +205,20 @@ function ChargeActions({
   cycleId,
   canObject,
   canResolve,
+  portalStoreId,
 }: {
   chargeId: string;
   customerId: string;
   cycleId: string;
   canObject: boolean;
   canResolve: boolean;
+  portalStoreId?: string | undefined;
 }) {
-  const t = useTranslations('Collections.charge');
+  const tStore = useTranslations('Collections.charge');
+  const tPortal = useTranslations('Portal.charge');
+  // En el portal, observar le habla al vecino; los errores y botones son los mismos
+  const t = (key: string) =>
+    portalStoreId && key.startsWith('object') ? tPortal(key) : tStore(key);
   const router = useRouter();
   const noteId = useId();
   const [action, setAction] = useState<Action | null>(null);
@@ -212,18 +234,20 @@ function ChargeActions({
 
   function submit() {
     if (!action) return;
-    const run = ACTIONS[action];
     const done = action;
     setError(null);
     startTransition(async () => {
-      const result = await run({ customerId, cycleId, chargeId, note });
+      const result = portalStoreId
+        ? await objectChargeFromPortalAction({ storeId: portalStoreId, cycleId, chargeId, note })
+        : await ACTIONS[done]({ customerId, cycleId, chargeId, note });
       if (!result.ok) {
         setError(result.error);
         return;
       }
       setAction(null);
       const notice = done === 'object' ? 'objected' : done === 'confirm' ? 'confirmed' : 'voided';
-      router.replace(`/customers/${customerId}/cycles/${cycleId}?notice=${notice}`);
+      const base = portalStoreId ? `/portal/${portalStoreId}` : `/customers/${customerId}`;
+      router.replace(`${base}/cycles/${cycleId}?notice=${notice}`);
       router.refresh();
     });
   }
@@ -232,7 +256,12 @@ function ChargeActions({
     <>
       <div className="flex flex-wrap gap-2">
         {canObject ? (
-          <Button variant="secondary" size="sm" onClick={() => openDialog('object')}>
+          <Button
+            variant="secondary"
+            size={portalStoreId ? 'lg' : 'sm'}
+            className={cn(portalStoreId && 'w-full text-base sm:w-auto')}
+            onClick={() => openDialog('object')}
+          >
             <MessageSquareWarningIcon aria-hidden="true" />
             {t('object')}
           </Button>
@@ -255,8 +284,12 @@ function ChargeActions({
         <DialogContent showCloseButton={false} className="rounded-card border-line bg-surface">
           {action ? (
             <>
-              <DialogTitle className="text-lg text-ink">{t(`${action}Title`)}</DialogTitle>
-              <DialogDescription className="text-sm text-ink-soft">
+              <DialogTitle className={cn('text-ink', portalStoreId ? 'text-xl' : 'text-lg')}>
+                {t(`${action}Title`)}
+              </DialogTitle>
+              <DialogDescription
+                className={cn('text-ink-soft', portalStoreId ? 'text-base' : 'text-sm')}
+              >
                 {t(`${action}Body`)}
               </DialogDescription>
               {error ? (
@@ -265,7 +298,10 @@ function ChargeActions({
                 </Notice>
               ) : null}
               <div className="flex flex-col gap-2">
-                <Label htmlFor={noteId} className="text-sm font-medium text-ink">
+                <Label
+                  htmlFor={noteId}
+                  className={cn('font-medium text-ink', portalStoreId ? 'text-base' : 'text-sm')}
+                >
                   {t(`${action}Label`)}
                 </Label>
                 <Textarea
@@ -276,11 +312,17 @@ function ChargeActions({
                 />
               </div>
               <DialogFooter>
-                <Button variant="secondary" onClick={() => setAction(null)} disabled={busy}>
+                <Button
+                  variant="secondary"
+                  size={portalStoreId ? 'lg' : 'default'}
+                  onClick={() => setAction(null)}
+                  disabled={busy}
+                >
                   {t('cancel')}
                 </Button>
                 <Button
                   variant={action === 'void' ? 'destructive' : 'default'}
+                  size={portalStoreId ? 'lg' : 'default'}
                   disabled={busy || note.trim().length === 0}
                   onClick={submit}
                 >

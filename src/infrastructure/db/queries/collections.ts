@@ -314,8 +314,15 @@ export type Receipt = {
   cycle: { id: string; cutOffDate: Date; paymentDueDate: Date };
 };
 
-/** Recibo imprimible de un pago (US13 crit. 6). */
-export function getReceipt(storeId: string, paymentId: string): Promise<Receipt | null> {
+/**
+ * Recibo imprimible de un pago (US13 crit. 6). En el portal (US14.6) `customerId`
+ * entra en la consulta: el recibo de otro vecino ni se carga.
+ */
+export function getReceipt(
+  storeId: string,
+  paymentId: string,
+  customerId?: string,
+): Promise<Receipt | null> {
   return withTenant(storeId, async (tx) => {
     const [row] = await tx
       .select({
@@ -332,7 +339,9 @@ export function getReceipt(storeId: string, paymentId: string): Promise<Receipt 
       .innerJoin(settlementCycles, eq(settlementCycles.id, debtPayments.settlementCycleId))
       .innerJoin(stores, eq(stores.id, debtPayments.storeId))
       .innerJoin(users, eq(users.id, debtPayments.userIdCollector))
-      .where(eq(debtPayments.id, paymentId));
+      .where(
+        and(eq(debtPayments.id, paymentId), customerId ? eq(customers.id, customerId) : undefined),
+      );
     if (!row) return null;
     const { payment, account, customer, cycle, store } = row;
     return {

@@ -73,6 +73,7 @@ async function daily(ctx: Ctx, now: Date) {
 async function objectAndVoid(ctx: Ctx, chargeId: string, now: Date) {
   const objected = await charges.object({
     storeId: ctx.storeId,
+    userId: ctx.ownerId,
     chargeId,
     note: 'Dice que no lo sacó',
     now,
@@ -130,6 +131,7 @@ describe('resumen diario y conformidad (US11)', () => {
 
     const late = await charges.object({
       storeId: ctx.storeId,
+      userId: ctx.ownerId,
       chargeId: sale.chargeId,
       note: 'Tarde',
       now: SEP_19,
@@ -241,6 +243,7 @@ describe('anulación de cargos observados (US11 crit. 7)', () => {
     expect(
       await charges.object({
         storeId: other.storeId,
+        userId: other.ownerId,
         chargeId: sale.chargeId,
         note: 'Ajena',
         now: SEP_17,
@@ -255,6 +258,7 @@ describe('anulación de cargos observados (US11 crit. 7)', () => {
     const sale = await fiar(ctx, rosa.customerId, milk, SEP_15);
     await charges.object({
       storeId: ctx.storeId,
+      userId: ctx.ownerId,
       chargeId: sale.chargeId,
       note: 'Duda',
       now: SEP_17,

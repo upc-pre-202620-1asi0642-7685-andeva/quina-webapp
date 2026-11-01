@@ -22,6 +22,8 @@ export class ResolveChargeUseCase {
   object(command: {
     storeId: string;
     chargeId: string;
+    userId: string;
+    customerId?: string;
     note: string;
     now: Date;
   }): Promise<Result<void, ObjectionError | ChargeNotFound | NoteError>> {

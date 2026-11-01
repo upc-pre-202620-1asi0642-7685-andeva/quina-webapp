@@ -17,6 +17,11 @@
       "intro": "Usa este código para confirmar tu correo y seguir con tu bodega:",
       "outro": "El código vence en 15 minutos. Si no lo pediste tú, ignora este correo."
     },
+    "portalOtp": {
+      "subject": "Tu código para ver tu cuenta de fiado",
+      "intro": "Usa este código para entrar a tu cuenta y ver lo que debes, tus fechas de pago y tus cuotas:",
+      "outro": "El código vence en 15 minutos. Si no lo pediste tú, ignora este correo: nadie puede entrar sin él."
+    },
     "reset": {
       "subject": "Elige una contraseña nueva en Quina",
       "intro": "Pediste cambiar la contraseña de tu cuenta de Quina. Toca el botón para elegir una nueva:",
@@ -72,7 +77,8 @@
       "digest": {
         "subject": "{store}: tus compras fiadas",
         "intro": "Estas son tus compras fiadas en {store}:",
-        "outro": "Tienes 48 horas desde este correo para avisar si algo no está bien. Si no nos avisas, los cargos se dan por aceptados."
+        "outro": "Tienes 48 horas desde este correo para avisar si algo no está bien. Si no nos avisas, los cargos se dan por aceptados.",
+        "outroPortal": "Tienes 48 horas desde este correo para avisar si algo no está bien: obsérvalo en tu portal o escribe a la tienda. Si no nos avisas, los cargos se dan por aceptados."
       },
       "statement": {
         "subject": "{store}: tu estado de cuenta al {cutOff}",
@@ -93,7 +99,8 @@
         "subject": "{store}: comprobante de pago {receipt}",
         "intro": "Recibimos tu pago del {date} en {method}. Este es tu comprobante {receipt}:",
         "outro": "Gracias por pagar. Tu cuenta de ese ciclo quedó cancelada."
-      }
+      },
+      "portalButton": "Ver mi estado de cuenta"
     }
   },
   "Auth": {
@@ -114,7 +121,9 @@
       "submit": "Ingresar",
       "submitting": "Ingresando…",
       "noAccount": "¿Aún no tienes cuenta?",
-      "registerLink": "Registra tu bodega gratis"
+      "registerLink": "Registra tu bodega gratis",
+      "customerQuestion": "¿Eres vecino y quieres ver tu fiado?",
+      "customerLink": "Revisa tu cuenta"
     },
     "errors": {
       "nameRequired": "Escribe tu nombre completo (mínimo 2 letras) para identificar al titular.",
@@ -278,9 +287,12 @@
       "submit": "Crear contraseña",
       "created": "Listo: ya puedes ingresar con tu correo y esta contraseña.",
       "hasPassword": "Ya ingresas con tu correo y contraseña.",
-      "change": "Cambiar contraseña"
+      "change": "Cambiar contraseña",
+      "leadPortal": "Si prefieres, crea una contraseña para ingresar también con tu correo."
     },
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "backToPortal": "Volver a mi cuenta",
+    "subtitlePortal": "Ajusta tu idioma y tu contraseña."
   },
   "AuthAside": {
     "register": {
@@ -302,9 +314,14 @@
       "cutOff": "Fecha de corte",
       "due": "Fecha de pago",
       "reminder": "Recordatorio de pago enviado",
-      "reminderTo": "Por correo a Rosa"
+      "reminderTo": "Por correo a Rosa",
+      "balancePortal": "Lo que debes"
     },
-    "photoAlt": "Bodeguero atendiendo en su tienda de barrio"
+    "photoAlt": "Bodeguero atendiendo en su tienda de barrio",
+    "portal": {
+      "title": "Tus cuentas claras, sin cuaderno",
+      "lead": "Mira lo que debes y tus fechas de pago desde tu celular. Gratis y sin contraseñas."
+    }
   },
   "Shell": {
     "logoAlt": "Quina",
@@ -657,7 +674,63 @@
     "plansTitle": "Planes",
     "plansSubtitle": "Precios en soles.",
     "yourPlan": "Tu plan",
-    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí."
+    "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
+    "payment": {
+      "title": "Datos de cobro",
+      "subtitle": "Tus vecinos los ven en su cuenta para pagarte por Yape, Plin o transferencia. Llena solo los que usas.",
+      "yapeNumber": {
+        "label": "Yape",
+        "hint": "Celular de 9 números con el que recibes Yape."
+      },
+      "plinNumber": {
+        "label": "Plin",
+        "hint": "Celular de 9 números con el que recibes Plin."
+      },
+      "bankName": {
+        "label": "Banco",
+        "hint": "Por ejemplo: BCP, Interbank, BBVA. Obligatorio si pones una cuenta."
+      },
+      "bankAccountNumber": {
+        "label": "Número de cuenta",
+        "hint": "La cuenta donde recibes transferencias del mismo banco."
+      },
+      "bankCci": {
+        "label": "CCI",
+        "hint": "Código de cuenta interbancario de 20 números, para transferencias desde otro banco."
+      },
+      "qr": {
+        "title": "Código QR",
+        "label": "Foto del QR de Yape o Plin",
+        "hint": "JPG, PNG o WEBP de hasta 2 MB. Solo lo ven tus vecinos en su cuenta.",
+        "currentAlt": "Código QR de cobro de la tienda",
+        "remove": "Quitar el QR"
+      },
+      "save": "Guardar datos de cobro",
+      "saving": "Guardando…",
+      "saved": "Listo. Tus vecinos ya ven estos datos en su cuenta.",
+      "errors": {
+        "form": "No pudimos guardar los datos. Inténtalo de nuevo en unos segundos.",
+        "yapeNumber": {
+          "INVALID": "Escribe un celular de 9 números que empiece con 9."
+        },
+        "plinNumber": {
+          "INVALID": "Escribe un celular de 9 números que empiece con 9."
+        },
+        "bankName": {
+          "INVALID": "Escribe el nombre del banco (hasta 60 letras); es obligatorio si pones una cuenta o CCI."
+        },
+        "bankAccountNumber": {
+          "INVALID": "Escribe solo números (y guiones si tu banco los usa), de 6 a 30."
+        },
+        "bankCci": {
+          "INVALID": "El CCI tiene exactamente 20 números."
+        },
+        "qr": {
+          "IMAGE_TYPE": "Sube una imagen JPG, PNG o WEBP.",
+          "IMAGE_TOO_LARGE": "La imagen pesa más de 2 MB. Toma una captura más liviana."
+        }
+      }
+    }
   },
   "Platform": {
     "shellName": "Plataforma Quina",
@@ -1215,6 +1288,115 @@
         "AUTOMATIC": "Tu plan ya envía estos avisos solo.",
         "GENERIC": "No se pudieron enviar. Inténtalo otra vez."
       }
+    }
+  },
+  "Portal": {
+    "login": {
+      "title": "Revisa tu cuenta de fiado",
+      "subtitle": "Mira lo que debes, tus fechas de pago y tus cuotas. Es gratis y no necesitas contraseña.",
+      "typeLabel": "Tipo de documento",
+      "typeHint": "El mismo que diste en la tienda.",
+      "numberLabel": "Número de documento",
+      "numberHint": "Te mandaremos un código de 6 números al correo que registró tu tienda.",
+      "send": "Enviar código",
+      "sending": "Enviando…",
+      "sent": "Si tu documento está registrado en una tienda, te enviamos un código a tu correo. Revisa también la carpeta de spam.",
+      "codeLabel": "Código de 6 números",
+      "codeHint": "El código vence en 15 minutos.",
+      "verify": "Ver mi cuenta",
+      "verifying": "Verificando…",
+      "again": "Pedir otro código o cambiar documento",
+      "passwordQuestion": "¿Creaste una contraseña?",
+      "passwordLink": "Ingresa con tu correo",
+      "merchantQuestion": "¿Tienes una tienda?",
+      "merchantLink": "Ingresa aquí",
+      "notice": {
+        "link": "Ese enlace ya se usó o venció. Entra con tu documento o con Google.",
+        "google": "No encontramos ese correo de Google en ninguna tienda. Entra con tu documento o pide a tu tienda que revise tu correo."
+      },
+      "errors": {
+        "DOCUMENT_INVALID": "Revisa el número: el DNI tiene 8 números; el carné y el pasaporte, letras y números.",
+        "CAPTCHA_REQUIRED": "Completa la verificación de seguridad antes de continuar.",
+        "CODE_INVALID": "El código no coincide o ya venció. Revísalo o pide otro.",
+        "GENERIC": "No pudimos completar la operación. Inténtalo de nuevo en unos segundos."
+      },
+      "or": "o con tu documento"
+    },
+    "shell": {
+      "home": "Mis cuentas",
+      "logoAlt": "Quina",
+      "profile": "Mi perfil"
+    },
+    "home": {
+      "title": "Mis cuentas de fiado",
+      "subtitle": "Elige la tienda que quieres revisar.",
+      "balance": "Lo que debes hoy",
+      "noCredit": "Aún sin fiado",
+      "noStores": "Tu correo {email} ya no está registrado en ninguna tienda. Pide a tu tienda que revise tu correo."
+    },
+    "account": {
+      "allStores": "Todas mis tiendas",
+      "hello": "Hola, {name}",
+      "summaryTitle": "Resumen de tu cuenta",
+      "balance": "Lo que debes hoy",
+      "toPay": "Por pagar",
+      "payBy": "Paga hasta el {date}",
+      "seeStatement": "Ver el detalle",
+      "nothingDue": "No tienes pagos pendientes. Tus compras de este mes se suman en la próxima fecha de corte.",
+      "nextCutOff": "Próxima fecha de corte",
+      "creditLimit": "Tu límite de fiado",
+      "blocked": "Por ahora la tienda no te puede fiar más. Habla con tu casero.",
+      "noCredit": "Esta tienda todavía no te abrió una cuenta de fiado.",
+      "callStore": "Llamar a la tienda: {phone}"
+    },
+    "payment": {
+      "title": "Cómo pagar",
+      "empty": "Tu tienda aún no cargó sus datos de cobro. Paga en la tienda.",
+      "yape": "Yape",
+      "plin": "Plin",
+      "bank": "Banco",
+      "account": "Número de cuenta",
+      "cci": "CCI",
+      "qrAlt": "Código QR para pagar a la tienda"
+    },
+    "installments": {
+      "title": "Mis cuotas",
+      "purchase": "Compra del {date} por {amount}",
+      "progress": "{paid} de {total} cuotas pagadas",
+      "caption": "Cuotas de la compra: número, vencimiento, monto, capital, interés y estado",
+      "number": "N.°",
+      "dueDate": "Vence",
+      "installment": "Cuota",
+      "principal": "Capital",
+      "interest": "Interés",
+      "status": "Estado",
+      "statuses": {
+        "PENDING": "Por vencer",
+        "PAID": "Pagada",
+        "OVERDUE": "Vencida"
+      },
+      "row": "Cuota {number} de {total}",
+      "dueOn": "Vence el {date}",
+      "breakdown": "Capital {principal} · Interés {interest}"
+    },
+    "cycle": {
+      "back": "Volver a mi cuenta",
+      "objected": "Listo. La tienda revisará tu observación antes de cobrarte ese cargo."
+    },
+    "charge": {
+      "object": "No reconozco este cargo",
+      "objectTitle": "¿Qué pasó con este cargo?",
+      "objectBody": "Cuéntale a la tienda por qué no lo reconoces. No te lo cobrarán hasta que lo revisen.",
+      "objectLabel": "Tu observación",
+      "waiting": "La tienda está revisando tu observación.",
+      "objectSubmit": "Enviar a la tienda"
+    },
+    "enter": {
+      "title": "Tu estado de cuenta te espera",
+      "subtitle": "Toca el botón para entrar a tu cuenta de fiado. No necesitas contraseña.",
+      "submit": "Ver mi estado de cuenta",
+      "otherSession": "En este equipo hay otra cuenta abierta ({email}). Al entrar se cerrará esa sesión.",
+      "missing": "Este enlace no está completo. Entra con tu documento."
     }
   }
 }

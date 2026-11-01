@@ -183,7 +183,12 @@ export default async function CustomerPage({
               <CyclePayButton customerId={id} />
             </div>
           ) : null}
-          <AccountCycles customerId={id} cycles={cycles} currency={currency} now={now} />
+          <AccountCycles
+            hrefBase={`/customers/${id}`}
+            cycles={cycles}
+            currency={currency}
+            now={now}
+          />
         </>
       ) : null}
 

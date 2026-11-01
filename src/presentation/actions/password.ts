@@ -4,7 +4,8 @@ import { headers } from 'next/headers';
 import { getAuth } from '@/infrastructure/auth/auth';
 import { setOwnPassword } from '@/infrastructure/auth/set-password';
 import { db } from '@/infrastructure/db/connection';
-import { requireUser } from '@/presentation/auth/session';
+import { getSessionUser } from '@/presentation/auth/session';
+import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { setPasswordSchema } from '@/presentation/validation/auth-schemas';
 
 export type SetPasswordActionState = {
@@ -17,7 +18,9 @@ export async function setPasswordAction(
   _prev: SetPasswordActionState,
   formData: FormData,
 ): Promise<SetPasswordActionState> {
-  const user = await requireUser('/profile');
+  // Dueño, empleado o vecino desde su portal (US14.5): basta una sesión verificada
+  const user = await getSessionUser();
+  if (!user?.emailVerified) return actionRedirect('/login');
 
   const parsed = setPasswordSchema.safeParse({
     password: String(formData.get('password') ?? ''),
