@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSessionUser, nextRouteFor } from '@/presentation/auth/session';
+import { AppToaster } from '@/presentation/components/feedback/app-toaster';
 import { AppShell } from '@/presentation/components/shell/app-shell';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
@@ -25,6 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <AppShell user={{ name: user.name, role: user.role }} store={{ name: store.name, trialEndsAt }}>
       {children}
+      <AppToaster />
     </AppShell>
   );
 }

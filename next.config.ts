@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
     serverActions: {
       // El sitio público reenvía quina.andeva.tech/app/* con el Origin público.
       allowedOrigins: ['quina.andeva.tech'],
+      // Imagen del catálogo de hasta 2 MB más los campos del formulario (US03 crit. 3)
+      bodySizeLimit: '3mb',
     },
   },
 };

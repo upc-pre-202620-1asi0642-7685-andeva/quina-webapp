@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -24,6 +24,19 @@ const albertSans = localFont({
 
 // Aplica el tema guardado (clave `theme`, compartida con el sitio) antes de pintar.
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
+
+/**
+ * `viewport-fit=cover` activa los `env(safe-area-inset-*)` de la barra inferior,
+ * el encabezado y la hoja del carrito; sin él valen 0. El color de la barra del
+ * sistema copia `--color-surface` de cada tema (aquí no se pueden usar tokens).
+ */
+export const viewport: Viewport = {
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#242926' },
+  ],
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Metadata');
