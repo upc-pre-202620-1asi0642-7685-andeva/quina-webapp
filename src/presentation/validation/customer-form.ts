@@ -87,6 +87,7 @@ export function termsError(code: SaveCreditTermsError): [TermsField, string] {
     return ['maxInstallmentMonths', 'monthsOutOfRange'];
   }
   if (code === 'CURRENCY_LOCKED') return ['currency', 'currencyLocked'];
+  if (code === 'DAYS_LOCKED') return ['cutOffDay', 'daysLocked'];
   if (code === 'CUSTOMER_INACTIVE') return ['form', 'customerInactive'];
   if (code === 'PLAN_LIMIT_REACHED') return ['form', 'planLimit'];
   if (code === 'NOT_FOUND') return ['form', 'generic'];

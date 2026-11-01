@@ -1,4 +1,4 @@
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, inArray, ne } from 'drizzle-orm';
 import type { PlanTier, Subscription, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import type { RateCap, RateKind } from '@/core/domain/credit/rate-cap';
 import type { RateInput, RatePeriod, RateType } from '@/core/domain/finance/rate';
@@ -17,9 +17,12 @@ import { db } from '../connection';
 import {
   auditLogs,
   creditAccounts,
+  creditCharges,
+  creditInstallments,
   creditRateCaps,
   customerConsents,
   customers,
+  settlementCycles,
   storeSubscriptions,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
@@ -103,6 +106,48 @@ async function hasRoomForActive(tx: Tx, storeId: string, canOpen: OpenAccountGua
   return canOpen(current, active?.total ?? 0);
 }
 
+/**
+ * P7: los ciclos ya creados guardan sus fechas; mover los días mientras haya
+ * un ciclo abierto con compras, uno sin pagar o cuotas por vencer los desalinearía.
+ */
+async function cyclesPending(tx: Tx, accountId: string): Promise<boolean> {
+  const [unpaid] = await tx
+    .select({ id: settlementCycles.id })
+    .from(settlementCycles)
+    .where(
+      and(
+        eq(settlementCycles.creditAccountId, accountId),
+        inArray(settlementCycles.status, ['BILLED', 'OVERDUE']),
+      ),
+    )
+    .limit(1);
+  if (unpaid) return true;
+  const [openCharge] = await tx
+    .select({ id: creditCharges.id })
+    .from(creditCharges)
+    .innerJoin(settlementCycles, eq(settlementCycles.id, creditCharges.settlementCycleId))
+    .where(
+      and(
+        eq(creditCharges.creditAccountId, accountId),
+        eq(settlementCycles.status, 'OPEN'),
+        ne(creditCharges.status, 'VOIDED'),
+      ),
+    )
+    .limit(1);
+  if (openCharge) return true;
+  const [installment] = await tx
+    .select({ id: creditInstallments.id })
+    .from(creditInstallments)
+    .where(
+      and(
+        eq(creditInstallments.creditAccountId, accountId),
+        inArray(creditInstallments.status, ['PENDING', 'OVERDUE']),
+      ),
+    )
+    .limit(1);
+  return Boolean(installment);
+}
+
 export class DrizzleCreditAccountRepository implements CreditAccountRepository {
   constructor(private readonly database: Database = db) {}
 
@@ -142,6 +187,10 @@ export class DrizzleCreditAccountRepository implements CreditAccountRepository {
         if (existing) {
           const owes = !Money.of(existing.currentBalance, existing.currency as Currency).isZero();
           if (owes && existing.currency !== data.terms.currency) return 'CURRENCY_LOCKED';
+          const daysChanged =
+            existing.cutOffDay !== data.terms.cutOffDay ||
+            existing.paymentDueDay !== data.terms.paymentDueDay;
+          if (daysChanged && (await cyclesPending(tx, existing.id))) return 'DAYS_LOCKED';
           // US06 crit. 6: los cargos guardan su copia; cambiar aquí solo afecta compras futuras
           await tx
             .update(creditAccounts)

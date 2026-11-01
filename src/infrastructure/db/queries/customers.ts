@@ -21,6 +21,10 @@ export type CustomerListItem = {
 };
 
 export type CustomerDetail = CustomerListItem & {
+  /** Cuenta de fiado, para sus ciclos (Plan 4). */
+  accountId: string | null;
+  /** Último rebote del correo (US11 crit. 5). */
+  emailBouncedAt: Date | null;
   email: string;
   address: string | null;
   preferredLocale: string | null;
@@ -93,6 +97,8 @@ export async function getCustomer(
       documentType: customer.documentType,
       documentNumber: customer.documentNumber,
       phone: customer.phone,
+      accountId: account?.id ?? null,
+      emailBouncedAt: customer.emailBouncedAt,
       email: customer.email,
       address: customer.address,
       preferredLocale: customer.preferredLocale,

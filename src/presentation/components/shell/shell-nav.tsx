@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
   EllipsisIcon,
+  HandCoinsIcon,
   HouseIcon,
   LandmarkIcon,
   PackageIcon,
@@ -22,6 +23,7 @@ const ICONS: Record<NavKey, LucideIcon> = {
   home: HouseIcon,
   sell: ShoppingBasketIcon,
   customers: UsersIcon,
+  collections: HandCoinsIcon,
   inventory: PackageIcon,
   team: UserCogIcon,
   settings: SettingsIcon,
@@ -84,7 +86,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
   return (
     <nav
       aria-label={t('label')}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
       <ul className="mx-auto flex max-w-xl items-stretch justify-around px-2">
         {items.map((item) => {
@@ -96,7 +98,10 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               <li key={item.key} className="flex flex-1 justify-center py-1.5">
                 {item.soon ? (
                   // Mientras no exista la venta, el botón no compite en verde con la acción de la pantalla
-                  <span aria-disabled="true" className={cn(sellClass, 'bg-paper-deep text-ink-soft')}>
+                  <span
+                    aria-disabled="true"
+                    className={cn(sellClass, 'bg-paper-deep text-ink-soft')}
+                  >
                     <Icon aria-hidden="true" />
                     <span aria-hidden="true">{t(item.key)}</span>
                     <span className="sr-only">{t('sellSoon')}</span>

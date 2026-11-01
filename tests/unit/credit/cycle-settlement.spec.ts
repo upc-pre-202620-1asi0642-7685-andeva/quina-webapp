@@ -149,27 +149,48 @@ describe('settleCycle (cálculo de US10)', () => {
     });
   });
 
-  describe('anulaciones (crit. 4)', () => {
-    it('descuentan su capital y su interés ya liquidado', () => {
-      const s = unwrap(
-        settle({ voids: [{ chargeId: 'old', principal: pen('5.00'), interest: pen('0.05') }] }),
-      );
-      expect(s.adjustmentsTotal.toFixed2()).toBe('5.05');
-      expect(s.totalDue.toFixed2()).toBe('71.00'); // 76.05 − 5.05
-      expect(s.lines.at(-1)!.kind).toBe('VOID');
+  describe('anulaciones en el mismo ciclo (crit. 4, decisión P2)', () => {
+    it('descuentan la compra anulada completa: capital más su interés', () => {
+      const s = unwrap(settle({ voids: [{ chargeId: 'charge-3' }] }));
+      const purchase = s.lines.find((l) => l.kind === 'PURCHASE' && l.chargeId === 'charge-3')!;
+      const voided = s.lines.at(-1)!;
+      expect(voided.kind).toBe('VOID');
+      expect(voided.amount.equals(purchase.amount)).toBe(true);
+      expect(s.adjustmentsTotal.equals(purchase.amount)).toBe(true);
+      expect(s.totalDue.equals(Money.of('76.05', 'PEN').minus(purchase.amount))).toBe(true);
     });
 
-    it('si superan lo exigible, devuelven un error (regla pendiente del Plan 4)', () => {
-      expect(
-        settle({ voids: [{ chargeId: 'old', principal: pen('80.00'), interest: pen('0.00') }] }),
-      ).toEqual({ ok: false, error: 'ADJUSTMENTS_EXCEED_DUE' });
+    it('anular todas las compras deja el ciclo en cero, nunca en negativo', () => {
+      const s = unwrap(
+        settle({
+          voids: [{ chargeId: 'charge-1' }, { chargeId: 'charge-2' }, { chargeId: 'charge-3' }],
+        }),
+      );
+      expect(s.totalDue.isZero()).toBe(true);
+    });
+
+    it('rechaza anular un cargo que no es de este ciclo', () => {
+      expect(settle({ voids: [{ chargeId: 'otro' }] })).toEqual({
+        ok: false,
+        error: 'VOID_OUTSIDE_CYCLE',
+      });
     });
   });
 
   it('no mezcla monedas', () => {
     expect(
       settle({
-        voids: [{ chargeId: 'x', principal: Money.of('1', 'USD'), interest: Money.of('0', 'USD') }],
+        dueInstallments: [
+          {
+            id: 'i',
+            chargeId: 'x',
+            number: 1,
+            totalInstallments: 1,
+            dueDate: september.paymentDueDate,
+            principal: Money.of('1', 'USD'),
+            interest: Money.of('0', 'USD'),
+          },
+        ],
       }),
     ).toEqual({ ok: false, error: 'CURRENCY_MISMATCH' });
   });

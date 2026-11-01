@@ -55,6 +55,9 @@ export default defineConfig({
       GOOGLE_CLIENT_ID:
         process.env.GOOGLE_CLIENT_ID ?? 'test-google-client.apps.googleusercontent.com',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? 'test-google-client-secret',
+      // Plan 4: el cron con fecha simulada y acotado a la tienda de cada prueba (D17)
+      CRON_SECRET: process.env.CRON_SECRET ?? 'e2e-cron-secret',
+      ALLOW_SIMULATED_NOW: '1',
     },
   },
 });

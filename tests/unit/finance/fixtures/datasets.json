@@ -109,7 +109,7 @@
           "daysLate": 10,
           "moratoryInterest": "0.30",
           "amountDue": "76.35",
-          "moratoryShares": ["0.10", "0.15", "0.05"],
+          "moratoryShares": ["0.10", "0.16", "0.04"],
           "principalPaid": "75.50",
           "compensatoryInterestPaid": "0.55"
         }
@@ -223,7 +223,7 @@
           "daysLate": 10,
           "moratoryInterest": "0.32",
           "amountDue": "76.54",
-          "moratoryShares": ["0.10", "0.16", "0.06"],
+          "moratoryShares": ["0.11", "0.17", "0.04"],
           "principalPaid": "75.50",
           "compensatoryInterestPaid": "0.72"
         }

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { cycleClosingIn, cycleContains, cycleFor } from '@/core/domain/credit/billing-cycle';
+import {
+  cycleClosingIn,
+  cycleContains,
+  cycleFor,
+  cycleWithPaymentOn,
+  lastClosedCycle,
+} from '@/core/domain/credit/billing-cycle';
 import { CreditTerms, type CreditTermsInput } from '@/core/domain/credit/credit-terms';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { datasets } from '../finance/fixtures/datasets';
@@ -93,5 +99,37 @@ describe('CreditTerms', () => {
     ],
   ])('rechaza %j con %s', (patch, error) => {
     expect(CreditTerms.create({ ...base, ...patch })).toEqual({ ok: false, error });
+  });
+});
+
+describe('lastClosedCycle (corte del proceso diario, D1)', () => {
+  const d = BusinessDate.parse;
+  it('el día siguiente al corte, el ciclo de ese corte ya cerró', () => {
+    expect(lastClosedCycle(d('2026-09-21'), days).cutOffDate).toEqual(d('2026-09-20'));
+  });
+
+  it('el mismo día del corte todavía no cierra: el último cerrado es el del mes anterior', () => {
+    expect(lastClosedCycle(d('2026-09-20'), days).cutOffDate).toEqual(d('2026-08-20'));
+  });
+
+  it('a inicio de mes el último cerrado es el del mes anterior', () => {
+    expect(lastClosedCycle(d('2026-10-02'), days).cutOffDate).toEqual(d('2026-09-20'));
+  });
+});
+
+describe('cycleWithPaymentOn (ciclo de una cuota, US10 crit. 3 y 7)', () => {
+  const d = BusinessDate.parse;
+  it('con pago después del corte, la cuota cae en el ciclo que cierra su mismo mes', () => {
+    const cycle = cycleWithPaymentOn(d('2026-10-26'), days);
+    expect(cycle?.cutOffDate).toEqual(d('2026-10-20'));
+  });
+
+  it('con pago antes del corte, la cuota cae en el ciclo que cerró el mes anterior', () => {
+    const cycle = cycleWithPaymentOn(d('2026-11-05'), { cutOffDay: 25, paymentDueDay: 5 });
+    expect(cycle?.cutOffDate).toEqual(d('2026-10-25'));
+  });
+
+  it('una fecha que no es día de pago no pertenece a ningún ciclo', () => {
+    expect(cycleWithPaymentOn(d('2026-10-27'), days)).toBeNull();
   });
 });

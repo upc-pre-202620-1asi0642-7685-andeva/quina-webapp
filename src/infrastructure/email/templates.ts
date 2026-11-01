@@ -27,7 +27,7 @@ const BRAND_GREEN = '#2bdd66';
 const BRAND_DARK = '#0a2e17';
 const BRAND_SOFT = '#e3f9ea';
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -69,17 +69,21 @@ export function renderAuthEmail(
   return layout(locale, { subject, greeting: t('greeting'), intro, highlight, action, outro });
 }
 
-type EmailParts = {
+export type EmailParts = {
   subject: string;
   greeting: string;
   intro: string;
   outro: string;
   highlight?: string | undefined;
   action?: { label: string; url: string } | undefined;
+  /** Bloque ya escapado que va después de la introducción (detalle de cobranza). */
+  detail?: { html: string; text: string } | undefined;
+  /** Párrafos extra después del cierre (contacto y datos de pago). */
+  notes?: string[] | undefined;
 };
 
-function layout(locale: Locale, parts: EmailParts): RenderedEmail {
-  const { subject, greeting, intro, outro, highlight, action } = parts;
+export function layout(locale: Locale, parts: EmailParts): RenderedEmail {
+  const { subject, greeting, intro, outro, highlight, action, detail, notes = [] } = parts;
   const t = createTranslator({ locale, messages: messages[locale], namespace: 'Email' });
   const signature = t('signature');
 
@@ -97,16 +101,26 @@ function layout(locale: Locale, parts: EmailParts): RenderedEmail {
 <p style="margin:0 0 24px;font-size:24px;font-weight:700;color:${BRAND_DARK};border-bottom:4px solid ${BRAND_GREEN};padding-bottom:12px;">Quina</p>
 <p style="margin:0 0 12px;font-size:16px;">${escapeHtml(greeting)}</p>
 <p style="margin:0 0 12px;font-size:16px;line-height:1.5;">${escapeHtml(intro)}</p>
-${codeBlock}${button}<p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#4a564e;">${escapeHtml(outro)}</p>
-<p style="margin:0;font-size:14px;color:#4a564e;">${escapeHtml(signature)}</p>
+${detail?.html ?? ''}${codeBlock}${button}<p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#4a564e;">${escapeHtml(outro)}</p>
+${notes
+  .map(
+    (
+      note,
+    ) => `<p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#4a564e;">${escapeHtml(note)}</p>
+`,
+  )
+  .join('')}<p style="margin:0;font-size:14px;color:#4a564e;">${escapeHtml(signature)}</p>
 </div>
 </body>
 </html>`;
 
   const textParts = [greeting, '', intro];
+  if (detail) textParts.push('', detail.text);
   if (highlight) textParts.push('', highlight);
   if (action) textParts.push('', `${action.label}: ${action.url}`);
-  textParts.push('', outro, '', signature);
+  textParts.push('', outro);
+  for (const note of notes) textParts.push('', note);
+  textParts.push('', signature);
 
   return { subject, html, text: textParts.join('\n') };
 }
