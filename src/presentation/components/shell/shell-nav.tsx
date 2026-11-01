@@ -96,7 +96,10 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               <li key={item.key} className="flex flex-1 justify-center py-1.5">
                 {item.soon ? (
                   // Mientras no exista la venta, el botón no compite en verde con la acción de la pantalla
-                  <span aria-disabled="true" className={cn(sellClass, 'bg-paper-deep text-ink-soft')}>
+                  <span
+                    aria-disabled="true"
+                    className={cn(sellClass, 'bg-paper-deep text-ink-soft')}
+                  >
                     <Icon aria-hidden="true" />
                     <span aria-hidden="true">{t(item.key)}</span>
                     <span className="sr-only">{t('sellSoon')}</span>
