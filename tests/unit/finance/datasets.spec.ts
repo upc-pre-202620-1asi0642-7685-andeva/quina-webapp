@@ -4,6 +4,7 @@ import { CreditTerms, type CreditTermsInput } from '@/core/domain/credit/credit-
 import { settleCycle } from '@/core/domain/credit/cycle-settlement';
 import {
   allocatePayment,
+  moratoryBasesOf,
   quotePayment,
   validatePaymentAmount,
 } from '@/core/domain/credit/debt-payment';
@@ -75,7 +76,7 @@ describe.each(datasets.map((ds) => [ds.title, ds] as const))('%s', (_title, ds) 
           cutOffDate: cycle.cutOffDate,
           paymentDueDate: cycle.paymentDueDate,
           totalDue: settlement.totalDue,
-          moratoryRate: terms.moratory,
+          moratoryBases: moratoryBasesOf(settlement, () => terms.moratory),
         },
         new Date(late.paymentInstant),
       ),

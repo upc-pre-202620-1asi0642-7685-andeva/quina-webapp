@@ -25,8 +25,11 @@ export type DueInstallmentInput = {
   interest: Money;
 };
 
-/** Anulación que se descuenta en este ciclo (`credit_charge_voids`), ya desglosada. */
-export type VoidInput = { chargeId: string; principal: Money; interest: Money };
+/**
+ * Cargo de pago único de este mismo ciclo que el dueño anuló (`credit_charge_voids`).
+ * Se descuenta su línea completa, capital más interés (Plan 4, decisión P2).
+ */
+export type VoidInput = { chargeId: string };
 
 export type SettlementLine =
   | {
@@ -74,6 +77,7 @@ export type SettlementError =
   | 'CHARGE_OUTSIDE_CYCLE'
   | 'INSTALLMENT_OUTSIDE_CYCLE'
   | 'CURRENCY_MISMATCH'
+  | 'VOID_OUTSIDE_CYCLE'
   | 'ADJUSTMENTS_EXCEED_DUE';
 
 export type SettleCycleInput = {
@@ -96,7 +100,6 @@ export function settleCycle(input: SettleCycleInput): Result<CycleSettlement, Se
   const amounts = [
     ...input.singleCharges.map((c) => c.principal),
     ...input.dueInstallments.flatMap((i) => [i.principal, i.interest]),
-    ...input.voids.flatMap((v) => [v.principal, v.interest]),
   ];
   if (amounts.some((m) => m.currency !== currency)) return err('CURRENCY_MISMATCH');
   if (input.singleCharges.some((c) => !cycleContains(cycle, c.purchaseInstant))) {
@@ -137,13 +140,18 @@ export function settleCycle(input: SettleCycleInput): Result<CycleSettlement, Se
     amount: i.principal.plus(i.interest),
   }));
 
-  const voids = input.voids.map((v): SettlementLine => ({
-    kind: 'VOID',
-    chargeId: v.chargeId,
-    principal: v.principal,
-    interest: v.interest,
-    amount: v.principal.plus(v.interest),
-  }));
+  const voids: SettlementLine[] = [];
+  for (const v of input.voids) {
+    const purchase = purchases.find((l) => l.kind === 'PURCHASE' && l.chargeId === v.chargeId);
+    if (!purchase) return err('VOID_OUTSIDE_CYCLE');
+    voids.push({
+      kind: 'VOID',
+      chargeId: v.chargeId,
+      principal: purchase.principal,
+      interest: purchase.interest,
+      amount: purchase.amount,
+    });
+  }
 
   const sum = (lines: readonly SettlementLine[], pick: (l: SettlementLine) => Money) =>
     Money.sum(lines.map(pick), currency);
@@ -156,7 +164,7 @@ export function settleCycle(input: SettleCycleInput): Result<CycleSettlement, Se
     .plus(compensatoryInterestTotal)
     .plus(installmentsTotal)
     .minus(adjustmentsTotal);
-  // La regla para anulaciones mayores que lo exigible se define en el Plan 4.
+  // Invariante: solo se anulan compras del propio ciclo, así nunca queda negativo.
   if (totalDue.isNegative()) return err('ADJUSTMENTS_EXCEED_DUE');
 
   return ok(

@@ -4,11 +4,13 @@ import { CreditTerms, type CreditTermsInput } from '@/core/domain/credit/credit-
 import { settleCycle } from '@/core/domain/credit/cycle-settlement';
 import {
   allocatePayment,
+  moratoryBasesOf,
   oldestPayableCycle,
   quotePayment,
   validatePaymentAmount,
   type PayableCycle,
 } from '@/core/domain/credit/debt-payment';
+import { Rate } from '@/core/domain/finance/rate';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { Money } from '@/core/domain/shared/money';
 import { datasets } from '../finance/fixtures/datasets';
@@ -44,9 +46,9 @@ const scenario = (ds: (typeof datasets)[number]) => {
     cutOffDate: cycle.cutOffDate,
     paymentDueDate: cycle.paymentDueDate,
     totalDue: settlement.totalDue,
-    moratoryRate: terms.moratory,
+    moratoryBases: moratoryBasesOf(settlement, () => terms.moratory),
   };
-  return { settlement, payable };
+  return { settlement, payable, terms };
 };
 
 describe('quotePayment (cálculo de US13)', () => {
@@ -81,6 +83,46 @@ describe('quotePayment (cálculo de US13)', () => {
       expect(quote.amountDue.toFixed2()).toBe(late.amountDue);
     },
   );
+
+  it('cada línea paga mora con su propia tasa congelada (decisión P1)', () => {
+    const { settlement, terms } = scenario(datasets[0]!);
+    const doubled = Rate.parse({ ...terms.moratory.input, value: '0.3000' });
+    if (!doubled.ok) throw new Error(doubled.error);
+    const rateOf = (lineId: string) =>
+      lineId === 'charge:charge-2' ? doubled.value : terms.moratory;
+    const quote = unwrap(
+      quotePayment(
+        { ...payable, moratoryBases: moratoryBasesOf(settlement, (l) => rateOf(l)) },
+        new Date(datasets[0]!.singlePaymentCycle.latePayment.paymentInstant),
+      ),
+    );
+    const byLine = Object.fromEntries(quote.moratoryByLine.map((m) => [m.lineId, m.amount]));
+    const base = moratoryBasesOf(settlement, () => terms.moratory);
+    const sameRate = unwrap(
+      quotePayment(
+        { ...payable, moratoryBases: base },
+        new Date(datasets[0]!.singlePaymentCycle.latePayment.paymentInstant),
+      ),
+    );
+    const sameByLine = Object.fromEntries(sameRate.moratoryByLine.map((m) => [m.lineId, m.amount]));
+    expect(byLine['charge:charge-1']!.equals(sameByLine['charge:charge-1']!)).toBe(true);
+    expect(byLine['charge:charge-2']!.compare(sameByLine['charge:charge-2']!)).toBe(1);
+    expect(
+      quote.moratoryInterest.equals(
+        Money.sum(
+          quote.moratoryByLine.map((m) => m.amount),
+          'PEN',
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it('rechaza bases de mora que no suman el total exigible', () => {
+    expect(quotePayment({ ...payable, moratoryBases: [] }, new Date())).toEqual({
+      ok: false,
+      error: 'MORATORY_BASE_MISMATCH',
+    });
+  });
 
   it('un ciclo vencido (OVERDUE) también se cobra', () => {
     expect(
@@ -144,7 +186,7 @@ describe('oldestPayableCycle (crit. 8)', () => {
 
 describe('allocatePayment (crit. 5 y 7)', () => {
   it.each(datasets.map((ds) => [ds.title, ds] as const))(
-    '%s: reparte la mora en proporción y el desglose cuadra',
+    '%s: cada cargo carga su propia mora y el desglose cuadra',
     (_title, ds) => {
       const { settlement, payable } = scenario(ds);
       const late = ds.singlePaymentCycle.latePayment;
@@ -192,7 +234,7 @@ describe('allocatePayment (crit. 5 y 7)', () => {
           cutOffDate: october.cutOffDate,
           paymentDueDate: october.paymentDueDate,
           totalDue: settlement.totalDue,
-          moratoryRate: terms.moratory,
+          moratoryBases: moratoryBasesOf(settlement, () => terms.moratory),
         },
         new Date('2026-10-26T15:00:00Z'),
       ),
@@ -205,20 +247,59 @@ describe('allocatePayment (crit. 5 y 7)', () => {
     expect(allocation.amountPaid.toFixed2()).toBe('41.46');
   });
 
-  it('rechaza una cotización de otro total y deja pendiente el desglose con anulaciones', () => {
+  it('rechaza una cotización de otro total', () => {
     const { settlement, payable } = scenario(datasets[0]!);
-    const quote = unwrap(quotePayment({ ...payable, totalDue: pen('1.00') }, new Date()));
-    expect(allocatePayment(settlement, quote)).toEqual({ ok: false, error: 'SETTLEMENT_MISMATCH' });
-
-    const withVoid = {
-      ...settlement,
-      adjustmentsTotal: pen('1.00'),
-      totalDue: settlement.totalDue,
+    const other = {
+      ...payable,
+      totalDue: pen('1.00'),
+      moratoryBases: [
+        {
+          lineId: 'charge:x',
+          amount: pen('1.00'),
+          moratoryRate: payable.moratoryBases[0]!.moratoryRate,
+        },
+      ],
     };
-    const okQuote = unwrap(quotePayment(payable, new Date('2026-09-26T15:00:00Z')));
-    expect(allocatePayment(withVoid, okQuote)).toEqual({
-      ok: false,
-      error: 'ADJUSTMENTS_ALLOCATION_PENDING',
-    });
+    const quote = unwrap(quotePayment(other, new Date()));
+    expect(allocatePayment(settlement, quote)).toEqual({ ok: false, error: 'SETTLEMENT_MISMATCH' });
+  });
+
+  it('con una compra anulada cobra solo las demás y sin mora sobre la anulada (P2)', () => {
+    const terms = CreditTerms.of(datasets[0]!.terms as CreditTermsInput);
+    const cycle = cycleClosingIn(2026, 9, days);
+    const settlement = unwrap(
+      settleCycle({
+        cycle,
+        currency: 'PEN',
+        singleCharges: datasets[0]!.singlePaymentCycle.charges.map((c) => ({
+          id: c.id,
+          principal: pen(c.principal),
+          purchaseInstant: new Date(c.purchaseInstant),
+          compensatoryRate: terms.compensatory,
+        })),
+        dueInstallments: [],
+        voids: [{ chargeId: 'charge-3' }],
+      }),
+    );
+    const bases = moratoryBasesOf(settlement, () => terms.moratory);
+    expect(bases.map((b) => b.lineId)).toEqual(['charge:charge-1', 'charge:charge-2']);
+    const quote = unwrap(
+      quotePayment(
+        {
+          id: 'c',
+          status: 'OVERDUE',
+          cutOffDate: cycle.cutOffDate,
+          paymentDueDate: cycle.paymentDueDate,
+          totalDue: settlement.totalDue,
+          moratoryBases: bases,
+        },
+        new Date(datasets[0]!.singlePaymentCycle.latePayment.paymentInstant),
+      ),
+    );
+    const allocation = unwrap(allocatePayment(settlement, quote));
+    expect(
+      allocation.rows.some((r) => r.target.kind === 'CHARGE' && r.target.chargeId === 'charge-3'),
+    ).toBe(false);
+    expect(allocation.amountPaid.equals(quote.amountDue)).toBe(true);
   });
 });
