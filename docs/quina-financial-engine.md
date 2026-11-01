@@ -45,7 +45,9 @@ US10 y US13.
   calcula la cuota fija con el método francés vencido ordinario. La primera
   cuota vence un mes después de la fecha de pago del ciclo.
 - **Mora:** si el vecino paga después de la fecha pactada, paga interés
-  moratorio sobre el total exigible del ciclo por los días de atraso. Durante la
+  moratorio por los días de atraso. Cada línea exigible del ciclo (cargo de pago
+  único o cuota) lo calcula sobre su parte con su propia tasa moratoria
+  congelada, y la mora del ciclo es la suma (Plan 4, decisión P1). Durante la
   mora no corre interés compensatorio y las cuotas futuras no entran en la base.
 - **Pagos:** solo se pagan ciclos liquidados (`BILLED`) o vencidos
   (`OVERDUE`), completos y por el monto exacto. Con varios ciclos por pagar, se
@@ -61,21 +63,24 @@ programar:
    corte. Con corte el 20 y pago el 26, el pago cae el mismo mes. Con corte el 25
    y pago el 5, o con pago igual al corte, cae el mes siguiente.
 2. **Reparto de la mora.** Cada fila de `payment_allocations` se liga a un cargo
-   o a una cuota. La mora del ciclo se reparte en proporción a lo exigible de
-   cada uno: cada parte se trunca a céntimos y la última absorbe el residuo, así
-   la suma es exactamente la mora total.
-3. **Anulaciones.** El motor recibe cada anulación ya desglosada en capital e
-   interés y la descuenta del ciclo. Dos casos se definen en el Plan 4 (Corte y
-   cobranza): la anulación de un cargo en cuotas con cuotas ya liquidadas y las
-   anulaciones que superan lo exigible del ciclo. Mientras tanto el motor
-   devuelve `ADJUSTMENTS_EXCEED_DUE` o `ADJUSTMENTS_ALLOCATION_PENDING`.
+   o a una cuota. Desde el Plan 4 (P1) no hay prorrateo: cada línea paga su
+   propia mora, calculada con su tasa, y la suma de las filas es la mora total.
+3. **Anulaciones.** Se anula un cargo de pago único en su propio ciclo mientras
+   no esté pagado: el motor recibe el id del cargo y agrega una línea de
+   anulación igual a su línea de compra, con capital e interés, así el cargo
+   anulado nunca se cobra ni deja saldo negativo (`VOID_OUTSIDE_CYCLE` si el
+   cargo no es del ciclo; `ADJUSTMENTS_EXCEED_DUE` queda como invariante). Un
+   cargo en cuotas se anula solo si ninguna cuota se liquidó.
 
-### 1.2. Pendientes para el Plan 4
+### 1.2. Reglas del Plan 4 (corte y cobranza)
 
-- Qué tasa moratoria se aplica a un ciclo cuyas compras congelaron condiciones
-  distintas (el dueño cambió la tasa a mitad del ciclo). El motor recibe la tasa
-  como dato de entrada.
-- Los dos casos de anulación del punto 3 anterior.
+- **Tasa moratoria por línea (P1):** si el dueño cambió la tasa a mitad del
+  ciclo, cada cargo usa la que congeló.
+- **Saldo de la cuenta (D3):** el corte suma el interés de los cargos únicos y,
+  por cuota, `cuota − capital liberado`. El capital liberado de la cuota *k* es
+  $P \times amortización_k / S_{cap}$ truncado a céntimos y la última absorbe el
+  residuo, así la suma es el capital original $P$. El pago resta capital e
+  interés; la mora nunca entra al saldo.
 
 ---
 
@@ -157,8 +162,9 @@ $$
 
 - **Compensatorio:** $B$ es el importe de la compra y $días$ va de la compra a
   la fecha de pago de su ciclo.
-- **Moratorio:** $B$ es el total exigible del ciclo, $i_d$ sale de la tasa
-  moratoria y $días$ va de la fecha de pago pactada a la fecha real de pago.
+- **Moratorio:** se calcula por línea: $B$ es lo exigible de cada cargo o
+  cuota, $i_d$ sale de su tasa moratoria congelada y $días$ va de la fecha de
+  pago pactada a la fecha real de pago. La mora del ciclo es la suma.
 
 ### 3.4. Método francés vencido ordinario con gracia total
 
@@ -252,8 +258,9 @@ FUNCIÓN liquidar(ciclo, cargosÚnicos, cuotasDelMes, anulaciones)
     días ← días30360(fecha de Lima del cargo, ciclo.pago)
     interés ← redondear(capital × ((1 + i_d)^días − 1))   // i_d de la tasa congelada del cargo
   FIN PARA
+  PARA cada cargo anulado: agregar línea de anulación igual a su línea de compra
   total ← Σ capital + Σ interés + Σ cuotas − Σ anulaciones
-  SI total < 0 ENTONCES error (regla pendiente del Plan 4)
+  SI total < 0 ENTONCES error (invariante: solo se anulan cargos del ciclo)
   RETORNAR líneas y totales
 FIN FUNCIÓN
 ```
@@ -265,15 +272,18 @@ FUNCIÓN cotizarPago(ciclo, instantePago)
   SI ciclo.estado = OPEN ENTONCES error "ciclo no liquidado"
   SI ciclo.estado = PAID ENTONCES error "ciclo ya pagado"
   díasMora ← máximo(0, días30360(ciclo.pago, fecha de Lima de instantePago))
-  mora ← redondear(ciclo.totalExigible × ((1 + i_d,mor)^díasMora − 1))
-  RETORNAR díasMora, mora, ciclo.totalExigible + mora
+  PARA cada línea exigible (cargo no anulado o cuota)
+    moraLínea ← redondear(exigibleLínea × ((1 + i_d,mor de la línea)^díasMora − 1))
+  FIN PARA
+  mora ← Σ moraLínea
+  RETORNAR díasMora, mora, moraLínea por línea, ciclo.totalExigible + mora
 FIN FUNCIÓN
 
 FUNCIÓN registrarPago(cotización, monto)
   SI monto < cotización.montoAPagar ENTONCES error "no se aceptan pagos parciales"
   SI monto > cotización.montoAPagar ENTONCES error "el monto excede la deuda"
   repartir capital e interés compensatorio por cargo y por cuota
-  repartir la mora en proporción a lo exigible de cada uno (la última línea absorbe el residuo)
+  cada línea registra su propia mora (sin prorrateo)
 FIN FUNCIÓN
 ```
 

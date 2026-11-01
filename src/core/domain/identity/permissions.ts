@@ -10,6 +10,11 @@ export const PERMISSIONS = [
   'credit.terms',
   'sales.create',
   'payments.create',
+  // Plan 4, D13: observar un cargo (dueño y empleado); confirmarlo o anularlo (solo el dueño)
+  'charges.object',
+  'charges.resolve',
+  // Plan 4, P5: botones de avisos manuales del Plan Casero
+  'notifications.send',
   'stock.read',
   // Plan 3, D5: alta, edición, baja y ajuste de stock del catálogo (solo el dueño)
   'catalog.manage',
@@ -34,6 +39,8 @@ const EMPLOYEE: ReadonlySet<Permission> = new Set([
   'credit.read_available',
   'sales.create',
   'payments.create',
+  'charges.object',
+  'notifications.send',
   'stock.read',
 ]);
 

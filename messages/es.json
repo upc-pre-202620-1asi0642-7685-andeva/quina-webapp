@@ -50,6 +50,50 @@
       },
       "action": "Elegir mi contraseña",
       "outro": "El enlace vence en 72 horas y se usa una sola vez. Si no esperabas este correo, ignóralo."
+    },
+    "collections": {
+      "contact": "¿Algo no está bien? Escribe o llama a {store} al {contact}.",
+      "contactInStore": "¿Algo no está bien? Avísale a {store} en la tienda.",
+      "yape": "Puedes pagar con Yape al {yape}.",
+      "total": "Total",
+      "balance": "Tu saldo de fiado: {amount}",
+      "purchase": "Compra del {date}",
+      "purchaseAt": "Compra del {date} a las {time}",
+      "interest": "{days} días de interés: {amount}",
+      "installment": "Cuota {number} de {total}",
+      "void": "Cargo anulado",
+      "moratory": "Intereses moratorios por {days} días",
+      "method": {
+        "CASH": "efectivo",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "transferencia"
+      },
+      "digest": {
+        "subject": "{store}: tus compras fiadas",
+        "intro": "Estas son tus compras fiadas en {store}:",
+        "outro": "Tienes 48 horas desde este correo para avisar si algo no está bien. Si no nos avisas, los cargos se dan por aceptados."
+      },
+      "statement": {
+        "subject": "{store}: tu estado de cuenta al {cutOff}",
+        "intro": "Cerramos tu cuenta al {cutOff}. Este es el detalle de lo que vas a pagar:",
+        "outro": "Paga {amount} hasta el {dueDate} para no tener intereses por mora."
+      },
+      "reminder": {
+        "subject": "{store}: tu fecha de pago es el {dueDate}",
+        "intro": "Te recordamos con cariño que tu fecha de pago en {store} es el {dueDate}. El monto a pagar es {amount}.",
+        "outro": "¡Gracias por tu puntualidad!"
+      },
+      "late": {
+        "subject": "{store}: tu pago está vencido",
+        "intro": "Tu pago del {dueDate} por {amount} todavía no llega. Desde el día siguiente corren intereses por mora y el fiado queda en pausa hasta que te pongas al día.",
+        "outro": "Acércate a {store} para ponerte al día."
+      },
+      "receipt": {
+        "subject": "{store}: comprobante de pago {receipt}",
+        "intro": "Recibimos tu pago del {date} en {method}. Este es tu comprobante {receipt}:",
+        "outro": "Gracias por pagar. Tu cuenta de ese ciclo quedó cancelada."
+      }
     }
   },
   "Auth": {
@@ -277,7 +321,8 @@
       "stores": "Tiendas",
       "rateCaps": "Topes BCRP",
       "sellSoon": "Vender, disponible pronto",
-      "inventory": "Inventario"
+      "inventory": "Inventario",
+      "collections": "Cobranza"
     }
   },
   "Customers": {
@@ -472,7 +517,8 @@
         "currencyLocked": "Tiene deuda pendiente: no puedes cambiar la moneda hasta que pague.",
         "customerInactive": "El vecino está de baja: reactívalo para fiarle.",
         "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
-        "generic": "No pudimos guardar las condiciones. Intenta de nuevo."
+        "generic": "No pudimos guardar las condiciones. Intenta de nuevo.",
+        "daysLocked": "Tiene un ciclo con compras o sin pagar: podrás cambiar los días de corte y de pago cuando pague y no tenga cuotas pendientes. Las tasas y el límite sí puedes cambiarlos."
       }
     }
   },
@@ -977,5 +1023,198 @@
     "toastCreditTitle": "Fiado registrado · {total}",
     "toastInstallments": "{name} · {count} cuotas de {amount}",
     "toastAvailable": "{name} · le queda {available}"
+  },
+  "Collections": {
+    "cycleStatus": {
+      "OPEN": "Abierto",
+      "BILLED": "Por cobrar",
+      "DUE_SOON": "Vence pronto",
+      "PAID": "Pagado",
+      "OVERDUE": "Vencido"
+    },
+    "account": {
+      "title": "Estado de cuenta",
+      "empty": "Todavía no hay compras fiadas. El primer fiado abre su ciclo.",
+      "cutOff": "Corte del {date}",
+      "openHint": "Ciclo abierto: el interés se calcula en la fecha de corte",
+      "dueOn": "Paga hasta el {date}"
+    },
+    "bounce": "El correo de este vecino rebotó el {date}. Revisa su correo para que le lleguen los avisos.",
+    "cycle": {
+      "back": "Volver a {name}",
+      "notice": {
+        "objected": "Observación registrada. El dueño la revisará antes de cobrar.",
+        "confirmed": "Cargo confirmado.",
+        "voided": "Cargo anulado. Los productos volvieron al stock y la deuda bajó."
+      },
+      "title": "Ciclo con corte del {date}",
+      "subtitle": "{name} · ciclo {number}",
+      "totalDue": "Total a pagar",
+      "openTotal": "Compras hasta hoy",
+      "dueDate": "Fecha de pago",
+      "paid": "Pagado",
+      "openNotice": "Este ciclo sigue abierto. El {date} se calcula el interés y se envía el estado de cuenta.",
+      "linesTitle": "Detalle",
+      "noLines": "Este ciclo no tiene compras.",
+      "purchases": "Compras",
+      "interest": "Interés compensatorio",
+      "installments": "Cuotas",
+      "adjustments": "Anulaciones",
+      "moratory": "Interés moratorio",
+      "installmentPurchasesTitle": "Compras en cuotas",
+      "installmentPurchasesHint": "Se pagan en sus cuotas, en los ciclos siguientes.",
+      "paymentsTitle": "Pagos",
+      "receipt": "Recibo {number} · {date}",
+      "pay": "Cobrar"
+    },
+    "charge": {
+      "purchase": "Compra del {date}",
+      "inInstallments": "{count, plural, one {# cuota} other {# cuotas}}",
+      "interest": "Interés por {days, plural, one {# día} other {# días}}:",
+      "installment": "Cuota {number} de {total}",
+      "installmentBreakdown": "Capital {principal} · interés {interest}",
+      "voidLine": "Anulación de un cargo",
+      "consent": {
+        "PENDING": "Por confirmar",
+        "ACCEPTED": "Conforme",
+        "OBJECTED": "Observado",
+        "VOIDED": "Anulado"
+      },
+      "deadline": "Puede observarlo hasta el {date}",
+      "objectionNote": "Lo que dijo el vecino: {note}",
+      "resolutionNote": "Nota del dueño: {note}",
+      "voidReason": "Motivo de la anulación: {note}",
+      "askOwner": "Pídele al dueño que revise este cargo observado.",
+      "object": "Registrar observación",
+      "confirm": "Confirmar",
+      "void": "Anular",
+      "cancel": "Cancelar",
+      "objectTitle": "Registrar observación",
+      "objectBody": "Anota lo que el vecino te dijo. El cargo no se podrá cobrar hasta que el dueño lo revise.",
+      "objectLabel": "¿Qué dijo el vecino?",
+      "objectSubmit": "Guardar observación",
+      "confirmTitle": "Confirmar el cargo",
+      "confirmBody": "El cargo queda conforme y se cobra en su ciclo.",
+      "confirmLabel": "¿Por qué lo confirmas?",
+      "confirmSubmit": "Confirmar cargo",
+      "voidTitle": "Anular el cargo",
+      "voidBody": "Los productos vuelven al stock y la deuda del vecino baja. No se puede deshacer.",
+      "voidLabel": "Motivo de la anulación",
+      "voidSubmit": "Anular cargo",
+      "errors": {
+        "SESSION": "Tu sesión terminó o no tienes permiso. Vuelve a entrar.",
+        "INVALID": "Revisa los datos e inténtalo otra vez.",
+        "GENERIC": "No se pudo guardar. Inténtalo otra vez.",
+        "NOTE_REQUIRED": "Escribe una nota.",
+        "CHARGE_NOT_FOUND": "No encontramos este cargo.",
+        "CHARGE_NOT_PENDING": "Este cargo ya no está por confirmar.",
+        "OBJECTION_WINDOW_CLOSED": "Ya pasaron las 48 horas para observar este cargo.",
+        "CHARGE_NOT_OBJECTED": "Este cargo no está observado.",
+        "CHARGE_ALREADY_VOIDED": "Este cargo ya fue anulado.",
+        "CHARGE_HAS_PAYMENTS": "Este cargo ya se pagó y no se puede anular.",
+        "INSTALLMENT_ALREADY_BILLED": "Una cuota de esta compra ya entró en un corte; ya no se puede anular."
+      }
+    },
+    "pay": {
+      "back": "Volver a {name}",
+      "title": "Cobrar a {name}",
+      "nothingDue": "No hay nada por cobrar: el vecino no tiene ciclos liquidados sin pagar.",
+      "cycle": "Ciclo con corte del {date}",
+      "dueOn": "Fecha de pago: {date}",
+      "totalDue": "Total del ciclo",
+      "moratory": "Intereses moratorios por {days, plural, one {# día} other {# días}}",
+      "amountDue": "A pagar",
+      "laterCycles": "{count, plural, one {Después queda # ciclo más por cobrar.} other {Después quedan # ciclos más por cobrar.}}",
+      "objectionOwner": "Resuelve la observación antes de cobrar:",
+      "objectionLink": "Cargo observado del {date}",
+      "objectionEmployee": "Pídele al dueño que revise el cargo observado antes de cobrar.",
+      "methodLabel": "Medio de pago",
+      "methods": {
+        "CASH": "Efectivo",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "Transferencia"
+      },
+      "receivedLabel": "Recibido",
+      "receivedHint": "Déjalo vacío si te paga exacto.",
+      "change": "Vuelto",
+      "submit": "Cobrar {amount}",
+      "errors": {
+        "SESSION": "Tu sesión terminó o no tienes permiso. Vuelve a entrar.",
+        "INVALID": "Revisa los datos e inténtalo otra vez.",
+        "GENERIC": "No se pudo registrar el cobro. Inténtalo otra vez.",
+        "ACCOUNT_NOT_FOUND": "Este vecino no tiene cuenta de fiado.",
+        "NO_PAYABLE_CYCLE": "No hay nada por cobrar.",
+        "CYCLE_NOT_OLDEST": "El monto cambió. Revisa el nuevo total y cobra otra vez.",
+        "OBJECTION_PENDING": "Hay un cargo observado sin resolver en este ciclo.",
+        "SETTLEMENT_MISMATCH": "El ciclo no cuadra. Avísanos para revisarlo.",
+        "MORATORY_BASE_MISMATCH": "El ciclo no cuadra. Avísanos para revisarlo.",
+        "CYCLE_NOT_BILLED": "El ciclo todavía no se liquida.",
+        "CYCLE_ALREADY_PAID": "Este ciclo ya se pagó.",
+        "PARTIAL_PAYMENT_NOT_ALLOWED": "Se paga el ciclo completo; no hay pagos parciales.",
+        "AMOUNT_EXCEEDS_DUE": "El monto es mayor que lo que debe.",
+        "CURRENCY_MISMATCH": "La moneda no coincide con la de la cuenta.",
+        "RECEIVED_INVALID": "Escribe lo recibido como un monto, por ejemplo 50 o 50.50.",
+        "RECEIVED_TOO_LOW": "Lo recibido es menos que el total."
+      }
+    },
+    "receipt": {
+      "back": "Volver a {name}",
+      "paid": "Cobro registrado. El comprobante se envió por correo.",
+      "paidWithChange": "Cobro registrado. Entrega {change} de vuelto.",
+      "nextCycle": "Ver si queda otro ciclo por cobrar",
+      "title": "Recibo {number}",
+      "customer": "Vecino",
+      "cycle": "Ciclo con corte",
+      "method": "Medio de pago",
+      "collector": "Cobró",
+      "principal": "Capital",
+      "compensatory": "Interés compensatorio",
+      "moratory": "Intereses moratorios por {days, plural, one {# día} other {# días}}",
+      "total": "Total pagado",
+      "print": "Imprimir"
+    },
+    "page": {
+      "title": "Cobranza",
+      "subtitleManual": "En el Plan Casero los avisos salen cuando tú lo pides.",
+      "subtitleAutomatic": "Los resúmenes, recordatorios y avisos de mora salen solos cada mañana.",
+      "tabsLabel": "Secciones de cobranza",
+      "tabs": {
+        "due": "Por cobrar",
+        "overdue": "Vencidos",
+        "notices": "Avisos de hoy"
+      },
+      "noDue": "No hay ciclos por cobrar.",
+      "noOverdue": "Ningún vecino tiene pagos vencidos.",
+      "noNotices": "Hoy todavía no salió ningún aviso.",
+      "dueOn": "Paga hasta el {date}",
+      "noticeType": {
+        "CHARGE_DIGEST": "Resumen de compras",
+        "CYCLE_STATEMENT": "Estado de cuenta",
+        "PAYMENT_REMINDER": "Recordatorio de pago",
+        "LATE_PAYMENT": "Aviso de mora",
+        "PAYMENT_RECEIPT": "Comprobante de pago"
+      },
+      "noticeStatus": {
+        "QUEUED": "En cola",
+        "SENT": "Enviado",
+        "DELIVERED": "Entregado",
+        "BOUNCED": "Rebotó",
+        "FAILED": "Falló"
+      }
+    },
+    "manual": {
+      "title": "Avisos a tus vecinos",
+      "hint": "El resumen de compras abre las 48 horas para que el vecino observe un cargo. El recordatorio va a quienes pagan en 3 días o menos.",
+      "digests": "Enviar resumen de compras",
+      "reminders": "Enviar recordatorios",
+      "nothing": "No había avisos pendientes por enviar.",
+      "sent": "{sent, plural, one {Se envió # aviso.} other {Se enviaron # avisos.}} {failed, plural, =0 {} one {# falló; se reintenta mañana.} other {# fallaron; se reintentan mañana.}}",
+      "errors": {
+        "SESSION": "Tu sesión terminó o no tienes permiso. Vuelve a entrar.",
+        "AUTOMATIC": "Tu plan ya envía estos avisos solo.",
+        "GENERIC": "No se pudieron enviar. Inténtalo otra vez."
+      }
+    }
   }
 }

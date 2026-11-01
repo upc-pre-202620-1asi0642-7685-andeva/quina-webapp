@@ -24,7 +24,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:roles": "node --env-file-if-exists=.env.local scripts/db-roles.ts",
-    "db:admin": "node --env-file-if-exists=.env.local scripts/create-platform-admin.ts"
+    "db:admin": "node --env-file-if-exists=.env.local scripts/create-platform-admin.ts",
+    "demo:collections": "vitest run --config vitest.demo.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",

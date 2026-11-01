@@ -508,19 +508,25 @@ saturar al vecino y mantiene el volumen dentro de la capa gratuita de Resend.
 2. El proceso diario envía un único correo por vecino con los cargos del día
    anterior: nombre del comercio, fecha/hora de cada compra, productos con precios
    y saldo deudor acumulado.
-3. Incluye el texto legal de 48 horas para observaciones y un enlace directo al
-   portal para observar un cargo.
+3. Incluye el texto legal de 48 horas para observaciones y el contacto de la
+   tienda (teléfono o WhatsApp) para reportarlas. El enlace al portal llega con
+   el Plan 5 (decisión P4).
 4. Las 48 horas se cuentan desde el envío del resumen; si no hay objeción, el
-   cargo pasa a `ACCEPTED` (conforme tácito). Si el vecino lo observa, queda
-   `OBJECTED` con su motivo para que el dueño lo revise.
-7. El cargo observado sigue en su ciclo. Solo el dueño lo resuelve: lo confirma
-   (pasa a `ACCEPTED` con su nota) o lo anula. La anulación inserta una fila en
-   `credit_charge_voids`, devuelve los productos al stock (`CUSTOMER_RETURN`) y
-   descuenta el monto del ciclo abierto o, si ya se liquidó, del siguiente. Solo
-   se anulan cargos sin pagos registrados.
+   cargo pasa a `ACCEPTED` (conforme tácito). Si el vecino lo observa, el dueño
+   o el empleado registran la observación y el cargo queda `OBJECTED` con su
+   motivo para que el dueño lo revise.
 5. Si el correo rebota, marca una alerta en la ficha del cliente
    (`email_bounced_at`).
 6. Guarda cada envío en `notification_logs`, con un solo resumen por vecino y día.
+7. El cargo observado sigue en su ciclo y bloquea su cobro. Solo el dueño lo
+   resuelve: lo confirma (pasa a `ACCEPTED` con su nota) o lo anula. La
+   anulación inserta una fila en `credit_charge_voids`, devuelve los productos al
+   stock (`CUSTOMER_RETURN`) y descuenta el monto de su propio ciclo mientras no
+   esté pagado; si ya se liquidó, se recalculan sus totales (decisión P2). Un
+   cargo en cuotas se anula solo si ninguna cuota se liquidó (P3). Solo se anulan
+   cargos sin pagos registrados.
+8. En el Plan Casero el resumen sale con el botón "Enviar resumen de compras" de
+   Cobranza; en Bodega Pro y Negocio Plus, solo cada mañana (decisión P5).
 
 ---
 

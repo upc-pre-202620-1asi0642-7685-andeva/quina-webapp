@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import sys
 from datetime import date, datetime, timedelta, timezone
-from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal, getcontext
+from decimal import ROUND_HALF_UP, Decimal, getcontext
 from pathlib import Path
 
 getcontext().prec = 40
@@ -204,13 +204,11 @@ def single_payment_cycle(terms: dict) -> dict:
 
     late_day = lima_day(LATE_PAYMENT_INSTANT)
     days_late = days_30_360(due, late_day)
-    moratory = interest(total, terms['moratory'], days_late)
-
-    # Reparto de la mora: proporcional al exigible de cada cargo, truncado a
-    # céntimos; el último cargo absorbe el residuo.
+    # Mora por línea (Plan 4, decisión P1): cada cargo paga mora sobre su propio
+    # exigible con la tasa moratoria que congeló; la mora del ciclo es la suma.
     weights = [Decimal(c['principal']) + Decimal(c['interest']) for c in charges]
-    shares = [(moratory * w / total).quantize(CENT, ROUND_DOWN) for w in weights[:-1]]
-    shares.append(moratory - sum(shares, Decimal('0')))
+    shares = [interest(w, terms['moratory'], days_late) for w in weights]
+    moratory = sum(shares, Decimal('0'))
 
     return {
         'cutOffDate': cut.isoformat(),

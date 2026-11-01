@@ -9,6 +9,7 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
       'home',
       'sell',
       'customers',
+      'collections',
       'inventory',
       'team',
       'settings',
@@ -21,6 +22,7 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
       'home',
       'sell',
       'customers',
+      'collections',
       'inventory',
     ]);
     const bottom = bottomItems('STORE_EMPLOYEE');

@@ -37,6 +37,13 @@ describe('can', () => {
     }
   });
 
+  it('el empleado registra observaciones y envía avisos, pero solo el dueño las resuelve (Plan 4, D13)', () => {
+    expect(can('STORE_EMPLOYEE', 'charges.object')).toBe(true);
+    expect(can('STORE_EMPLOYEE', 'notifications.send')).toBe(true);
+    expect(can('STORE_EMPLOYEE', 'charges.resolve')).toBe(false);
+    expect(can('STORE_OWNER', 'charges.resolve')).toBe(true);
+  });
+
   it('el administrador de plataforma solo tiene permisos de plataforma', () => {
     for (const permission of PERMISSIONS) {
       expect(can('PLATFORM_ADMIN', permission)).toBe(permission.startsWith('platform.'));

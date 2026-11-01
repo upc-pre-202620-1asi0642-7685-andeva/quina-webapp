@@ -51,6 +51,50 @@
       },
       "action": "Contraseñayta akllay",
       "outro": "Kay enlaceqa 72 horapi tukukun, huk kutillapaqmi. Mana suyasqa kaptinqa, ama kasuychu."
+    },
+    "collections": {
+      "contact": "¿Imapas mana allinchu? {store} nisqaman qillqay utaq waqyay {contact} nisqapi.",
+      "contactInStore": "¿Imapas mana allinchu? {store} nisqapi willakuy.",
+      "yape": "Yapewan {yape} nisqaman qullqiyta atinki.",
+      "total": "Llapan",
+      "balance": "Manu qullqiyki: {amount}",
+      "purchase": "{date} p'unchawpi rantisqa",
+      "purchaseAt": "{date} p'unchawpi {time} pachapi rantisqa",
+      "interest": "{days} p'unchaw mirasqan: {amount}",
+      "installment": "{total} t'aqamanta {number} kaq",
+      "void": "Chinkachisqa manu",
+      "moratory": "{days} p'unchaw qhipa mirasqan",
+      "method": {
+        "CASH": "qullqi",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "banku apachiy"
+      },
+      "digest": {
+        "subject": "{store}: manupi rantisqaykikuna",
+        "intro": "Kaykunam {store} nisqapi manupi rantisqaykikuna:",
+        "outro": "Kay correomanta 48 hora kapusunki imapas mana allin kaqta willanaykipaq. Mana willaptiykiqa, manukuna chaskisqa hina kanqa."
+      },
+      "statement": {
+        "subject": "{store}: {cutOff} kama yupaynikiy",
+        "intro": "{cutOff} p'unchawpi yupayniykita wichq'ayku. Kaymi qullqinayki:",
+        "outro": "{amount} qullqita {dueDate} kama qullqiy, qhipa mirasqan mana kananpaq."
+      },
+      "reminder": {
+        "subject": "{store}: {dueDate} p'unchawmi qullqinayki",
+        "intro": "Kuyakuywan yuyarichiyku: {store} nisqapi {dueDate} p'unchawmi qullqinayki. {amount} qullqim.",
+        "outro": "¡Pachapi qullqisqaykimanta añay!"
+      },
+      "late": {
+        "subject": "{store}: qullqinayki qhipakunña",
+        "intro": "{dueDate} p'unchawpaq {amount} qullqiyki manaraq chayamunchu. Qhipa mirasqan purin, manutaq sayan qullqinaykikama.",
+        "outro": "{store} nisqaman hamuy qullqinaykipaq."
+      },
+      "receipt": {
+        "subject": "{store}: qullqisqa willay {receipt}",
+        "intro": "{date} p'unchawpi {method} nisqawan qullqiykita chaskiyku. Kaymi {receipt} willayniyki:",
+        "outro": "Qullqisqaykimanta añay. Chay yupaynikiyqa tukusqañam."
+      }
     }
   },
   "Auth": {
@@ -278,7 +322,8 @@
       "stores": "Tiendas",
       "rateCaps": "Topes BCRP",
       "sellSoon": "Rantiy, qayllaña",
-      "inventory": "Rantinakuna"
+      "inventory": "Rantinakuna",
+      "collections": "Cobranza"
     }
   },
   "Customers": {
@@ -473,7 +518,8 @@
         "currencyLocked": "Tiene deuda pendiente: no puedes cambiar la moneda hasta que pague.",
         "customerInactive": "El vecino está de baja: reactívalo para fiarle.",
         "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
-        "generic": "No pudimos guardar las condiciones. Intenta de nuevo."
+        "generic": "No pudimos guardar las condiciones. Intenta de nuevo.",
+        "daysLocked": "Rantikunayuq utaq mana pagasqa ciclon kan: pagaptin, cuotankuna mana kaptinmi kuchuy p'unchawta, pagana p'unchawta ima tikrayta atinki. Tasakunata, límiteta ima kunanpas tikrayta atinki."
       }
     }
   },
@@ -978,5 +1024,198 @@
     "toastCreditTitle": "Fiado qillqasqa · {total}",
     "toastInstallments": "{name} · {count} cuotas {amount}",
     "toastAvailable": "{name} · {available} puchun"
+  },
+  "Collections": {
+    "cycleStatus": {
+      "OPEN": "Kichasqa",
+      "BILLED": "Cobranapaq",
+      "DUE_SOON": "Pisi p'unchawmanta",
+      "PAID": "Pagasqa",
+      "OVERDUE": "Pasasqa"
+    },
+    "account": {
+      "title": "Cuentapa willakuynin",
+      "empty": "Manaraq fiado rantikunachu kan. Ñawpaq fiadom ciclonta kichan.",
+      "cutOff": "{date} kuchuy",
+      "openHint": "Kichasqa ciclo: interesqa kuchuy p'unchawpi yupakun",
+      "dueOn": "{date} p'unchawkama pagay"
+    },
+    "bounce": "Kay vecinopa correon {date} p'unchawpi kutimurqa. Correonta qhaway willakuykuna chayananpaq.",
+    "cycle": {
+      "back": "{name}man kutiy",
+      "notice": {
+        "objected": "Observación waqaychasqa. Dueñom manaraq cobrachkaspa qhawanqa.",
+        "confirmed": "Cargo confirmasqa.",
+        "voided": "Cargo anulasqa. Rantikunaqa stockman kutirqa, manupas pisiyarqa."
+      },
+      "title": "{date} kuchuyniyuq ciclo",
+      "subtitle": "{name} · {number} ciclo",
+      "totalDue": "Llapan pagana",
+      "openTotal": "Kunankama rantikuna",
+      "dueDate": "Pagana p'unchaw",
+      "paid": "Pagasqa",
+      "openNotice": "Kay ciclo kichasqallaraq. {date} p'unchawpi interes yupakun, cuentapa willakuyninpas kachakun.",
+      "linesTitle": "Sapanka",
+      "noLines": "Kay cicloqa mana rantikunayuqchu.",
+      "purchases": "Rantikuna",
+      "interest": "Compensatorio interés",
+      "installments": "Cuotakuna",
+      "adjustments": "Anulacionkuna",
+      "moratory": "Moratorio interés",
+      "installmentPurchasesTitle": "Cuotapi rantikuna",
+      "installmentPurchasesHint": "Cuotankunapi pagakun, qatiq ciclokunapi.",
+      "paymentsTitle": "Pagokuna",
+      "receipt": "Recibo {number} · {date}",
+      "pay": "Cobray"
+    },
+    "charge": {
+      "purchase": "{date} rantiy",
+      "inInstallments": "{count, plural, one {# cuota} other {# cuotakuna}}",
+      "interest": "{days, plural, one {# p'unchaw} other {# p'unchawkuna}} interés:",
+      "installment": "{total} cuotamanta {number}",
+      "installmentBreakdown": "Capital {principal} · interés {interest}",
+      "voidLine": "Cargo anulasqa",
+      "consent": {
+        "PENDING": "Confirmanapaq",
+        "ACCEPTED": "Allin",
+        "OBJECTED": "Observasqa",
+        "VOIDED": "Anulasqa"
+      },
+      "deadline": "{date} p'unchawkama observayta atin",
+      "objectionNote": "Vecinopa nisqan: {note}",
+      "resolutionNote": "Dueñopa notan: {note}",
+      "voidReason": "Imarayku anulasqa: {note}",
+      "askOwner": "Dueñota mañakuy kay observasqa cargota qhawananpaq.",
+      "object": "Observacionta qillqay",
+      "confirm": "Confirmay",
+      "void": "Anulay",
+      "cancel": "Saqiy",
+      "objectTitle": "Observacionta qillqay",
+      "objectBody": "Vecinopa nisusqaykita qillqay. Dueñom manaraq qhawachkaptinqa mana cobrakunqachu.",
+      "objectLabel": "¿Imatataq vecino nirqa?",
+      "objectSubmit": "Observacionta waqaychay",
+      "confirmTitle": "Cargota confirmay",
+      "confirmBody": "Cargoqa allinmi kanqa, ciclonpi cobrakunqa.",
+      "confirmLabel": "¿Imaraykutaq confirmanki?",
+      "confirmSubmit": "Cargota confirmay",
+      "voidTitle": "Cargota anulay",
+      "voidBody": "Rantikunaqa stockman kutinqa, vecinopa manunpas pisiyanqa. Mana kutichiyta atikunchu.",
+      "voidLabel": "Imarayku anulanki",
+      "voidSubmit": "Cargota anulay",
+      "errors": {
+        "SESSION": "Sesionniyki tukurqa utaq mana permisoyuqchu kanki. Yapamanta yaykuy.",
+        "INVALID": "Datokunata qhaway, yapamanta ruray.",
+        "GENERIC": "Mana waqaychakurqachu. Yapamanta ruray.",
+        "NOTE_REQUIRED": "Huk notata qillqay.",
+        "CHARGE_NOT_FOUND": "Mana kay cargota tarirqanchikchu.",
+        "CHARGE_NOT_PENDING": "Kay cargoqa manaña confirmanapaqchu.",
+        "OBJECTION_WINDOW_CLOSED": "48 horakunaña pasarqa kay cargota observanapaq.",
+        "CHARGE_NOT_OBJECTED": "Kay cargoqa mana observasqachu.",
+        "CHARGE_ALREADY_VOIDED": "Kay cargoqa anulasqañam.",
+        "CHARGE_HAS_PAYMENTS": "Kay cargoqa pagasqañam, mana anulakunchu.",
+        "INSTALLMENT_ALREADY_BILLED": "Kay rantiypa huk cuotan kuchuymanña yaykurqa; manaña anulakunchu."
+      }
+    },
+    "pay": {
+      "back": "{name}man kutiy",
+      "title": "{name}man cobray",
+      "nothingDue": "Mana imapas cobranapaqchu kan: vecinoqa mana pagasqa ciclokunayuqchu.",
+      "cycle": "{date} kuchuyniyuq ciclo",
+      "dueOn": "Pagana p'unchaw: {date}",
+      "totalDue": "Ciclopa llapan",
+      "moratory": "{days, plural, one {# p'unchaw} other {# p'unchawkuna}} moratorio interés",
+      "amountDue": "Pagana",
+      "laterCycles": "{count, plural, one {Qhipaman # ciclo cobranapaq qhepan.} other {Qhipaman # ciclokuna cobranapaq qhepan.}}",
+      "objectionOwner": "Manaraq cobrachkaspa observacionta allichay:",
+      "objectionLink": "{date} observasqa cargo",
+      "objectionEmployee": "Manaraq cobrachkaspa dueñota mañakuy observasqa cargota qhawananpaq.",
+      "methodLabel": "Imawan pagan",
+      "methods": {
+        "CASH": "Qullqi",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "Transferencia"
+      },
+      "receivedLabel": "Chaskisqa",
+      "receivedHint": "Chusaqta saqiy exacto pagaptinqa.",
+      "change": "Vuelto",
+      "submit": "{amount} cobray",
+      "errors": {
+        "SESSION": "Sesionniyki tukurqa utaq mana permisoyuqchu kanki. Yapamanta yaykuy.",
+        "INVALID": "Datokunata qhaway, yapamanta ruray.",
+        "GENERIC": "Mana cobro qillqakurqachu. Yapamanta ruray.",
+        "ACCOUNT_NOT_FOUND": "Kay vecinoqa mana fiado cuentayuqchu.",
+        "NO_PAYABLE_CYCLE": "Mana imapas cobranapaqchu.",
+        "CYCLE_NOT_OLDEST": "Montoqa tikrakurqa. Musuq llapanta qhaway, yapamanta cobray.",
+        "OBJECTION_PENDING": "Kay ciclopi mana allichasqa observasqa cargo kan.",
+        "SETTLEMENT_MISMATCH": "Cicloqa mana tupanchu. Willawayku qhawanaykupaq.",
+        "MORATORY_BASE_MISMATCH": "Cicloqa mana tupanchu. Willawayku qhawanaykupaq.",
+        "CYCLE_NOT_BILLED": "Cicloqa manaraq liquidakunchu.",
+        "CYCLE_ALREADY_PAID": "Kay cicloqa pagasqañam.",
+        "PARTIAL_PAYMENT_NOT_ALLOWED": "Llapan ciclom pagakun; mana parcial pagokuna kanchu.",
+        "AMOUNT_EXCEEDS_DUE": "Montoqa manunmanta aswan hatunmi.",
+        "CURRENCY_MISMATCH": "Qullqiqa mana cuentapa qullqinwan tupanchu.",
+        "RECEIVED_INVALID": "Chaskisqata monto hina qillqay, 50 utaq 50.50 hina.",
+        "RECEIVED_TOO_LOW": "Chaskisqaqa llapanmanta pisim."
+      }
+    },
+    "receipt": {
+      "back": "{name}man kutiy",
+      "paid": "Cobro qillqasqa. Comprobanteqa correowan kachakurqa.",
+      "paidWithChange": "Cobro qillqasqa. {change} vueltota quy.",
+      "nextCycle": "Qhaway huk ciclo cobranapaq kanchu",
+      "title": "Recibo {number}",
+      "customer": "Vecino",
+      "cycle": "Ciclopa kuchuynin",
+      "method": "Imawan pagan",
+      "collector": "Cobraq",
+      "principal": "Capital",
+      "compensatory": "Compensatorio interés",
+      "moratory": "{days, plural, one {# p'unchaw} other {# p'unchawkuna}} moratorio interés",
+      "total": "Llapan pagasqa",
+      "print": "Imprimiy"
+    },
+    "page": {
+      "title": "Cobranza",
+      "subtitleManual": "Plan Caseropi willakuykunaqa mañakuptiykim lluqsin.",
+      "subtitleAutomatic": "Resumenkuna, yuyarichiykuna, mora willakuykuna ima sapa paqarin kikinmanta lluqsin.",
+      "tabsLabel": "Cobranzapa partenkuna",
+      "tabs": {
+        "due": "Cobranapaq",
+        "overdue": "Pasasqa",
+        "notices": "Kunan willakuykuna"
+      },
+      "noDue": "Mana ciclokuna cobranapaqchu kan.",
+      "noOverdue": "Mana mayqen vecinopas pasasqa pagoyuqchu.",
+      "noNotices": "Kunanqa manaraq willakuy lluqsinchu.",
+      "dueOn": "{date} p'unchawkama pagay",
+      "noticeType": {
+        "CHARGE_DIGEST": "Rantikunapa resumen",
+        "CYCLE_STATEMENT": "Cuentapa willakuynin",
+        "PAYMENT_REMINDER": "Pagomanta yuyarichiy",
+        "LATE_PAYMENT": "Moramanta willakuy",
+        "PAYMENT_RECEIPT": "Pagopa comprobanten"
+      },
+      "noticeStatus": {
+        "QUEUED": "Suyachkan",
+        "SENT": "Kachasqa",
+        "DELIVERED": "Chayasqa",
+        "BOUNCED": "Kutimurqa",
+        "FAILED": "Pantarqa"
+      }
+    },
+    "manual": {
+      "title": "Vecinoykikunaman willakuykuna",
+      "hint": "Rantikunapa resumenqa 48 horakunata kichan vecino huk cargota observananpaq. Yuyarichiyqa 3 p'unchawpi utaq pisipi pagaqkunamanmi rin.",
+      "digests": "Rantikunapa resumenta kachay",
+      "reminders": "Yuyarichiykunata kachay",
+      "nothing": "Mana kachanapaq willakuykuna karqachu.",
+      "sent": "{sent, plural, one {# willakuy kachakurqa.} other {# willakuykuna kachakurqa.}} {failed, plural, =0 {} one {# pantarqa; paqarin yapamanta kachakunqa.} other {# pantarqa; paqarin yapamanta kachakunqa.}}",
+      "errors": {
+        "SESSION": "Sesionniyki tukurqa utaq mana permisoyuqchu kanki. Yapamanta yaykuy.",
+        "AUTOMATIC": "Planniykiqa kay willakuykunata kikinmantam kachan.",
+        "GENERIC": "Mana kachakurqachu. Yapamanta ruray."
+      }
+    }
   }
 }

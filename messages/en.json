@@ -50,6 +50,50 @@
       },
       "action": "Choose my password",
       "outro": "The link expires in 72 hours and works only once. If you were not expecting this email, ignore it."
+    },
+    "collections": {
+      "contact": "Something wrong? Message or call {store} at {contact}.",
+      "contactInStore": "Something wrong? Let {store} know at the store.",
+      "yape": "You can pay with Yape to {yape}.",
+      "total": "Total",
+      "balance": "Your credit balance: {amount}",
+      "purchase": "Purchase on {date}",
+      "purchaseAt": "Purchase on {date} at {time}",
+      "interest": "{days} days of interest: {amount}",
+      "installment": "Installment {number} of {total}",
+      "void": "Voided charge",
+      "moratory": "Late interest for {days} days",
+      "method": {
+        "CASH": "cash",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "bank transfer"
+      },
+      "digest": {
+        "subject": "{store}: your purchases on credit",
+        "intro": "These are your purchases on credit at {store}:",
+        "outro": "You have 48 hours from this email to tell us if something is wrong. If you don't, the charges are considered accepted."
+      },
+      "statement": {
+        "subject": "{store}: your statement as of {cutOff}",
+        "intro": "We closed your account on {cutOff}. This is what you will pay:",
+        "outro": "Pay {amount} by {dueDate} to avoid late interest."
+      },
+      "reminder": {
+        "subject": "{store}: your payment is due on {dueDate}",
+        "intro": "A friendly reminder that your payment at {store} is due on {dueDate}. The amount is {amount}.",
+        "outro": "Thank you for paying on time!"
+      },
+      "late": {
+        "subject": "{store}: your payment is overdue",
+        "intro": "Your payment of {amount} due on {dueDate} has not arrived yet. Late interest runs from the next day and credit is paused until you catch up.",
+        "outro": "Drop by {store} to catch up."
+      },
+      "receipt": {
+        "subject": "{store}: payment receipt {receipt}",
+        "intro": "We received your payment on {date} by {method}. This is your receipt {receipt}:",
+        "outro": "Thank you for paying. That cycle of your account is settled."
+      }
     }
   },
   "Auth": {
@@ -277,7 +321,8 @@
       "stores": "Stores",
       "rateCaps": "BCRP caps",
       "sellSoon": "Sell, coming soon",
-      "inventory": "Inventory"
+      "inventory": "Inventory",
+      "collections": "Collections"
     }
   },
   "Customers": {
@@ -472,7 +517,8 @@
         "currencyLocked": "They owe money: you can't change the currency until they pay.",
         "customerInactive": "The neighbor is deactivated: reactivate them to give credit.",
         "planLimit": "You reached your plan's limit of neighbors with active credit.",
-        "generic": "We couldn't save the terms. Try again."
+        "generic": "We couldn't save the terms. Try again.",
+        "daysLocked": "They have a cycle with purchases or unpaid: you can change the cut-off and payment days once they pay and have no pending installments. You can still change the rates and the limit."
       }
     }
   },
@@ -977,5 +1023,198 @@
     "toastCreditTitle": "Credit sale recorded · {total}",
     "toastInstallments": "{name} · {count} installments of {amount}",
     "toastAvailable": "{name} · {available} left"
+  },
+  "Collections": {
+    "cycleStatus": {
+      "OPEN": "Open",
+      "BILLED": "To collect",
+      "DUE_SOON": "Due soon",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue"
+    },
+    "account": {
+      "title": "Account statement",
+      "empty": "No credit purchases yet. The first one opens its cycle.",
+      "cutOff": "Cut-off {date}",
+      "openHint": "Open cycle: interest is calculated on the cut-off date",
+      "dueOn": "Pay by {date}"
+    },
+    "bounce": "This customer's email bounced on {date}. Check their email so notices reach them.",
+    "cycle": {
+      "back": "Back to {name}",
+      "notice": {
+        "objected": "Objection saved. The owner will review it before collecting.",
+        "confirmed": "Charge confirmed.",
+        "voided": "Charge voided. The products went back to stock and the debt went down."
+      },
+      "title": "Cycle with cut-off {date}",
+      "subtitle": "{name} · cycle {number}",
+      "totalDue": "Total due",
+      "openTotal": "Purchases so far",
+      "dueDate": "Payment date",
+      "paid": "Paid",
+      "openNotice": "This cycle is still open. On {date} interest is calculated and the statement is sent.",
+      "linesTitle": "Detail",
+      "noLines": "This cycle has no purchases.",
+      "purchases": "Purchases",
+      "interest": "Compensatory interest",
+      "installments": "Installments",
+      "adjustments": "Voids",
+      "moratory": "Late interest",
+      "installmentPurchasesTitle": "Installment purchases",
+      "installmentPurchasesHint": "They are paid in their installments, in the following cycles.",
+      "paymentsTitle": "Payments",
+      "receipt": "Receipt {number} · {date}",
+      "pay": "Collect"
+    },
+    "charge": {
+      "purchase": "Purchase on {date}",
+      "inInstallments": "{count, plural, one {# installment} other {# installments}}",
+      "interest": "Interest for {days, plural, one {# day} other {# days}}:",
+      "installment": "Installment {number} of {total}",
+      "installmentBreakdown": "Principal {principal} · interest {interest}",
+      "voidLine": "Voided charge",
+      "consent": {
+        "PENDING": "Awaiting confirmation",
+        "ACCEPTED": "Accepted",
+        "OBJECTED": "Objected",
+        "VOIDED": "Voided"
+      },
+      "deadline": "Can be objected until {date}",
+      "objectionNote": "What the customer said: {note}",
+      "resolutionNote": "Owner's note: {note}",
+      "voidReason": "Reason for the void: {note}",
+      "askOwner": "Ask the owner to review this objected charge.",
+      "object": "Record objection",
+      "confirm": "Confirm",
+      "void": "Void",
+      "cancel": "Cancel",
+      "objectTitle": "Record objection",
+      "objectBody": "Write down what the customer told you. The charge can't be collected until the owner reviews it.",
+      "objectLabel": "What did the customer say?",
+      "objectSubmit": "Save objection",
+      "confirmTitle": "Confirm the charge",
+      "confirmBody": "The charge is accepted and collected in its cycle.",
+      "confirmLabel": "Why are you confirming it?",
+      "confirmSubmit": "Confirm charge",
+      "voidTitle": "Void the charge",
+      "voidBody": "The products go back to stock and the customer's debt goes down. This can't be undone.",
+      "voidLabel": "Reason for the void",
+      "voidSubmit": "Void charge",
+      "errors": {
+        "SESSION": "Your session ended or you don't have permission. Sign in again.",
+        "INVALID": "Check the data and try again.",
+        "GENERIC": "It couldn't be saved. Try again.",
+        "NOTE_REQUIRED": "Write a note.",
+        "CHARGE_NOT_FOUND": "We couldn't find this charge.",
+        "CHARGE_NOT_PENDING": "This charge is no longer awaiting confirmation.",
+        "OBJECTION_WINDOW_CLOSED": "The 48 hours to object to this charge have passed.",
+        "CHARGE_NOT_OBJECTED": "This charge isn't objected.",
+        "CHARGE_ALREADY_VOIDED": "This charge was already voided.",
+        "CHARGE_HAS_PAYMENTS": "This charge was already paid and can't be voided.",
+        "INSTALLMENT_ALREADY_BILLED": "An installment of this purchase already entered a cut-off; it can no longer be voided."
+      }
+    },
+    "pay": {
+      "back": "Back to {name}",
+      "title": "Collect from {name}",
+      "nothingDue": "Nothing to collect: this customer has no unpaid settled cycles.",
+      "cycle": "Cycle with cut-off {date}",
+      "dueOn": "Payment date: {date}",
+      "totalDue": "Cycle total",
+      "moratory": "Late interest for {days, plural, one {# day} other {# days}}",
+      "amountDue": "To pay",
+      "laterCycles": "{count, plural, one {# more cycle left to collect after this one.} other {# more cycles left to collect after this one.}}",
+      "objectionOwner": "Resolve the objection before collecting:",
+      "objectionLink": "Objected charge from {date}",
+      "objectionEmployee": "Ask the owner to review the objected charge before collecting.",
+      "methodLabel": "Payment method",
+      "methods": {
+        "CASH": "Cash",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "TRANSFER": "Transfer"
+      },
+      "receivedLabel": "Received",
+      "receivedHint": "Leave it empty if they pay the exact amount.",
+      "change": "Change",
+      "submit": "Collect {amount}",
+      "errors": {
+        "SESSION": "Your session ended or you don't have permission. Sign in again.",
+        "INVALID": "Check the data and try again.",
+        "GENERIC": "The payment couldn't be recorded. Try again.",
+        "ACCOUNT_NOT_FOUND": "This customer has no credit account.",
+        "NO_PAYABLE_CYCLE": "Nothing to collect.",
+        "CYCLE_NOT_OLDEST": "The amount changed. Check the new total and collect again.",
+        "OBJECTION_PENDING": "There's an unresolved objected charge in this cycle.",
+        "SETTLEMENT_MISMATCH": "The cycle doesn't add up. Let us know so we can check it.",
+        "MORATORY_BASE_MISMATCH": "The cycle doesn't add up. Let us know so we can check it.",
+        "CYCLE_NOT_BILLED": "The cycle hasn't been settled yet.",
+        "CYCLE_ALREADY_PAID": "This cycle is already paid.",
+        "PARTIAL_PAYMENT_NOT_ALLOWED": "The whole cycle is paid; there are no partial payments.",
+        "AMOUNT_EXCEEDS_DUE": "The amount is more than what they owe.",
+        "CURRENCY_MISMATCH": "The currency doesn't match the account's.",
+        "RECEIVED_INVALID": "Enter the received amount, for example 50 or 50.50.",
+        "RECEIVED_TOO_LOW": "The received amount is less than the total."
+      }
+    },
+    "receipt": {
+      "back": "Back to {name}",
+      "paid": "Payment recorded. The receipt was sent by email.",
+      "paidWithChange": "Payment recorded. Give {change} in change.",
+      "nextCycle": "Check whether another cycle is left to collect",
+      "title": "Receipt {number}",
+      "customer": "Customer",
+      "cycle": "Cycle cut-off",
+      "method": "Payment method",
+      "collector": "Collected by",
+      "principal": "Principal",
+      "compensatory": "Compensatory interest",
+      "moratory": "Late interest for {days, plural, one {# day} other {# days}}",
+      "total": "Total paid",
+      "print": "Print"
+    },
+    "page": {
+      "title": "Collections",
+      "subtitleManual": "On the Casero plan, notices go out when you send them.",
+      "subtitleAutomatic": "Summaries, reminders and late notices go out on their own every morning.",
+      "tabsLabel": "Collections sections",
+      "tabs": {
+        "due": "To collect",
+        "overdue": "Overdue",
+        "notices": "Today's notices"
+      },
+      "noDue": "No cycles to collect.",
+      "noOverdue": "No customer has overdue payments.",
+      "noNotices": "No notices have gone out today yet.",
+      "dueOn": "Pay by {date}",
+      "noticeType": {
+        "CHARGE_DIGEST": "Purchase summary",
+        "CYCLE_STATEMENT": "Account statement",
+        "PAYMENT_REMINDER": "Payment reminder",
+        "LATE_PAYMENT": "Late notice",
+        "PAYMENT_RECEIPT": "Payment receipt"
+      },
+      "noticeStatus": {
+        "QUEUED": "Queued",
+        "SENT": "Sent",
+        "DELIVERED": "Delivered",
+        "BOUNCED": "Bounced",
+        "FAILED": "Failed"
+      }
+    },
+    "manual": {
+      "title": "Notices to your customers",
+      "hint": "The purchase summary opens the 48 hours for the customer to object to a charge. The reminder goes to those who pay in 3 days or less.",
+      "digests": "Send purchase summary",
+      "reminders": "Send reminders",
+      "nothing": "There were no pending notices to send.",
+      "sent": "{sent, plural, one {# notice was sent.} other {# notices were sent.}} {failed, plural, =0 {} one {# failed; it will be retried tomorrow.} other {# failed; they will be retried tomorrow.}}",
+      "errors": {
+        "SESSION": "Your session ended or you don't have permission. Sign in again.",
+        "AUTOMATIC": "Your plan already sends these notices on its own.",
+        "GENERIC": "They couldn't be sent. Try again."
+      }
+    }
   }
 }

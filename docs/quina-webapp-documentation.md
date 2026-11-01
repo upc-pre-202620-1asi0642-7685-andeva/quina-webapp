@@ -384,6 +384,59 @@ Tomadas el 31 de octubre de 2026 al construir US03, US07 y US08:
   capitalizada. Al pagar cada cuota se libera la parte proporcional del capital
   original.
 
+### Decisiones del Plan 4 (corte y cobranza)
+
+Tomadas el 31 de octubre de 2026 al construir US10, US11, US12 y US13:
+
+- **P1, mora por línea:** cada cargo de pago único y cada cuota calcula su mora
+  con su propia tasa moratoria congelada sobre su parte exigible; la mora del
+  ciclo es la suma y `payment_allocations` la reparte línea por línea.
+- **P2, anulación en el mismo ciclo:** un cargo observado se anula en su propio
+  ciclo mientras no esté pagado (`credit_charge_voids.applied_cycle_id` es ese
+  ciclo). Si ya estaba liquidado, se recalculan `adjustments_total` y
+  `total_due`; la anulación cancela la línea entera, con su interés. Si el ciclo
+  queda en 0, pasa a `PAID`.
+- **P3, cuotas:** un cargo en cuotas se anula solo si ninguna cuota se liquidó;
+  sus cuotas pasan a `VOIDED`. El ciclo de la compra (que puede haber cerrado en
+  0 y estar `PAID`) no lo impide.
+- **P4, observaciones sin portal:** el correo pide escribir a la tienda dentro de
+  las 48 h. El dueño o el empleado registran la observación (`charges.object`);
+  solo el dueño la confirma o la anula (`charges.resolve`). El portal llega en el
+  Plan 5.
+- **P5, correos en Casero:** el estado de cuenta y el comprobante salen siempre.
+  El resumen de compras y los recordatorios salen con un botón en Cobranza
+  (`notifications.send`, dueño y empleado) en Casero y solos en Pro y Plus. El
+  aviso de mora es automático solo en Pro y Plus.
+- **P6, conformidad:** no frena el corte. Un cargo sin notificar entra al ciclo y
+  sigue `PENDING` hasta que pasan 48 h desde el resumen o el dueño lo resuelve.
+- **P7, cambio de días:** `DAYS_LOCKED` si hay un ciclo `OPEN` con compras, un
+  ciclo sin pagar o cuotas por vencer. Las tasas y el límite sí cambian.
+- **P8, demo:** `pnpm demo:collections` carga vecinos y compras con fechas pasadas
+  en una tienda existente y corre el proceso diario (sección 11.3).
+- **D3, saldo:** el corte suma el interés de los cargos únicos y, por cuota,
+  `cuota − capital liberado`; el capital liberado de la cuota *k* es
+  `P × amortización_k / Σ amortizaciones` truncado, y la última absorbe el
+  residuo. El pago resta capital e interés; la mora nunca entra al saldo. Al
+  anular se resta el capital y el interés ya liquidado.
+- **D6, varios ciclos vencidos:** se cobra siempre el más antiguo, completo y con
+  el monto exacto; la pantalla ofrece cobrar el siguiente.
+- **D7, recibo:** correlativo por tienda `R-000001`, serializado con
+  `pg_advisory_xact_lock(hashtext('receipt:' || store_id))`.
+- **D8, observación pendiente:** bloquea el cobro de su ciclo hasta que el dueño
+  la resuelva.
+- **D9 y D10, envíos:** cada correo se guarda `QUEUED` en la transacción del
+  negocio y se envía después del commit, uno por uno (≤ 2 por segundo) y con la
+  etiqueta `store_id`. Lo que quede en cola o falle se reintenta en el proceso
+  siguiente durante 3 días. Un resumen de otro día que falló se reemplaza por el
+  de hoy. El cobro nunca falla porque falle el correo.
+- **D14, rebotes:** `/app/api/webhooks/resend` verifica la firma svix
+  (`RESEND_WEBHOOK_SECRET`), entra con `withTenant` según la etiqueta
+  `store_id`, marca `DELIVERED` o `BOUNCED` (una entrega no pisa un rebote) y
+  llena `customers.email_bounced_at`.
+- **D17, fecha simulada:** fuera de producción y con `ALLOW_SIMULATED_NOW=1`, el
+  cron acepta la cabecera `x-quina-now`. Los envíos y avisos usan la hora del
+  proceso, así las 48 h y los "Avisos de hoy" siguen la fecha simulada.
+
 ### Por qué Drizzle ORM frente a Prisma
 - **Sin binarios pesados en serverless:** Prisma requiere un motor en Rust
   (~40 MB) que penaliza los arranques en frío en funciones serverless de Vercel.
@@ -805,6 +858,8 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `DATABASE_TEST_APP_URL` | Pruebas de integración: conexión como `quina_app`, para comprobar RLS. |
 | `DATABASE_TEST_PLATFORM_URL` | Pruebas de integración: conexión como `quina_platform`. |
 | `CRON_SECRET` | Protege el proceso programado diario. |
+| `ALLOW_SIMULATED_NOW` | Solo fuera de producción: con `1`, el cron acepta la cabecera `x-quina-now` para simular la fecha (pruebas y demo). |
+| `DEMO_STORE_ID`, `DEMO_CONFIRM`, `DEMO_EMAIL` | Solo para `pnpm demo:collections` (sección 11.3). |
 
 ---
 
@@ -845,20 +900,33 @@ El proceso corre con la conexión de la aplicación (`quina_app`, sin `BYPASSRLS
 lista las tiendas activas (`stores` no tiene RLS) y ejecuta cada paso dentro de
 `withTenant(storeId, ...)`, una tienda a la vez.
 
+El orden quedó fijado en el Plan 4 (D1b): los pasos de datos de todas las
+tiendas van primero y los envíos al final, cortados antes del límite de 60 s de
+la función (`maxDuration`); lo que no salga, sale al día siguiente.
+
 | Orden | Paso | Qué hace |
 | :---: | :--- | :--- |
-| 1 | Resumen diario de cargos | Agrupa por vecino los cargos con `notified_at` vacío y envía **un correo por vecino** (`CHARGE_DIGEST`). Marca `notified_at` y fija `consent_deadline` 48 h después del envío. |
-| 2 | Conformidad tácita | Los cargos `PENDING` cuyo `consent_deadline` ya pasó quedan `ACCEPTED`. |
-| 3 | Cortes | Liquida las cuentas cuyo día de corte fue **el día anterior** (las compras hasta las 23:59:59, hora de Lima, de ese día entran al ciclo): crea el ciclo si solo vencen cuotas, calcula intereses, descuenta los cargos anulados, pasa el ciclo a `BILLED` y envía el estado de cuenta. |
-| 4 | Recordatorios | Envía `PAYMENT_REMINDER` a los ciclos `BILLED` que vencen en 3 días. El índice único de `notification_logs` impide duplicados. |
-| 5 | Mora | Pasa a `OVERDUE` los ciclos y cuotas vencidos sin pago y envía el aviso de mora. Con un ciclo `OVERDUE`, el vecino no puede comprar al crédito hasta pagarlo. |
-| 6 | Suscripciones | Al terminar la prueba de 14 días o el periodo de gracia sin pago, la tienda vuelve al Plan Casero. |
+| 1 | Conformidad tácita | Los cargos `PENDING` cuyo `consent_deadline` ya pasó quedan `ACCEPTED`. |
+| 2 | Cortes | Liquida, del más antiguo al más nuevo, todo ciclo `OPEN` cuyo corte ya pasó (las compras hasta las 23:59:59, hora de Lima, del día de corte entran al ciclo), así un día sin cron se recupera al siguiente. Crea el ciclo si solo vencen cuotas, calcula intereses, descuenta los cargos anulados y pasa el ciclo a `BILLED` (o a `PAID` si queda en 0). Pone en cola el estado de cuenta. |
+| 3 | Mora | Pasa a `OVERDUE` los ciclos `BILLED` vencidos y sus cuotas, y pone en cola el aviso de mora. Con un ciclo `OVERDUE`, el vecino no puede comprar al crédito hasta pagarlo. |
+| 4 | Resumen diario de cargos | Agrupa por vecino los cargos sin notificar de días anteriores en **un correo por vecino** (`CHARGE_DIGEST`). Al enviarlo marca `notified_at` y fija `consent_deadline` 48 h después. |
+| 5 | Recordatorios | `PAYMENT_REMINDER` a los ciclos todavía `BILLED` que vencen entre hoy y dentro de 3 días. El índice único de `notification_logs` impide duplicados. |
+| 6 | Envíos | Manda lo que quedó en cola (y reintenta lo fallido de los últimos 3 días), uno por uno. |
+| 7 | Suscripciones | Al terminar la prueba de 14 días o el periodo de gracia sin pago, la tienda vuelve al Plan Casero (Plan 7). |
 
-Los pasos 1 y 4 son automáticos solo en **Bodega Pro** y **Negocio Plus**. En el
-**Plan Casero** los avisos por correo son manuales (estrategia de precios): el
-dueño envía el resumen de cargos y los recordatorios con un botón, y el plazo de
-48 h de conformidad cuenta desde ese envío. Los cortes (paso 3) y la mora
-(paso 5) corren en todos los planes porque son reglas del motor financiero.
+Los pasos 4 y 5 y el aviso de mora son automáticos solo en **Bodega Pro** y
+**Negocio Plus**. En el **Plan Casero** el resumen y los recordatorios salen con
+los botones de Cobranza (decisión P5), y el plazo de 48 h de conformidad cuenta
+desde ese envío. Los cortes, la mora, el estado de cuenta y el comprobante de
+pago corren en todos los planes.
+
+Fuera de producción (`VERCEL_ENV` distinto de `production`) y con
+`ALLOW_SIMULATED_NOW=1`, la cabecera `x-quina-now` simula la fecha:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" -H "x-quina-now: 2026-10-21T11:00:00Z" \
+  http://localhost:3000/app/api/cron/daily
+```
 
 ### 11.2. Presupuesto de correos (Resend, capa gratuita)
 
@@ -872,6 +940,24 @@ cargos al día, en lugar de uno por compra.
 - **Si se agota la cuota:** los resúmenes que no salieron conservan
   `notified_at` vacío y se envían al día siguiente; el plazo de 48 h cuenta desde
   el envío real, nunca desde la compra.
-- **Rebotes:** el webhook de Resend marca el envío como `BOUNCED` en
+- **Rebotes:** el webhook de Resend (`/app/api/webhooks/resend`, eventos
+  `email.delivered` y `email.bounced`) marca el envío como `BOUNCED` en
   `notification_logs` y llena `customers.email_bounced_at`, lo que muestra una
   alerta en la ficha del vecino.
+
+### 11.3. Datos de demostración (`pnpm demo:collections`)
+
+Para mostrar el corte, la mora y el cobro sin esperar un mes (decisión P8):
+
+```bash
+DEMO_STORE_ID=<id de la tienda> DEMO_CONFIRM=<host de DATABASE_URL> pnpm demo:collections
+```
+
+Crea en esa tienda tres productos y cuatro vecinos con compras de fechas
+pasadas: Rosa con un ciclo vencido (se cobra con mora), Juan con un pago en 2
+días, Carmen con un ciclo abierto (para observar un cargo) y Pedro con una
+licuadora en 3 cuotas. Luego corre el proceso diario de hoy. `DEMO_EMAIL`
+(opcional, `nombre@dominio`) envía los correos a `nombre+alias@dominio`; sin él
+van a `example.test`. Se niega a correr con `VERCEL_ENV` o `NODE_ENV` en
+`production` y sin `DEMO_CONFIRM` igual al host de la base. Corre con Vitest
+(`vitest.demo.config.ts`) solo para resolver los alias `@/`; no es una prueba.

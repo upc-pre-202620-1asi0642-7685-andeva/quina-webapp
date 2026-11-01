@@ -25,8 +25,8 @@ export async function AppShell({
   const trial = store.trialEndsAt ? t('trialUntil', { date: formatDate(store.trialEndsAt) }) : null;
 
   return (
-    <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[256px_1fr]">
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface p-4 lg:flex">
+    <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[256px_1fr] print:block">
+      <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface p-4 lg:flex print:hidden">
         <Link
           href={user.role === 'PLATFORM_ADMIN' ? '/platform/stores' : '/'}
           className="px-4 pt-2"
@@ -53,7 +53,7 @@ export async function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden print:hidden">
           <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
           <div className="flex min-w-0 items-center gap-1">
             <span className="truncate text-sm font-medium text-ink">{store.name}</span>
