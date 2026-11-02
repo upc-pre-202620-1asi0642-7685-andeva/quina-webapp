@@ -8,6 +8,7 @@ export type NavKey =
   | 'collections'
   | 'inventory'
   | 'team'
+  | 'audit'
   | 'settings'
   | 'more'
   | 'stores'
@@ -18,6 +19,8 @@ export type NavItem = {
   href: string;
   /** Destino que llega en un plan posterior: se muestra, pero no navega. */
   soon?: boolean;
+  /** Contador de alerta (p. ej. productos con stock bajo en Inventario). */
+  badge?: number;
 };
 
 type NavDefinition = NavItem & { permission?: Permission };
@@ -30,6 +33,7 @@ const SIDEBAR: NavDefinition[] = [
   { key: 'collections', href: '/collections', permission: 'payments.create' },
   { key: 'inventory', href: '/inventory', permission: 'stock.read' },
   { key: 'team', href: '/team', permission: 'team.manage' },
+  { key: 'audit', href: '/audit', permission: 'settings.billing' },
   { key: 'settings', href: '/settings', permission: 'settings.billing' },
 ];
 
@@ -50,15 +54,21 @@ const PLATFORM: NavDefinition[] = [
 const allowed = (role: Role) => (item: NavDefinition) =>
   !item.permission || can(role, item.permission);
 
-const strip = ({ key, href, soon }: NavDefinition): NavItem => ({
+const strip = ({ key, href, soon, badge }: NavDefinition): NavItem => ({
   key,
   href,
   ...(soon ? { soon } : {}),
+  ...(badge && badge > 0 ? { badge } : {}),
 });
 
-export function sidebarItems(role: Role): NavItem[] {
+export function sidebarItems(role: Role, lowStockCount = 0): NavItem[] {
   if (role === 'PLATFORM_ADMIN') return PLATFORM.map(strip);
-  return SIDEBAR.filter(allowed(role)).map(strip);
+  return SIDEBAR.filter(allowed(role)).map((item) =>
+    strip({
+      ...item,
+      badge: item.key === 'inventory' && lowStockCount > 0 ? lowStockCount : undefined,
+    }),
+  );
 }
 
 /** El empleado no tiene ajustes: su "Más" lleva a su perfil. */

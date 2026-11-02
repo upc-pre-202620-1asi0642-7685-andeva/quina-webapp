@@ -9,6 +9,7 @@ import {
   HouseIcon,
   LandmarkIcon,
   PackageIcon,
+  ShieldCheckIcon,
   StoreIcon,
   SettingsIcon,
   ShoppingBasketIcon,
@@ -26,6 +27,7 @@ const ICONS: Record<NavKey, LucideIcon> = {
   collections: HandCoinsIcon,
   inventory: PackageIcon,
   team: UserCogIcon,
+  audit: ShieldCheckIcon,
   settings: SettingsIcon,
   more: EllipsisIcon,
   stores: StoreIcon,
@@ -71,7 +73,12 @@ export function SidebarNav({ items }: { items: NavItem[] }) {
             )}
           >
             <Icon aria-hidden="true" />
-            {t(item.key)}
+            <span>{t(item.key)}</span>
+            {item.badge && item.badge > 0 ? (
+              <span className="ml-auto rounded-full bg-amber/12 px-2 py-0.5 text-xs font-semibold text-amber-ink tabular-nums">
+                {item.badge}
+              </span>
+            ) : null}
           </Link>
         );
       })}
