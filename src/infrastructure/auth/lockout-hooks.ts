@@ -26,11 +26,37 @@ export type LockoutDeps = {
 };
 
 export function createLockout({ db, mailer, now = () => new Date() }: LockoutDeps) {
+  async function writeUserAudit(
+    row: { id: string; storeId: string | null },
+    action: string,
+    newData: Record<string, unknown>,
+    meta: RequestMeta,
+  ): Promise<void> {
+    const audit = {
+      storeId: row.storeId,
+      userId: row.id,
+      action,
+      entityName: 'users',
+      entityId: row.id,
+      newData,
+      ipAddress: meta.ipAddress?.slice(0, 45) ?? null,
+      userAgent: meta.userAgent ?? null,
+    };
+    // audit_logs es de solo inserción y con RLS: sin .returning()
+    if (row.storeId) {
+      await withTenant(row.storeId, (tx) => tx.insert(auditLogs).values(audit), db);
+    } else {
+      await db.insert(auditLogs).values(audit);
+    }
+  }
+
   return {
     /** Antes de verificar la contraseña: bloqueada, desactivada o tienda inactiva. */
-    async gate(email: string): Promise<SignInGate> {
+    async gate(email: string, meta: RequestMeta = {}): Promise<SignInGate> {
       const [row] = await db
         .select({
+          id: users.id,
+          storeId: users.storeId,
           lockedUntil: users.lockedUntil,
           isActive: users.isActive,
           storeActive: stores.isActive,
@@ -40,7 +66,15 @@ export function createLockout({ db, mailer, now = () => new Date() }: LockoutDep
         .where(eq(users.email, email.toLowerCase()));
       // Un correo inexistente sigue el camino normal (credenciales inválidas)
       if (!row) return 'OK';
-      if (AccountLockoutPolicy.isLocked(row, now())) return 'ACCOUNT_LOCKED';
+      if (AccountLockoutPolicy.isLocked(row, now())) {
+        await writeUserAudit(
+          row,
+          'LOGIN_BLOCKED',
+          { lockedUntil: row.lockedUntil?.toISOString() ?? null },
+          meta,
+        );
+        return 'ACCOUNT_LOCKED';
+      }
       if (!row.isActive || row.storeActive === false) return 'ACCOUNT_DISABLED';
       return 'OK';
     },
@@ -77,28 +111,30 @@ export function createLockout({ db, mailer, now = () => new Date() }: LockoutDep
           .where(eq(users.id, row.id));
         return { row, next };
       });
-      if (!outcome?.next.justLocked) return;
+      if (!outcome) return;
 
       const { row, next } = outcome;
-      const audit = {
-        storeId: row.storeId,
-        userId: row.id,
-        action: 'LOCK_ACCOUNT',
-        entityName: 'users',
-        entityId: row.id,
-        newData: {
+      await writeUserAudit(
+        row,
+        'LOGIN_FAILED',
+        {
           failedLoginAttempts: next.failedAttempts,
           lockedUntil: next.lockedUntil?.toISOString() ?? null,
         },
-        ipAddress: meta.ipAddress?.slice(0, 45) ?? null,
-        userAgent: meta.userAgent ?? null,
-      };
-      // audit_logs es de solo inserción y con RLS: sin .returning()
-      if (row.storeId) {
-        await withTenant(row.storeId, (tx) => tx.insert(auditLogs).values(audit), db);
-      } else {
-        await db.insert(auditLogs).values(audit);
-      }
+        meta,
+      );
+
+      if (!next.justLocked) return;
+
+      await writeUserAudit(
+        row,
+        'LOCK_ACCOUNT',
+        {
+          failedLoginAttempts: next.failedAttempts,
+          lockedUntil: next.lockedUntil?.toISOString() ?? null,
+        },
+        meta,
+      );
 
       try {
         await mailer.sendLockoutAlert({
