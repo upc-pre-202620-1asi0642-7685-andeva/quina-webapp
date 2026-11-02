@@ -8,6 +8,7 @@ export type ProductDetails = {
   sku: string | null;
   barcode: string | null;
   unitId: string;
+  defaultSupplierId?: string | null;
   isService: boolean;
   allowsInstallments: boolean;
 };
@@ -19,6 +20,7 @@ export type ProductDetailsInput = {
   sku: string;
   barcode: string;
   unitId: string;
+  defaultSupplierId?: string | null | undefined;
   isService: boolean;
   allowsInstallments: boolean;
 };
@@ -50,6 +52,7 @@ export function parseProductDetails(
     sku,
     barcode,
     unitId: input.unitId,
+    defaultSupplierId: input.defaultSupplierId?.trim() || null,
     isService: input.isService,
     allowsInstallments: input.allowsInstallments,
   });

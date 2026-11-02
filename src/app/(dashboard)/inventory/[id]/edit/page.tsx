@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { z } from 'zod';
 import { getProduct } from '@/infrastructure/db/queries/catalog';
 import { DrizzleProductRepository } from '@/infrastructure/db/repositories/drizzle-product-repository';
+import { DrizzlePurchaseRepository } from '@/infrastructure/db/repositories/drizzle-purchase-repository';
 import { updateProductAction } from '@/presentation/actions/catalog';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { ProductForm } from '@/presentation/components/catalog/product-form';
@@ -14,9 +15,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const user = await requireStoreUser(`/inventory/${id}/edit`, 'catalog.manage');
   if (!z.uuid().safeParse(id).success) notFound();
-  const [product, units] = await Promise.all([
+  const [product, units, suppliers] = await Promise.all([
     getProduct(user.storeId, id),
     new DrizzleProductRepository().units(user.storeId),
+    new DrizzlePurchaseRepository().suppliers(user.storeId),
   ]);
   if (!product) notFound();
   const t = await getTranslations('Inventory');
@@ -41,6 +43,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           mode="edit"
           action={updateProductAction.bind(null, id)}
           units={units}
+          suppliers={suppliers}
           cancelHref={`/inventory/${id}`}
           initial={{
             name: product.name,
@@ -49,6 +52,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             sku: product.sku ?? '',
             barcode: product.barcode ?? '',
             unitId: product.unitId,
+            defaultSupplierId: product.defaultSupplierId ?? '',
             isService: product.isService,
             allowsInstallments: product.allowsInstallments,
             cashPrice: product.cashPrice,

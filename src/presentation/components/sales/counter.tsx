@@ -41,6 +41,10 @@ import {
   type CreditSaleActionError,
   type SaleActionError,
 } from '@/presentation/actions/sales';
+import {
+  ProductStatusBadge,
+  productStatus,
+} from '@/presentation/components/catalog/product-status-badge';
 import { formatMoney, Money } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
@@ -717,6 +721,7 @@ export function Counter({
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
             {visible.map((item) => {
               const out = !item.isService && Quantity.isZero(item.currentStock);
+              const status = productStatus(item);
               const quantity = inCart(item.id);
               return (
                 <li key={item.id}>
@@ -754,7 +759,7 @@ export function Counter({
                         currency="PEN"
                         className="text-base font-semibold whitespace-nowrap text-ink"
                       />
-                      <span className="text-[13px] text-ink-soft tabular-nums">
+                      <span className="flex flex-wrap items-center gap-1.5 text-[13px] text-ink-soft tabular-nums">
                         {item.isService
                           ? t('service')
                           : out
@@ -763,6 +768,7 @@ export function Counter({
                                 quantity: formatQuantity(item.currentStock),
                                 unit: item.unitCode,
                               })}
+                        {status === 'lowStock' ? <ProductStatusBadge status="lowStock" /> : null}
                       </span>
                     </span>
                     {quantity ? (

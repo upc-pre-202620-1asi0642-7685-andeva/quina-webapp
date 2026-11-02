@@ -8,6 +8,7 @@ import { RatePercent } from '@/core/domain/credit/rate-percent';
 import type { RateInput } from '@/core/domain/finance/rate';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import type { Currency } from '@/core/domain/shared/money';
+import { listAccountTermsHistory } from '@/infrastructure/db/queries/audit';
 import { getCustomer } from '@/infrastructure/db/queries/customers';
 import { DrizzleCreditAccountRepository } from '@/infrastructure/db/repositories/drizzle-credit-account-repository';
 import { saveCreditTermsAction } from '@/presentation/actions/customers';
@@ -19,6 +20,7 @@ import {
   type TermsFormValues,
 } from '@/presentation/components/customers/terms-form';
 import { Notice } from '@/presentation/components/notice';
+import { formatDate } from '@/presentation/lib/format-date';
 
 // Ejemplo de la historia US06: corte el 20, pago el 26 y hasta 3 cuotas
 const DEFAULTS: TermsFormValues = {
@@ -57,7 +59,12 @@ export default async function CustomerTermsPage({
   const t = await getTranslations('Customers');
   const { new: isNew, notice } = await searchParams;
 
-  const caps = await new DrizzleCreditAccountRepository().rateCaps();
+  const [caps, termsHistory] = await Promise.all([
+    new DrizzleCreditAccountRepository().rateCaps(),
+    customer.accountId
+      ? listAccountTermsHistory(user.storeId, customer.accountId)
+      : Promise.resolve([]),
+  ]);
   const today = BusinessDate.fromInstant(new Date());
   const capPercent = (kind: RateKind, currency: Currency) => {
     const cap = RateCaps.inForce(caps, kind, currency, today);
@@ -123,6 +130,44 @@ export default async function CustomerTermsPage({
           {...(isNew && !customer.terms ? { cashOnlyHref: back } : {})}
         />
       </section>
+
+      {termsHistory.length > 0 ? (
+        <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:p-6">
+          <h2 className="text-lg font-semibold text-ink">{t('terms.historyTitle')}</h2>
+          <ol className="flex flex-col divide-y divide-line">
+            {termsHistory.map((item) => (
+              <li key={item.id} className="flex flex-col gap-1.5 py-3 text-sm first:pt-0 last:pb-0">
+                <p className="text-xs text-ink-soft">
+                  {formatDate(item.createdAt)} · {item.userName ?? '—'}
+                </p>
+                {item.oldData ? (
+                  <p className="text-xs text-ink-soft tabular-nums">
+                    {t('terms.historyBefore')}: {summarizeTerms(item.oldData)}
+                  </p>
+                ) : null}
+                {item.newData ? (
+                  <p className="text-sm text-ink tabular-nums">
+                    {t('terms.historyAfter')}: {summarizeTerms(item.newData)}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
     </div>
   );
+}
+
+function summarizeTerms(data: Record<string, unknown>): string {
+  const limit = data.creditLimit
+    ? `${String(data.currency ?? 'PEN')} ${String(data.creditLimit)}`
+    : '';
+  const comp = data.compensatory as { type?: string; value?: string; period?: string } | undefined;
+  const mor = data.moratory as { type?: string; value?: string; period?: string } | undefined;
+  const compText = comp?.value
+    ? `Comp: ${RatePercent.fromFraction(comp.value)}% (${comp.type})`
+    : '';
+  const morText = mor?.value ? `Mora: ${RatePercent.fromFraction(mor.value)}% (${mor.type})` : '';
+  return [limit, compText, morText].filter(Boolean).join(' · ');
 }

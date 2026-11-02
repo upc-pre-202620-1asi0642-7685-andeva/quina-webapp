@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { countLowStockProducts } from '@/infrastructure/db/queries/catalog';
 import { getSessionUser, nextRouteFor } from '@/presentation/auth/session';
 import { AppToaster } from '@/presentation/components/feedback/app-toaster';
 import { AppShell } from '@/presentation/components/shell/app-shell';
@@ -17,14 +18,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login');
   }
 
-  const store = await loadStoreContext(user.storeId);
+  const [store, lowStockCount] = await Promise.all([
+    loadStoreContext(user.storeId),
+    countLowStockProducts(user.storeId),
+  ]);
   const trialEndsAt =
     store.subscription.status === 'TRIALING' && store.tier !== 'CASERO'
       ? store.subscription.trialEndsAt
       : null;
 
   return (
-    <AppShell user={{ name: user.name, role: user.role }} store={{ name: store.name, trialEndsAt }}>
+    <AppShell
+      user={{ name: user.name, role: user.role }}
+      store={{ name: store.name, trialEndsAt, lowStockCount }}
+    >
       {children}
       <AppToaster />
     </AppShell>

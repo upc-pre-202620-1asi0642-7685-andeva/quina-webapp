@@ -224,7 +224,11 @@ export function createAuth(deps: AuthDeps) {
           assertStrongPassword(body.newPassword);
         }
         if (ctx.path === '/sign-in/email' && typeof body.email === 'string') {
-          const gate = await lockout.gate(body.email);
+          const headers = requestHeaders(ctx);
+          const gate = await lockout.gate(body.email, {
+            ipAddress: headers ? getIP(headers, ctx.context.options) : null,
+            userAgent: headers?.get('user-agent') ?? null,
+          });
           if (gate === 'ACCOUNT_LOCKED') {
             throw new APIError('FORBIDDEN', { code: 'ACCOUNT_LOCKED', message: LOCKED_MESSAGE });
           }

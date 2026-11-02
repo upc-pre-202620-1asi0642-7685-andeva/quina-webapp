@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { PackageIcon, ShoppingBasketIcon, UserPlusIcon } from 'lucide-react';
+import {
+  AlertTriangleIcon,
+  PackageIcon,
+  ShieldCheckIcon,
+  ShoppingBasketIcon,
+  UserPlusIcon,
+} from 'lucide-react';
 import { can } from '@/core/domain/identity/permissions';
+import { countLowStockProducts } from '@/infrastructure/db/queries/catalog';
 import { loadTodayCashBox } from '@/infrastructure/db/queries/sales';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { Money } from '@/presentation/components/money';
@@ -14,7 +21,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export default async function DashboardHomePage() {
   const user = await requireStoreUser('/');
   const t = await getTranslations('Dashboard');
-  const store = await loadStoreContext(user.storeId);
+  const [store, lowStockCount] = await Promise.all([
+    loadStoreContext(user.storeId),
+    countLowStockProducts(user.storeId),
+  ]);
   // US24: la prueba Pro se ve desde el primer día, también en el celular
   const trialEndsAt =
     store.subscription.status === 'TRIALING' && store.tier !== 'CASERO'
@@ -43,6 +53,17 @@ export default async function DashboardHomePage() {
             </span>
           </div>
         ) : null}
+        {lowStockCount > 0 ? (
+          <div>
+            <Link
+              href="/inventory?filter=low"
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber/12 px-3 py-1 text-xs font-medium text-amber-ink hover:opacity-90"
+            >
+              <AlertTriangleIcon aria-hidden="true" className="size-3.5" />
+              {t('lowStockBanner', { count: lowStockCount })}
+            </Link>
+          </div>
+        ) : null}
         <h1 className="text-2xl font-semibold tracking-tight text-ink">{store.name}</h1>
         <p className="text-base text-ink">{t('welcome', { name: user.name })}</p>
         <p className="text-sm text-ink-soft">{t('subtitle')}</p>
@@ -64,6 +85,12 @@ export default async function DashboardHomePage() {
             <Link href="/inventory" className={buttonVariants({ variant: 'secondary' })}>
               <PackageIcon aria-hidden="true" />
               {t('inventoryLink')}
+            </Link>
+          ) : null}
+          {can(user.role, 'settings.billing') ? (
+            <Link href="/audit" className={buttonVariants({ variant: 'secondary' })}>
+              <ShieldCheckIcon aria-hidden="true" />
+              {t('auditLink')}
             </Link>
           ) : null}
         </div>

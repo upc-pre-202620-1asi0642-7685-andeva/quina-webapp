@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type {
   AdjustStockError,
   CreateProductError,
+  RecordWasteError,
   UpdateProductError,
 } from '@/core/application/catalog/manage-catalog';
 
@@ -17,6 +18,7 @@ export const productFormSchema = z.object({
   sku: z.string().max(80),
   barcode: z.string().max(80),
   unitId: z.string().max(40),
+  defaultSupplierId: z.string().max(40),
   isService: checkbox,
   allowsInstallments: checkbox,
   cashPrice: z.string().max(20),
@@ -38,6 +40,7 @@ export function readProductForm(formData: FormData) {
     sku: text('sku'),
     barcode: text('barcode'),
     unitId: text('unitId'),
+    defaultSupplierId: text('defaultSupplierId'),
     isService: formData.get('isService'),
     allowsInstallments: formData.get('allowsInstallments'),
     cashPrice: text('cashPrice'),
@@ -55,6 +58,7 @@ export type ProductField =
   | 'sku'
   | 'barcode'
   | 'unitId'
+  | 'defaultSupplierId'
   | 'cashPrice'
   | 'creditPrice'
   | 'minimumStock'
@@ -93,6 +97,8 @@ export function productError(
     case 'UNIT_REQUIRED':
     case 'UNIT_NOT_FOUND':
       return ['unitId', 'unitRequired'];
+    case 'SUPPLIER_NOT_FOUND':
+      return ['defaultSupplierId', 'generic'];
     case 'CASH_PRICE_INVALID':
       return ['cashPrice', 'priceInvalid'];
     case 'CREDIT_PRICE_INVALID':
@@ -120,5 +126,16 @@ export function adjustError(code: AdjustStockError): [AdjustField, string] {
   }
   if (code === 'REASON_REQUIRED') return ['reason', 'reasonRequired'];
   if (code === 'NO_CHANGE') return ['countedStock', 'noChange'];
+  return ['form', 'notFound'];
+}
+
+export type WasteField = 'quantity' | 'reason' | 'form';
+
+export function wasteError(code: RecordWasteError): [WasteField, string] {
+  if (code.startsWith('WASTE_')) {
+    return ['quantity', QUANTITY_KEYS[code.slice(6) as keyof typeof QUANTITY_KEYS]];
+  }
+  if (code === 'REASON_REQUIRED') return ['reason', 'reasonRequired'];
+  if (code === 'INSUFFICIENT_STOCK') return ['quantity', 'insufficientStock'];
   return ['form', 'notFound'];
 }
