@@ -54,6 +54,7 @@ export type ProductFormError =
   | ProductImageError
   | `${StockField}_${QuantityError}`
   | 'UNIT_NOT_FOUND'
+  | 'SUPPLIER_NOT_FOUND'
   | 'BARCODE_TAKEN';
 
 export type CreateProductError = ProductFormError | 'PLAN_LIMIT_REACHED';
@@ -248,6 +249,42 @@ export class AdjustStockUseCase {
       actorId: command.actorId,
       productId: command.productId,
       countedStock: counted.value,
+      reason: reason.slice(0, 300),
+      now: command.now,
+    });
+    return result === 'OK' ? ok(undefined) : err(result);
+  }
+}
+
+export type RecordWasteError =
+  `WASTE_${QuantityError}` | 'REASON_REQUIRED' | 'NOT_FOUND' | 'IS_SERVICE' | 'INSUFFICIENT_STOCK';
+
+export class RecordWasteUseCase {
+  constructor(private readonly products: ProductRepository) {}
+
+  /** Merma por producto dañado o vencido con motivo obligatorio (US16 crit. 4). */
+  async execute(command: {
+    storeId: string;
+    actorId: string;
+    productId: string;
+    allowDecimals: boolean;
+    quantity: string;
+    reason: string;
+    now: Date;
+  }): Promise<Result<void, RecordWasteError>> {
+    const parsed = Quantity.parse(command.quantity, {
+      allowDecimals: command.allowDecimals,
+      allowZero: false,
+    });
+    if (!parsed.ok) return err(`WASTE_${parsed.error}` as const);
+    const reason = command.reason.trim().replace(/\s+/g, ' ');
+    if (reason.length < 3) return err('REASON_REQUIRED');
+    if (!this.products.recordWaste) return err('NOT_FOUND');
+    const result = await this.products.recordWaste({
+      storeId: command.storeId,
+      actorId: command.actorId,
+      productId: command.productId,
+      quantity: parsed.value,
       reason: reason.slice(0, 300),
       now: command.now,
     });

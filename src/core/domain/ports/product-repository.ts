@@ -40,7 +40,14 @@ export type UpdateProductData = {
 
 export type UpdateProductResult =
   | { status: 'OK'; previousImageUrl: string | null }
-  | { status: 'NOT_FOUND' | 'BARCODE_TAKEN' | 'UNIT_NOT_FOUND' | 'SERVICE_HAS_STOCK' };
+  | {
+      status:
+        | 'NOT_FOUND'
+        | 'BARCODE_TAKEN'
+        | 'UNIT_NOT_FOUND'
+        | 'SUPPLIER_NOT_FOUND'
+        | 'SERVICE_HAS_STOCK';
+    };
 
 export type SetProductActiveData = {
   storeId: string;
@@ -61,15 +68,35 @@ export type AdjustStockData = {
   now: Date;
 };
 
+export type RecordWasteData = {
+  storeId: string;
+  actorId: string;
+  productId: string;
+  /** Cantidad dañada o vencida (positiva); sale del kardex como `-quantity`. */
+  quantity: string;
+  reason: string;
+  now: Date;
+};
+
 export interface ProductRepository {
   units(storeId: string): Promise<Unit[]>;
   /** Inserta producto, stock inicial en el kardex y auditoría en una transacción. */
   create(
     data: CreateProductData,
-  ): Promise<{ productId: string } | 'PLAN_LIMIT_REACHED' | 'BARCODE_TAKEN' | 'UNIT_NOT_FOUND'>;
+  ): Promise<
+    | { productId: string }
+    | 'PLAN_LIMIT_REACHED'
+    | 'BARCODE_TAKEN'
+    | 'UNIT_NOT_FOUND'
+    | 'SUPPLIER_NOT_FOUND'
+  >;
   /** Cambia la ficha; si cambian los precios guarda el historial en la misma transacción. */
   update(data: UpdateProductData): Promise<UpdateProductResult>;
   setActive(data: SetProductActiveData): Promise<'OK' | 'NOT_FOUND' | 'PLAN_LIMIT_REACHED'>;
   /** Conteo físico (`COUNT_ADJUSTMENT`) hasta que lleguen las compras (D1). */
   adjustStock(data: AdjustStockData): Promise<'OK' | 'NOT_FOUND' | 'IS_SERVICE' | 'NO_CHANGE'>;
+  /** Merma (`WASTE_LOSS`, US16 crit. 4): descuenta stock sin alterar el costo promedio. */
+  recordWaste?(
+    data: RecordWasteData,
+  ): Promise<'OK' | 'NOT_FOUND' | 'IS_SERVICE' | 'INSUFFICIENT_STOCK'>;
 }

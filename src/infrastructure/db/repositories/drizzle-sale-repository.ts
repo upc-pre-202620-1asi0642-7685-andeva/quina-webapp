@@ -14,6 +14,7 @@ import type { PricedSale, SaleProduct } from '@/core/domain/sales/sale-pricing';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { err, ok, type Result } from '@/core/domain/shared/result';
 import {
+  auditLogs,
   creditAccounts,
   creditCharges,
   creditInstallments,
@@ -196,6 +197,21 @@ export class DrizzleSaleRepository implements SaleRepository {
         priced,
         now: data.now,
       });
+      await tx.insert(auditLogs).values({
+        storeId: data.storeId,
+        userId: data.cashierId,
+        action: 'CREATE_CASH_SALE',
+        entityName: 'sales',
+        entityId: saleId,
+        newData: {
+          saleModality: 'CASH',
+          paymentMethod: payment.method,
+          totalAmount: priced.total.toFixed2(),
+          customerId: data.customerId,
+          itemsCount: priced.lines.length,
+        },
+        createdAt: data.now,
+      });
       return ok({
         saleId,
         total: priced.total.toFixed2(),
@@ -331,6 +347,24 @@ export class DrizzleSaleRepository implements SaleRepository {
         .update(creditAccounts)
         .set({ currentBalance: balanceAfter.toFixed2(), updatedAt: data.now })
         .where(eq(creditAccounts.id, account.id));
+
+      await tx.insert(auditLogs).values({
+        storeId: data.storeId,
+        userId: data.cashierId,
+        action: 'CREATE_CREDIT_SALE',
+        entityName: 'sales',
+        entityId: saleId,
+        newData: {
+          saleModality: installments ? 'INSTALLMENTS_CREDIT' : 'SINGLE_PAYMENT_CREDIT',
+          totalAmount: priced.total.toFixed2(),
+          customerId: data.customerId,
+          creditAccountId: account.id,
+          chargeId: charge!.id,
+          installmentsCount: installments?.rows.length ?? null,
+          balanceAfter: balanceAfter.toFixed2(),
+        },
+        createdAt: data.now,
+      });
 
       return ok({
         saleId,

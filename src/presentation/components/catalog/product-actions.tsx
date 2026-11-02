@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { useActionState, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ArchiveIcon, ArchiveRestoreIcon, ClipboardListIcon } from 'lucide-react';
+import { ArchiveIcon, ArchiveRestoreIcon, ClipboardListIcon, PackageMinusIcon } from 'lucide-react';
 import {
   adjustStockAction,
+  recordWasteAction,
   setProductActiveAction,
   type AdjustStockState,
+  type RecordWasteState,
 } from '@/presentation/actions/catalog';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { Notice } from '@/presentation/components/notice';
@@ -42,6 +44,7 @@ export function ProductActions({
   const router = useRouter();
   const [confirm, setConfirm] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
+  const [recordingWaste, setRecordingWaste] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, startTransition] = useTransition();
 
@@ -70,10 +73,16 @@ export function ProductActions({
 
       <div className="flex flex-wrap gap-2">
         {!isService && isActive ? (
-          <Button variant="secondary" onClick={() => setAdjusting(true)} disabled={busy}>
-            <ClipboardListIcon aria-hidden="true" />
-            {t('adjustTitle')}
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => setAdjusting(true)} disabled={busy}>
+              <ClipboardListIcon aria-hidden="true" />
+              {t('adjustTitle')}
+            </Button>
+            <Button variant="secondary" onClick={() => setRecordingWaste(true)} disabled={busy}>
+              <PackageMinusIcon aria-hidden="true" />
+              {t('wasteTitle')}
+            </Button>
+          </>
         ) : null}
         {isActive ? (
           <Button variant="ghost" onClick={() => setConfirm(true)} disabled={busy}>
@@ -115,6 +124,21 @@ export function ProductActions({
               unitCode={unitCode}
               allowDecimals={allowDecimals}
               onCancel={() => setAdjusting(false)}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={recordingWaste} onOpenChange={setRecordingWaste}>
+        <DialogContent className="rounded-card border-line bg-surface">
+          <DialogTitle className="text-lg text-ink">{t('wasteTitle')}</DialogTitle>
+          <DialogDescription className="text-sm text-ink-soft">{t('wasteBody')}</DialogDescription>
+          {recordingWaste ? (
+            <RecordWasteForm
+              productId={productId}
+              unitCode={unitCode}
+              allowDecimals={allowDecimals}
+              onCancel={() => setRecordingWaste(false)}
             />
           ) : null}
         </DialogContent>
@@ -184,6 +208,73 @@ function AdjustStockForm({
         </Button>
         <Button type="submit" disabled={pending}>
           {pending ? t('adjusting') : t('adjustSubmit')}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+function RecordWasteForm({
+  productId,
+  unitCode,
+  allowDecimals,
+  onCancel,
+}: {
+  productId: string;
+  unitCode: string;
+  allowDecimals: boolean;
+  onCancel: () => void;
+}) {
+  const t = useTranslations('Inventory.detail');
+  const [state, formAction, pending] = useActionState<RecordWasteState, FormData>(
+    recordWasteAction.bind(null, productId),
+    {},
+  );
+  const error = (field: 'quantity' | 'reason') =>
+    state.errors?.[field] ? t(`errors.${state.errors[field]}`) : undefined;
+
+  return (
+    <form action={formAction} className="flex flex-col gap-4">
+      {state.errors?.form ? <Notice tone="error">{t(`errors.${state.errors.form}`)}</Notice> : null}
+      <FormField
+        id="waste-quantity"
+        label={t('wasteQuantityLabel')}
+        hint={t('wasteQuantityHint')}
+        error={error('quantity')}
+      >
+        {(props) => (
+          <div className="relative">
+            <Input
+              {...props}
+              name="quantity"
+              inputMode={allowDecimals ? 'decimal' : 'numeric'}
+              autoComplete="off"
+              required
+              className="pr-14 tabular-nums"
+            />
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-sm text-ink-soft"
+            >
+              {unitCode}
+            </span>
+          </div>
+        )}
+      </FormField>
+      <FormField
+        id="waste-reason"
+        label={t('wasteReasonLabel')}
+        hint={t('wasteReasonHint')}
+        error={error('reason')}
+      >
+        {(props) => <Input {...props} name="reason" autoComplete="off" required />}
+      </FormField>
+      <DialogFooter>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={pending}>
+          {t('cancel')}
+        </Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? t('wasteSubmitting') : t('wasteSubmit')}
         </Button>
       </DialogFooter>
     </form>

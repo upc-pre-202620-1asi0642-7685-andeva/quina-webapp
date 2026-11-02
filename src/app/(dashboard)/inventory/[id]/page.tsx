@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { ArrowLeftIcon, PackageIcon, PencilIcon } from 'lucide-react';
+import { ArrowLeftIcon, LockIcon, PackageIcon, PencilIcon } from 'lucide-react';
 import { z } from 'zod';
+import { PlanLimits } from '@/core/domain/billing/plan-limits';
+import { Quantity } from '@/core/domain/catalog/quantity';
 import { can } from '@/core/domain/identity/permissions';
 import { getProduct } from '@/infrastructure/db/queries/catalog';
 import { requireStoreUser } from '@/presentation/auth/guards';
@@ -16,8 +18,9 @@ import { Notice } from '@/presentation/components/notice';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
 import { formatQuantity } from '@/presentation/lib/format-quantity';
+import { loadStoreContext } from '@/presentation/queries/store-context';
 
-const NOTICES = ['created', 'saved', 'stockAdjusted'] as const;
+const NOTICES = ['created', 'saved', 'stockAdjusted', 'wasteRecorded'] as const;
 
 export default async function ProductPage({
   params,
@@ -29,14 +32,23 @@ export default async function ProductPage({
   const { id } = await params;
   const user = await requireStoreUser(`/inventory/${id}`, 'stock.read');
   if (!z.uuid().safeParse(id).success) notFound();
-  const product = await getProduct(user.storeId, id);
+  const [product, store] = await Promise.all([
+    getProduct(user.storeId, id),
+    loadStoreContext(user.storeId),
+  ]);
   if (!product) notFound();
 
   const t = await getTranslations('Inventory.detail');
+  const tPlans = await getTranslations('Plans');
   const { notice } = await searchParams;
   const shownNotice = NOTICES.find((n) => n === notice);
   const canManage = can(user.role, 'catalog.manage');
+  const hasKardexCost = PlanLimits.of(store.tier).features.kardexAverageCost;
   const quantity = (value: string) => `${formatQuantity(value)} ${product.unitCode}`;
+  const signedQuantity = (value: string) => {
+    const sign = value.startsWith('-') ? '' : '+';
+    return `${sign}${formatQuantity(value)} ${product.unitCode}`;
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -99,13 +111,41 @@ export default async function ProductPage({
         {product.isService ? (
           <p className="text-sm text-ink-soft">{t('serviceNoStock')}</p>
         ) : (
-          <dl className="grid grid-cols-2 gap-3">
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Figure label={t('currentStock')}>
               <span className="tabular-nums">{quantity(product.currentStock)}</span>
             </Figure>
             <Figure label={t('minimumStock')}>
               <span className="tabular-nums">{quantity(product.minimumStock)}</span>
             </Figure>
+            {canManage ? (
+              hasKardexCost ? (
+                <>
+                  <Figure label={t('averageCost')}>
+                    <span className="tabular-nums">S/ {product.currentAverageCost}</span>
+                  </Figure>
+                  <Figure label={t('stockValue')}>
+                    <Money
+                      amount={Quantity.valuedAt(product.currentStock, product.currentAverageCost)}
+                      currency="PEN"
+                    />
+                  </Figure>
+                </>
+              ) : (
+                <div className="col-span-2 flex items-center justify-between gap-3 rounded-field bg-paper-deep p-3 text-sm text-ink-soft">
+                  <span className="flex items-center gap-2">
+                    <LockIcon aria-hidden="true" className="size-4 shrink-0" />
+                    {tPlans('features.kardexAverageCost')}
+                  </span>
+                  <Link
+                    href="/settings#plans"
+                    className="font-semibold text-link-active underline underline-offset-4"
+                  >
+                    {tPlans('seePlans')}
+                  </Link>
+                </div>
+              )
+            ) : null}
           </dl>
         )}
 
@@ -128,6 +168,9 @@ export default async function ProductPage({
           <Row label={t('unit')} value={`${product.unitCode} · ${product.unitName}`} />
           <Row label={t('barcode')} value={product.barcode ?? t('none')} />
           <Row label={t('sku')} value={product.sku ?? t('none')} />
+          {!product.isService ? (
+            <Row label={t('defaultSupplier')} value={product.defaultSupplierName ?? t('none')} />
+          ) : null}
           <Row
             label={t('installments')}
             value={product.allowsInstallments ? t('installmentsYes') : t('installmentsNo')}
@@ -140,6 +183,45 @@ export default async function ProductPage({
           ) : null}
         </dl>
       </section>
+
+      {!product.isService && canManage ? (
+        <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg font-semibold text-ink">{t('kardexTitle')}</h2>
+            <p className="text-[13px] text-ink-soft">{t('kardexSubtitle')}</p>
+          </div>
+          {product.movements.length === 0 ? (
+            <p className="text-sm text-ink-soft">{t('kardexEmpty')}</p>
+          ) : (
+            <ol className="flex flex-col divide-y divide-line">
+              {product.movements.map((mov) => (
+                <li key={mov.id} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className="text-sm font-medium text-ink">
+                      {t(`movementTypes.${mov.movementType}`)}
+                    </span>
+                    <span className="text-sm font-semibold text-ink tabular-nums">
+                      {signedQuantity(mov.quantity)}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-ink-soft">
+                    <span>
+                      {formatDate(mov.createdAt)} · {mov.userName}
+                    </span>
+                    <span className="tabular-nums">
+                      {t('kardexStockAfter', { stock: quantity(mov.stockAfter) })}
+                      {hasKardexCost
+                        ? ` · ${t('kardexAvgAfter', { cost: `S/ ${mov.averageCostAfter}` })}`
+                        : ''}
+                    </span>
+                  </div>
+                  {mov.notes ? <p className="text-sm text-ink-soft">{mov.notes}</p> : null}
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+      ) : null}
 
       <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-ink">{t('historyTitle')}</h2>
