@@ -19,6 +19,7 @@ import { BusinessDate } from '@/core/domain/shared/business-date';
 import { Money, type Currency } from '@/core/domain/shared/money';
 import { err, ok, type Result } from '@/core/domain/shared/result';
 import {
+  auditLogs,
   creditAccounts,
   creditCharges,
   creditInstallments,
@@ -265,6 +266,26 @@ export class DrizzlePaymentRepository implements PaymentRepository {
               createdAt: input.now,
             })
           : null;
+
+        await tx.insert(auditLogs).values({
+          storeId: input.storeId,
+          userId: input.collectorId,
+          action: 'REGISTER_PAYMENT',
+          entityName: 'debt_payments',
+          entityId: paymentId,
+          newData: {
+            receiptNumber,
+            customerId: input.customerId,
+            settlementCycleId: row.id,
+            paymentMethod: input.method,
+            amountPaid: a.amountPaid.toFixed2(),
+            principalPaid: a.principalPaid.toFixed2(),
+            compensatoryInterestPaid: a.compensatoryInterestPaid.toFixed2(),
+            moratoryInterestPaid: a.moratoryInterestPaid.toFixed2(),
+            daysLate: quote.value.daysLate,
+          },
+          createdAt: input.now,
+        });
 
         return ok({
           paymentId,

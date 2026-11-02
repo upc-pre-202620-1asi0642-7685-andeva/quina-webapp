@@ -8,6 +8,7 @@ import { IMAGE_TYPES, MAX_IMAGE_BYTES } from '@/core/domain/catalog/product-imag
 import { ProductPrices } from '@/core/domain/catalog/product-prices';
 import { Quantity } from '@/core/domain/catalog/quantity';
 import type { Unit } from '@/core/domain/ports/product-repository';
+import type { SupplierOption } from '@/core/domain/ports/purchase-repository';
 import type { ProductFormState } from '@/presentation/actions/catalog';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { NativeSelect } from '@/presentation/components/forms/native-select';
@@ -25,6 +26,7 @@ export type ProductFormValues = {
   sku: string;
   barcode: string;
   unitId: string;
+  defaultSupplierId?: string;
   isService: boolean;
   allowsInstallments: boolean;
   cashPrice: string;
@@ -40,12 +42,14 @@ export function ProductForm({
   mode,
   action,
   units,
+  suppliers = [],
   initial,
   cancelHref,
 }: {
   mode: 'new' | 'edit';
   action: Action;
   units: Unit[];
+  suppliers?: SupplierOption[];
   initial: ProductFormValues;
   cancelHref: string;
 }) {
@@ -268,6 +272,32 @@ export function ProductForm({
               />
             )}
           </FormField>
+          {!values.isService ? (
+            <div className="sm:col-span-2">
+              <FormField
+                id="product-supplier"
+                label={t('defaultSupplierLabel')}
+                hint={t('defaultSupplierHint')}
+                error={error('defaultSupplierId')}
+              >
+                {(props) => (
+                  <NativeSelect
+                    {...props}
+                    name="defaultSupplierId"
+                    value={values.defaultSupplierId ?? ''}
+                    onChange={(e) => set('defaultSupplierId', e.target.value)}
+                  >
+                    <option value="">{t('defaultSupplierNone')}</option>
+                    {suppliers.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.tradeName} · {s.taxIdNumber}
+                      </option>
+                    ))}
+                  </NativeSelect>
+                )}
+              </FormField>
+            </div>
+          ) : null}
           <div className="sm:col-span-2">
             <FormField
               id="product-description"

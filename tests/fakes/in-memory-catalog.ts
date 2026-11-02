@@ -7,6 +7,7 @@ import type {
   CreateProductData,
   PriceColumns,
   ProductRepository,
+  RecordWasteData,
   SetProductActiveData,
   Unit,
   UpdateProductData,
@@ -116,6 +117,19 @@ export class InMemoryCatalog implements ProductRepository {
     if (Quantity.isZero(difference)) return 'NO_CHANGE';
     this.movements.push({ productId: data.productId, quantity: difference, notes: data.reason });
     product.stock = data.countedStock;
+    return 'OK';
+  }
+
+  async recordWaste(
+    data: RecordWasteData,
+  ): Promise<'OK' | 'NOT_FOUND' | 'IS_SERVICE' | 'INSUFFICIENT_STOCK'> {
+    const product = this.productOf(data.storeId, data.productId);
+    if (!product) return 'NOT_FOUND';
+    if (product.details.isService) return 'IS_SERVICE';
+    if (Quantity.compare(data.quantity, product.stock) > 0) return 'INSUFFICIENT_STOCK';
+    const exit = Quantity.minus('0', data.quantity);
+    this.movements.push({ productId: data.productId, quantity: exit, notes: data.reason });
+    product.stock = Quantity.minus(product.stock, data.quantity);
     return 'OK';
   }
 

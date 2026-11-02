@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { ArrowLeftIcon } from 'lucide-react';
 import { DrizzleProductRepository } from '@/infrastructure/db/repositories/drizzle-product-repository';
+import { DrizzlePurchaseRepository } from '@/infrastructure/db/repositories/drizzle-purchase-repository';
 import { createProductAction } from '@/presentation/actions/catalog';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { ProductForm } from '@/presentation/components/catalog/product-form';
@@ -9,7 +10,10 @@ import { ProductForm } from '@/presentation/components/catalog/product-form';
 export default async function NewProductPage() {
   const user = await requireStoreUser('/inventory/new', 'catalog.manage');
   const t = await getTranslations('Inventory');
-  const units = await new DrizzleProductRepository().units(user.storeId);
+  const [units, suppliers] = await Promise.all([
+    new DrizzleProductRepository().units(user.storeId),
+    new DrizzlePurchaseRepository().suppliers(user.storeId),
+  ]);
   const defaultUnit = units.find((u) => u.code === 'UND') ?? units[0];
 
   return (
@@ -30,6 +34,7 @@ export default async function NewProductPage() {
           mode="new"
           action={createProductAction}
           units={units}
+          suppliers={suppliers}
           cancelHref="/inventory"
           initial={{
             name: '',
@@ -38,6 +43,7 @@ export default async function NewProductPage() {
             sku: '',
             barcode: '',
             unitId: defaultUnit?.id ?? '',
+            defaultSupplierId: '',
             isService: false,
             allowsInstallments: false,
             cashPrice: '',

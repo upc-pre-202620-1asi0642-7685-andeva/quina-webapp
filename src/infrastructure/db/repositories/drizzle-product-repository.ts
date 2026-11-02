@@ -7,6 +7,7 @@ import type {
   AdjustStockData,
   CreateProductData,
   ProductRepository,
+  RecordWasteData,
   SetProductActiveData,
   Unit,
   UpdateProductData,
@@ -19,6 +20,7 @@ import {
   productPriceHistory,
   products,
   storeSubscriptions,
+  suppliers,
   units,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
@@ -33,6 +35,7 @@ function detailColumns(details: ProductDetails) {
     sku: details.sku,
     barcode: details.barcode,
     unitId: details.unitId,
+    defaultSupplierId: details.defaultSupplierId ?? null,
     isService: details.isService,
     allowsInstallments: details.allowsInstallments,
   };
@@ -73,6 +76,15 @@ async function unitExists(tx: Tx, storeId: string, unitId: string) {
   return Boolean(unit);
 }
 
+async function supplierExists(tx: Tx, storeId: string, supplierId: string | null | undefined) {
+  if (!supplierId) return true;
+  const [supplier] = await tx
+    .select({ id: suppliers.id })
+    .from(suppliers)
+    .where(and(eq(suppliers.id, supplierId), eq(suppliers.storeId, storeId)));
+  return Boolean(supplier);
+}
+
 export class DrizzleProductRepository implements ProductRepository {
   async units(storeId: string): Promise<Unit[]> {
     return withTenant(storeId, (tx) =>
@@ -91,11 +103,20 @@ export class DrizzleProductRepository implements ProductRepository {
 
   async create(
     data: CreateProductData,
-  ): Promise<{ productId: string } | 'PLAN_LIMIT_REACHED' | 'BARCODE_TAKEN' | 'UNIT_NOT_FOUND'> {
+  ): Promise<
+    | { productId: string }
+    | 'PLAN_LIMIT_REACHED'
+    | 'BARCODE_TAKEN'
+    | 'UNIT_NOT_FOUND'
+    | 'SUPPLIER_NOT_FOUND'
+  > {
     try {
       return await withTenant(data.storeId, async (tx) => {
         if (!(await unitExists(tx, data.storeId, data.details.unitId))) {
           return 'UNIT_NOT_FOUND' as const;
+        }
+        if (!(await supplierExists(tx, data.storeId, data.details.defaultSupplierId))) {
+          return 'SUPPLIER_NOT_FOUND' as const;
         }
         if (!(await hasRoomForProduct(tx, data.storeId, data.canAdd))) {
           return 'PLAN_LIMIT_REACHED' as const;
@@ -164,6 +185,9 @@ export class DrizzleProductRepository implements ProductRepository {
         if (!(await unitExists(tx, data.storeId, data.details.unitId))) {
           return { status: 'UNIT_NOT_FOUND' };
         }
+        if (!(await supplierExists(tx, data.storeId, data.details.defaultSupplierId))) {
+          return { status: 'SUPPLIER_NOT_FOUND' };
+        }
         if (data.details.isService && !Quantity.isZero(before.currentStock)) {
           return { status: 'SERVICE_HAS_STOCK' };
         }
@@ -210,6 +234,7 @@ export class DrizzleProductRepository implements ProductRepository {
               sku: before.sku,
               barcode: before.barcode,
               unitId: before.unitId,
+              defaultSupplierId: before.defaultSupplierId,
               isService: before.isService,
               allowsInstallments: before.allowsInstallments,
             }),
@@ -298,6 +323,63 @@ export class DrizzleProductRepository implements ProductRepository {
         entityId: data.productId,
         oldData: { currentStock: product.stock },
         newData: { currentStock: data.countedStock, reason: data.reason },
+      });
+      return 'OK' as const;
+    });
+  }
+
+  async recordWaste(
+    data: RecordWasteData,
+  ): Promise<'OK' | 'NOT_FOUND' | 'IS_SERVICE' | 'INSUFFICIENT_STOCK'> {
+    return withTenant(data.storeId, async (tx) => {
+      const [product] = await tx
+        .select({
+          isService: products.isService,
+          stock: products.currentStock,
+          averageCost: products.currentAverageCost,
+        })
+        .from(products)
+        .where(and(eq(products.id, data.productId), eq(products.storeId, data.storeId)))
+        .for('update');
+      if (!product) return 'NOT_FOUND' as const;
+      if (product.isService) return 'IS_SERVICE' as const;
+      if (Quantity.compare(data.quantity, product.stock) > 0) {
+        return 'INSUFFICIENT_STOCK' as const;
+      }
+
+      const stockAfter = Quantity.minus(product.stock, data.quantity);
+      const negativeQuantity = Quantity.minus('0', data.quantity);
+
+      await tx
+        .update(products)
+        .set({ currentStock: stockAfter, updatedAt: data.now })
+        .where(eq(products.id, data.productId));
+      await tx.insert(inventoryMovements).values({
+        storeId: data.storeId,
+        productId: data.productId,
+        movementType: 'WASTE_LOSS',
+        quantity: negativeQuantity,
+        unitCost: product.averageCost,
+        totalCost: Quantity.valuedAt(negativeQuantity, product.averageCost),
+        stockAfter,
+        // US16: la merma descuenta existencias sin alterar el costo promedio unitario
+        averageCostAfter: product.averageCost,
+        notes: data.reason,
+        userId: data.actorId,
+        createdAt: data.now,
+      });
+      await tx.insert(auditLogs).values({
+        storeId: data.storeId,
+        userId: data.actorId,
+        action: 'RECORD_WASTE',
+        entityName: 'products',
+        entityId: data.productId,
+        oldData: { currentStock: product.stock },
+        newData: {
+          currentStock: stockAfter,
+          wasteQuantity: data.quantity,
+          reason: data.reason,
+        },
       });
       return 'OK' as const;
     });

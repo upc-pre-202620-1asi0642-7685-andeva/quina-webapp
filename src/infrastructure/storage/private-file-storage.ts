@@ -1,14 +1,18 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { IMAGE_TYPES, MAX_IMAGE_BYTES, type ImageType } from '@/core/domain/catalog/product-image';
+import {
+  ATTACHMENT_MIME_TYPES,
+  MAX_ATTACHMENT_BYTES,
+  type AttachmentMimeType,
+} from '@/core/domain/catalog/purchase-attachment';
 import type { PrivateFileStorage } from '@/core/domain/ports/private-file-storage';
 
 export const STORE_FILES_BUCKET = 'store-files';
 
 /**
- * Bucket privado de Supabase Storage (Plan 5, P3). Solo el servidor sube y firma
- * URLs con la clave de servicio; el vecino nunca recibe la ruta del bucket.
+ * Bucket privado de Supabase Storage (Plan 5 P3 y Plan 6 US15). Solo el servidor
+ * sube y firma URLs con la clave de servicio; el vecino nunca recibe la ruta del bucket.
  */
 export class SupabasePrivateFileStorage implements PrivateFileStorage {
   private readonly client: SupabaseClient;
@@ -19,17 +23,16 @@ export class SupabasePrivateFileStorage implements PrivateFileStorage {
     });
   }
 
-  async upload(input: { path: string; contentType: ImageType; bytes: Uint8Array }) {
+  async upload(input: { path: string; contentType: AttachmentMimeType; bytes: Uint8Array }) {
     const bucket = this.client.storage.from(STORE_FILES_BUCKET);
     const send = () =>
       bucket.upload(input.path, input.bytes, { contentType: input.contentType, upsert: false });
     let { error } = await send();
     if (error && /bucket not found/i.test(error.message)) {
-      // Primer uso en un proyecto nuevo, como el bucket del catálogo
       await this.client.storage.createBucket(STORE_FILES_BUCKET, {
         public: false,
-        fileSizeLimit: MAX_IMAGE_BYTES,
-        allowedMimeTypes: IMAGE_TYPES,
+        fileSizeLimit: MAX_ATTACHMENT_BYTES,
+        allowedMimeTypes: ATTACHMENT_MIME_TYPES,
       });
       ({ error } = await send());
     }
@@ -53,10 +56,11 @@ export class SupabasePrivateFileStorage implements PrivateFileStorage {
 }
 
 const ROOT = path.join(process.cwd(), '.private-uploads');
-const TYPES: Record<string, ImageType> = {
+const TYPES: Record<string, AttachmentMimeType> = {
   jpg: 'image/jpeg',
   png: 'image/png',
   webp: 'image/webp',
+  pdf: 'application/pdf',
 };
 
 /**

@@ -1,14 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { CircleUserRoundIcon } from 'lucide-react';
+import { AlertTriangleIcon, CircleUserRoundIcon } from 'lucide-react';
 import type { Role } from '@/core/domain/identity/roles';
 import { formatDate } from '@/presentation/lib/format-date';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
 import { bottomItems, sidebarItems } from './nav-items';
 import { BottomNav, SidebarNav } from './shell-nav';
 
-export type ShellStore = { name: string; trialEndsAt: Date | null };
+export type ShellStore = {
+  name: string;
+  trialEndsAt: Date | null;
+  lowStockCount?: number;
+};
 
 /** Marco del panel (tienda o plataforma): barra lateral desde 1024 px y barra inferior en celular. */
 export async function AppShell({
@@ -23,6 +27,7 @@ export async function AppShell({
   const t = await getTranslations('Shell');
   const tDashboard = await getTranslations('Dashboard');
   const trial = store.trialEndsAt ? t('trialUntil', { date: formatDate(store.trialEndsAt) }) : null;
+  const lowStockCount = store.lowStockCount ?? 0;
 
   return (
     <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[256px_1fr] print:block">
@@ -33,8 +38,17 @@ export async function AppShell({
         >
           <Image src={isologo} alt={t('logoAlt')} priority className="h-8 w-auto" />
         </Link>
-        <SidebarNav items={sidebarItems(user.role)} />
+        <SidebarNav items={sidebarItems(user.role, lowStockCount)} />
         <div className="mt-auto flex flex-col gap-3">
+          {lowStockCount > 0 ? (
+            <Link
+              href="/inventory?filter=low"
+              className="flex items-center gap-2 rounded-card bg-amber/12 px-4 py-2.5 text-xs font-medium text-amber-ink hover:opacity-90"
+            >
+              <AlertTriangleIcon aria-hidden="true" className="size-4 shrink-0" />
+              <span>{t('lowStockAlert', { count: lowStockCount })}</span>
+            </Link>
+          ) : null}
           {trial ? (
             <p className="rounded-card bg-soft px-4 py-3 text-sm text-soft-ink">{trial}</p>
           ) : null}
@@ -53,9 +67,18 @@ export async function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-4 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden print:hidden">
+        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-2 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden print:hidden">
           <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
-          <div className="flex min-w-0 items-center gap-1">
+          <div className="flex min-w-0 items-center gap-2">
+            {lowStockCount > 0 ? (
+              <Link
+                href="/inventory?filter=low"
+                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber/12 px-2.5 py-1 text-xs font-medium text-amber-ink tabular-nums"
+              >
+                <AlertTriangleIcon aria-hidden="true" className="size-3.5" />
+                <span>{t('lowStockShort', { count: lowStockCount })}</span>
+              </Link>
+            ) : null}
             <span className="truncate text-sm font-medium text-ink">{store.name}</span>
             {/* En el celular el perfil y el idioma quedan a un toque, también para el dueño */}
             <Link

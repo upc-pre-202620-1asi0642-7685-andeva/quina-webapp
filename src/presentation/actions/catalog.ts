@@ -5,6 +5,7 @@ import { z } from 'zod';
 import {
   AdjustStockUseCase,
   CreateProductUseCase,
+  RecordWasteUseCase,
   SetProductActiveUseCase,
   UpdateProductUseCase,
   type ImageUpload,
@@ -18,13 +19,16 @@ import {
   adjustError,
   productError,
   readProductForm,
+  wasteError,
   type AdjustField,
   type ProductField,
   type ProductForm,
+  type WasteField,
 } from '@/presentation/validation/product-form';
 
 export type ProductFormState = { errors?: Partial<Record<ProductField, string>> };
 export type AdjustStockState = { errors?: Partial<Record<AdjustField, string>> };
+export type RecordWasteState = { errors?: Partial<Record<WasteField, string>> };
 export type CatalogActionResult = { ok: true } | { ok: false; error: string };
 
 const idSchema = z.uuid();
@@ -43,6 +47,7 @@ function details(form: ProductForm) {
     sku: form.sku,
     barcode: form.barcode,
     unitId: form.unitId,
+    defaultSupplierId: form.defaultSupplierId.trim() || null,
     isService: form.isService,
     allowsInstallments: form.allowsInstallments,
   };
@@ -165,4 +170,33 @@ export async function adjustStockAction(
   }
   revalidatePath('/inventory');
   return actionRedirect(`/inventory/${productId}?notice=stockAdjusted`);
+}
+
+/** US16 crit. 4: merma por mercadería dañada o vencida con motivo obligatorio. */
+export async function recordWasteAction(
+  productId: string,
+  _prev: RecordWasteState,
+  formData: FormData,
+): Promise<RecordWasteState> {
+  const user = await authorizeStore('catalog.manage');
+  if (!user) return actionRedirect('/login');
+  if (!idSchema.safeParse(productId).success) return { errors: { form: 'notFound' } };
+  const product = await getProduct(user.storeId, productId);
+  if (!product) return { errors: { form: 'notFound' } };
+
+  const result = await new RecordWasteUseCase(new DrizzleProductRepository()).execute({
+    storeId: user.storeId,
+    actorId: user.id,
+    productId,
+    allowDecimals: product.allowDecimals,
+    quantity: String(formData.get('quantity') ?? '').slice(0, 20),
+    reason: String(formData.get('reason') ?? '').slice(0, 400),
+    now: new Date(),
+  });
+  if (!result.ok) {
+    const [field, key] = wasteError(result.error);
+    return { errors: { [field]: key } };
+  }
+  revalidatePath('/inventory');
+  return actionRedirect(`/inventory/${productId}?notice=wasteRecorded`);
 }

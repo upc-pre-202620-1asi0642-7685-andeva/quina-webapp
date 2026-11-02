@@ -252,7 +252,9 @@
         "PLIN": "Plin",
         "CARD": "Tarjeta"
       }
-    }
+    },
+    "auditLink": "Auditoría",
+    "lowStockBanner": "{count, plural, =1 {1 producto con stock bajo} other {# productos con stock bajo}}"
   },
   "Profile": {
     "title": "Mi perfil",
@@ -339,8 +341,11 @@
       "rateCaps": "Topes BCRP",
       "sellSoon": "Vender, disponible pronto",
       "inventory": "Inventario",
-      "collections": "Cobranza"
-    }
+      "collections": "Cobranza",
+      "audit": "Auditoría"
+    },
+    "lowStockAlert": "{count, plural, =1 {1 producto por agotarse} other {# productos por agotarse}}",
+    "lowStockShort": "{count} bajo"
   },
   "Customers": {
     "list": {
@@ -536,7 +541,10 @@
         "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
         "generic": "No pudimos guardar las condiciones. Intenta de nuevo.",
         "daysLocked": "Tiene un ciclo con compras o sin pagar: podrás cambiar los días de corte y de pago cuando pague y no tenga cuotas pendientes. Las tasas y el límite sí puedes cambiarlos."
-      }
+      },
+      "historyTitle": "Historial de cambios de condiciones",
+      "historyBefore": "Antes",
+      "historyAfter": "Después"
     }
   },
   "Plans": {
@@ -868,7 +876,18 @@
       "colStock": "Stock",
       "colStatus": "Estado",
       "service": "Servicio",
-      "count": "{count, plural, =1 {1 producto} other {# productos}}"
+      "count": "{count, plural, =1 {1 producto} other {# productos}}",
+      "purchasesButton": "Compras y pedidos",
+      "replenishButton": "Armar pedido de reposición",
+      "replenishBusy": "Armando pedido…",
+      "replenishSuccess": "Creamos {orders} {orders, plural, =1 {pedido borrador} other {pedidos borrador}} con {items} {items, plural, =1 {producto} other {productos}}.",
+      "valuationLabel": "Valor total de mercadería al costo promedio",
+      "valuationLocked": "Ver valorización al costo (disponible desde Bodega Pro)",
+      "lowStockAlert": "{count, plural, =1 {1 producto con stock bajo} other {# productos con stock bajo}}",
+      "filterGroupLabel": "Filtrar inventario",
+      "filterAll": "Todos",
+      "filterLowStock": "Stock bajo ({count})",
+      "noLowStockResults": "No tienes productos con stock bajo en este momento."
     },
     "status": {
       "active": "A la venta",
@@ -938,7 +957,10 @@
         "imageTooLarge": "La foto pesa más de 2 MB. Elige otra o tómala con menos calidad.",
         "serviceHasStock": "Tiene stock en el estante. Ajusta el stock a 0 antes de volverlo servicio.",
         "planLimit": "Llegaste a los 50 productos de tu plan Casero. Da de baja uno que ya no vendas o sube de plan."
-      }
+      },
+      "defaultSupplierLabel": "Proveedor habitual (opcional)",
+      "defaultSupplierHint": "Para agrupar este producto cuando armes pedidos de reposición.",
+      "defaultSupplierNone": "Sin proveedor asignado"
     },
     "detail": {
       "back": "Volver al inventario",
@@ -990,8 +1012,35 @@
         "quantityInvalid": "Escribe una cantidad válida, con hasta 3 decimales.",
         "quantityNotWhole": "Esta unidad se cuenta en enteros.",
         "reasonRequired": "Cuéntanos el motivo del ajuste (al menos 3 letras).",
-        "noChange": "Es el mismo stock que ya tenías."
-      }
+        "noChange": "Es el mismo stock que ya tenías.",
+        "exceedsStock": "La merma no puede superar el stock actual en el estante."
+      },
+      "wasteRecorded": "Registramos la merma de {name}.",
+      "averageCost": "Costo promedio",
+      "stockValue": "Valor en estante",
+      "defaultSupplier": "Proveedor habitual",
+      "kardexTitle": "Movimientos de inventario (kardex)",
+      "kardexSubtitle": "Cada entrada, venta, merma y ajuste queda registrado sin borrarse.",
+      "kardexEmpty": "Aún no hay movimientos registrados.",
+      "kardexStockAfter": "Quedó: {stock}",
+      "kardexAvgAfter": "Costo prom.: {cost}",
+      "movementTypes": {
+        "PURCHASE_ENTRY": "Entrada por compra",
+        "SALE_EXIT": "Salida por venta",
+        "WASTE_LOSS": "Baja por merma",
+        "ADJUSTMENT_IN": "Ajuste a favor",
+        "ADJUSTMENT_OUT": "Ajuste en contra",
+        "COUNT_ADJUSTMENT": "Ajuste por conteo",
+        "CUSTOMER_RETURN": "Devolución de vecino"
+      },
+      "wasteTitle": "Registrar merma",
+      "wasteBody": "Descuenta mercadería vencida, rota o dañada. No cambia el costo promedio de lo que queda.",
+      "wasteQuantityLabel": "Cantidad perdida",
+      "wasteQuantityHint": "Cuánto se perdió o dañó. Ejemplo: 2.",
+      "wasteReasonLabel": "Motivo de la merma",
+      "wasteReasonHint": "Ejemplo: bolsa rota, producto vencido.",
+      "wasteSubmit": "Registrar merma",
+      "wasteSubmitting": "Registrando…"
     }
   },
   "Sales": {
@@ -1397,6 +1446,193 @@
       "submit": "Ver mi estado de cuenta",
       "otherSession": "En este equipo hay otra cuenta abierta ({email}). Al entrar se cerrará esa sesión.",
       "missing": "Este enlace no está completo. Entra con tu documento."
+    }
+  },
+  "Purchases": {
+    "backToInventory": "Volver al inventario",
+    "title": "Compras y reposición",
+    "subtitle": "Registra tus facturas o boletas de compra y arma pedidos para tus proveedores.",
+    "newPurchaseButton": "Registrar compra",
+    "docTypes": {
+      "FACTURA": "Factura",
+      "BOLETA": "Boleta",
+      "GUIA_REMISION": "Guía de remisión",
+      "RECIBO": "Recibo / Nota"
+    },
+    "orders": {
+      "title": "Borradores de pedidos de reposición",
+      "count": "{count, plural, =0 {Sin borradores} =1 {1 borrador} other {# borradores}}",
+      "empty": "No tienes pedidos pendientes. Cuando haya productos con stock bajo, toca “Armar pedido de reposición”.",
+      "unassignedSupplier": "Sin proveedor asignado",
+      "draftBadge": "Borrador",
+      "discardButton": "Descartar",
+      "discarded": "Descartamos el borrador de pedido.",
+      "convertToPurchase": "Registrar compra"
+    },
+    "history": {
+      "title": "Compras registradas",
+      "filterSupplier": "Proveedor:",
+      "allSuppliers": "Todos los proveedores",
+      "applyFilter": "Filtrar",
+      "empty": "Aún no has registrado compras de mercadería.",
+      "noSupplier": "Compra sin proveedor",
+      "itemsCount": "{count, plural, =1 {1 ítem} other {# ítems}}"
+    },
+    "form": {
+      "backToPurchases": "Volver a compras y pedidos",
+      "title": "Registrar compra de mercadería",
+      "subtitle": "Suma el stock al instante y recalcula el costo promedio ponderado de cada producto.",
+      "noPhysicalProducts": "Primero registra al menos un producto físico en tu inventario.",
+      "createProductFirst": "Nuevo producto",
+      "documentSection": "Datos del comprobante y proveedor",
+      "newSupplierButton": "Nuevo proveedor",
+      "supplierLabel": "Proveedor",
+      "supplierNone": "Selecciona un proveedor",
+      "dateLabel": "Fecha de compra",
+      "docTypeLabel": "Tipo de comprobante",
+      "seriesLabel": "Serie (opcional)",
+      "numberLabel": "Número",
+      "notesLabel": "Notas (opcional)",
+      "itemsSection": "Productos comprados",
+      "addLineButton": "Agregar línea",
+      "productLabel": "Producto",
+      "quantityLabel": "Cantidad",
+      "unitCostLabel": "Costo unitario (S/)",
+      "removeLineAria": "Quitar línea",
+      "estimatedTotal": "Total estimado",
+      "receiptSection": "Comprobante digital",
+      "receiptLabel": "Foto o PDF de la factura o boleta (opcional)",
+      "receiptHint": "JPG, PNG, WEBP o PDF de hasta 5 MB. Desde el celular puedes usar la cámara.",
+      "receiptLocked": "Adjuntar comprobantes digitales está disponible desde el plan Bodega Pro.",
+      "cancel": "Cancelar",
+      "submit": "Guardar compra",
+      "submitting": "Guardando…",
+      "createdToast": "Compra registrada y stock actualizado.",
+      "newSupplierTitle": "Nuevo proveedor",
+      "newSupplierDescription": "Guárdalo para elegirlo en tus compras y pedidos de reposición.",
+      "supplierBusinessName": "Razón social o nombre comercial",
+      "supplierTaxId": "RUC o DNI",
+      "supplierPhone": "Teléfono (opcional)",
+      "saveSupplier": "Guardar proveedor",
+      "savingSupplier": "Guardando…",
+      "supplierCreatedToast": "Proveedor registrado.",
+      "supplierHint": "Elige a quién le compraste o agrégalo arriba.",
+      "dateHint": "Fecha de emisión de la factura o boleta.",
+      "docTypeHint": "El documento que te entregó el proveedor.",
+      "seriesHint": "Ejemplo: F001 o B001.",
+      "numberHint": "Correlativo del comprobante.",
+      "notesHint": "Opcional. Ejemplo: entregado por repartidor.",
+      "productHint": "Producto físico que entra al almacén.",
+      "quantityHint": "Unidades compradas.",
+      "unitCostHint": "Precio de compra por unidad.",
+      "supplierBusinessHint": "Como figura en su RUC o boleta.",
+      "supplierTaxIdHint": "11 dígitos para RUC o 8 para DNI.",
+      "supplierPhoneHint": "Opcional, para pedidos por WhatsApp.",
+      "errors": {
+        "generic": "No pudimos registrar la compra. Revisa los datos.",
+        "supplierRequired": "Elige un proveedor válido.",
+        "documentTypeInvalid": "Elige un tipo de comprobante válido.",
+        "seriesInvalid": "La serie solo admite letras, números o guion (hasta 10).",
+        "documentNumberInvalid": "Escribe el número del comprobante (hasta 20 caracteres).",
+        "issueDateInvalid": "Elige una fecha válida que no sea futura.",
+        "linesEmpty": "Agrega al menos un producto a la compra.",
+        "duplicateProduct": "No repitas el mismo producto en dos líneas; suma su cantidad en una sola.",
+        "productInvalid": "Uno de los productos no existe o es un servicio.",
+        "quantityInvalid": "Escribe una cantidad mayor que cero.",
+        "quantityNotWhole": "Esta unidad solo acepta números enteros.",
+        "unitCostInvalid": "Escribe un costo unitario mayor que cero.",
+        "attachmentType": "El comprobante debe ser JPG, PNG, WEBP o PDF.",
+        "attachmentTooLarge": "El comprobante supera los 5 MB.",
+        "receiptLimit": "Alcanzaste los 50 comprobantes del mes de tu plan Bodega Pro."
+      },
+      "supplierErrors": {
+        "generic": "No pudimos guardar el proveedor.",
+        "taxIdInvalid": "Escribe un RUC de 11 dígitos o DNI de 8 dígitos.",
+        "taxIdTaken": "Ya tienes un proveedor registrado con ese RUC o DNI.",
+        "tradeNameRequired": "Escribe el nombre o razón social (de 2 a 150 caracteres).",
+        "contactTooLong": "El nombre de contacto es demasiado largo.",
+        "phoneInvalid": "Escribe un teléfono válido.",
+        "emailInvalid": "Escribe un correo válido."
+      }
+    },
+    "detail": {
+      "backToPurchases": "Volver a compras y pedidos",
+      "noSupplier": "Compra sin proveedor",
+      "totalAmount": "Total de la compra",
+      "itemsTitle": "Detalle de productos",
+      "colProduct": "Producto",
+      "colQuantity": "Cantidad",
+      "colUnitCost": "Costo unit.",
+      "colSubtotal": "Subtotal",
+      "registeredBy": "Registrado por",
+      "supplierTaxId": "RUC del proveedor",
+      "notes": "Notas",
+      "attachmentsTitle": "Comprobante adjunto",
+      "noAttachments": "Esta compra se registró sin comprobante digital.",
+      "openAttachment": "Abrir o descargar comprobante",
+      "attachmentImageAlt": "Vista previa del comprobante de compra",
+      "signedUrlNotice": "Enlace privado temporal válido por 15 minutos.",
+      "createdNotice": "Compra registrada: sumamos el stock y actualizamos el costo promedio."
+    }
+  },
+  "Audit": {
+    "title": "Registro de auditoría",
+    "subtitle": "Historial inmutable de ventas, cobros, inventario, condiciones de fiado y seguridad.",
+    "exportCsvButton": "Exportar CSV",
+    "empty": "No encontramos registros con esos filtros.",
+    "count": "{count, plural, =1 {1 evento registrado} other {# eventos registrados}}",
+    "systemActor": "Sistema",
+    "before": "Valor anterior",
+    "after": "Valor nuevo",
+    "filters": {
+      "from": "Desde",
+      "to": "Hasta",
+      "user": "Usuario",
+      "allUsers": "Todos los usuarios",
+      "entity": "Entidad",
+      "allEntities": "Todas las entidades",
+      "apply": "Filtrar",
+      "clear": "Limpiar",
+      "fromHint": "Fecha inicial en hora de Lima.",
+      "toHint": "Fecha final en hora de Lima.",
+      "userHint": "Filtra quién realizó la operación.",
+      "entityHint": "Filtra el módulo o tabla."
+    },
+    "actions": {
+      "CREATE_CASH_SALE": "Venta al contado",
+      "CREATE_CREDIT_SALE": "Venta al fiado",
+      "REGISTER_PAYMENT": "Cobro de deuda",
+      "VOID_CREDIT_CHARGE": "Anulación de cargo",
+      "OPEN_CREDIT_ACCOUNT": "Apertura de cuenta de fiado",
+      "UPDATE_CREDIT_TERMS": "Cambio de condiciones de fiado",
+      "SET_CREDIT_ACCOUNT_STATUS": "Cambio de estado de cuenta",
+      "CREATE_PRODUCT": "Alta de producto",
+      "UPDATE_PRODUCT": "Edición de producto",
+      "ADJUST_STOCK": "Ajuste de inventario",
+      "RECORD_WASTE": "Registro de merma",
+      "ACTIVATE_PRODUCT": "Reactivación de producto",
+      "DEACTIVATE_PRODUCT": "Baja de producto",
+      "REGISTER_PURCHASE": "Registro de compra",
+      "CREATE_SUPPLIER": "Alta de proveedor",
+      "GENERATE_REPLENISHMENT_ORDERS": "Generación de pedido de reposición",
+      "DISCARD_PURCHASE_ORDER": "Descarte de pedido borrador",
+      "LOGIN_FAILED": "Intento fallido de ingreso",
+      "LOGIN_BLOCKED": "Intento de ingreso en cuenta bloqueada",
+      "LOCK_ACCOUNT": "Bloqueo de cuenta por seguridad",
+      "ACCEPT_TERMS": "Aceptación de términos"
+    },
+    "entities": {
+      "sales": "Ventas",
+      "debt_payments": "Cobros",
+      "credit_accounts": "Cuentas de fiado",
+      "credit_charges": "Cargos de fiado",
+      "customers": "Vecinos",
+      "products": "Productos",
+      "purchases": "Compras",
+      "purchase_orders": "Pedidos de reposición",
+      "suppliers": "Proveedores",
+      "users": "Usuarios",
+      "stores": "Tienda"
     }
   }
 }

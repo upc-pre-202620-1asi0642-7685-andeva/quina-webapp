@@ -252,7 +252,9 @@
         "PLIN": "Plin",
         "CARD": "Card"
       }
-    }
+    },
+    "auditLink": "Audit log",
+    "lowStockBanner": "{count, plural, =1 {1 product low on stock} other {# products low on stock}}"
   },
   "Profile": {
     "title": "My profile",
@@ -339,8 +341,11 @@
       "rateCaps": "BCRP caps",
       "sellSoon": "Sell, coming soon",
       "inventory": "Inventory",
-      "collections": "Collections"
-    }
+      "collections": "Collections",
+      "audit": "Audit log"
+    },
+    "lowStockAlert": "{count, plural, =1 {1 low-stock item} other {# low-stock items}}",
+    "lowStockShort": "{count} low"
   },
   "Customers": {
     "list": {
@@ -536,7 +541,10 @@
         "planLimit": "You reached your plan's limit of neighbors with active credit.",
         "generic": "We couldn't save the terms. Try again.",
         "daysLocked": "They have a cycle with purchases or unpaid: you can change the cut-off and payment days once they pay and have no pending installments. You can still change the rates and the limit."
-      }
+      },
+      "historyTitle": "Credit terms change history",
+      "historyBefore": "Before",
+      "historyAfter": "After"
     }
   },
   "Plans": {
@@ -868,7 +876,18 @@
       "colStock": "Stock",
       "colStatus": "Status",
       "service": "Service",
-      "count": "{count, plural, =1 {1 product} other {# products}}"
+      "count": "{count, plural, =1 {1 product} other {# products}}",
+      "purchasesButton": "Purchases & orders",
+      "replenishButton": "Build restock order",
+      "replenishBusy": "Building order…",
+      "replenishSuccess": "Created {orders} {orders, plural, =1 {draft order} other {draft orders}} with {items} {items, plural, =1 {item} other {items}}.",
+      "valuationLabel": "Total inventory value at average cost",
+      "valuationLocked": "View cost valuation (available from Bodega Pro)",
+      "lowStockAlert": "{count, plural, =1 {1 product low on stock} other {# products low on stock}}",
+      "filterGroupLabel": "Filter inventory",
+      "filterAll": "All",
+      "filterLowStock": "Low stock ({count})",
+      "noLowStockResults": "No products are currently low on stock."
     },
     "status": {
       "active": "On sale",
@@ -938,7 +957,10 @@
         "imageTooLarge": "The photo is larger than 2 MB. Choose another or take it at lower quality.",
         "serviceHasStock": "It has stock on the shelf. Set the stock to 0 before making it a service.",
         "planLimit": "You've reached the 50 products of your Casero plan. Remove one you no longer sell or upgrade."
-      }
+      },
+      "defaultSupplierLabel": "Default supplier (optional)",
+      "defaultSupplierHint": "Used to group this item when building restock orders.",
+      "defaultSupplierNone": "No supplier assigned"
     },
     "detail": {
       "back": "Back to inventory",
@@ -990,8 +1012,35 @@
         "quantityInvalid": "Enter a valid quantity, with up to 3 decimals.",
         "quantityNotWhole": "This unit is counted in whole numbers.",
         "reasonRequired": "Tell us the reason for the adjustment (at least 3 letters).",
-        "noChange": "It's the same stock you already had."
-      }
+        "noChange": "It's the same stock you already had.",
+        "exceedsStock": "Waste cannot exceed current stock on the shelf."
+      },
+      "wasteRecorded": "Recorded waste for {name}.",
+      "averageCost": "Average cost",
+      "stockValue": "Shelf value",
+      "defaultSupplier": "Default supplier",
+      "kardexTitle": "Inventory movements (kardex)",
+      "kardexSubtitle": "Every purchase entry, sale, waste and adjustment is permanently recorded.",
+      "kardexEmpty": "No inventory movements yet.",
+      "kardexStockAfter": "Balance: {stock}",
+      "kardexAvgAfter": "Avg. cost: {cost}",
+      "movementTypes": {
+        "PURCHASE_ENTRY": "Purchase entry",
+        "SALE_EXIT": "Sale exit",
+        "WASTE_LOSS": "Waste / loss",
+        "ADJUSTMENT_IN": "Positive adjustment",
+        "ADJUSTMENT_OUT": "Negative adjustment",
+        "COUNT_ADJUSTMENT": "Count adjustment",
+        "CUSTOMER_RETURN": "Customer return"
+      },
+      "wasteTitle": "Record waste",
+      "wasteBody": "Deduct expired, broken or damaged stock. It does not change the average cost of remaining stock.",
+      "wasteQuantityLabel": "Lost quantity",
+      "wasteQuantityHint": "How much was lost or damaged. Example: 2.",
+      "wasteReasonLabel": "Reason for waste",
+      "wasteReasonHint": "Example: torn bag, expired item.",
+      "wasteSubmit": "Record waste",
+      "wasteSubmitting": "Recording…"
     }
   },
   "Sales": {
@@ -1397,6 +1446,193 @@
       "submit": "See my statement",
       "otherSession": "Another account is signed in on this device ({email}). Continuing will sign it out.",
       "missing": "This link is incomplete. Sign in with your ID document."
+    }
+  },
+  "Purchases": {
+    "backToInventory": "Back to inventory",
+    "title": "Purchases & restocking",
+    "subtitle": "Log supplier invoices or receipts and build restock orders.",
+    "newPurchaseButton": "Log purchase",
+    "docTypes": {
+      "FACTURA": "Invoice",
+      "BOLETA": "Receipt",
+      "GUIA_REMISION": "Delivery note",
+      "RECIBO": "Note / Voucher"
+    },
+    "orders": {
+      "title": "Draft restock orders",
+      "count": "{count, plural, =0 {No drafts} =1 {1 draft} other {# drafts}}",
+      "empty": "No pending draft orders. When items reach low stock, tap “Build restock order”.",
+      "unassignedSupplier": "No supplier assigned",
+      "draftBadge": "Draft",
+      "discardButton": "Discard",
+      "discarded": "Draft order discarded.",
+      "convertToPurchase": "Log purchase"
+    },
+    "history": {
+      "title": "Logged purchases",
+      "filterSupplier": "Supplier:",
+      "allSuppliers": "All suppliers",
+      "applyFilter": "Filter",
+      "empty": "You have not logged any merchandise purchases yet.",
+      "noSupplier": "Purchase without supplier",
+      "itemsCount": "{count, plural, =1 {1 item} other {# items}}"
+    },
+    "form": {
+      "backToPurchases": "Back to purchases & orders",
+      "title": "Log merchandise purchase",
+      "subtitle": "Adds stock immediately and updates each item’s weighted average cost.",
+      "noPhysicalProducts": "Register at least one physical product in your inventory first.",
+      "createProductFirst": "New product",
+      "documentSection": "Receipt & supplier details",
+      "newSupplierButton": "New supplier",
+      "supplierLabel": "Supplier",
+      "supplierNone": "Select a supplier",
+      "dateLabel": "Purchase date",
+      "docTypeLabel": "Document type",
+      "seriesLabel": "Series (optional)",
+      "numberLabel": "Number",
+      "notesLabel": "Notes (optional)",
+      "itemsSection": "Purchased items",
+      "addLineButton": "Add line",
+      "productLabel": "Product",
+      "quantityLabel": "Quantity",
+      "unitCostLabel": "Unit cost (S/)",
+      "removeLineAria": "Remove line",
+      "estimatedTotal": "Estimated total",
+      "receiptSection": "Digital receipt",
+      "receiptLabel": "Photo or PDF of the invoice or receipt (optional)",
+      "receiptHint": "JPG, PNG, WEBP or PDF up to 5 MB.",
+      "receiptLocked": "Attaching digital receipts is available starting on the Bodega Pro plan.",
+      "cancel": "Cancel",
+      "submit": "Save purchase",
+      "submitting": "Saving…",
+      "createdToast": "Purchase logged and stock updated.",
+      "newSupplierTitle": "New supplier",
+      "newSupplierDescription": "Save it to select in your purchases and restock orders.",
+      "supplierBusinessName": "Business or trade name",
+      "supplierTaxId": "RUC or DNI",
+      "supplierPhone": "Phone (optional)",
+      "saveSupplier": "Save supplier",
+      "savingSupplier": "Saving…",
+      "supplierCreatedToast": "Supplier saved.",
+      "supplierHint": "Select who you bought from or add a new supplier above.",
+      "dateHint": "Issue date on the invoice or receipt.",
+      "docTypeHint": "Document provided by the supplier.",
+      "seriesHint": "Example: F001 or B001.",
+      "numberHint": "Receipt number.",
+      "notesHint": "Optional notes about the delivery.",
+      "productHint": "Physical product entering stock.",
+      "quantityHint": "Purchased quantity.",
+      "unitCostHint": "Purchase cost per unit.",
+      "supplierBusinessHint": "As shown on their tax ID or receipt.",
+      "supplierTaxIdHint": "11 digits for RUC or 8 for DNI.",
+      "supplierPhoneHint": "Optional phone number for orders.",
+      "errors": {
+        "generic": "Could not log purchase. Please check the fields.",
+        "supplierRequired": "Select a valid supplier.",
+        "documentTypeInvalid": "Select a valid document type.",
+        "seriesInvalid": "Series can only contain letters, numbers or hyphen (up to 10).",
+        "documentNumberInvalid": "Enter the document number (up to 20 characters).",
+        "issueDateInvalid": "Select a valid date not in the future.",
+        "linesEmpty": "Add at least one product line.",
+        "duplicateProduct": "Do not repeat the same product on two lines.",
+        "productInvalid": "One of the selected products does not exist or is a service.",
+        "quantityInvalid": "Enter a quantity greater than zero.",
+        "quantityNotWhole": "This unit only accepts whole numbers.",
+        "unitCostInvalid": "Enter a unit cost greater than zero.",
+        "attachmentType": "Receipt must be JPG, PNG, WEBP or PDF.",
+        "attachmentTooLarge": "Receipt exceeds the 5 MB limit.",
+        "receiptLimit": "You reached the 50 monthly receipts limit of your Bodega Pro plan."
+      },
+      "supplierErrors": {
+        "generic": "Could not save supplier.",
+        "taxIdInvalid": "Enter an 11-digit RUC or 8-digit DNI.",
+        "taxIdTaken": "A supplier with that RUC or DNI already exists.",
+        "tradeNameRequired": "Enter the business or trade name (2 to 150 characters).",
+        "contactTooLong": "Contact name is too long.",
+        "phoneInvalid": "Enter a valid phone number.",
+        "emailInvalid": "Enter a valid email address."
+      }
+    },
+    "detail": {
+      "backToPurchases": "Back to purchases & orders",
+      "noSupplier": "Purchase without supplier",
+      "totalAmount": "Purchase total",
+      "itemsTitle": "Purchased items",
+      "colProduct": "Product",
+      "colQuantity": "Quantity",
+      "colUnitCost": "Unit cost",
+      "colSubtotal": "Subtotal",
+      "registeredBy": "Logged by",
+      "supplierTaxId": "Supplier RUC",
+      "notes": "Notes",
+      "attachmentsTitle": "Attached receipt",
+      "noAttachments": "This purchase was logged without a digital receipt.",
+      "openAttachment": "Open or download receipt",
+      "attachmentImageAlt": "Purchase receipt preview",
+      "signedUrlNotice": "Temporary private link valid for 15 minutes.",
+      "createdNotice": "Purchase logged: stock added and average cost updated."
+    }
+  },
+  "Audit": {
+    "title": "Audit log",
+    "subtitle": "Immutable history of sales, collections, inventory, credit terms and security events.",
+    "exportCsvButton": "Export CSV",
+    "empty": "No audit records match those filters.",
+    "count": "{count, plural, =1 {1 recorded event} other {# recorded events}}",
+    "systemActor": "System",
+    "before": "Previous value",
+    "after": "New value",
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "user": "User",
+      "allUsers": "All users",
+      "entity": "Entity",
+      "allEntities": "All entities",
+      "apply": "Filter",
+      "clear": "Clear",
+      "fromHint": "Start date in Lima time.",
+      "toHint": "End date in Lima time.",
+      "userHint": "Filter by who performed the action.",
+      "entityHint": "Filter by module or table."
+    },
+    "actions": {
+      "CREATE_CASH_SALE": "Cash sale",
+      "CREATE_CREDIT_SALE": "Credit sale",
+      "REGISTER_PAYMENT": "Debt payment",
+      "VOID_CREDIT_CHARGE": "Voided credit charge",
+      "OPEN_CREDIT_ACCOUNT": "Credit account opened",
+      "UPDATE_CREDIT_TERMS": "Credit terms updated",
+      "SET_CREDIT_ACCOUNT_STATUS": "Account status changed",
+      "CREATE_PRODUCT": "Product created",
+      "UPDATE_PRODUCT": "Product updated",
+      "ADJUST_STOCK": "Stock adjustment",
+      "RECORD_WASTE": "Waste recorded",
+      "ACTIVATE_PRODUCT": "Product reactivated",
+      "DEACTIVATE_PRODUCT": "Product deactivated",
+      "REGISTER_PURCHASE": "Purchase logged",
+      "CREATE_SUPPLIER": "Supplier created",
+      "GENERATE_REPLENISHMENT_ORDERS": "Restock order generated",
+      "DISCARD_PURCHASE_ORDER": "Draft order discarded",
+      "LOGIN_FAILED": "Failed sign-in attempt",
+      "LOGIN_BLOCKED": "Blocked account sign-in attempt",
+      "LOCK_ACCOUNT": "Account locked for security",
+      "ACCEPT_TERMS": "Terms accepted"
+    },
+    "entities": {
+      "sales": "Sales",
+      "debt_payments": "Payments",
+      "credit_accounts": "Credit accounts",
+      "credit_charges": "Credit charges",
+      "customers": "Customers",
+      "products": "Products",
+      "purchases": "Purchases",
+      "purchase_orders": "Restock orders",
+      "suppliers": "Suppliers",
+      "users": "Users",
+      "stores": "Store"
     }
   }
 }

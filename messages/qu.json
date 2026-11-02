@@ -253,7 +253,9 @@
         "PLIN": "Plin",
         "CARD": "Tarjeta"
       }
-    }
+    },
+    "auditLink": "Qhawapayay",
+    "lowStockBanner": "{count, plural, =1 {1 ruru pisi kapuqniyuq} other {# rurukuna pisi kapuqniyuq}}"
   },
   "Profile": {
     "title": "Perfilniy",
@@ -340,8 +342,11 @@
       "rateCaps": "Topes BCRP",
       "sellSoon": "Rantiy, qayllaña",
       "inventory": "Rantinakuna",
-      "collections": "Cobranza"
-    }
+      "collections": "Cobranza",
+      "audit": "Qhawapayay"
+    },
+    "lowStockAlert": "{count, plural, =1 {1 rurupa pisi kapuqnin} other {# rurukunapa pisi kapuqnin}}",
+    "lowStockShort": "{count} pisi"
   },
   "Customers": {
     "list": {
@@ -537,7 +542,10 @@
         "planLimit": "Llegaste al límite de vecinos con fiado activo de tu plan.",
         "generic": "No pudimos guardar las condiciones. Intenta de nuevo.",
         "daysLocked": "Rantikunayuq utaq mana pagasqa ciclon kan: pagaptin, cuotankuna mana kaptinmi kuchuy p'unchawta, pagana p'unchawta ima tikrayta atinki. Tasakunata, límiteta ima kunanpas tikrayta atinki."
-      }
+      },
+      "historyTitle": "Manu kamachikuykuna t’ikray willakuy",
+      "historyBefore": "Ñawpaq",
+      "historyAfter": "Kunan"
     }
   },
   "Plans": {
@@ -869,7 +877,18 @@
       "colStock": "Stock",
       "colStatus": "Estado",
       "service": "Servicio",
-      "count": "{count, plural, =1 {1 rantina} other {# rantinakuna}}"
+      "count": "{count, plural, =1 {1 rantina} other {# rantinakuna}}",
+      "purchasesButton": "Rantiykuna mañakuykunawan",
+      "replenishButton": "Yapamanta rantiyta wakichiy",
+      "replenishBusy": "Wakichispa…",
+      "replenishSuccess": "{orders} {orders, plural, =1 {mañakuy} other {mañakuykuna}} ({items} {items, plural, =1 {ruru} other {rurukuna}}) kamarqanchik.",
+      "valuationLabel": "Llapan rurukunapa chanin (chawpi chaninpi)",
+      "valuationLocked": "Chaninchayta qhaway (Bodega Pro planmanta)",
+      "lowStockAlert": "{count, plural, =1 {1 ruru pisi kapuqniyuq} other {# rurukuna pisi kapuqniyuq}}",
+      "filterGroupLabel": "Rurukunata akllay",
+      "filterAll": "Llapan",
+      "filterLowStock": "Pisi kapuq ({count})",
+      "noLowStockResults": "Manam pisi kapuqniyuq rurukuna kanchu."
     },
     "status": {
       "active": "A la venta",
@@ -939,7 +958,10 @@
         "imageTooLarge": "La foto pesa más de 2 MB. Elige otra o tómala con menos calidad.",
         "serviceHasStock": "Tiene stock en el estante. Ajusta el stock a 0 antes de volverlo servicio.",
         "planLimit": "Llegaste a los 50 productos de tu plan Casero. Da de baja uno que ya no vendas o sube de plan."
-      }
+      },
+      "defaultSupplierLabel": "Sapa kuti rantiq (munaspaqa)",
+      "defaultSupplierHint": "Mañakuykunata rantiqman hina huñunapaq.",
+      "defaultSupplierNone": "Mana rantiqniyuq"
     },
     "detail": {
       "back": "Rantinakunaman kutiy",
@@ -991,8 +1013,35 @@
         "quantityInvalid": "Escribe una cantidad válida, con hasta 3 decimales.",
         "quantityNotWhole": "Esta unidad se cuenta en enteros.",
         "reasonRequired": "Cuéntanos el motivo del ajuste (al menos 3 letras).",
-        "noChange": "Es el mismo stock que ya tenías."
-      }
+        "noChange": "Es el mismo stock que ya tenías.",
+        "exceedsStock": "Chinkasqaqa manam kapuqmanta aswan hatun kanmanchu."
+      },
+      "wasteRecorded": "{name} chinkaynin qillqasqaña.",
+      "averageCost": "Chawpi chanin",
+      "stockValue": "Churana chanin",
+      "defaultSupplier": "Sapa kuti rantiq",
+      "kardexTitle": "Ruru kuyuykuna (kardex)",
+      "kardexSubtitle": "Llapan yaykuy, lluqsiy, chinkay allichaypas mana pichay atina qillqasqa.",
+      "kardexEmpty": "Manaraq kuyuykuna kanchu.",
+      "kardexStockAfter": "Puchuq: {stock}",
+      "kardexAvgAfter": "Chawpi chanin: {cost}",
+      "movementTypes": {
+        "PURCHASE_ENTRY": "Rantiwan yaykuy",
+        "SALE_EXIT": "Qhatuywan lluqsiy",
+        "WASTE_LOSS": "Chinkay / waqlliy",
+        "ADJUSTMENT_IN": "Yapay allichay",
+        "ADJUSTMENT_OUT": "Pisiyachiy allichay",
+        "COUNT_ADJUSTMENT": "Yupaywan allichay",
+        "CUSTOMER_RETURN": "Wasi masipa kutichisqan"
+      },
+      "wasteTitle": "Chinkayta qillqay",
+      "wasteBody": "Waqllisqa utaq p’akisqa rurukunata pisiyachin. Chawpi chanintaqa manam t’ikranchu.",
+      "wasteQuantityLabel": "Chinkasqa yupay",
+      "wasteQuantityHint": "Hayk’a waqllirqan. Qhawarina: 2.",
+      "wasteReasonLabel": "Imarayku chinkarqan",
+      "wasteReasonHint": "Qhawarina: wayaqa llik’isqa, p’unchawnin pasasqa.",
+      "wasteSubmit": "Chinkayta waqaychay",
+      "wasteSubmitting": "Waqaychaspa…"
     }
   },
   "Sales": {
@@ -1398,6 +1447,193 @@
       "submit": "Cuentayta qhaway",
       "otherSession": "Kay equipopi huk cuentam kichasqa kachkan ({email}). Yaykuspaqa chay sesionqa wichqakunqa.",
       "missing": "Kay enlaceqa mana hunt’asqachu. Documentoykiwan yaykuy."
+    }
+  },
+  "Purchases": {
+    "backToInventory": "Rurukunaman kutiy",
+    "title": "Rantiykuna yapamanta hunt’achiypas",
+    "subtitle": "Rantisqayki p’anqakunata qillqay hinaspa mañakuykunata wakichiy.",
+    "newPurchaseButton": "Rantiyta qillqay",
+    "docTypes": {
+      "FACTURA": "Factura",
+      "BOLETA": "Boleta",
+      "GUIA_REMISION": "Apay p’anqa",
+      "RECIBO": "Recibo / Willakuy"
+    },
+    "orders": {
+      "title": "Wakichisqa mañakuykuna",
+      "count": "{count, plural, =0 {Mana wakichisqayuq} =1 {1 wakichisqa} other {# wakichisqakuna}}",
+      "empty": "Manam suyakuq mañakuykuna kanchu.",
+      "unassignedSupplier": "Mana rantiqniyuq",
+      "draftBadge": "Wakichisqa",
+      "discardButton": "Wisch’uy",
+      "discarded": "Wakichisqa mañakuy wisch’usqaña.",
+      "convertToPurchase": "Rantiyta qillqay"
+    },
+    "history": {
+      "title": "Qillqasqa rantiykuna",
+      "filterSupplier": "Rantiq:",
+      "allSuppliers": "Llapan rantiqkuna",
+      "applyFilter": "Akllay",
+      "empty": "Manaraq rantiykunata qillqarqankichu.",
+      "noSupplier": "Mana rantiq sutiyuq rantiy",
+      "itemsCount": "{count, plural, =1 {1 ruru} other {# rurukuna}}"
+    },
+    "form": {
+      "backToPurchases": "Rantiykunaman kutiy",
+      "title": "Ruru rantiyta qillqay",
+      "subtitle": "Kapuqta chaylla yapan hinaspa chawpi chaninta musuqmanta yupan.",
+      "noPhysicalProducts": "Ñawpaqta huk hap’ina ruruta qillqay.",
+      "createProductFirst": "Musuq ruru",
+      "documentSection": "P’anqapa rantiqpawan willakuynin",
+      "newSupplierButton": "Musuq rantiq",
+      "supplierLabel": "Rantiq",
+      "supplierNone": "Rantiqta akllay",
+      "dateLabel": "Rantiy p’unchaw",
+      "docTypeLabel": "P’anqa laya",
+      "seriesLabel": "Serie (munaspaqa)",
+      "numberLabel": "Yupay",
+      "notesLabel": "Willakuy (munaspaqa)",
+      "itemsSection": "Rantisqa rurukuna",
+      "addLineButton": "Siq’ita yapay",
+      "productLabel": "Ruru",
+      "quantityLabel": "Yupay",
+      "unitCostLabel": "Sapa huk chanin (S/)",
+      "removeLineAria": "Siq’ita hurquy",
+      "estimatedTotal": "Llapan chanin",
+      "receiptSection": "Rantiy p’anqa rikch’ay",
+      "receiptLabel": "Factura utaq boleta rikch’ay / PDF (munaspaqa)",
+      "receiptHint": "JPG, PNG, WEBP utaq PDF 5 MB kama.",
+      "receiptLocked": "P’anqa rikch’ayta churayqa Bodega Pro planmantam kashan.",
+      "cancel": "Saqiy",
+      "submit": "Rantiyta waqaychay",
+      "submitting": "Waqaychaspa…",
+      "createdToast": "Rantiy qillqasqa, kapuqpas musuqchasqa.",
+      "newSupplierTitle": "Musuq rantiq",
+      "newSupplierDescription": "Rantiykunapi akllanaykipaq waqaychay.",
+      "supplierBusinessName": "Rantiqpa sutin",
+      "supplierTaxId": "RUC utaq DNI",
+      "supplierPhone": "Karurimana (munaspaqa)",
+      "saveSupplier": "Rantiqta waqaychay",
+      "savingSupplier": "Waqaychaspa…",
+      "supplierCreatedToast": "Rantiq waqaychasqaña.",
+      "supplierHint": "Pimantataq rantirqanki chayta akllay.",
+      "dateHint": "P’anqapi p’unchaw.",
+      "docTypeHint": "Rantiqpa qusqan p’anqa.",
+      "seriesHint": "Qhawarina: F001 utaq B001.",
+      "numberHint": "P’anqapa yupaynin.",
+      "notesHint": "Munaspaqa willakuyta yapay.",
+      "productHint": "Yaykuq ruru.",
+      "quantityHint": "Rantisqa yupay.",
+      "unitCostHint": "Sapa huk chanin.",
+      "supplierBusinessHint": "RUCninpi hina sutin.",
+      "supplierTaxIdHint": "11 yupay RUCpaq utaq 8 DNIpaq.",
+      "supplierPhoneHint": "Munaspaqa karurimana.",
+      "errors": {
+        "generic": "Manam rantiyta qillqayta atirqanchikchu.",
+        "supplierRequired": "Allin rantiqta akllay.",
+        "documentTypeInvalid": "Allin p’anqa layata akllay.",
+        "seriesInvalid": "Serieqa 10 qillqakama.",
+        "documentNumberInvalid": "P’anqa yupayta qillqay.",
+        "issueDateInvalid": "Allin p’unchawta akllay.",
+        "linesEmpty": "Huk rurullatapas yapay.",
+        "duplicateProduct": "Ama kikin ruruta iskay siq’ipi churaychu.",
+        "productInvalid": "Chay ruruqa manam kanchu.",
+        "quantityInvalid": "Ch’usaqmanta aswan hatun yupayta qillqay.",
+        "quantityNotWhole": "Kay tupuyqa hunt’a yupayllatam chaskin.",
+        "unitCostInvalid": "Allin chaninta qillqay.",
+        "attachmentType": "JPG, PNG, WEBP utaq PDF kanan.",
+        "attachmentTooLarge": "P’anqaqa 5 MBmanta aswan llasaqmi.",
+        "receiptLimit": "Bodega Pro planpa 50 killapi p’anqankunaman chayarqankiña."
+      },
+      "supplierErrors": {
+        "generic": "Manam rantiqta waqaychayta atirqanchikchu.",
+        "taxIdInvalid": "11 yupay RUCta utaq 8 yupay DNIta qillqay.",
+        "taxIdTaken": "Chay RUC utaq DNIwanqa huk rantiq kashanñam.",
+        "tradeNameRequired": "Rantiqpa sutinta qillqay (2manta 150 qillqakama).",
+        "contactTooLong": "Sutiqa nishutam hatun.",
+        "phoneInvalid": "Allin karurimanata qillqay.",
+        "emailInvalid": "Allin chaskita qillqay."
+      }
+    },
+    "detail": {
+      "backToPurchases": "Rantiykunaman kutiy",
+      "noSupplier": "Mana rantiq sutiyuq rantiy",
+      "totalAmount": "Llapan rantiy chanin",
+      "itemsTitle": "Rantisqa rurukuna",
+      "colProduct": "Ruru",
+      "colQuantity": "Yupay",
+      "colUnitCost": "Sapa chanin",
+      "colSubtotal": "Subtotal",
+      "registeredBy": "Qillqaq",
+      "supplierTaxId": "Rantiqpa RUCnin",
+      "notes": "Willakuy",
+      "attachmentsTitle": "Yapachisqa p’anqa",
+      "noAttachments": "Kay rantiyqa mana p’anqa rikch’aywan qillqakurqan.",
+      "openAttachment": "P’anqata kichay utaq uraykachiy",
+      "attachmentImageAlt": "Rantiy p’anqa qhaway",
+      "signedUrlNotice": "15 minutullapaq pakasqa t’inki.",
+      "createdNotice": "Rantiy qillqasqaña: kapuq yapasqa, chawpi chaninpas musuqchasqa."
+    }
+  },
+  "Audit": {
+    "title": "Qhawapayay qillqa",
+    "subtitle": "Mana pichay atina qhatuy, mañay, kapuq, manu kamachikuy waqaychaypawan willakuy.",
+    "exportCsvButton": "CSV uraykachiy",
+    "empty": "Chay akllaykunawanqa manam qillqakuna tarikunchu.",
+    "count": "{count, plural, =1 {1 qillqasqa ruray} other {# qillqasqa ruraykuna}}",
+    "systemActor": "Llikacha",
+    "before": "Ñawpaq chanin",
+    "after": "Musuq chanin",
+    "filters": {
+      "from": "Kay p’unchawmanta",
+      "to": "Kay p’unchawkama",
+      "user": "Ruraq",
+      "allUsers": "Llapan ruraqkuna",
+      "entity": "Laya",
+      "allEntities": "Llapan layakuna",
+      "apply": "Akllay",
+      "clear": "Pichay",
+      "fromHint": "Qallariy p’unchaw.",
+      "toHint": "Tukukuy p’unchaw.",
+      "userHint": "Ruraqman hina akllay.",
+      "entityHint": "Layaman hina akllay."
+    },
+    "actions": {
+      "CREATE_CASH_SALE": "Qullqiwan qhatuy",
+      "CREATE_CREDIT_SALE": "Manuwan qhatuy",
+      "REGISTER_PAYMENT": "Manu kutichiy",
+      "VOID_CREDIT_CHARGE": "Manu chinkachiy",
+      "OPEN_CREDIT_ACCOUNT": "Manu yupay kichay",
+      "UPDATE_CREDIT_TERMS": "Manu kamachikuy t’ikray",
+      "SET_CREDIT_ACCOUNT_STATUS": "Manu yupay kawsay t’ikray",
+      "CREATE_PRODUCT": "Musuq ruru",
+      "UPDATE_PRODUCT": "Ruru allichay",
+      "ADJUST_STOCK": "Kapuq allichay",
+      "RECORD_WASTE": "Chinkay qillqay",
+      "ACTIVATE_PRODUCT": "Ruru kutichiy",
+      "DEACTIVATE_PRODUCT": "Ruru sayachiy",
+      "REGISTER_PURCHASE": "Rantiy qillqay",
+      "CREATE_SUPPLIER": "Musuq rantiq",
+      "GENERATE_REPLENISHMENT_ORDERS": "Mañakuy kamay",
+      "DISCARD_PURCHASE_ORDER": "Wakichisqa mañakuy wisch’uy",
+      "LOGIN_FAILED": "Pantay yaykuy",
+      "LOGIN_BLOCKED": "Wichq’asqa yupayman yaykuy munay",
+      "LOCK_ACCOUNT": "Waqaychayrayku yupay wichq’ay",
+      "ACCEPT_TERMS": "Kamachikuykunata chaskiy"
+    },
+    "entities": {
+      "sales": "Qhatuykuna",
+      "debt_payments": "Kutichiykuna",
+      "credit_accounts": "Manu yupaykuna",
+      "credit_charges": "Manu churaykuna",
+      "customers": "Wasi masikuna",
+      "products": "Rurukuna",
+      "purchases": "Rantiykuna",
+      "purchase_orders": "Mañakuykuna",
+      "suppliers": "Rantiqkuna",
+      "users": "Ruraqkuna",
+      "stores": "Qhatu wasi"
     }
   }
 }
