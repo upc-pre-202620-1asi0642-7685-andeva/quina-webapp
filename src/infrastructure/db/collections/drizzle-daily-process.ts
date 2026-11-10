@@ -1,23 +1,30 @@
 import { and, asc, eq, gte, inArray, isNull, lt, lte, max, ne, sql } from 'drizzle-orm';
 import { cutOffBalanceIncrease } from '@/core/domain/credit/account-balance';
 import { cycleWithPaymentOn, lastClosedCycle } from '@/core/domain/credit/billing-cycle';
-import type { Subscription } from '@/core/domain/billing/plan-limits';
+import { PlanLimits, type Subscription } from '@/core/domain/billing/plan-limits';
 import type {
   DailyProcessGateway,
   DailyStore,
   DispatchResult,
 } from '@/core/domain/ports/daily-process';
+import type { NotificationMailer } from '@/core/domain/ports/notification-mailer';
 import { BusinessDate } from '@/core/domain/shared/business-date';
+import { isLocale } from '@/presentation/i18n/resolve-locale';
 import { Money, type Currency } from '@/core/domain/shared/money';
+import { getNotificationMailer } from '../../email/auth-mailer-factory';
 import { db } from '../connection';
+import { selectSubscription } from '../repositories/drizzle-subscription-repository';
 import {
+  auditLogs,
   creditAccounts,
   creditCharges,
   creditInstallments,
   customers,
+  notificationLogs,
   settlementCycles,
   stores,
   storeSubscriptions,
+  users,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
 import { loadCycleLedger } from './cycle-ledger';
@@ -33,7 +40,10 @@ export class DrizzleDailyProcess implements DailyProcessGateway {
    */
   constructor(
     private readonly dispatcher: NotificationDispatcher = new NotificationDispatcher(),
-    private readonly options: { storeIds?: readonly string[] } = {},
+    private readonly options: {
+      storeIds?: readonly string[];
+      notificationMailer?: NotificationMailer;
+    } = {},
   ) {}
 
   async activeStores(): Promise<DailyStore[]> {
@@ -48,23 +58,230 @@ export class DrizzleDailyProcess implements DailyProcessGateway {
       );
     const result: DailyStore[] = [];
     for (const { id } of rows) {
-      const [sub] = await withTenant(id, (tx) =>
-        tx
-          .select({
-            planTier: storeSubscriptions.planTier,
-            status: storeSubscriptions.status,
-            trialEndsAt: storeSubscriptions.trialEndsAt,
-          })
-          .from(storeSubscriptions)
-          .where(eq(storeSubscriptions.storeId, id))
-          .limit(1),
-      );
-      const subscription: Subscription = sub
-        ? (sub as Subscription)
-        : { planTier: 'CASERO', status: 'ACTIVE', trialEndsAt: null };
+      const sub = await withTenant(id, (tx) => selectSubscription(tx, id));
+      const subscription: Subscription = sub ?? {
+        planTier: 'CASERO',
+        status: 'ACTIVE',
+        trialEndsAt: null,
+      };
       result.push({ id, subscription });
     }
     return result;
+  }
+
+  async processSubscriptionLifecycle(storeId: string, now: Date): Promise<number> {
+    const outcome = await withTenant(storeId, async (tx) => {
+      const [sub] = await tx
+        .select()
+        .from(storeSubscriptions)
+        .where(eq(storeSubscriptions.storeId, storeId))
+        .for('update');
+      if (!sub) return { changed: 0, trialWarning: null };
+
+      // Case A: Prueba Pro vencida -> Casero (US25 crit. 4)
+      if (
+        sub.status === 'TRIALING' &&
+        sub.trialEndsAt &&
+        sub.trialEndsAt.getTime() <= now.getTime()
+      ) {
+        await tx
+          .update(storeSubscriptions)
+          .set({
+            planTier: 'CASERO',
+            status: 'ACTIVE',
+            updatedAt: now,
+          })
+          .where(eq(storeSubscriptions.id, sub.id));
+        await tx.insert(auditLogs).values({
+          storeId,
+          userId: null,
+          action: 'EXPIRE_TRIAL',
+          entityName: 'store_subscriptions',
+          entityId: sub.id,
+          oldData: { planTier: sub.planTier, status: sub.status },
+          newData: { planTier: 'CASERO', status: 'ACTIVE' },
+          createdAt: now,
+        });
+        return { changed: 1, trialWarning: null };
+      }
+
+      // Case B: Periodo de gracia vencido -> Casero (US23 crit. 4, docs §11.1)
+      if (
+        sub.status === 'PAST_DUE' &&
+        sub.gracePeriodEndsAt &&
+        sub.gracePeriodEndsAt.getTime() <= now.getTime()
+      ) {
+        await tx
+          .update(storeSubscriptions)
+          .set({
+            planTier: 'CASERO',
+            status: 'ACTIVE',
+            billingInterval: null,
+            currentPeriodEnd: null,
+            gracePeriodEndsAt: null,
+            mpPreapprovalId: null,
+            cancelAtPeriodEnd: false,
+            updatedAt: now,
+          })
+          .where(eq(storeSubscriptions.id, sub.id));
+        await tx.insert(auditLogs).values({
+          storeId,
+          userId: null,
+          action: 'EXPIRE_GRACE_PERIOD',
+          entityName: 'store_subscriptions',
+          entityId: sub.id,
+          oldData: {
+            planTier: sub.planTier,
+            status: sub.status,
+            gracePeriodEndsAt: sub.gracePeriodEndsAt.toISOString(),
+          },
+          newData: { planTier: 'CASERO', status: 'ACTIVE' },
+          createdAt: now,
+        });
+        return { changed: 1, trialWarning: null };
+      }
+
+      // Case C: Suscripción con renovación cancelada que llega al fin de su periodo (US23 crit. 6)
+      if (
+        sub.status === 'ACTIVE' &&
+        sub.planTier !== 'CASERO' &&
+        sub.cancelAtPeriodEnd &&
+        sub.currentPeriodEnd &&
+        sub.currentPeriodEnd.getTime() <= now.getTime()
+      ) {
+        await tx
+          .update(storeSubscriptions)
+          .set({
+            planTier: 'CASERO',
+            status: 'ACTIVE',
+            billingInterval: null,
+            currentPeriodEnd: null,
+            gracePeriodEndsAt: null,
+            mpPreapprovalId: null,
+            cancelAtPeriodEnd: false,
+            updatedAt: now,
+          })
+          .where(eq(storeSubscriptions.id, sub.id));
+        await tx.insert(auditLogs).values({
+          storeId,
+          userId: null,
+          action: 'COMPLETE_CANCELED_SUBSCRIPTION',
+          entityName: 'store_subscriptions',
+          entityId: sub.id,
+          oldData: {
+            planTier: sub.planTier,
+            status: sub.status,
+            currentPeriodEnd: sub.currentPeriodEnd.toISOString(),
+          },
+          newData: { planTier: 'CASERO', status: 'ACTIVE' },
+          createdAt: now,
+        });
+        return { changed: 1, trialWarning: null };
+      }
+
+      // Case D: Aviso de prueba Pro por vencer en <= 3 días (US25 crit. 3)
+      const subscription: Subscription = {
+        planTier: sub.planTier as Subscription['planTier'],
+        status: sub.status as Subscription['status'],
+        trialEndsAt: sub.trialEndsAt,
+      };
+      const daysRemaining = PlanLimits.trialDaysRemaining(subscription, now);
+      if (daysRemaining !== null && daysRemaining >= 1 && daysRemaining <= 3 && sub.trialEndsAt) {
+        const [alreadySent] = await tx
+          .select({ id: notificationLogs.id })
+          .from(notificationLogs)
+          .where(
+            and(
+              eq(notificationLogs.storeId, storeId),
+              eq(notificationLogs.notificationType, 'SUBSCRIPTION'),
+              eq(notificationLogs.referenceType, 'trial_ending'),
+              eq(notificationLogs.referenceId, sub.id),
+              inArray(notificationLogs.status, ['SENT', 'DELIVERED', 'QUEUED']),
+            ),
+          )
+          .limit(1);
+        if (!alreadySent) {
+          const [storeRow] = await tx
+            .select({
+              commercialName: stores.commercialName,
+              defaultLocale: stores.defaultLocale,
+            })
+            .from(stores)
+            .where(eq(stores.id, storeId))
+            .limit(1);
+          const [ownerRow] = await tx
+            .select({
+              id: users.id,
+              name: users.name,
+              email: users.email,
+              preferredLocale: users.preferredLocale,
+            })
+            .from(users)
+            .where(
+              and(
+                eq(users.storeId, storeId),
+                eq(users.role, 'STORE_OWNER'),
+                eq(users.isActive, true),
+              ),
+            )
+            .limit(1);
+          if (storeRow && ownerRow) {
+            return {
+              changed: 0,
+              trialWarning: {
+                subId: sub.id,
+                daysRemaining,
+                endsDate: BusinessDate.toISO(BusinessDate.fromInstant(sub.trialEndsAt)),
+                storeName: storeRow.commercialName,
+                ownerId: ownerRow.id,
+                ownerName: ownerRow.name,
+                ownerEmail: ownerRow.email,
+                locale: isLocale(ownerRow.preferredLocale)
+                  ? ownerRow.preferredLocale
+                  : isLocale(storeRow.defaultLocale)
+                    ? storeRow.defaultLocale
+                    : ('es' as const),
+              },
+            };
+          }
+        }
+      }
+
+      return { changed: 0, trialWarning: null };
+    });
+
+    if (outcome.trialWarning) {
+      const w = outcome.trialWarning;
+      const appUrl = (process.env.APP_URL || 'http://localhost:3000/app').replace(/\/$/, '');
+      const mailer = this.options.notificationMailer ?? getNotificationMailer();
+      if (mailer.sendSubscriptionNotice) {
+        try {
+          await mailer.sendSubscriptionNotice(
+            {
+              kind: 'trial_ending',
+              to: w.ownerEmail,
+              name: w.ownerName,
+              storeName: w.storeName,
+              locale: w.locale,
+              daysLeft: w.daysRemaining,
+              endsDate: w.endsDate,
+              url: `${appUrl}/settings#plans`,
+            },
+            {
+              storeId,
+              userId: w.ownerId,
+              referenceType: 'trial_ending',
+              referenceId: w.subId,
+            },
+          );
+          return 1;
+        } catch {
+          return 0;
+        }
+      }
+    }
+
+    return outcome.changed;
   }
 
   acceptExpiredConsents(storeId: string, now: Date): Promise<number> {

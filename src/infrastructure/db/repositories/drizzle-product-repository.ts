@@ -1,5 +1,4 @@
 import { and, asc, count, eq } from 'drizzle-orm';
-import type { PlanTier, Subscription, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import type { ProductDetails } from '@/core/domain/catalog/product-details';
 import { Quantity } from '@/core/domain/catalog/quantity';
 import type {
@@ -19,11 +18,11 @@ import {
   inventoryMovements,
   productPriceHistory,
   products,
-  storeSubscriptions,
   suppliers,
   units,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
+import { selectSubscription } from './drizzle-subscription-repository';
 
 const BARCODE_CONSTRAINT = 'uq_products_store_barcode';
 
@@ -46,25 +45,12 @@ function detailColumns(details: ProductDetails) {
  * a la vez no pueden pasar ambas el límite del plan (US26 crit. 8).
  */
 async function hasRoomForProduct(tx: Tx, storeId: string, canAdd: AddProductGuard) {
-  const [subscription] = await tx
-    .select({
-      planTier: storeSubscriptions.planTier,
-      status: storeSubscriptions.status,
-      trialEndsAt: storeSubscriptions.trialEndsAt,
-    })
-    .from(storeSubscriptions)
-    .where(eq(storeSubscriptions.storeId, storeId))
-    .for('update');
-  if (!subscription) return false;
+  const current = await selectSubscription(tx, storeId, { forUpdate: true });
+  if (!current) return false;
   const [active] = await tx
     .select({ total: count() })
     .from(products)
     .where(and(eq(products.storeId, storeId), eq(products.isActive, true)));
-  const current: Subscription = {
-    planTier: subscription.planTier as PlanTier,
-    status: subscription.status as SubscriptionStatus,
-    trialEndsAt: subscription.trialEndsAt,
-  };
   return canAdd(current, active?.total ?? 0);
 }
 

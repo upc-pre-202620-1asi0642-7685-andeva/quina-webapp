@@ -101,6 +101,24 @@
         "outro": "Gracias por pagar. Tu cuenta de ese ciclo quedó cancelada."
       },
       "portalButton": "Ver mi estado de cuenta"
+    },
+    "subscription": {
+      "action": "Ver mi suscripción",
+      "trialEnding": {
+        "subject": "Tu prueba gratis de Bodega Pro termina en {days, plural, one {# día} other {# días}}",
+        "intro": "Tu prueba gratis de Bodega Pro para {store} termina en {days, plural, one {# día} other {# días}}.",
+        "outro": "Elige un plan antes de que termine para seguir usando los avisos automáticos y todos tus cupos sin interrupción."
+      },
+      "paymentFailed": {
+        "subject": "No pudimos cobrar tu suscripción de {store}",
+        "intro": "No se pudo procesar el pago de tu plan {plan} para {store}. Tienes 5 días hábiles de gracia antes de pasar al Plan Casero.",
+        "outro": "Actualiza tu pago en Ajustes para mantener tu plan activo."
+      },
+      "paymentApproved": {
+        "subject": "Recibimos el pago de tu plan {plan}",
+        "intro": "Confirmamos tu pago de S/ {amount} para el plan {plan} de {store}.",
+        "outro": "Tu suscripción está al día. Puedes ver e imprimir tu comprobante en Ajustes."
+      }
     }
   },
   "Auth": {
@@ -328,6 +346,10 @@
   "Shell": {
     "logoAlt": "Quina",
     "trialUntil": "Prueba Pro hasta el {date}",
+    "trialDays": "Prueba Pro: {days, plural, one {queda # día} other {quedan # días}}",
+    "graceDays": "Pago pendiente: {days, plural, one {queda # día hábil de gracia} other {quedan # días hábiles de gracia}}",
+    "readOnlyLock": "Modo solo lectura: superas los límites de tu plan. Paga tu suscripción o ajusta tu uso en Ajustes.",
+    "managePlan": "Ir a Ajustes",
     "nav": {
       "label": "Navegación principal",
       "home": "Inicio",
@@ -554,9 +576,15 @@
       "BODEGA_PRO": "Bodega Pro",
       "NEGOCIO_PLUS": "Negocio Plus"
     },
+    "intervals": {
+      "MONTHLY": "Mensual",
+      "YEARLY": "Anual (-20 %)"
+    },
     "unlimited": "sin límite",
     "perMonth": "al mes",
+    "perYear": "al año",
     "annual": "o {price} al año",
+    "annualSavings": "Equivale a {monthly} al mes · ahorras 20 %",
     "freeForever": "Gratis para siempre",
     "availableIn": "en {plan}",
     "features": {
@@ -671,7 +699,13 @@
     "title": "Ajustes",
     "subtitle": "Tu plan y lo que estás usando.",
     "currentPlan": "Tu plan: {plan}",
-    "trialUntil": "Prueba gratis hasta el {date}. Después pasas a Casero si no eliges un plan.",
+    "trialUntil": "Prueba gratis hasta el {date} ({days, plural, one {queda # día} other {quedan # días}}). Después pasas a Casero si no eliges un plan.",
+    "activeUntil": "Próxima renovación o vencimiento: {date}.",
+    "canceledUntil": "Renovación cancelada. Seguirás con {plan} hasta el {date}; luego pasarás al Plan Casero.",
+    "graceWarningTitle": "No pudimos cobrar tu suscripción",
+    "graceWarningBody": "Tienes hasta el {date} ({days, plural, one {# día hábil} other {# días hábiles}} de gracia) para renovar tu pago antes de pasar al Plan Casero.",
+    "readOnlyLockTitle": "Tu tienda está en modo solo lectura",
+    "readOnlyLockBody": "Tu uso actual supera los límites del plan {plan}. Para volver a vender o registrar operaciones, suscríbete a un plan superior o da de baja vecinos, productos o usuarios hasta entrar en el límite. Siempre puedes cobrar deudas pendientes.",
     "usage": {
       "activeCreditCustomers": "Vecinos con fiado activo",
       "users": "Usuarios",
@@ -680,8 +714,69 @@
     "usageOf": "{used} de {max}",
     "usageUnlimited": "{used} · sin límite",
     "plansTitle": "Planes",
-    "plansSubtitle": "Precios en soles.",
-    "yourPlan": "Tu plan",
+    "plansSubtitle": "Precios en soles. Paga con tarjeta o Yape por Mercado Pago.",
+    "intervalLabel": "Frecuencia de pago",
+    "intervalMonthly": "Mensual (tarjeta recurrente)",
+    "intervalYearly": "Anual -20 % (Yape o tarjeta)",
+    "yourPlan": "Tu plan actual",
+    "subscribe": "Elegir {plan}",
+    "subscribing": "Abriendo pago…",
+    "cancelRenewal": "Cancelar renovación automática",
+    "cancelingRenewal": "Cancelando…",
+    "cancelConfirmTitle": "¿Cancelar la renovación automática?",
+    "cancelConfirmBody": "Mantendrás todos los beneficios de tu plan hasta el fin del periodo pagado ({date}). Después tu tienda pasará al Plan Casero sin cobros adicionales.",
+    "cancelConfirmAction": "Sí, cancelar renovación",
+    "cancelKeepAction": "Mantener mi plan",
+    "billingNotice": {
+      "approved": "Pago confirmado. Tu plan ya está activo.",
+      "rejected": "El pago fue rechazado. Tienes 5 días hábiles de gracia para reintentar.",
+      "canceled": "Cancelaste la renovación automática. Conservarás tu plan hasta el fin del periodo pagado.",
+      "checkoutError": "No pudimos iniciar el pago. Intenta de nuevo."
+    },
+    "localCheckout": {
+      "title": "Pasarela local de prueba (Mercado Pago)",
+      "subtitle": "Estás en modo local sin conexión externa. Simula el resultado del webhook de Mercado Pago para {plan} ({interval} · S/ {amount}):",
+      "approve": "Simular pago aprobado",
+      "reject": "Simular pago rechazado",
+      "processing": "Procesando…"
+    },
+    "billingHistory": {
+      "title": "Historial de pagos de suscripción",
+      "subtitle": "Tus pagos procesados y sus comprobantes.",
+      "empty": "Aún no tienes pagos de suscripción registrados.",
+      "colDate": "Fecha",
+      "colPlan": "Plan",
+      "colMethod": "Medio",
+      "colAmount": "Monto",
+      "colStatus": "Estado",
+      "colReceipt": "Comprobante",
+      "seeReceipt": "Ver recibo",
+      "externalReceipt": "Comprobante MP",
+      "statuses": {
+        "APPROVED": "Aprobado",
+        "REJECTED": "Rechazado",
+        "REFUNDED": "Reembolsado"
+      },
+      "methods": {
+        "yape": "Yape",
+        "card": "Tarjeta"
+      }
+    },
+    "billingReceipt": {
+      "back": "Volver a ajustes",
+      "title": "Comprobante de suscripción",
+      "subtitle": "{store} · RUC/DNI {taxId}",
+      "reference": "Operación MP",
+      "plan": "Plan contratado",
+      "interval": "Modalidad",
+      "method": "Medio de pago",
+      "paidAt": "Fecha de proceso",
+      "period": "Periodo cubierto",
+      "periodRange": "Del {start} al {end}",
+      "status": "Estado",
+      "total": "Total",
+      "print": "Imprimir o guardar PDF"
+    },
     "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
     "payment": {
       "title": "Datos de cobro",
@@ -1619,7 +1714,14 @@
       "LOGIN_FAILED": "Intento fallido de ingreso",
       "LOGIN_BLOCKED": "Intento de ingreso en cuenta bloqueada",
       "LOCK_ACCOUNT": "Bloqueo de cuenta por seguridad",
-      "ACCEPT_TERMS": "Aceptación de términos"
+      "ACCEPT_TERMS": "Aceptación de términos",
+      "SUBSCRIBE_PLAN": "Suscripción a plan",
+      "RENEW_SUBSCRIPTION": "Renovación de suscripción",
+      "MARK_SUBSCRIPTION_PAST_DUE": "Pago de suscripción fallido (en gracia)",
+      "CANCEL_SUBSCRIPTION_RENEWAL": "Cancelación de renovación de plan",
+      "EXPIRE_TRIAL": "Fin de prueba Pro (pase a Casero)",
+      "EXPIRE_GRACE_PERIOD": "Fin de periodo de gracia (pase a Casero)",
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Fin de periodo pagado (pase a Casero)"
     },
     "entities": {
       "sales": "Ventas",
@@ -1632,7 +1734,9 @@
       "purchase_orders": "Pedidos de reposición",
       "suppliers": "Proveedores",
       "users": "Usuarios",
-      "stores": "Tienda"
+      "stores": "Tienda",
+      "store_subscriptions": "Suscripción",
+      "subscription_payments": "Pagos de suscripción"
     }
   }
 }

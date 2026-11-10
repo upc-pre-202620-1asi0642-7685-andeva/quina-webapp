@@ -11,6 +11,9 @@ import { BottomNav, SidebarNav } from './shell-nav';
 export type ShellStore = {
   name: string;
   trialEndsAt: Date | null;
+  trialDaysRemaining?: number | null;
+  graceDaysRemaining?: number | null;
+  isReadOnly?: boolean;
   lowStockCount?: number;
 };
 
@@ -26,7 +29,17 @@ export async function AppShell({
 }) {
   const t = await getTranslations('Shell');
   const tDashboard = await getTranslations('Dashboard');
-  const trial = store.trialEndsAt ? t('trialUntil', { date: formatDate(store.trialEndsAt) }) : null;
+  const trial =
+    store.trialDaysRemaining !== undefined && store.trialDaysRemaining !== null
+      ? t('trialDays', { days: store.trialDaysRemaining })
+      : store.trialEndsAt
+        ? t('trialUntil', { date: formatDate(store.trialEndsAt) })
+        : null;
+  const grace =
+    store.graceDaysRemaining !== undefined && store.graceDaysRemaining !== null
+      ? t('graceDays', { days: store.graceDaysRemaining })
+      : null;
+  const isReadOnly = Boolean(store.isReadOnly);
   const lowStockCount = store.lowStockCount ?? 0;
 
   return (
@@ -49,8 +62,20 @@ export async function AppShell({
               <span>{t('lowStockAlert', { count: lowStockCount })}</span>
             </Link>
           ) : null}
-          {trial ? (
-            <p className="rounded-card bg-soft px-4 py-3 text-sm text-soft-ink">{trial}</p>
+          {grace ? (
+            <Link
+              href="/settings#plans"
+              className="rounded-card bg-amber/12 px-4 py-3 text-xs font-medium text-amber-ink hover:opacity-90"
+            >
+              {grace}
+            </Link>
+          ) : trial ? (
+            <Link
+              href="/settings#plans"
+              className="rounded-card bg-soft px-4 py-3 text-sm text-soft-ink hover:opacity-90"
+            >
+              {trial}
+            </Link>
           ) : null}
           <Link
             href="/profile"
@@ -91,6 +116,40 @@ export async function AppShell({
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-28 lg:px-8 lg:pt-8 lg:pb-12">
+          {isReadOnly ? (
+            <div
+              role="alert"
+              className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-card border border-error/50 bg-error/12 px-4 py-3 text-sm font-medium text-error-ink print:hidden"
+            >
+              <span>{t('readOnlyLock')}</span>
+              {user.role === 'STORE_OWNER' ? (
+                <Link href="/settings#plans" className="font-semibold underline">
+                  {t('managePlan')}
+                </Link>
+              ) : null}
+            </div>
+          ) : grace ? (
+            <div
+              role="status"
+              className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-card border border-amber/25 bg-amber/12 px-4 py-3 text-sm text-amber-ink lg:hidden print:hidden"
+            >
+              <span>{grace}</span>
+              {user.role === 'STORE_OWNER' ? (
+                <Link href="/settings#plans" className="font-semibold underline">
+                  {t('managePlan')}
+                </Link>
+              ) : null}
+            </div>
+          ) : trial ? (
+            <div className="mb-4 flex items-center justify-between gap-3 rounded-card bg-soft px-4 py-2.5 text-xs font-medium text-soft-ink lg:hidden print:hidden">
+              <span>{trial}</span>
+              {user.role === 'STORE_OWNER' ? (
+                <Link href="/settings#plans" className="font-semibold underline">
+                  {t('managePlan')}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
           {children}
         </main>
       </div>

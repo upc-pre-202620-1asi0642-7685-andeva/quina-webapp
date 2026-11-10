@@ -6,11 +6,16 @@ import type {
   NotificationMailKind,
 } from '@/core/domain/ports/notification-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
-import { renderAuthEmail, renderNotificationEmail, type EmailData } from './templates';
+import {
+  renderAuthEmail,
+  renderNotificationEmail,
+  renderSubscriptionEmail,
+  type EmailData,
+} from './templates';
 
 export type OutboxMail = {
   to: string;
-  kind: AuthMailKind | NotificationMailKind;
+  kind: AuthMailKind | NotificationMailKind | `subscription-${string}`;
   otp?: string;
   url?: string;
   locale: Locale;
@@ -62,6 +67,16 @@ export class OutboxAuthMailer implements AuthMailer, NotificationMailer {
   sendAccountSetup(input: Parameters<NotificationMailer['sendAccountSetup']>[0]): Promise<void> {
     const { subject } = renderNotificationEmail('account-setup', input.locale, input);
     return this.save(input.to, 'account-setup', input.locale, subject, { url: input.url });
+  }
+
+  sendSubscriptionNotice(
+    input: Parameters<NonNullable<NotificationMailer['sendSubscriptionNotice']>>[0],
+  ): Promise<void> {
+    const { subject } = renderSubscriptionEmail(input);
+    const url = input.kind === 'payment_approved' ? input.receiptUrl : input.url;
+    return this.save(input.to, `subscription-${input.kind}`, input.locale, subject, {
+      url,
+    });
   }
 
   private write(to: string, kind: AuthMailKind, locale: Locale, data: EmailData): Promise<void> {

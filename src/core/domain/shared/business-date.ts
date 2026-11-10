@@ -53,6 +53,49 @@ export const BusinessDate = {
     return make(Math.floor(index / 12), (index % 12) + 1, date.day);
   },
 
+  /** Suma meses calendario ajustando al último día del mes destino si el día es 29, 30 o 31. */
+  addCalendarMonths(date: BusinessDate, months: number): BusinessDate {
+    if (!Number.isInteger(months)) throw new RangeError('months debe ser entero');
+    const index = date.year * 12 + (date.month - 1) + months;
+    const targetYear = Math.floor(index / 12);
+    const targetMonth = (((index % 12) + 12) % 12) + 1;
+    const lastDay = new Date(Date.UTC(targetYear, targetMonth, 0)).getUTCDate();
+    return make(targetYear, targetMonth, Math.min(date.day, lastDay));
+  },
+
+  /** Suma `days` días calendario (positivos o negativos). */
+  addDays(date: BusinessDate, days: number): BusinessDate {
+    if (!Number.isInteger(days)) throw new RangeError('days debe ser entero');
+    const utc = new Date(Date.UTC(date.year, date.month - 1, date.day + days));
+    return make(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate());
+  },
+
+  /** Suma días hábiles (lunes a viernes) en Lima (US23 crit. 4: 5 días hábiles de gracia). */
+  addBusinessDays(date: BusinessDate, businessDays: number): BusinessDate {
+    if (!Number.isInteger(businessDays) || businessDays < 0) {
+      throw new RangeError('businessDays debe ser un entero no negativo');
+    }
+    let current = date;
+    let remaining = businessDays;
+    while (remaining > 0) {
+      current = BusinessDate.addDays(current, 1);
+      const dayOfWeek = new Date(
+        Date.UTC(current.year, current.month - 1, current.day),
+      ).getUTCDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        remaining -= 1;
+      }
+    }
+    return current;
+  },
+
+  /** Días calendario enteros de `from` a `to` (`to - from`). */
+  daysBetween(from: BusinessDate, to: BusinessDate): number {
+    const startFrom = Date.UTC(from.year, from.month - 1, from.day);
+    const startTo = Date.UTC(to.year, to.month - 1, to.day);
+    return Math.round((startTo - startFrom) / (24 * 60 * 60 * 1000));
+  },
+
   isLastDayOfFebruary(date: BusinessDate): boolean {
     return date.month === 2 && new Date(Date.UTC(date.year, 1, date.day + 1)).getUTCMonth() === 2;
   },

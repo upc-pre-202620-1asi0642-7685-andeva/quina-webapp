@@ -89,7 +89,7 @@ export async function resendInviteAction(userId: string): Promise<TeamActionResu
 }
 
 export async function cancelInviteAction(userId: string): Promise<TeamActionResult> {
-  const user = await authorizeStore('team.manage');
+  const user = await authorizeStore('team.manage', { allowWhenReadOnly: true });
   if (!user || !idSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
   const result = await new CancelInviteUseCase(new DrizzleTeamRepository()).execute({
     storeId: user.storeId,
@@ -106,7 +106,7 @@ export async function setEmployeeActiveAction(
   userId: string,
   active: boolean,
 ): Promise<TeamActionResult> {
-  const user = await authorizeStore('team.manage');
+  const user = await authorizeStore('team.manage', { allowWhenReadOnly: !active });
   if (!user || !idSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
   const result = await new SetEmployeeActiveUseCase(new DrizzleTeamRepository()).execute({
     storeId: user.storeId,

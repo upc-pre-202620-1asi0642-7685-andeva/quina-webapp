@@ -35,6 +35,7 @@ export default defineConfig(
     'test-results/',
     'next-env.d.ts',
     '.claude/',
+    '.agents/',
   ]),
   nextVitals,
   nextTs,

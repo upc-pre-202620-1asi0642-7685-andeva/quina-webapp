@@ -75,4 +75,50 @@ describe('PlanLimits (US26)', () => {
     expect(PlanLimits.upgradeFor('users', 3)).toBe('NEGOCIO_PLUS');
     expect(PlanLimits.featureTier('ai')).toBe('BODEGA_PRO');
   });
+
+  it('mantiene el plan durante los 5 días hábiles de gracia en PAST_DUE y baja a Casero al vencer (US23 crit. 4)', () => {
+    // Viernes 13 nov 2026 en Lima -> 5 días hábiles (lun, mar, mié, jue, vie) terminan el viernes 20 nov al fin del día
+    const fridayFailure = new Date('2026-11-13T15:00:00Z');
+    const graceEnd = PlanLimits.gracePeriodEnd(fridayFailure);
+    const pastDue = subscription({
+      planTier: 'BODEGA_PRO',
+      status: 'PAST_DUE',
+      gracePeriodEndsAt: graceEnd,
+    });
+    expect(PlanLimits.effectiveTier(pastDue, new Date('2026-11-20T20:00:00Z'))).toBe('BODEGA_PRO');
+    expect(PlanLimits.graceDaysRemaining(pastDue, new Date('2026-11-18T15:00:00Z'))).toBe(2);
+    expect(PlanLimits.effectiveTier(pastDue, new Date('2026-11-21T06:00:00Z'))).toBe('CASERO');
+  });
+
+  it('mantiene el plan con renovación cancelada hasta el fin del periodo pagado (US23 crit. 6)', () => {
+    const canceledAtEnd = subscription({
+      planTier: 'NEGOCIO_PLUS',
+      status: 'ACTIVE',
+      cancelAtPeriodEnd: true,
+      currentPeriodEnd: new Date('2026-11-25T23:59:59Z'),
+    });
+    expect(PlanLimits.effectiveTier(canceledAtEnd, NOW)).toBe('NEGOCIO_PLUS');
+    expect(PlanLimits.effectiveTier(canceledAtEnd, new Date('2026-11-26T00:00:01Z'))).toBe(
+      'CASERO',
+    );
+  });
+
+  it('activa el bloqueo de solo lectura cuando el uso supera los límites del plan efectivo (US26 crit. 7 / D1)', () => {
+    const usage = { activeCreditCustomers: 18, users: 2, products: 60 };
+    expect(PlanLimits.isReadOnly('BODEGA_PRO', usage)).toBe(false);
+    expect(PlanLimits.isReadOnly('CASERO', usage)).toBe(true);
+    expect(PlanLimits.overLimitResources('CASERO', usage)).toEqual([
+      'activeCreditCustomers',
+      'users',
+      'products',
+    ]);
+    expect(PlanLimits.upgradeForUsage(usage)).toBe('BODEGA_PRO');
+  });
+
+  it('calcula precios mensuales y anuales con 20 % de descuento (US23 crit. 1 y 7)', () => {
+    expect(PlanLimits.planPriceFor('BODEGA_PRO', 'MONTHLY')).toBe('29.00');
+    expect(PlanLimits.planPriceFor('BODEGA_PRO', 'YEARLY')).toBe('279.00');
+    expect(PlanLimits.planPriceFor('NEGOCIO_PLUS', 'MONTHLY')).toBe('69.00');
+    expect(PlanLimits.planPriceFor('NEGOCIO_PLUS', 'YEARLY')).toBe('660.00');
+  });
 });
