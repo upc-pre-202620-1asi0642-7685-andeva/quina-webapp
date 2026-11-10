@@ -5,6 +5,7 @@ import type { Locale } from '@/core/domain/shared/locale';
 import {
   renderAuthEmail,
   renderNotificationEmail,
+  renderSubscriptionEmail,
   type EmailData,
   type RenderedEmail,
 } from './templates';
@@ -59,6 +60,12 @@ export class ResendAuthMailer implements AuthMailer, NotificationMailer {
       'account-setup',
       renderNotificationEmail('account-setup', input.locale, input),
     );
+  }
+
+  sendSubscriptionNotice(
+    input: Parameters<NonNullable<NotificationMailer['sendSubscriptionNotice']>>[0],
+  ): Promise<void> {
+    return this.deliver(input.to, `subscription-${input.kind}`, renderSubscriptionEmail(input));
   }
 
   private send(to: string, kind: AuthMailKind, locale: Locale, data: EmailData): Promise<void> {

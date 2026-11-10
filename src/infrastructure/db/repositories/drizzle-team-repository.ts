@@ -1,5 +1,4 @@
 import { and, count, eq, sql } from 'drizzle-orm';
-import type { PlanTier, Subscription, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import type {
   InviteData,
   MemberData,
@@ -9,8 +8,9 @@ import type {
 import type { Database } from '../connection';
 import { db } from '../connection';
 import { uniqueViolation } from '../errors';
-import { auditLogs, sessions, storeSubscriptions, users, verifications } from '../schema';
+import { auditLogs, sessions, users, verifications } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
+import { selectSubscription } from './drizzle-subscription-repository';
 
 /** Prefijo de `verifications.identifier` para los enlaces de cuenta. */
 export const ACCOUNT_SETUP_PREFIX = 'account-setup:';
@@ -32,25 +32,12 @@ export const WITHOUT_PASSWORD = sql`not ${HAS_PASSWORD}`;
  * dueño e invitados incluidos (D4): dos invitaciones a la vez no pasan el límite.
  */
 async function hasSeat(tx: Tx, storeId: string, canAdd: SeatGuard): Promise<boolean> {
-  const [subscription] = await tx
-    .select({
-      planTier: storeSubscriptions.planTier,
-      status: storeSubscriptions.status,
-      trialEndsAt: storeSubscriptions.trialEndsAt,
-    })
-    .from(storeSubscriptions)
-    .where(eq(storeSubscriptions.storeId, storeId))
-    .for('update');
-  if (!subscription) return false;
+  const current = await selectSubscription(tx, storeId, { forUpdate: true });
+  if (!current) return false;
   const [seats] = await tx
     .select({ total: count() })
     .from(users)
     .where(and(eq(users.storeId, storeId), eq(users.isActive, true)));
-  const current: Subscription = {
-    planTier: subscription.planTier as PlanTier,
-    status: subscription.status as SubscriptionStatus,
-    trialEndsAt: subscription.trialEndsAt,
-  };
   return canAdd(current, seats?.total ?? 0);
 }
 

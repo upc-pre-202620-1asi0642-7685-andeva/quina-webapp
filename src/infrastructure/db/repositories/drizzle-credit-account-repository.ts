@@ -1,5 +1,4 @@
 import { and, count, eq, inArray, ne } from 'drizzle-orm';
-import type { PlanTier, Subscription, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import type { RateCap, RateKind } from '@/core/domain/credit/rate-cap';
 import type { RateInput, RatePeriod, RateType } from '@/core/domain/finance/rate';
 import type {
@@ -23,9 +22,9 @@ import {
   customerConsents,
   customers,
   settlementCycles,
-  storeSubscriptions,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
+import { selectSubscription } from './drizzle-subscription-repository';
 
 function termColumns(terms: CreditAccountTerms) {
   return {
@@ -84,25 +83,12 @@ export function termsFromRow(row: typeof creditAccounts.$inferSelect): CreditAcc
  * aperturas a la vez no pueden pasar ambas el límite del plan (US26 crit. 8).
  */
 async function hasRoomForActive(tx: Tx, storeId: string, canOpen: OpenAccountGuard) {
-  const [subscription] = await tx
-    .select({
-      planTier: storeSubscriptions.planTier,
-      status: storeSubscriptions.status,
-      trialEndsAt: storeSubscriptions.trialEndsAt,
-    })
-    .from(storeSubscriptions)
-    .where(eq(storeSubscriptions.storeId, storeId))
-    .for('update');
-  if (!subscription) return false;
+  const current = await selectSubscription(tx, storeId, { forUpdate: true });
+  if (!current) return false;
   const [active] = await tx
     .select({ total: count() })
     .from(creditAccounts)
     .where(and(eq(creditAccounts.storeId, storeId), eq(creditAccounts.status, 'ACTIVE')));
-  const current: Subscription = {
-    planTier: subscription.planTier as PlanTier,
-    status: subscription.status as SubscriptionStatus,
-    trialEndsAt: subscription.trialEndsAt,
-  };
   return canOpen(current, active?.total ?? 0);
 }
 

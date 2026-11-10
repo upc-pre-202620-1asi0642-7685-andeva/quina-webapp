@@ -1,5 +1,4 @@
 import { and, asc, count, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
-import type { PlanTier, Subscription, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import type { PurchaseProductInfo } from '@/core/domain/catalog/purchase';
 import { Quantity } from '@/core/domain/catalog/quantity';
 import {
@@ -26,11 +25,11 @@ import {
   purchaseOrderItems,
   purchaseOrders,
   purchases,
-  storeSubscriptions,
   suppliers,
   units,
 } from '../schema';
 import { withTenant, type Tx } from '../with-tenant';
+import { selectSubscription } from './drizzle-subscription-repository';
 
 const SUPPLIER_TAX_CONSTRAINT = 'uq_suppliers_store_tax_id';
 
@@ -56,16 +55,8 @@ async function canAttachReceipts(
   canAttach: AddReceiptsGuard,
 ): Promise<boolean> {
   if (adding === 0) return true;
-  const [subscription] = await tx
-    .select({
-      planTier: storeSubscriptions.planTier,
-      status: storeSubscriptions.status,
-      trialEndsAt: storeSubscriptions.trialEndsAt,
-    })
-    .from(storeSubscriptions)
-    .where(eq(storeSubscriptions.storeId, storeId))
-    .for('update');
-  if (!subscription) return false;
+  const current = await selectSubscription(tx, storeId, { forUpdate: true });
+  if (!current) return false;
   const { start, end } = currentLimaMonthRange(now);
   const [used] = await tx
     .select({ total: count() })
@@ -77,11 +68,6 @@ async function canAttachReceipts(
         lte(purchaseAttachments.createdAt, end),
       ),
     );
-  const current: Subscription = {
-    planTier: subscription.planTier as PlanTier,
-    status: subscription.status as SubscriptionStatus,
-    trialEndsAt: subscription.trialEndsAt,
-  };
   return canAttach(current, used?.total ?? 0, adding);
 }
 

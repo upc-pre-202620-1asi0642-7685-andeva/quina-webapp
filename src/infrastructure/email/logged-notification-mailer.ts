@@ -4,7 +4,7 @@ import { db, type Database } from '../db/connection';
 import { notificationLogs } from '../db/schema';
 import { withTenant } from '../db/with-tenant';
 
-type LogType = 'WELCOME' | 'EMPLOYEE_INVITE';
+type LogType = 'WELCOME' | 'EMPLOYEE_INVITE' | 'SUBSCRIPTION';
 
 /**
  * Envía con el transporte real y registra el resultado en `notification_logs`
@@ -35,6 +35,17 @@ export class LoggedNotificationMailer implements NotificationMailer {
     );
   }
 
+  sendSubscriptionNotice(
+    input: Parameters<NonNullable<NotificationMailer['sendSubscriptionNotice']>>[0],
+    context: MailContext,
+  ): Promise<void> {
+    return this.track('SUBSCRIPTION', input.to, input.locale, context, () =>
+      this.inner.sendSubscriptionNotice
+        ? this.inner.sendSubscriptionNotice(input, context)
+        : Promise.resolve(),
+    );
+  }
+
   private async track(
     type: LogType,
     to: string,
@@ -55,6 +66,8 @@ export class LoggedNotificationMailer implements NotificationMailer {
       notificationType: type,
       recipientEmail: to,
       locale,
+      referenceType: context.referenceType ?? null,
+      referenceId: context.referenceId ?? null,
       status: failure ? 'FAILED' : 'SENT',
       errorMessage: failure ? String((failure as Error).message ?? failure).slice(0, 500) : null,
       sentAt: failure ? null : new Date(),
