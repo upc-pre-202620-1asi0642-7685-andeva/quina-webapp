@@ -38,6 +38,7 @@ function gateway(stores: DailyStore[], failOn: string | null = null) {
     markOverdueCycles: step('overdue'),
     queueChargeDigests: step('digest'),
     queuePaymentReminders: step('reminder'),
+    processSubscriptionLifecycle: step('subscription'),
     dispatchPending: async (storeId) => {
       calls.push(`dispatch:${storeId}`);
       return { sent: 1, failed: 0, pending: 0 };
@@ -47,7 +48,7 @@ function gateway(stores: DailyStore[], failOn: string | null = null) {
 }
 
 describe('RunDailyProcessUseCase (docs §11.1, D1b, P5)', () => {
-  it('corre los pasos en orden: conformidad, corte, mora, resumen y recordatorios; envía al final', async () => {
+  it('corre los pasos en orden: conformidad, corte, mora, resumen, recordatorios y suscripción; envía al final', async () => {
     const { fake, calls } = gateway([pro]);
     await new RunDailyProcessUseCase(fake).execute({ now: NOW, budgetMs: 50_000 });
     expect(calls).toEqual([
@@ -56,20 +57,23 @@ describe('RunDailyProcessUseCase (docs §11.1, D1b, P5)', () => {
       'overdue:pro:true',
       'digest:pro',
       'reminder:pro',
+      'subscription:pro',
       'dispatch:pro',
     ]);
   });
 
-  it('en Casero no encola resúmenes, recordatorios ni avisos de mora; el corte y la mora sí corren', async () => {
+  it('en Casero no encola resúmenes, recordatorios ni avisos de mora; el corte, la mora y la suscripción sí corren', async () => {
     const { fake, calls } = gateway([casero, expiredTrial]);
     await new RunDailyProcessUseCase(fake).execute({ now: NOW, budgetMs: 50_000 });
     expect(calls).toEqual([
       'consent:casero',
       'cutoff:casero',
       'overdue:casero:false',
+      'subscription:casero',
       'consent:trial',
       'cutoff:trial',
       'overdue:trial:false',
+      'subscription:trial',
       'dispatch:casero',
       'dispatch:trial',
     ]);
@@ -94,6 +98,7 @@ describe('RunDailyProcessUseCase (docs §11.1, D1b, P5)', () => {
       overdue: 1,
       digest: 1,
       reminder: 1,
+      subscription: 1,
     });
     expect(summary.mail).toEqual({ sent: 1, failed: 0, pending: 0 });
   });

@@ -5,7 +5,8 @@ import type {
   DispatchResult,
 } from '@/core/domain/ports/daily-process';
 
-export type DailyStepName = 'consent' | 'cutoff' | 'overdue' | 'digest' | 'reminder';
+export type DailyStepName =
+  'consent' | 'cutoff' | 'overdue' | 'digest' | 'reminder' | 'subscription';
 
 export type DailyProcessSummary = {
   stores: number;
@@ -41,6 +42,11 @@ const STEPS: readonly DailyStep[] = [
   },
   { name: 'digest', automaticOnly: true, run: (g, id, now) => g.queueChargeDigests(id, now) },
   { name: 'reminder', automaticOnly: true, run: (g, id, now) => g.queuePaymentReminders(id, now) },
+  {
+    name: 'subscription',
+    automaticOnly: false,
+    run: (g, id, now) => g.processSubscriptionLifecycle(id, now),
+  },
 ];
 
 /**
@@ -58,7 +64,7 @@ export class RunDailyProcessUseCase {
     const stores = await this.gateway.activeStores();
     const summary: DailyProcessSummary = {
       stores: stores.length,
-      steps: { consent: 0, cutoff: 0, overdue: 0, digest: 0, reminder: 0 },
+      steps: { consent: 0, cutoff: 0, overdue: 0, digest: 0, reminder: 0, subscription: 0 },
       mail: { sent: 0, failed: 0, pending: 0 },
       errors: [],
     };

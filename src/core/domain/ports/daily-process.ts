@@ -15,6 +15,12 @@ export type DispatchResult = { sent: number; failed: number; pending: number };
  */
 export interface DailyProcessGateway {
   activeStores(): Promise<DailyStore[]>;
+  /**
+   * Paso de suscripciones (US23 crit. 4 y 6; US25 crit. 3 y 4): envía el aviso
+   * 3 días antes del fin de prueba y pasa a Casero las pruebas, períodos de
+   * gracia o suscripciones canceladas que ya vencieron.
+   */
+  processSubscriptionLifecycle(storeId: string, now: Date): Promise<StepCount>;
   /** US11 crit. 4: cargos `PENDING` cuyo plazo de 48 h ya pasó quedan `ACCEPTED`. */
   acceptExpiredConsents(storeId: string, now: Date): Promise<StepCount>;
   /** US10: liquida los ciclos cuyo corte ya pasó y deja en cola su estado de cuenta. */
