@@ -101,6 +101,24 @@
         "outro": "Thank you for paying. That cycle of your account is settled."
       },
       "portalButton": "See my statement"
+    },
+    "subscription": {
+      "action": "View my subscription",
+      "trialEnding": {
+        "subject": "Your free Bodega Pro trial ends in {days, plural, one {# day} other {# days}}",
+        "intro": "Your free Bodega Pro trial for {store} ends in {days, plural, one {# day} other {# days}}.",
+        "outro": "Choose a plan before it ends to keep automatic payment reminders and all your quotas without interruption."
+      },
+      "paymentFailed": {
+        "subject": "We could not charge your subscription for {store}",
+        "intro": "We could not process the payment for your {plan} plan at {store}. You have 5 business days of grace before moving to the Casero plan.",
+        "outro": "Update your payment in Settings to keep your plan active."
+      },
+      "paymentApproved": {
+        "subject": "We received the payment for your {plan} plan",
+        "intro": "We confirmed your payment of S/ {amount} for the {plan} plan of {store}.",
+        "outro": "Your subscription is up to date. You can view and print your receipt in Settings."
+      }
     }
   },
   "Auth": {
@@ -328,6 +346,10 @@
   "Shell": {
     "logoAlt": "Quina",
     "trialUntil": "Pro Trial until {date}",
+    "trialDays": "Pro Trial: {days, plural, one {# day left} other {# days left}}",
+    "graceDays": "Payment due: {days, plural, one {# business day of grace left} other {# business days of grace left}}",
+    "readOnlyLock": "Read-only mode: you exceed your plan limits. Pay your subscription or adjust your usage in Settings.",
+    "managePlan": "Go to Settings",
     "nav": {
       "label": "Main navigation",
       "home": "Home",
@@ -554,9 +576,15 @@
       "BODEGA_PRO": "Bodega Pro",
       "NEGOCIO_PLUS": "Negocio Plus"
     },
+    "intervals": {
+      "MONTHLY": "Monthly",
+      "YEARLY": "Yearly (-20 %)"
+    },
     "unlimited": "no limit",
     "perMonth": "per month",
+    "perYear": "per year",
     "annual": "or {price} per year",
+    "annualSavings": "Equals {monthly} per month · save 20 %",
     "freeForever": "Free forever",
     "availableIn": "on {plan}",
     "features": {
@@ -671,7 +699,13 @@
     "title": "Settings",
     "subtitle": "Your plan and what you are using.",
     "currentPlan": "Your plan: {plan}",
-    "trialUntil": "Free trial until {date}. After that you move to Casero unless you choose a plan.",
+    "trialUntil": "Free trial until {date} ({days, plural, one {# day left} other {# days left}}). After that you move to Casero unless you choose a plan.",
+    "activeUntil": "Next renewal or expiration: {date}.",
+    "canceledUntil": "Auto-renewal canceled. You will keep {plan} until {date}, then move to the Casero plan.",
+    "graceWarningTitle": "We could not charge your subscription",
+    "graceWarningBody": "You have until {date} ({days, plural, one {# business day} other {# business days}} of grace) to renew your payment before moving to the Casero plan.",
+    "readOnlyLockTitle": "Your store is in read-only mode",
+    "readOnlyLockBody": "Your current usage exceeds the limits of the {plan} plan. To sell or record operations again, subscribe to a higher plan or deactivate customers, products or users to fit within the limit. You can always collect pending debts.",
     "usage": {
       "activeCreditCustomers": "Customers with active credit",
       "users": "Users",
@@ -680,8 +714,69 @@
     "usageOf": "{used} of {max}",
     "usageUnlimited": "{used} · no limit",
     "plansTitle": "Plans",
-    "plansSubtitle": "Prices in Peruvian soles.",
-    "yourPlan": "Your plan",
+    "plansSubtitle": "Prices in Peruvian soles. Pay by card or Yape via Mercado Pago.",
+    "intervalLabel": "Billing interval",
+    "intervalMonthly": "Monthly (recurring card)",
+    "intervalYearly": "Yearly -20 % (Yape or card)",
+    "yourPlan": "Your current plan",
+    "subscribe": "Choose {plan}",
+    "subscribing": "Opening checkout…",
+    "cancelRenewal": "Cancel automatic renewal",
+    "cancelingRenewal": "Canceling…",
+    "cancelConfirmTitle": "Cancel automatic renewal?",
+    "cancelConfirmBody": "You will keep all benefits of your plan until the end of the paid period ({date}). After that your store will move to the Casero plan with no further charges.",
+    "cancelConfirmAction": "Yes, cancel renewal",
+    "cancelKeepAction": "Keep my plan",
+    "billingNotice": {
+      "approved": "Payment confirmed. Your plan is now active.",
+      "rejected": "Payment was rejected. You have 5 business days of grace to retry.",
+      "canceled": "Automatic renewal canceled. You will keep your plan until the end of the paid period.",
+      "checkoutError": "We could not start the checkout. Please try again."
+    },
+    "localCheckout": {
+      "title": "Local test gateway (Mercado Pago)",
+      "subtitle": "You are running in local mode with no external connection. Simulate the Mercado Pago webhook outcome for {plan} ({interval} · S/ {amount}):",
+      "approve": "Simulate approved payment",
+      "reject": "Simulate rejected payment",
+      "processing": "Processing…"
+    },
+    "billingHistory": {
+      "title": "Subscription payment history",
+      "subtitle": "Your processed payments and receipts.",
+      "empty": "You have no subscription payments recorded yet.",
+      "colDate": "Date",
+      "colPlan": "Plan",
+      "colMethod": "Method",
+      "colAmount": "Amount",
+      "colStatus": "Status",
+      "colReceipt": "Receipt",
+      "seeReceipt": "View receipt",
+      "externalReceipt": "MP receipt",
+      "statuses": {
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "REFUNDED": "Refunded"
+      },
+      "methods": {
+        "yape": "Yape",
+        "card": "Card"
+      }
+    },
+    "billingReceipt": {
+      "back": "Back to settings",
+      "title": "Subscription receipt",
+      "subtitle": "{store} · RUC/DNI {taxId}",
+      "reference": "MP operation",
+      "plan": "Plan",
+      "interval": "Billing interval",
+      "method": "Payment method",
+      "paidAt": "Processed date",
+      "period": "Covered period",
+      "periodRange": "From {start} to {end}",
+      "status": "Status",
+      "total": "Total",
+      "print": "Print or save PDF"
+    },
     "paymentSoon": "Soon you will be able to change plans and pay from here.",
     "payment": {
       "title": "Payment details",
@@ -1619,7 +1714,14 @@
       "LOGIN_FAILED": "Failed sign-in attempt",
       "LOGIN_BLOCKED": "Blocked account sign-in attempt",
       "LOCK_ACCOUNT": "Account locked for security",
-      "ACCEPT_TERMS": "Terms accepted"
+      "ACCEPT_TERMS": "Terms accepted",
+      "SUBSCRIBE_PLAN": "Plan subscription",
+      "RENEW_SUBSCRIPTION": "Subscription renewal",
+      "MARK_SUBSCRIPTION_PAST_DUE": "Failed subscription payment (grace period)",
+      "CANCEL_SUBSCRIPTION_RENEWAL": "Subscription renewal canceled",
+      "EXPIRE_TRIAL": "Pro trial ended (moved to Casero)",
+      "EXPIRE_GRACE_PERIOD": "Grace period ended (moved to Casero)",
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Paid period ended (moved to Casero)"
     },
     "entities": {
       "sales": "Sales",
@@ -1632,7 +1734,9 @@
       "purchase_orders": "Restock orders",
       "suppliers": "Suppliers",
       "users": "Users",
-      "stores": "Store"
+      "stores": "Store",
+      "store_subscriptions": "Subscription",
+      "subscription_payments": "Subscription payments"
     }
   }
 }
