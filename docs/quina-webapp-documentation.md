@@ -892,7 +892,8 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Credenciales de Google OAuth 2.0. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Claves de Cloudflare Turnstile. |
 | `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET` | Envío de correos y webhook de rebotes. |
-| `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` | Mercado Pago: suscripciones y validación de webhooks. |
+| `MP_TRANSPORT` | Pasarela de suscripción: `mercadopago` (SDK oficial) o `local` (pasarela simulada en desarrollo y pruebas). |
+| `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` | Mercado Pago: suscripciones y validación HMAC de webhooks (`/app/api/webhooks/mercadopago`). |
 | `GROQ_API_KEY` | Recomendaciones con IA. |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Solo Supabase Storage desde el servidor (comprobantes y QR de cobro). |
 | `QUINA_APP_DB_PASSWORD`, `QUINA_PLATFORM_DB_PASSWORD` | Contraseñas que `pnpm db:roles` asigna a los roles `quina_app` y `quina_platform`. |
@@ -955,8 +956,8 @@ la función (`maxDuration`); lo que no salga, sale al día siguiente.
 | 3 | Mora | Pasa a `OVERDUE` los ciclos `BILLED` vencidos y sus cuotas, y pone en cola el aviso de mora. Con un ciclo `OVERDUE`, el vecino no puede comprar al crédito hasta pagarlo. |
 | 4 | Resumen diario de cargos | Agrupa por vecino los cargos sin notificar de días anteriores en **un correo por vecino** (`CHARGE_DIGEST`). Al enviarlo marca `notified_at` y fija `consent_deadline` 48 h después. |
 | 5 | Recordatorios | `PAYMENT_REMINDER` a los ciclos todavía `BILLED` que vencen entre hoy y dentro de 3 días. El índice único de `notification_logs` impide duplicados. |
-| 6 | Envíos | Manda lo que quedó en cola (y reintenta lo fallido de los últimos 3 días), uno por uno. |
-| 7 | Suscripciones | Al terminar la prueba de 14 días o el periodo de gracia sin pago, la tienda vuelve al Plan Casero (Plan 7). |
+| 6 | Suscripciones | Al terminar la prueba Pro de 14 días, los 5 días hábiles de gracia tras un pago rechazado o el periodo pagado con renovación cancelada, la tienda pasa al Plan Casero. Si al pasar a Casero el uso supera los límites del plan, la tienda entra en modo solo lectura hasta que el dueño pague o ajuste su uso (US26 crit. 7). También envía el aviso único 3 días antes de que termine la prueba Pro (US25 crit. 3). |
+| 7 | Envíos | Manda lo que quedó en cola (y reintenta lo fallido de los últimos 3 días), uno por uno. |
 
 Los pasos 4 y 5 y el aviso de mora son automáticos solo en **Bodega Pro** y
 **Negocio Plus**. En el **Plan Casero** el resumen y los recordatorios salen con
