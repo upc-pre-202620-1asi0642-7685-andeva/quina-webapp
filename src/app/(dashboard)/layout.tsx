@@ -30,7 +30,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <AppShell
       user={{ name: user.name, role: user.role }}
-      store={{ name: store.name, trialEndsAt, lowStockCount }}
+      store={{
+        name: store.name,
+        trialEndsAt,
+        trialDaysRemaining: store.trialDaysRemaining,
+        graceDaysRemaining: store.graceDaysRemaining,
+        isReadOnly: store.isReadOnly,
+        lowStockCount,
+      }}
     >
       {children}
       <AppToaster />

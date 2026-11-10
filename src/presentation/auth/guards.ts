@@ -4,6 +4,7 @@ import { can, type Permission } from '@/core/domain/identity/permissions';
 import type { PortalLink } from '@/core/domain/ports/portal-directory';
 import { createPortalDirectory } from '@/infrastructure/db/portal/drizzle-portal-directory';
 import { getSessionUser, requireUser, type SessionUser } from '@/presentation/auth/session';
+import { loadStoreContext } from '@/presentation/queries/store-context';
 
 export type PortalUser = { user: SessionUser; links: PortalLink[] };
 
@@ -64,12 +65,19 @@ export async function requirePlatformAdmin(path: string): Promise<PlatformAdmin>
 }
 
 /**
- * Para Server Actions (US05 crit. 4): el rol se verifica en el servidor antes de
- * cualquier mutación. Devuelve `null` si no hay sesión válida o falta el permiso.
+ * Para Server Actions (US05 crit. 4, US26 crit. 7 y D1): el rol y el bloqueo de
+ * solo lectura se verifican en el servidor antes de cualquier mutación.
  */
-export async function authorizeStore(permission: Permission): Promise<StoreUser | null> {
+export async function authorizeStore(
+  permission: Permission,
+  options?: { allowWhenReadOnly?: boolean },
+): Promise<StoreUser | null> {
   const user = await getSessionUser();
   if (!isStoreUser(user) || !can(user.role, permission)) return null;
+  if (!options?.allowWhenReadOnly) {
+    const store = await loadStoreContext(user.storeId);
+    if (store.isReadOnly) return null;
+  }
   return user;
 }
 

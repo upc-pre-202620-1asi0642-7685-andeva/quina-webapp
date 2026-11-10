@@ -125,7 +125,7 @@ export async function setProductActiveAction(
   productId: string,
   active: boolean,
 ): Promise<CatalogActionResult> {
-  const user = await authorizeStore('catalog.manage');
+  const user = await authorizeStore('catalog.manage', { allowWhenReadOnly: !active });
   if (!user || !idSchema.safeParse(productId).success) return { ok: false, error: 'generic' };
   const result = await new SetProductActiveUseCase(new DrizzleProductRepository()).execute({
     storeId: user.storeId,

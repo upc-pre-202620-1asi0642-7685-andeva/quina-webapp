@@ -3,6 +3,7 @@ import type { AuthMailKind } from '@/core/domain/ports/auth-mailer';
 import type {
   AccountSetupAudience,
   NotificationMailKind,
+  SubscriptionNoticeInput,
 } from '@/core/domain/ports/notification-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
 import es from '../../../messages/es.json';
@@ -156,5 +157,46 @@ export function renderNotificationEmail(
     intro: t(`setup.${audience}.intro`, { store }),
     action: { label: t('setup.action'), url: data.url },
     outro: t('setup.outro'),
+  });
+}
+
+export function renderSubscriptionEmail(input: SubscriptionNoticeInput): RenderedEmail {
+  const { locale, name, storeName } = input;
+  const t = createTranslator({ locale, messages: messages[locale], namespace: 'Email' });
+  const greeting = t('welcome.greeting', { name });
+
+  if (input.kind === 'trial_ending') {
+    return layout(locale, {
+      subject: t('subscription.trialEnding.subject', { days: input.daysLeft }),
+      greeting,
+      intro: t('subscription.trialEnding.intro', { store: storeName, days: input.daysLeft }),
+      action: { label: t('subscription.action'), url: input.url },
+      outro: t('subscription.trialEnding.outro'),
+    });
+  }
+
+  if (input.kind === 'payment_failed') {
+    return layout(locale, {
+      subject: t('subscription.paymentFailed.subject', { store: storeName }),
+      greeting,
+      intro: t('subscription.paymentFailed.intro', {
+        store: storeName,
+        plan: input.graceEndsDate,
+      }),
+      action: { label: t('subscription.action'), url: input.url },
+      outro: t('subscription.paymentFailed.outro'),
+    });
+  }
+
+  return layout(locale, {
+    subject: t('subscription.paymentApproved.subject', { plan: input.planName }),
+    greeting,
+    intro: t('subscription.paymentApproved.intro', {
+      store: storeName,
+      plan: input.planName,
+      amount: input.amount.replace(/^S\/\s*/, ''),
+    }),
+    action: { label: t('subscription.action'), url: input.receiptUrl },
+    outro: t('subscription.paymentApproved.outro'),
   });
 }

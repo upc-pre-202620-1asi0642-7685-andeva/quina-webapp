@@ -1,19 +1,25 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { CheckIcon, LockIcon } from 'lucide-react';
 import {
-  PLAN_PRICES,
-  PLAN_TIERS,
+  BILLING_INTERVALS,
+  PAID_PLAN_TIERS,
   PlanLimits,
+  type BillingInterval,
   type CountedResource,
   type Feature,
+  type PaidPlanTier,
 } from '@/core/domain/billing/plan-limits';
 import { can } from '@/core/domain/identity/permissions';
-import { loadPlanUsage } from '@/infrastructure/db/queries/plan-usage';
 import { getStorePayment } from '@/infrastructure/db/queries/store-payment';
+import { listSubscriptionPayments } from '@/infrastructure/db/queries/subscriptions';
+import { isLocalMpTransport } from '@/infrastructure/payments/mercado-pago-subscription-gateway';
 import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
 import { requireStoreUser } from '@/presentation/auth/guards';
-import { PaymentDetailsForm } from '@/presentation/components/settings/payment-details-form';
 import { formatMoney } from '@/presentation/components/money';
+import { Notice } from '@/presentation/components/notice';
+import { PaymentDetailsForm } from '@/presentation/components/settings/payment-details-form';
+import { SubscriptionPlans } from '@/presentation/components/settings/subscription-plans';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
 import { loadStoreContext } from '@/presentation/queries/store-context';
@@ -30,12 +36,22 @@ const FEATURES: Feature[] = [
 // La URL firmada del QR dura lo que una visita a la página
 const QR_URL_SECONDS = 15 * 60;
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    mp_checkout?: string;
+    plan?: string;
+    interval?: string;
+    preapproval_id?: string;
+  }>;
+}) {
   const user = await requireStoreUser('/settings', 'settings.billing');
-  const [store, usage] = await Promise.all([
+  const [store, payments] = await Promise.all([
     loadStoreContext(user.storeId),
-    loadPlanUsage(user.storeId),
+    listSubscriptionPayments(user.storeId),
   ]);
+  const usage = store.usage;
   const t = await getTranslations('Settings');
   const tPlans = await getTranslations('Plans');
   const limits = PlanLimits.of(store.tier);
@@ -43,12 +59,28 @@ export default async function SettingsPage() {
     store.subscription.status === 'TRIALING' && store.tier !== 'CASERO'
       ? store.subscription.trialEndsAt
       : null;
-  const unlimited = (max: number | null) => (max === null ? tPlans('unlimited') : String(max));
   const payment = can(user.role, 'store.payment_details')
     ? await getStorePayment(user.storeId)
     : null;
   const qrUrl = payment?.qrPath
     ? await getPrivateFileStorage().signedUrl(payment.qrPath, QR_URL_SECONDS)
+    : null;
+
+  const params = (await searchParams) ?? {};
+  const initialLocalCheckout =
+    isLocalMpTransport() &&
+    params.mp_checkout === 'local' &&
+    PAID_PLAN_TIERS.includes(params.plan as PaidPlanTier) &&
+    BILLING_INTERVALS.includes(params.interval as BillingInterval)
+      ? {
+          planTier: params.plan as PaidPlanTier,
+          billingInterval: params.interval as BillingInterval,
+          preapprovalId: params.preapproval_id ?? null,
+        }
+      : null;
+
+  const currentPeriodEndLabel = store.subscription.currentPeriodEnd
+    ? formatDate(store.subscription.currentPeriodEnd)
     : null;
 
   return (
@@ -58,14 +90,53 @@ export default async function SettingsPage() {
         <p className="text-sm text-ink-soft">{t('subtitle')}</p>
       </header>
 
+      {store.isReadOnly ? (
+        <Notice tone="error">
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold">{t('readOnlyLockTitle')}</p>
+            <p>{t('readOnlyLockBody', { plan: tPlans(`names.${store.tier}`) })}</p>
+          </div>
+        </Notice>
+      ) : null}
+
+      {store.subscription.status === 'PAST_DUE' &&
+      store.subscription.gracePeriodEndsAt &&
+      store.graceDaysRemaining !== null ? (
+        <Notice tone="warning">
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold">{t('graceWarningTitle')}</p>
+            <p>
+              {t('graceWarningBody', {
+                date: formatDate(store.subscription.gracePeriodEndsAt),
+                days: store.graceDaysRemaining,
+              })}
+            </p>
+          </div>
+        </Notice>
+      ) : null}
+
       <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-ink">
             {t('currentPlan', { plan: tPlans(`names.${store.tier}`) })}
           </h2>
-          {trialEndsAt ? (
+          {trialEndsAt && store.trialDaysRemaining !== null ? (
             <p className="text-sm text-ink-soft">
-              {t('trialUntil', { date: formatDate(trialEndsAt) })}
+              {t('trialUntil', {
+                date: formatDate(trialEndsAt),
+                days: store.trialDaysRemaining,
+              })}
+            </p>
+          ) : store.subscription.cancelAtPeriodEnd && currentPeriodEndLabel ? (
+            <p className="text-sm text-ink-soft">
+              {t('canceledUntil', {
+                plan: tPlans(`names.${store.tier}`),
+                date: currentPeriodEndLabel,
+              })}
+            </p>
+          ) : currentPeriodEndLabel && store.tier !== 'CASERO' ? (
+            <p className="text-sm text-ink-soft">
+              {t('activeUntil', { date: currentPeriodEndLabel })}
             </p>
           ) : null}
         </div>
@@ -96,7 +167,7 @@ export default async function SettingsPage() {
                     <div
                       className={cn(
                         'h-full rounded-full',
-                        percent >= 100 ? 'bg-amber' : 'bg-primary',
+                        used > max ? 'bg-error' : percent >= 100 ? 'bg-amber' : 'bg-primary',
                       )}
                       style={{ width: `${percent}%` }}
                     />
@@ -160,61 +231,100 @@ export default async function SettingsPage() {
           <h2 className="text-lg font-semibold text-ink">{t('plansTitle')}</h2>
           <p className="text-sm text-ink-soft">{t('plansSubtitle')}</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {PLAN_TIERS.map((tier) => {
-            const plan = PlanLimits.of(tier);
-            const price = PLAN_PRICES[tier];
-            const current = tier === store.tier;
-            return (
-              <article
-                key={tier}
-                className={cn(
-                  'flex flex-col gap-3 rounded-card border bg-surface p-4',
-                  current ? 'border-primary' : 'border-line',
-                )}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold text-ink">{tPlans(`names.${tier}`)}</h3>
-                  {current ? (
-                    <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-[13px] font-medium text-success-ink dark:bg-success/12">
-                      {t('yourPlan')}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="text-ink">
-                  <span className="text-2xl font-semibold tabular-nums">
-                    {formatMoney(price.monthly, 'PEN')}
-                  </span>
-                  <span className="text-sm text-ink-soft"> {tPlans('perMonth')}</span>
-                </p>
-                {price.annual ? (
-                  <p className="text-[13px] text-ink-soft">
-                    {tPlans('annual', { price: formatMoney(price.annual, 'PEN') })}
-                  </p>
-                ) : (
-                  <p className="text-[13px] text-ink-soft">{tPlans('freeForever')}</p>
-                )}
-                <ul className="flex flex-col gap-1.5 text-sm text-ink">
-                  <li>
-                    {tPlans('limits.activeCreditCustomers', {
-                      max: unlimited(plan.activeCreditCustomers),
-                    })}
-                  </li>
-                  <li>{tPlans('limits.users', { max: unlimited(plan.users) })}</li>
-                  <li>{tPlans('limits.products', { max: unlimited(plan.products) })}</li>
-                  <li>
-                    {tPlans('limits.receiptsPerMonth', { max: unlimited(plan.receiptsPerMonth) })}
-                  </li>
-                  <li>
-                    {tPlans('limits.aiQueriesPerMonth', { max: unlimited(plan.aiQueriesPerMonth) })}
-                  </li>
-                </ul>
-              </article>
-            );
-          })}
+        <SubscriptionPlans
+          currentTier={store.tier}
+          subscriptionStatus={store.subscription.status}
+          billingInterval={store.subscription.billingInterval ?? null}
+          cancelAtPeriodEnd={Boolean(store.subscription.cancelAtPeriodEnd)}
+          currentPeriodEndLabel={currentPeriodEndLabel}
+          initialLocalCheckout={initialLocalCheckout}
+        />
+      </section>
+
+      <section
+        id="billing-history"
+        aria-labelledby="billing-history-title"
+        className="flex scroll-mt-24 flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
+      >
+        <div className="flex flex-col gap-1">
+          <h2 id="billing-history-title" className="text-lg font-semibold text-ink">
+            {t('billingHistory.title')}
+          </h2>
+          <p className="text-sm text-ink-soft">{t('billingHistory.subtitle')}</p>
         </div>
-        {/* El pago en línea (Mercado Pago) llega con el Plan 7 */}
-        <p className="text-sm text-ink-soft">{t('paymentSoon')}</p>
+        {payments.length === 0 ? (
+          <p className="text-sm text-ink-soft">{t('billingHistory.empty')}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-line text-xs text-ink-soft">
+                  <th className="py-2 pr-3 font-medium">{t('billingHistory.colDate')}</th>
+                  <th className="py-2 pr-3 font-medium">{t('billingHistory.colPlan')}</th>
+                  <th className="py-2 pr-3 font-medium">{t('billingHistory.colMethod')}</th>
+                  <th className="py-2 pr-3 font-medium">{t('billingHistory.colAmount')}</th>
+                  <th className="py-2 pr-3 font-medium">{t('billingHistory.colStatus')}</th>
+                  <th className="py-2 text-right font-medium">{t('billingHistory.colReceipt')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {payments.map((row) => (
+                  <tr key={row.id}>
+                    <td className="py-3 pr-3 whitespace-nowrap text-ink">
+                      {formatDate(row.paidAt ?? row.createdAt)}
+                    </td>
+                    <td className="py-3 pr-3 text-ink">
+                      {tPlans(`names.${row.planTier}`)} ·{' '}
+                      {tPlans(`intervals.${row.billingInterval}`)}
+                    </td>
+                    <td className="py-3 pr-3 text-ink-soft">
+                      {row.billingInterval === 'YEARLY'
+                        ? t('billingHistory.methods.yape')
+                        : t('billingHistory.methods.card')}
+                    </td>
+                    <td className="py-3 pr-3 font-semibold text-ink tabular-nums">
+                      {formatMoney(row.amount, row.currency)}
+                    </td>
+                    <td className="py-3 pr-3">
+                      <span
+                        className={cn(
+                          'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium',
+                          row.status === 'APPROVED'
+                            ? 'bg-primary-soft text-success-ink dark:bg-success/12'
+                            : row.status === 'REJECTED'
+                              ? 'bg-error/12 text-error-ink'
+                              : 'bg-amber/12 text-amber-ink',
+                        )}
+                      >
+                        {t(`billingHistory.statuses.${row.status}`)}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-3">
+                        <Link
+                          href={`/settings/billing/${row.id}`}
+                          className="font-medium text-link-active hover:underline"
+                        >
+                          {t('billingHistory.seeReceipt')}
+                        </Link>
+                        {row.receiptUrl ? (
+                          <a
+                            href={row.receiptUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-ink-soft underline hover:text-ink"
+                          >
+                            {t('billingHistory.externalReceipt')}
+                          </a>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );

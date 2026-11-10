@@ -24,7 +24,7 @@ export async function savePaymentDetailsAction(
   _prev: PaymentDetailsState,
   formData: FormData,
 ): Promise<PaymentDetailsState> {
-  const user = await authorizeStore('store.payment_details');
+  const user = await authorizeStore('store.payment_details', { allowWhenReadOnly: true });
   if (!user) return actionRedirect('/login');
 
   const file = formData.get('qr');

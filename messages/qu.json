@@ -102,6 +102,24 @@
         "outro": "Qullqisqaykimanta añay. Chay yupaynikiyqa tukusqañam."
       },
       "portalButton": "Cuentayta qhaway"
+    },
+    "subscription": {
+      "action": "Suscripcionniyta qhaway",
+      "trialEnding": {
+        "subject": "Bodega Pro mana qullqiyuq pruebaykiqa {days, plural, one {# p'unchawpi} other {# p'unchawkunapi}} tukukun",
+        "intro": "{store} tiendaykipaq Bodega Pro mana qullqiyuq pruebaykiqa {days, plural, one {# p'unchawpi} other {# p'unchawkunapi}} tukukun.",
+        "outro": "Manaraq tukukuchkaptin huk planta akllay willakuykuna kikillanmanta lluqsinanpaq."
+      },
+      "paymentFailed": {
+        "subject": "{store} suscripcionniykita manam cobrayta atirqanikuchu",
+        "intro": "{store} tiendapaq {plan} plan qullqita manam chaskiyta atirqanikuchu. 5 llamk'ana p'unchaw gracianiyki kan Plan Caseroman manaraq pasachkaspa.",
+        "outro": "Allichanakunapi qullqiykita musuqchay planiyki purinanpaq."
+      },
+      "paymentApproved": {
+        "subject": "{plan} planiykipa qullqinta chaskiyku",
+        "intro": "{store} tiendapa {plan} planpaq S/ {amount} qullqiykita chaskirqaniku.",
+        "outro": "Suscripcionniykiqa p'unchawpim kachkan. Allichanakunapi comprobanteykita qhawayta hinaspa imprimiyta atinki."
+      }
     }
   },
   "Auth": {
@@ -329,6 +347,10 @@
   "Shell": {
     "logoAlt": "Quina",
     "trialUntil": "Prueba Pro {date} kama",
+    "trialDays": "Prueba Pro: {days, plural, one {# p'unchaw puchun} other {# p'unchaw puchun}}",
+    "graceDays": "Qullqi suyasqa: {days, plural, one {# llamk'ana p'unchaw gracia puchun} other {# llamk'ana p'unchaw gracia puchun}}",
+    "readOnlyLock": "Ñawinchayllapaq: planiykipa limitenta yalliranki. Allichanakunapi suscripcionniykita pagay utaq llamk'ayniykita pisiyachiy.",
+    "managePlan": "Allichanakunaman riy",
     "nav": {
       "label": "Hatun purina",
       "home": "Qallariy",
@@ -555,9 +577,15 @@
       "BODEGA_PRO": "Bodega Pro",
       "NEGOCIO_PLUS": "Negocio Plus"
     },
+    "intervals": {
+      "MONTHLY": "Killanpi",
+      "YEARLY": "Watanpi (-20 %)"
+    },
     "unlimited": "sin límite",
     "perMonth": "al mes",
+    "perYear": "watanpi",
     "annual": "o {price} al año",
+    "annualSavings": "Killanpi {monthly} hina · 20 % waqaychanki",
     "freeForever": "Gratis para siempre",
     "availableIn": "en {plan}",
     "features": {
@@ -672,7 +700,13 @@
     "title": "Allichanakuna",
     "subtitle": "Tu plan y lo que estás usando.",
     "currentPlan": "Tu plan: {plan}",
-    "trialUntil": "Prueba gratis hasta el {date}. Después pasas a Casero si no eliges un plan.",
+    "trialUntil": "Prueba gratis hasta el {date} ({days, plural, one {# p'unchaw puchun} other {# p'unchaw puchun}}). Después pasas a Casero si no eliges un plan.",
+    "activeUntil": "Qhipa musuqchay utaq tukukuy: {date}.",
+    "canceledUntil": "Kikillanmanta musuqchay sayachisqa. {plan} planwan {date} kama qhipanki; chaymanta Plan Caseroman pasanki.",
+    "graceWarningTitle": "Suscripcionniykita manam cobrayta atirqanikuchu",
+    "graceWarningBody": "{date} kama ({days, plural, one {# llamk'ana p'unchaw} other {# llamk'ana p'unchaw}} gracia) qullqiykita musuqchanaykipaq kan Plan Caseroman manaraq pasachkaspa.",
+    "readOnlyLockTitle": "Tiendaykiqa ñawinchayllapaqmi kachkan",
+    "readOnlyLockBody": "Kunan llamk'ayniykiqa {plan} planpa limitenta yallinmi. Musuqmanta qhatunaykipaqqa aswan hatun planman suscribikuy utaq llaqtamasikunata, rurukunata utaq ruraqkunata pisiyachiy. Manu cobraytaqa hayk'appas atinki.",
     "usage": {
       "activeCreditCustomers": "Vecinos con fiado activo",
       "users": "Usuarios",
@@ -681,8 +715,69 @@
     "usageOf": "{used} de {max}",
     "usageUnlimited": "{used} · sin límite",
     "plansTitle": "Planes",
-    "plansSubtitle": "Precios en soles.",
-    "yourPlan": "Tu plan",
+    "plansSubtitle": "Precios en soles. Tarjetawan utaq Yapewan Mercado Pagopi pagay.",
+    "intervalLabel": "Imayna pagay",
+    "intervalMonthly": "Killanpi (tarjeta)",
+    "intervalYearly": "Watanpi -20 % (Yape utaq tarjeta)",
+    "yourPlan": "Kunan planiyki",
+    "subscribe": "{plan} akllay",
+    "subscribing": "Kichachkan…",
+    "cancelRenewal": "Kikillanmanta musuqchayta sayachiy",
+    "cancelingRenewal": "Sayachichkan…",
+    "cancelConfirmTitle": "¿Kikillanmanta musuqchayta sayachiy?",
+    "cancelConfirmBody": "Pagasqa pacha tukukunkama ({date}) planiykipa llapan yanapakuyninkunata hap'inki. Chaymanta tiendaykiqa Plan Caseroman pasanqa mana qullqiwan.",
+    "cancelConfirmAction": "Arí, musuqchayta sayachiy",
+    "cancelKeepAction": "Planiyta waqaychay",
+    "billingNotice": {
+      "approved": "Qullqi chaskisqa. Planiykiqa purichkanñam.",
+      "rejected": "Qullqiqa mana chaskisqachu karqan. 5 llamk'ana p'unchaw gracianiyki kan.",
+      "canceled": "Kikillanmanta musuqchay sayachisqa. Pagasqa pacha tukukunkama planiykita hap'inki.",
+      "checkoutError": "Manam qullqi pagayta qallariyta atirqanikuchu. Wakmanta ruway."
+    },
+    "localCheckout": {
+      "title": "Kayllapi prueba pasarela (Mercado Pago)",
+      "subtitle": "Mana hawa llikawan tupachisqa prueba modopim kachkanki. {plan} ({interval} · S/ {amount}) Mercado Pago webhookta simulay:",
+      "approve": "Chaskisqa qullqita simulay",
+      "reject": "Mana chaskisqa qullqita simulay",
+      "processing": "Ruwachkan…"
+    },
+    "billingHistory": {
+      "title": "Suscripción qullqi pagasqakuna",
+      "subtitle": "Pagasqaykikuna hinaspa comprobantenkuna.",
+      "empty": "Manaraq suscripción qullqi pagasqakuna kanchu.",
+      "colDate": "P'unchaw",
+      "colPlan": "Plan",
+      "colMethod": "Imayna",
+      "colAmount": "Chanin",
+      "colStatus": "Kawsay",
+      "colReceipt": "Comprobante",
+      "seeReceipt": "Recibota qhaway",
+      "externalReceipt": "MP comprobante",
+      "statuses": {
+        "APPROVED": "Chaskisqa",
+        "REJECTED": "Mana chaskisqa",
+        "REFUNDED": "Kutichisqa"
+      },
+      "methods": {
+        "yape": "Yape",
+        "card": "Tarjeta"
+      }
+    },
+    "billingReceipt": {
+      "back": "Allichanakunaman kutiy",
+      "title": "Suscripción comprobante",
+      "subtitle": "{store} · RUC/DNI {taxId}",
+      "reference": "MP yupay",
+      "plan": "Plan",
+      "interval": "Modalidad",
+      "method": "Imayna pagasqa",
+      "paidAt": "P'unchaw",
+      "period": "Pacha",
+      "periodRange": "{start} manta {end} kama",
+      "status": "Kawsay",
+      "total": "Llapan",
+      "print": "Imprimiy utaq PDF waqaychay"
+    },
     "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
     "payment": {
       "title": "Cobrana datokuna",
@@ -1620,7 +1715,14 @@
       "LOGIN_FAILED": "Pantay yaykuy",
       "LOGIN_BLOCKED": "Wichq’asqa yupayman yaykuy munay",
       "LOCK_ACCOUNT": "Waqaychayrayku yupay wichq’ay",
-      "ACCEPT_TERMS": "Kamachikuykunata chaskiy"
+      "ACCEPT_TERMS": "Kamachikuykunata chaskiy",
+      "SUBSCRIBE_PLAN": "Planman suscribikuy",
+      "RENEW_SUBSCRIPTION": "Suscripción musuqchay",
+      "MARK_SUBSCRIPTION_PAST_DUE": "Suscripción qullqi pantay (graciapi)",
+      "CANCEL_SUBSCRIPTION_RENEWAL": "Plan musuqchay sayachiy",
+      "EXPIRE_TRIAL": "Prueba Pro tukukuy (Caseroman)",
+      "EXPIRE_GRACE_PERIOD": "Gracia pacha tukukuy (Caseroman)",
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Pagasqa pacha tukukuy (Caseroman)"
     },
     "entities": {
       "sales": "Qhatuykuna",
@@ -1633,7 +1735,9 @@
       "purchase_orders": "Mañakuykuna",
       "suppliers": "Rantiqkuna",
       "users": "Ruraqkuna",
-      "stores": "Qhatu wasi"
+      "stores": "Qhatu wasi",
+      "store_subscriptions": "Suscripción",
+      "subscription_payments": "Suscripción qullqikuna"
     }
   }
 }

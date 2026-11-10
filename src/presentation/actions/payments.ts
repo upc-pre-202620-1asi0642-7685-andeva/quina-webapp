@@ -24,7 +24,7 @@ export type PaymentActionResult =
 
 /** US13: el dueño o el empleado cobran el ciclo completo; el cobrador sale de la sesión. */
 export async function registerPaymentAction(input: PaymentInput): Promise<PaymentActionResult> {
-  const user = await authorizeStore('payments.create');
+  const user = await authorizeStore('payments.create', { allowWhenReadOnly: true });
   if (!user) return { ok: false, error: 'SESSION' };
   const parsed = paymentSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: 'INVALID' };

@@ -134,7 +134,7 @@ export async function setCustomerActiveAction(
   customerId: string,
   active: boolean,
 ): Promise<CustomerActionResult> {
-  const user = await authorizeStore('customers.deactivate');
+  const user = await authorizeStore('customers.deactivate', { allowWhenReadOnly: !active });
   if (!user) return { ok: false, error: 'generic' };
   if (!idSchema.safeParse(customerId).success) return { ok: false, error: 'generic' };
 
@@ -156,7 +156,9 @@ export async function setCreditAccountStatusAction(
   customerId: string,
   status: 'ACTIVE' | 'SUSPENDED',
 ): Promise<CustomerActionResult> {
-  const user = await authorizeStore('credit.terms');
+  const user = await authorizeStore('credit.terms', {
+    allowWhenReadOnly: status === 'SUSPENDED',
+  });
   if (!user) return { ok: false, error: 'generic' };
   if (!idSchema.safeParse(customerId).success) return { ok: false, error: 'generic' };
 
