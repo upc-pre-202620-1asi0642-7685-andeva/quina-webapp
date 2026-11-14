@@ -63,7 +63,7 @@ export class StartSubscriptionCheckoutUseCase {
       planTier: command.planTier,
       billingInterval: command.billingInterval,
       amount,
-      backUrl: `${base}/settings?billing=return`,
+      backUrl: `${base}/settings/subscription?billing=return`,
       notificationUrl: `${base}/api/webhooks/mercadopago`,
     });
 
@@ -244,7 +244,7 @@ export class ProcessSubscriptionWebhookUseCase {
             graceEndsDate: BusinessDate.toISO(
               BusinessDate.fromInstant(subscription.gracePeriodEndsAt),
             ),
-            url: `${base}/settings#plans`,
+            url: `${base}/settings/subscription`,
           },
           {
             storeId,

@@ -54,7 +54,8 @@ export async function startSubscriptionCheckoutAction(input: {
     });
     if (!result.ok) return { ok: false, error: 'GENERIC' };
     return { ok: true, checkoutUrl: result.value.redirectUrl };
-  } catch {
+  } catch (error) {
+    console.error('[billing] checkout failed', error);
     return { ok: false, error: 'GENERIC' };
   }
 }
@@ -75,7 +76,7 @@ export async function cancelSubscriptionRenewalAction(): Promise<CancelRenewalAc
       now: new Date(),
     });
     if (!result.ok) return { ok: false, error: 'GENERIC' };
-    revalidatePath('/settings');
+    revalidatePath('/settings', 'layout');
     revalidatePath('/');
     return { ok: true };
   } catch {
@@ -129,7 +130,7 @@ export async function simulateLocalSubscriptionPaymentAction(input: {
       appUrl,
     });
     if (outcome.status === 'IGNORED') return { ok: false, error: 'GENERIC' };
-    revalidatePath('/settings');
+    revalidatePath('/settings', 'layout');
     revalidatePath('/');
     return {
       ok: true,

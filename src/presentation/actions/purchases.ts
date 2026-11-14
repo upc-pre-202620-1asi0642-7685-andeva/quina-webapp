@@ -133,6 +133,7 @@ export async function createSupplierAction(input: {
   revalidatePath('/inventory');
   revalidatePath('/inventory/purchases');
   revalidatePath('/inventory/purchases/new');
+  revalidatePath('/inventory/suppliers');
   return { ok: true, supplierId: result.value };
 }
 

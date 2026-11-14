@@ -1,14 +1,12 @@
 'use client';
 
-import { useActionState, useState, useTransition } from 'react';
+import { useActionState, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { sileo } from 'sileo';
 import { LockIcon, PaperclipIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { PURCHASE_DOCUMENT_TYPES, type PurchaseDocumentType } from '@/core/domain/catalog/purchase';
 import type { SupplierOption } from '@/core/domain/ports/purchase-repository';
 import {
-  createSupplierAction,
   registerPurchaseAction,
   type PurchaseField,
   type PurchaseFormState,
@@ -16,14 +14,8 @@ import {
 import { FormField } from '@/presentation/components/auth/form-field';
 import { Notice } from '@/presentation/components/notice';
 import { Button, buttonVariants } from '@/presentation/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from '@/presentation/components/ui/dialog';
 import { Input } from '@/presentation/components/ui/input';
+import { SupplierDialog } from './supplier-dialog';
 
 export type PurchaseFormProduct = {
   id: string;
@@ -110,11 +102,6 @@ export function PurchaseForm({
   });
 
   const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
-  const [supplierBusy, startSupplierTransition] = useTransition();
-  const [newTradeName, setNewTradeName] = useState('');
-  const [newTaxId, setNewTaxId] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [supplierError, setSupplierError] = useState<string | null>(null);
 
   const addLine = () => {
     setLines((prev) => [
@@ -155,40 +142,6 @@ export function PurchaseForm({
 
   const fieldError = (field: PurchaseField) =>
     state.errors?.[field] ? t(`errors.${state.errors[field]}`) : undefined;
-
-  const handleCreateSupplier = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSupplierError(null);
-    startSupplierTransition(async () => {
-      const result = await createSupplierAction({
-        taxIdNumber: newTaxId.trim(),
-        tradeName: newTradeName.trim(),
-        phone: newPhone.trim() || undefined,
-      });
-      if (!result.ok) {
-        setSupplierError(t(`supplierErrors.${result.error}`));
-        return;
-      }
-      setSuppliers((prev) => [
-        ...prev,
-        {
-          id: result.supplierId,
-          tradeName: newTradeName.trim(),
-          taxIdNumber: newTaxId.trim(),
-          contactName: null,
-          phone: newPhone.trim() || null,
-          email: null,
-          isActive: true,
-        },
-      ]);
-      setSupplierId(result.supplierId);
-      setNewTradeName('');
-      setNewTaxId('');
-      setNewPhone('');
-      setSupplierDialogOpen(false);
-      sileo.success({ title: t('supplierCreatedToast') });
-    });
-  };
 
   return (
     <>
@@ -473,7 +426,7 @@ export function PurchaseForm({
                 {t('receiptLocked')}
               </span>
               <Link
-                href="/settings#plans"
+                href="/settings/subscription"
                 className="font-semibold text-link-active underline underline-offset-4"
               >
                 {tPlans('seePlans')}
@@ -492,77 +445,14 @@ export function PurchaseForm({
         </div>
       </form>
 
-      <Dialog open={supplierDialogOpen} onOpenChange={setSupplierDialogOpen}>
-        <DialogContent className="rounded-card border-line bg-surface">
-          <DialogTitle className="text-lg text-ink">{t('newSupplierTitle')}</DialogTitle>
-          <DialogDescription className="text-sm text-ink-soft">
-            {t('newSupplierDescription')}
-          </DialogDescription>
-          <form onSubmit={handleCreateSupplier} className="flex flex-col gap-4">
-            {supplierError ? (
-              <Notice tone="error">
-                <p>{supplierError}</p>
-              </Notice>
-            ) : null}
-            <FormField
-              id="supplier-business-name"
-              label={t('supplierBusinessName')}
-              hint={t('supplierBusinessHint')}
-            >
-              {(props) => (
-                <Input
-                  {...props}
-                  value={newTradeName}
-                  onChange={(e) => setNewTradeName(e.target.value)}
-                  required
-                  maxLength={200}
-                />
-              )}
-            </FormField>
-            <FormField
-              id="supplier-tax-id"
-              label={t('supplierTaxId')}
-              hint={t('supplierTaxIdHint')}
-            >
-              {(props) => (
-                <Input
-                  {...props}
-                  value={newTaxId}
-                  onChange={(e) => setNewTaxId(e.target.value)}
-                  inputMode="numeric"
-                  placeholder="20123456789"
-                  required
-                  maxLength={11}
-                />
-              )}
-            </FormField>
-            <FormField id="supplier-phone" label={t('supplierPhone')} hint={t('supplierPhoneHint')}>
-              {(props) => (
-                <Input
-                  {...props}
-                  value={newPhone}
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  inputMode="tel"
-                  maxLength={20}
-                />
-              )}
-            </FormField>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setSupplierDialogOpen(false)}
-                disabled={supplierBusy}
-              >
-                {t('cancel')}
-              </Button>
-              <Button type="submit" disabled={supplierBusy}>
-                {supplierBusy ? t('savingSupplier') : t('saveSupplier')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <SupplierDialog
+        open={supplierDialogOpen}
+        onOpenChange={setSupplierDialogOpen}
+        onCreated={(supplier) => {
+          setSuppliers((prev) => [...prev, supplier]);
+          setSupplierId(supplier.id);
+        }}
+      />
     </>
   );
 }
