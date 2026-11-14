@@ -1,13 +1,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
-import { AlertTriangleIcon, CircleUserRoundIcon } from 'lucide-react';
+import { AlertTriangleIcon } from 'lucide-react';
+import { can } from '@/core/domain/identity/permissions';
 import type { Role } from '@/core/domain/identity/roles';
+import { AppToaster } from '@/presentation/components/feedback/app-toaster';
+import { RouteBones } from '@/presentation/components/feedback/page-skeleton';
 import { OfflineBanner } from '@/presentation/components/pwa/pwa';
 import { formatDate } from '@/presentation/lib/format-date';
+import type { AppNotification } from '@/presentation/queries/notifications';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
-import { bottomItems, sidebarItems } from './nav-items';
-import { BottomNav, SidebarNav } from './shell-nav';
+import { Breadcrumbs } from './breadcrumbs';
+import { mobileTabs, navGroups, quickActions, secondaryItems, SIDEBAR_COOKIE } from './nav-items';
+import { NotificationsMenu, ProfileMenu } from './shell-menus';
+import { MobileNav, Sidebar } from './shell-nav';
 
 export type ShellStore = {
   name: string;
@@ -16,20 +23,25 @@ export type ShellStore = {
   graceDaysRemaining?: number | null;
   isReadOnly?: boolean;
   lowStockCount?: number;
+  overdueCount?: number;
 };
 
 /** Marco del panel (tienda o plataforma): barra lateral desde 1024 px y barra inferior en celular. */
 export async function AppShell({
   user,
   store,
+  notifications = [],
   children,
 }: {
-  user: { name: string; role: Role };
+  user: { name: string; email: string; role: Role };
   store: ShellStore;
+  notifications?: AppNotification[];
   children: React.ReactNode;
 }) {
   const t = await getTranslations('Shell');
-  const tDashboard = await getTranslations('Dashboard');
+  // La barra plegada se pinta igual desde el servidor: sin salto al hidratar
+  const collapsed = (await cookies()).get(SIDEBAR_COOKIE)?.value === 'collapsed';
+  const isPlatform = user.role === 'PLATFORM_ADMIN';
   const trial =
     store.trialDaysRemaining !== undefined && store.trialDaysRemaining !== null
       ? t('trialDays', { days: store.trialDaysRemaining })
@@ -42,55 +54,31 @@ export async function AppShell({
       : null;
   const isReadOnly = Boolean(store.isReadOnly);
   const lowStockCount = store.lowStockCount ?? 0;
+  const groups = navGroups(user.role, lowStockCount, store.overdueCount ?? 0);
+  const secondary = secondaryItems(user.role);
+  const { tabs, sell } = mobileTabs(user.role);
 
   return (
-    <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[256px_1fr] print:block">
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface p-4 lg:flex print:hidden">
-        <Link
-          href={user.role === 'PLATFORM_ADMIN' ? '/platform/stores' : '/'}
-          className="px-4 pt-2"
-        >
-          <Image src={isologo} alt={t('logoAlt')} priority className="h-8 w-auto" />
-        </Link>
-        <SidebarNav items={sidebarItems(user.role, lowStockCount)} />
-        <div className="mt-auto flex flex-col gap-3">
-          {lowStockCount > 0 ? (
-            <Link
-              href="/inventory?filter=low"
-              className="flex items-center gap-2 rounded-card bg-amber/12 px-4 py-2.5 text-xs font-medium text-amber-ink hover:opacity-90"
-            >
-              <AlertTriangleIcon aria-hidden="true" className="size-4 shrink-0" />
-              <span>{t('lowStockAlert', { count: lowStockCount })}</span>
-            </Link>
-          ) : null}
-          {grace ? (
-            <Link
-              href="/settings#plans"
-              className="rounded-card bg-amber/12 px-4 py-3 text-xs font-medium text-amber-ink hover:opacity-90"
-            >
-              {grace}
-            </Link>
-          ) : trial ? (
-            <Link
-              href="/settings#plans"
-              className="rounded-card bg-soft px-4 py-3 text-sm text-soft-ink hover:opacity-90"
-            >
-              {trial}
-            </Link>
-          ) : null}
-          <Link
-            href="/profile"
-            className="flex items-center gap-3 rounded-full px-4 py-2 text-sm hover:bg-surface-hover"
-          >
-            <CircleUserRoundIcon aria-hidden="true" className="size-5 text-ink-soft" />
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate font-medium text-ink">{user.name}</span>
-              <span className="truncate text-xs text-ink-soft">{store.name}</span>
-            </span>
-            <span className="sr-only">{tDashboard('profileLink')}</span>
-          </Link>
-        </div>
-      </aside>
+    <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[auto_1fr] print:block">
+      <Sidebar
+        initialCollapsed={collapsed}
+        groups={groups}
+        secondary={secondary}
+        quick={quickActions(user.role)}
+        notifications={notifications}
+        user={{
+          name: user.name,
+          email: user.email,
+          canManageStore: can(user.role, 'settings.billing'),
+          homeHref: isPlatform ? '/platform/stores' : '/',
+        }}
+        store={{
+          name: store.name,
+          status: grace ?? trial,
+          statusTone: grace ? 'grace' : trial ? 'trial' : null,
+          isPlatform,
+        }}
+      />
 
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-2 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden print:hidden">
@@ -106,17 +94,19 @@ export async function AppShell({
               </Link>
             ) : null}
             <span className="truncate text-sm font-medium text-ink">{store.name}</span>
-            {/* En el celular el perfil y el idioma quedan a un toque, también para el dueño */}
-            <Link
-              href="/profile"
-              aria-label={tDashboard('profileLink')}
-              className="-mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-soft hover:bg-surface-hover hover:text-ink"
-            >
-              <CircleUserRoundIcon aria-hidden="true" className="size-6" />
-            </Link>
+            {/* En el celular avisos y cuenta quedan a un toque, como en escritorio */}
+            <NotificationsMenu items={notifications} compact />
+            <div className="-mr-1.5">
+              <ProfileMenu
+                user={user}
+                storeName={store.name}
+                canManageStore={can(user.role, 'settings.billing')}
+                compact
+              />
+            </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-28 lg:px-8 lg:pt-8 lg:pb-12">
+        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:px-8 lg:pt-8 lg:pb-12">
           {isReadOnly ? (
             <div
               role="alert"
@@ -124,7 +114,7 @@ export async function AppShell({
             >
               <span>{t('readOnlyLock')}</span>
               {user.role === 'STORE_OWNER' ? (
-                <Link href="/settings#plans" className="font-semibold underline">
+                <Link href="/settings/subscription" className="font-semibold underline">
                   {t('managePlan')}
                 </Link>
               ) : null}
@@ -136,7 +126,7 @@ export async function AppShell({
             >
               <span>{grace}</span>
               {user.role === 'STORE_OWNER' ? (
-                <Link href="/settings#plans" className="font-semibold underline">
+                <Link href="/settings/subscription" className="font-semibold underline">
                   {t('managePlan')}
                 </Link>
               ) : null}
@@ -145,18 +135,26 @@ export async function AppShell({
             <div className="mb-4 flex items-center justify-between gap-3 rounded-card bg-soft px-4 py-2.5 text-xs font-medium text-soft-ink lg:hidden print:hidden">
               <span>{trial}</span>
               {user.role === 'STORE_OWNER' ? (
-                <Link href="/settings#plans" className="font-semibold underline">
+                <Link href="/settings/subscription" className="font-semibold underline">
                   {t('managePlan')}
                 </Link>
               ) : null}
             </div>
           ) : null}
           <OfflineBanner />
-          {children}
+          <Breadcrumbs groups={groups} secondary={secondary} />
+          <RouteBones>{children}</RouteBones>
         </main>
       </div>
 
-      <BottomNav items={bottomItems(user.role)} />
+      <MobileNav
+        groups={groups}
+        secondary={secondary}
+        tabs={tabs}
+        sell={sell}
+        user={{ name: user.name, storeName: store.name }}
+      />
+      <AppToaster />
     </div>
   );
 }
