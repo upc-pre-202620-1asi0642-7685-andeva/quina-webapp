@@ -9,7 +9,7 @@ import {
   type PaymentDetailsField,
 } from '@/presentation/actions/payment-details';
 import { FormField } from '@/presentation/components/auth/form-field';
-import { Notice } from '@/presentation/components/notice';
+import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Checkbox } from '@/presentation/components/ui/checkbox';
 import { Input } from '@/presentation/components/ui/input';
@@ -33,18 +33,19 @@ export function PaymentDetailsForm({
   const t = useTranslations('Settings.payment');
   const [state, formAction, pending] = useActionState(savePaymentDetailsAction, {});
   const [removeQr, setRemoveQr] = useState(false);
+  useActionToast(
+    state,
+    state.saved
+      ? { type: 'success', title: t('saved') }
+      : state.errors?.form
+        ? { type: 'error', title: t('errors.form') }
+        : null,
+  );
   const error = (field: PaymentDetailsField) =>
     state.errors?.[field] ? t(`errors.${field}.${state.errors[field]}`) : undefined;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      {state.saved ? (
-        <Notice tone="success">
-          <p>{t('saved')}</p>
-        </Notice>
-      ) : null}
-      {state.errors?.form ? <Notice tone="error">{t('errors.form')}</Notice> : null}
-
       <div className="grid gap-4 sm:grid-cols-2">
         {TEXT_FIELDS.map(({ name, inputMode }) => (
           <FormField

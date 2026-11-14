@@ -10,7 +10,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
   const t = await getTranslations('Platform');
   return (
     <AppShell
-      user={{ name: admin.name, role: admin.role }}
+      user={{ name: admin.name, email: admin.email, role: admin.role }}
       store={{ name: t('shellName'), trialEndsAt: null }}
     >
       {children}

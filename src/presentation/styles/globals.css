@@ -241,6 +241,18 @@ html[data-offline] form :is(button[type='submit'], button:not([type])) {
   animation: auth-aside-card-in 450ms var(--ease-out-expo) 120ms both;
 }
 
+/*
+ * Toasts de Sileo con sombra (DESIGN.md §7.3): la forma es un SVG, así que la
+ * sombra va con drop-shadow. En el borde superior Sileo voltea el lienzo con
+ * scaleY(-1), por eso ahí el desplazamiento va al revés.
+ */
+[data-sileo-svg] {
+  filter: drop-shadow(0 8px 20px rgb(0 0 0 / 0.14)) drop-shadow(0 1px 2px rgb(0 0 0 / 0.08));
+}
+[data-sileo-canvas][data-edge='top'] [data-sileo-svg] {
+  filter: drop-shadow(0 -8px 20px rgb(0 0 0 / 0.14)) drop-shadow(0 -1px 2px rgb(0 0 0 / 0.08));
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -161,12 +161,22 @@ shadcn, no aceptar cambios a `globals.css`.
 - **Primero el celular.** El mostrador se usa en teléfonos de 360 a 430 px de
   ancho. Cada pantalla se diseña y revisa primero a 390 px y luego a 1440 px.
 - **Navegación:**
-  - **Celular:** barra inferior fija con los destinos frecuentes del rol (dueño:
-    Vender, Clientes, Cobros, Más). La acción "Vender" va al centro y en verde.
-  - **Escritorio (≥ 1024 px):** barra lateral con Inicio, Vender, Clientes,
-    Créditos, Inventario y Reportes, como la ventana que muestra el sitio. El
-    ítem activo usa `--color-soft` con texto `--color-soft-ink`.
-  - El empleado solo ve los destinos que su rol permite (US05).
+  - **Una sola estructura de módulos** (`shell/nav-items.ts`) para escritorio y
+    celular, agrupada: **Mostrador** (Inicio, Vender, Clientes, Cobranza),
+    **Negocio** (Inventario con Productos, Compras y Proveedores; Cartera,
+    Reportes), **Administración** (Equipo, Auditoría) y, bajo un separador, la
+    sección secundaria sin listas (Ajustes, Suscripción). Perfil va en la tarjeta
+    del usuario al pie.
+  - **Escritorio (≥ 1024 px):** barra lateral con etiquetas de grupo pequeñas,
+    submenú desplegable con guía vertical (solo Inventario) y tarjeta de usuario al
+    pie. El ítem activo usa `--color-soft` con texto `--color-soft-ink`; los
+    inactivos van en `--color-ink-soft`.
+  - **Celular:** barra flotante en píldora (`shadow-float`) con Inicio, Clientes,
+    Cobranza y **Módulos**, y a su derecha el botón circular verde **Vender**.
+    Módulos abre una hoja inferior con todos los grupos: desde el celular se llega
+    a todo lo que hay en escritorio.
+  - El empleado solo ve los destinos que su rol permite (US05); un grupo vacío no
+    se muestra.
 - **Tablas:** en escritorio, tabla con encabezado fijo; en celular, la misma
   información como lista de tarjetas. Nunca scroll horizontal en la página.
 - Ancho de contenido máximo: 1280 px, centrado.
@@ -283,8 +293,10 @@ Base: **shadcn/ui** (primitivas de Radix) ajustado a estos tokens. Se crean en
 
 - **Diálogo / hoja:** en escritorio, diálogo centrado; en celular, hoja inferior.
 - **Insignia de estado:** píldora con color según la tabla 2.4.
-- **Toast (Sileo):** confirmaciones breves ("Venta registrada · S/ 27.60"). Los
-  errores que exigen acción no van en toast, van en la pantalla.
+- **Toast (Sileo):** todo resultado de una acción (guardar, registrar, invitar,
+  anular, cobrar) se avisa con Sileo, con `shadow-float` para despegarse del
+  fondo. En la pantalla solo quedan los errores de validación junto a su campo y
+  los avisos de estado persistentes (solo lectura, gracia, prueba).
 - **Esqueletos (Boneyard):** para cargas de más de 300 ms, con la forma real del
   contenido.
 - **Estados vacíos:** ilustración mínima o ícono, una frase en voz Quina y la
@@ -298,7 +310,10 @@ Base: **shadcn/ui** (primitivas de Radix) ajustado a estos tokens. Se crean en
 
 - Solo funcional: confirmar una acción, mostrar un cambio de estado, abrir y
   cerrar capas. Duraciones de 150 a 250 ms con `--ease-out-expo`.
-- Se animan solo `transform` y `opacity`.
+- Se animan solo `transform` y `opacity` (y `grid-template-rows` para abrir un
+  submenú). El indicador del ítem activo que se desliza y la respuesta al
+  presionar (`scale(.97)`) cuentan como cambio de estado; deben poder
+  interrumpirse (transiciones CSS, sin librerías).
 - Interfaz optimista en el mostrador (la venta aparece al instante y se confirma
   después), sin animaciones que demoren el siguiente toque.
 - Todo respeta `prefers-reduced-motion` (ya está en `globals.css`).

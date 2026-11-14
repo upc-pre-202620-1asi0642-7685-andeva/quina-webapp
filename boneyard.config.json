@@ -1,0 +1,7 @@
+{
+  "breakpoints": [390, 1440],
+  "out": "./src/bones",
+  "animate": "pulse",
+  "select": "viewport",
+  "wait": 1200
+}

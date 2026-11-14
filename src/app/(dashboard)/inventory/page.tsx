@@ -101,7 +101,7 @@ export default async function InventoryPage({
               />
             ) : (
               <Link
-                href="/settings#plans"
+                href="/settings/subscription"
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-link-active underline-offset-4 hover:underline"
               >
                 <LockIcon aria-hidden="true" className="size-3.5" />

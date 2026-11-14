@@ -1,9 +1,7 @@
 import { redirect } from 'next/navigation';
-import { countLowStockProducts } from '@/infrastructure/db/queries/catalog';
 import { getSessionUser, nextRouteFor } from '@/presentation/auth/session';
-import { AppToaster } from '@/presentation/components/feedback/app-toaster';
 import { AppShell } from '@/presentation/components/shell/app-shell';
-import { loadStoreContext } from '@/presentation/queries/store-context';
+import { loadStoreNotifications } from '@/presentation/queries/notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +16,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login');
   }
 
-  const [store, lowStockCount] = await Promise.all([
-    loadStoreContext(user.storeId),
-    countLowStockProducts(user.storeId),
-  ]);
+  const { store, lowStockCount, ...notifications } = await loadStoreNotifications(
+    user.storeId,
+    user.role,
+  );
   const trialEndsAt =
     store.subscription.status === 'TRIALING' && store.tier !== 'CASERO'
       ? store.subscription.trialEndsAt
@@ -29,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <AppShell
-      user={{ name: user.name, role: user.role }}
+      user={{ name: user.name, email: user.email, role: user.role }}
       store={{
         name: store.name,
         trialEndsAt,
@@ -37,10 +35,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
         graceDaysRemaining: store.graceDaysRemaining,
         isReadOnly: store.isReadOnly,
         lowStockCount,
+        overdueCount: notifications.overdueCount,
       }}
+      notifications={notifications.items}
     >
       {children}
-      <AppToaster />
     </AppShell>
   );
 }

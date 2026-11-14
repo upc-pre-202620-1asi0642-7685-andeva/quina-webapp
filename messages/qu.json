@@ -184,7 +184,8 @@
       "submitting": "Cuentata kamarichkan…",
       "hasAccount": "¿Cuentayki kanñachu?",
       "loginLink": "Yaykuy",
-      "consentLabel": "<terms>Términos y condiciones</terms> nisqata, <privacy>Política de privacidad</privacy> nisqatapas chaskini, Ley N.° 29733 nisqaman hina willakuyniykuna llamk’achinankupaq ari nini."
+      "consentLabel": "<terms>Términos y condiciones</terms> nisqata, <privacy>Política de privacidad</privacy> nisqatapas chaskini, Ley N.° 29733 nisqaman hina willakuyniykuna llamk’achinankupaq ari nini.",
+      "googleConsent": "Google nisqawan qatispaqa <terms>Términos y condiciones</terms> nisqata, <privacy>Política de privacidad</privacy> nisqatapas chaskinki, Ley N.° 29733 nisqaman hina willakuyniykikuna llamk’achinankupaq ari ninki."
     },
     "strength": {
       "label": "Pakasqa simip kallpan",
@@ -254,13 +255,8 @@
     "logoAlt": "Quina",
     "trialBadge": "Prueba Pro: {days} p'unchaw",
     "trialUntil": "Prueba Pro {date} kama",
-    "welcome": "Mostradoruykiqa listom kachkan, {name}.",
-    "subtitle": "Llaqtamasikunata qillqachiyta qallariy hinaspa yupaykunata sut'ita apay.",
     "profileLink": "Perfilniy hinaspa simi",
     "signOut": "Lluqsiy",
-    "registerCustomer": "Llaqtamasita qillqachiy",
-    "inventoryLink": "Rantinakunata rikuy",
-    "sellLink": "Rantikuy",
     "cashBox": {
       "title": "Kunan p’unchaw caja",
       "count": "{count} qullqi rantikuy",
@@ -272,10 +268,114 @@
         "CARD": "Tarjeta"
       }
     },
-    "auditLink": "Qhawapayay",
-    "lowStockBanner": "{count, plural, =1 {1 ruru pisi kapuqniyuq} other {# rurukuna pisi kapuqniyuq}}",
-    "portfolioLink": "Cartera",
-    "reportsLink": "Willakuykuna"
+    "greeting": "Napaykullayki, {name}",
+    "today": "{date} · {store}",
+    "customize": {
+      "customize": "Allichay",
+      "done": "Tukusqa",
+      "add": "Widget yapay",
+      "addShort": "Yapay",
+      "addOne": "{name} yapay",
+      "addTitle": "Qallariyniykiman yapay",
+      "addSubtitle": "Quina kichaspa imata rikuyta munasqaykita akllay.",
+      "allAdded": "Llapan widgetkuna qallariyniykipi kachkanña.",
+      "reset": "Ñawpaq kaqman kutichiy",
+      "hint": "Sapa tarjetata hapinanmanta aysay utaq flechakunawan. Tikraykuna kikillanmanta waqaychakun.",
+      "drag": "{name} kuyuchiy",
+      "dragHelp": "Aysay utaq teclado flechakunawan ñiqinta tikray.",
+      "moveUp": "{name} wichachiy",
+      "moveDown": "{name} uraykachiy",
+      "hide": "{name} qallariymanta qichuy",
+      "moved": "{name} {position} kaqpi, {total} ukhupi",
+      "hidden": "{name} qichusqa",
+      "added": "{name} yapasqa",
+      "saved": "Qallariyniyki waqaychasqa",
+      "saveError": "Mana waqaychayta atirqanchikchu. Huktawan ruway.",
+      "empty": "Qallariyniyki chusaq. Sapa paqarin rikuyta munasqaykita yapay.",
+      "gridLabel": "Qallariy widgetkuna"
+    },
+    "widgets": {
+      "seeAll": "Llapanta rikuy",
+      "quickActions": {
+        "title": "Utqay ruraykuna",
+        "description": "Rantichiy, llaqtamasikunata qillqay, sapa punchaw ruranaykuna."
+      },
+      "collect": {
+        "title": "Cobranapaq",
+        "description": "Pagonku pasasqa utaq 3 punchawpi tukukuq llaqtamasikuna.",
+        "overdue": "{count, plural, =0 {Mana pasasqachu} other {# pasasqa}}",
+        "soon": "{count, plural, =0 {Mana tukukuqchu} other {# tukukunqa}}",
+        "lateBy": "{days, plural, other {# punchaw pasasqa}}",
+        "dueIn": "{days, plural, =0 {Kunan tukukun} one {Paqarin tukukun} other {# punchawpi tukukun}}",
+        "collectAction": "Cobray",
+        "empty": "Mana pipas pasasqa pagoyuqchu. Llapan allin."
+      },
+      "cashToday": {
+        "title": "Kunan punchaw caja",
+        "description": "Kunan contadopi rantichisqakuna."
+      },
+      "salesWeek": {
+        "title": "Semana rantichiykuna",
+        "description": "Qhipa 7 punchaw contado fiadowan.",
+        "cash": "Contado",
+        "credit": "Fiado",
+        "day": "Punchaw",
+        "caption": "Qhipa 7 punchaw rantichiykuna"
+      },
+      "moneyOut": {
+        "title": "Ñanpi qullqi",
+        "description": "Llaqtamasikuna manusqanku, pasasqapas.",
+        "lentHint": "Llapan llaqtamasikunamanta cobranapaq fiado",
+        "overdue": "Pasasqa",
+        "projected": "Kay killapi tukukun",
+        "delinquent": "{count, plural, =0 {Mana pipas morapichu} other {# llaqtamasi morapi}}"
+      },
+      "riskCustomers": {
+        "title": "Riesgopi llaqtamasikuna",
+        "description": "Puka puntaje, morapi utaq límite qhawanapaq.",
+        "balance": "Pagonapaq:",
+        "lowerLimit": "Límitenta qhaway · pagonapaq:",
+        "empty": "Mana pipas riesgopichu."
+      },
+      "lowStock": {
+        "title": "Pisi stock",
+        "description": "Minimonman chayasqa productokuna.",
+        "stockOf": "{stock} / {min} {unit}",
+        "more": "{count, plural, other {# producto aswan}}",
+        "empty": "Llapan inventarioyki minimonmanta aswan."
+      },
+      "rus": {
+        "title": "Nuevo RUS",
+        "description": "Kay killa rantichiyniyki rantiyniykipas.",
+        "notRus": "Tiendayki mana Nuevo RUS-pichu. Ajustespi tikrayta atinki."
+      },
+      "plan": {
+        "title": "Planniyki",
+        "description": "Kunan plan, prueba punchawkuna, límitekuna.",
+        "trial": "{days, plural, other {# prueba punchaw}}",
+        "grace": "{days, plural, other {# gracia punchaw}}"
+      },
+      "monthSummary": {
+        "title": "Kay killa",
+        "description": "Kay killapi rantichiykuna, ganancia, interés.",
+        "sales": "Rantichiykuna",
+        "margin": "Ganancia",
+        "interest": "Cobrasqa interés",
+        "count": "{count, plural, =0 {Mana rantichiychu} other {# rantichiy}}"
+      },
+      "purchaseDrafts": {
+        "title": "Qhawanapaq pedidokuna",
+        "description": "Borradorpi reposición pedidokuna.",
+        "noSupplier": "Mana proveedoryuq",
+        "items": "{count, plural, other {# producto}}",
+        "empty": "Mana pedidokuna kanchu."
+      },
+      "notices": {
+        "title": "Kunan willakuykuna",
+        "description": "Kunan kachasqa willakuykuna.",
+        "empty": "Kunan manaraq willakuy lluqsinchu."
+      }
+    }
   },
   "Profile": {
     "title": "Perfilniy",
@@ -370,10 +470,89 @@
       "audit": "Qhawapayay",
       "rusCaps": "Topes RUS",
       "portfolio": "Cartera",
-      "reports": "Willakuykuna"
+      "reports": "Willakuykuna",
+      "products": "Rantinakuna",
+      "purchases": "Rantikuna",
+      "suppliers": "Proveedores",
+      "subscription": "Suscripción",
+      "profile": "Perfil",
+      "modules": "Llapan",
+      "modulesTitle": "Llapan módulos",
+      "close": "Wichqay",
+      "groups": {
+        "counter": "Mostrador",
+        "business": "Negocio",
+        "admin": "Kamachiy",
+        "account": "Cuenta",
+        "platform": "Plataforma"
+      },
+      "logoAlt": "Quina",
+      "customersAll": "Llapan",
+      "customersNew": "Llaqtamasita qillqay",
+      "collectionsDue": "Cobranapaq",
+      "collectionsOverdue": "Pachan pasasqa",
+      "collectionsNotices": "Kunan willakuykuna",
+      "lowStock": "Pisi stock",
+      "collapse": "Barrata pakay",
+      "expand": "Barrata kichay",
+      "create": "Ruray"
     },
     "lowStockAlert": "{count, plural, =1 {1 rurupa pisi kapuqnin} other {# rurukunapa pisi kapuqnin}}",
-    "lowStockShort": "{count} pisi"
+    "lowStockShort": "{count} pisi",
+    "create": {
+      "label": "Ruray",
+      "title": "Qillqay",
+      "newSale": "Musuq rantiy",
+      "newCustomer": "Musuq llaqtamasi",
+      "newProduct": "Musuq ranti",
+      "newPurchase": "Musuq rantisqa",
+      "newSupplier": "Musuq proveedor",
+      "inviteEmployee": "Llamkaqkunata waqyay"
+    },
+    "account": {
+      "open": "Cuentayki menuta kichay",
+      "profile": "Perfilniy",
+      "settings": "Tiendaq allichanakuna",
+      "theme": "Tema",
+      "themes": {
+        "light": "Achiq",
+        "dark": "Tutayaq",
+        "system": "Sistema hina"
+      },
+      "language": "Simi",
+      "plans": "Planes, suscripción",
+      "signOut": "Lluqsiy"
+    },
+    "notifications": {
+      "title": "Willakuykuna",
+      "markAll": "Llapanta ñawinchasqa hina churay",
+      "empty": "Kaypim willakuykunayki rikhurinqa.",
+      "open": "Willakuykuna",
+      "openUnread": "Willakuykuna, {count} mana ñawinchasqa",
+      "unread": "Mana ñawinchasqa",
+      "readOnlyTitle": "Tiendayki ñawinchanallapaqmi",
+      "readOnlyBody": "Huk planta akllay rantiykunata qillqanaykipaq.",
+      "graceTitle": "Pagoyki suyachkan",
+      "graceBody": "{days} punchaw puchun.",
+      "trialTitle": "Pro pruebayki tukukuchkan",
+      "trialBody": "{days} punchaw puchun. Planniykita akllay.",
+      "overdueTitle": "{name}: ciclon pasasqa",
+      "overdueBody": "{amount} · {date}",
+      "dueSoonTitle": "{name}-manta cobray",
+      "dueSoonBody": "{amount} · {date}",
+      "lowStockTitle": "Tukukuq rantinakuna",
+      "lowStockBody": "{count} ranti pisi stockwan"
+    },
+    "breadcrumb": {
+      "label": "Kaypi kachkanki",
+      "detail": "Detalle",
+      "new": "Musuq",
+      "edit": "Allichay",
+      "pay": "Cobray",
+      "terms": "Condicionkuna",
+      "cycle": "Ciclo",
+      "billing": "Pago"
+    }
   },
   "Customers": {
     "list": {
@@ -704,6 +883,8 @@
   "Settings": {
     "title": "Allichanakuna",
     "subtitle": "Tu plan y lo que estás usando.",
+    "subscriptionTitle": "Suscripción",
+    "storeSubtitle": "Llaqtamasikuna imaynata qullqita qusunki, impuesto willakuykunapas.",
     "currentPlan": "Tu plan: {plan}",
     "trialUntil": "Prueba gratis hasta el {date} ({days, plural, one {# p'unchaw puchun} other {# p'unchaw puchun}}). Después pasas a Casero si no eliges un plan.",
     "activeUntil": "Qhipa musuqchay utaq tukukuy: {date}.",
@@ -1597,6 +1778,17 @@
       "otherSession": "Kay equipopi huk cuentam kichasqa kachkan ({email}). Yaykuspaqa chay sesionqa wichqakunqa.",
       "missing": "Kay enlaceqa mana hunt’asqachu. Documentoykiwan yaykuy."
     }
+  },
+  "Suppliers": {
+    "title": "Proveedores",
+    "subtitle": "Pimanta rantinkiki.",
+    "newButton": "Proveedorta qillqay",
+    "empty": "Manaraq proveedorniyki kanchu. Ñawpaq kaqta qillqay.",
+    "taxId": "RUC",
+    "phone": "Teléfono",
+    "contact": "Contacto",
+    "inactive": "Mana llamkaq",
+    "seePurchases": "Rantikunata qhaway"
   },
   "Purchases": {
     "backToInventory": "Rurukunaman kutiy",

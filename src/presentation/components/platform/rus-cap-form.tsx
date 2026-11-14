@@ -7,7 +7,7 @@ import { RUS_CATEGORIES } from '@/core/domain/tax/rus';
 import { addRusCapAction, type PlatformFormState } from '@/presentation/actions/platform';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { NativeSelect } from '@/presentation/components/forms/native-select';
-import { Notice } from '@/presentation/components/notice';
+import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 
@@ -17,6 +17,14 @@ export function RusCapForm() {
   const t = useTranslations('Platform.rusCaps.form');
   const tCaps = useTranslations('Platform.rusCaps');
   const [state, formAction, pending] = useActionState<State, FormData>(addRusCapAction, {});
+  useActionToast(
+    state,
+    state.saved
+      ? { type: 'success', title: t('saved') }
+      : state.error === 'generic'
+        ? { type: 'error', title: t('errors.generic') }
+        : null,
+  );
 
   const amountError = state.error === 'AMOUNT_INVALID' ? t('errors.AMOUNT_INVALID') : undefined;
   const dateError =
@@ -26,17 +34,6 @@ export function RusCapForm() {
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
-      {state.saved ? (
-        <Notice tone="success">
-          <p>{t('saved')}</p>
-        </Notice>
-      ) : null}
-      {state.error === 'generic' ? (
-        <Notice tone="error">
-          <p>{t('errors.generic')}</p>
-        </Notice>
-      ) : null}
-
       <div className="grid gap-5 sm:grid-cols-2">
         <FormField id="rus-category" label={t('category')} hint={t('categoryHint')}>
           {(props) => (

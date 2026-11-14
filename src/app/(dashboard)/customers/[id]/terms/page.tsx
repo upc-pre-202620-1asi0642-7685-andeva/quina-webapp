@@ -19,7 +19,7 @@ import {
   type RateValues,
   type TermsFormValues,
 } from '@/presentation/components/customers/terms-form';
-import { Notice } from '@/presentation/components/notice';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { formatDate } from '@/presentation/lib/format-date';
 
 // Ejemplo de la historia US06: corte el 20, pago el 26 y hasta 3 cuotas
@@ -105,9 +105,10 @@ export default async function CustomerTermsPage({
       </Link>
 
       {notice === 'created' || notice === 'createdNoMail' ? (
-        <Notice tone={notice === 'created' ? 'success' : 'warning'}>
-          <p>{t(`detail.${notice}`, { name: customer.firstName })}</p>
-        </Notice>
+        <FlashToast
+          type={notice === 'created' ? 'success' : 'warning'}
+          title={t(`detail.${notice}`, { name: customer.firstName })}
+        />
       ) : null}
 
       <header className="flex flex-col gap-1">

@@ -43,6 +43,13 @@
       "when": 1794600000000,
       "tag": "0005_rus_categories_seed",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794694877208,
+      "tag": "0006_dashboard_layout",
+      "breakpoints": true
     }
   ]
 }

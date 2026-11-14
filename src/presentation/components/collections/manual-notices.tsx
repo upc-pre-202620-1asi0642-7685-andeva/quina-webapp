@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { BellRingIcon, MailIcon } from 'lucide-react';
@@ -9,20 +9,26 @@ import {
   sendPaymentRemindersAction,
   type ManualNoticeResult,
 } from '@/presentation/actions/collections';
-import { Notice } from '@/presentation/components/notice';
+import { sileo } from 'sileo';
 import { Button } from '@/presentation/components/ui/button';
 
 /** P5: en el Plan Casero los avisos de cobranza salen cuando el dueño o el empleado lo piden. */
 export function ManualNotices() {
   const t = useTranslations('Collections.manual');
   const router = useRouter();
-  const [result, setResult] = useState<ManualNoticeResult | null>(null);
   const [busy, startTransition] = useTransition();
 
   function run(task: () => Promise<ManualNoticeResult>) {
-    setResult(null);
     startTransition(async () => {
-      setResult(await task());
+      const result = await task();
+      if (!result.ok) sileo.error({ title: t(`errors.${result.error}`) });
+      else
+        sileo[result.failed > 0 ? 'warning' : 'success']({
+          title:
+            result.queued === 0 && result.sent === 0
+              ? t('nothing')
+              : t('sent', { sent: result.sent, failed: result.failed }),
+        });
       router.refresh();
     });
   }
@@ -48,21 +54,6 @@ export function ManualNotices() {
           {t('reminders')}
         </Button>
       </div>
-      {result ? (
-        result.ok ? (
-          <Notice tone={result.failed > 0 ? 'warning' : 'success'}>
-            <p>
-              {result.queued === 0 && result.sent === 0
-                ? t('nothing')
-                : t('sent', { sent: result.sent, failed: result.failed })}
-            </p>
-          </Notice>
-        ) : (
-          <Notice tone="error">
-            <p>{t(`errors.${result.error}`)}</p>
-          </Notice>
-        )
-      ) : null}
     </section>
   );
 }

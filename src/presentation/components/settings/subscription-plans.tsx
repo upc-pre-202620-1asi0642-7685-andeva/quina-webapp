@@ -17,7 +17,7 @@ import {
   startSubscriptionCheckoutAction,
 } from '@/presentation/actions/billing';
 import { formatMoney } from '@/presentation/components/money';
-import { Notice } from '@/presentation/components/notice';
+import { sileo } from 'sileo';
 import { Button } from '@/presentation/components/ui/button';
 import { cn } from '@/presentation/lib/utils';
 
@@ -50,10 +50,10 @@ export function SubscriptionPlans({
   );
   const [busyTier, setBusyTier] = useState<PaidPlanTier | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
-  const [notice, setNotice] = useState<{
-    tone: 'success' | 'warning' | 'error';
-    message: string;
-  } | null>(null);
+  // El resultado del pago o la cancelación se avisa con Sileo (DESIGN.md §7.3)
+  const setNotice = (notice: { tone: 'success' | 'warning' | 'error'; message: string } | null) => {
+    if (notice) sileo[notice.tone]({ title: notice.message });
+  };
   const [localCheckout, setLocalCheckout] = useState<LocalCheckoutState>(initialLocalCheckout);
   const [isPending, startTransition] = useTransition();
 
@@ -110,7 +110,7 @@ export function SubscriptionPlans({
         message:
           result.status === 'APPROVED' ? t('billingNotice.approved') : t('billingNotice.rejected'),
       });
-      router.replace('/settings#plans');
+      router.replace('/settings/subscription');
       router.refresh();
     });
   };
@@ -137,12 +137,6 @@ export function SubscriptionPlans({
 
   return (
     <div className="flex flex-col gap-4">
-      {notice ? (
-        <Notice tone={notice.tone}>
-          <p>{notice.message}</p>
-        </Notice>
-      ) : null}
-
       {localCheckout ? (
         <div
           role="region"

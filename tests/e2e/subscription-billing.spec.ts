@@ -19,7 +19,7 @@ test.describe('Suscripciones SaaS, Mercado Pago y bloqueo por exceso de plan (US
     await registerOwnerWithStore(page);
 
     // US25 crit. 1 y 2: prueba de 14 días de Bodega Pro con contador visible en Ajustes
-    await page.goto('./settings');
+    await page.goto('./settings/subscription');
     await expect(page.getByRole('heading', { name: 'Tu plan: Bodega Pro' })).toBeVisible();
     await expect(page.getByText(/Prueba gratis hasta el .*quedan 14 días/)).toBeVisible();
 
@@ -74,7 +74,7 @@ test.describe('Suscripciones SaaS, Mercado Pago y bloqueo por exceso de plan (US
     // Vence la prueba de 14 días: la tienda cae a Casero con 2 usuarios (> 1 permitido)
     await endTrial(storeId);
 
-    await page.goto('./settings');
+    await page.goto('./settings/subscription');
     await expect(page.getByText('Tu tienda está en modo solo lectura')).toBeVisible();
     await expectAccessible(page);
 

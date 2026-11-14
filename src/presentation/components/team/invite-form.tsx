@@ -6,6 +6,7 @@ import { SendIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { inviteEmployeeAction } from '@/presentation/actions/team';
 import { FormField } from '@/presentation/components/auth/form-field';
+import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -15,6 +16,16 @@ export function InviteForm() {
   const tPlans = useTranslations('Plans');
   const [state, formAction, pending] = useActionState(inviteEmployeeAction, {});
   const nameRef = useRef<HTMLInputElement>(null);
+  useActionToast(
+    state,
+    state.invited
+      ? state.mailFailed
+        ? { type: 'warning', title: t('mailFailed', { email: state.invited }) }
+        : { type: 'success', title: t('sent', { email: state.invited }) }
+      : state.error === 'generic'
+        ? { type: 'error', title: t('errors.generic') }
+        : null,
+  );
 
   // Tras invitar, el formulario se vacía (React 19) y el foco vuelve al nombre
   useEffect(() => {
@@ -31,23 +42,16 @@ export function InviteForm() {
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-4">
-      {state.invited ? (
-        <Notice tone={state.mailFailed ? 'warning' : 'success'}>
-          <p>
-            {state.mailFailed
-              ? t('mailFailed', { email: state.invited })
-              : t('sent', { email: state.invited })}
-          </p>
-        </Notice>
-      ) : null}
-      {state.error === 'planLimit' || state.error === 'generic' ? (
-        <Notice tone={state.error === 'planLimit' ? 'warning' : 'error'}>
-          <p>{t(`errors.${state.error}`)}</p>
-          {state.error === 'planLimit' ? (
-            <Link href="/settings#plans" className="font-semibold underline underline-offset-4">
-              {tPlans('seePlans')}
-            </Link>
-          ) : null}
+      {/* El tope del plan exige una acción: se queda en pantalla con el enlace (DESIGN §7.3) */}
+      {state.error === 'planLimit' ? (
+        <Notice tone="warning">
+          <p>{t('errors.planLimit')}</p>
+          <Link
+            href="/settings/subscription"
+            className="font-semibold underline underline-offset-4"
+          >
+            {tPlans('seePlans')}
+          </Link>
         </Notice>
       ) : null}
 

@@ -11,6 +11,7 @@ import {
   setEmployeeActiveAction,
   type TeamActionResult,
 } from '@/presentation/actions/team';
+import { sileo } from 'sileo';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
 import {
@@ -36,18 +37,20 @@ export function MemberActions({
   const tPlans = useTranslations('Plans');
   const router = useRouter();
   const [confirm, setConfirm] = useState<Pending>(null);
-  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'warning'; key: string }>();
+  // Solo el tope del plan se queda en pantalla: pide ir a Suscripción (DESIGN §7.3)
+  const [planLimit, setPlanLimit] = useState(false);
   const [busy, startTransition] = useTransition();
 
   function run(task: () => Promise<TeamActionResult>, successKey?: string) {
-    setMessage(undefined);
+    setPlanLimit(false);
     startTransition(async () => {
       const result = await task();
       setConfirm(null);
       if (!result.ok) {
-        setMessage({ tone: result.error === 'planLimit' ? 'warning' : 'error', key: result.error });
+        if (result.error === 'planLimit') setPlanLimit(true);
+        else sileo.error({ title: t(`messages.${result.error}`) });
       } else if (successKey) {
-        setMessage({ tone: 'success', key: successKey });
+        sileo.success({ title: t(`messages.${successKey}`) });
       }
       router.refresh();
     });
@@ -93,14 +96,15 @@ export function MemberActions({
         ) : null}
       </div>
 
-      {message ? (
-        <Notice tone={message.tone}>
-          <p>{t(`messages.${message.key}`)}</p>
-          {message.key === 'planLimit' ? (
-            <Link href="/settings#plans" className="font-semibold underline underline-offset-4">
-              {tPlans('seePlans')}
-            </Link>
-          ) : null}
+      {planLimit ? (
+        <Notice tone="warning">
+          <p>{t('messages.planLimit')}</p>
+          <Link
+            href="/settings/subscription"
+            className="font-semibold underline underline-offset-4"
+          >
+            {tPlans('seePlans')}
+          </Link>
         </Notice>
       ) : null}
 
