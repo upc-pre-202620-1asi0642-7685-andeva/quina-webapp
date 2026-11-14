@@ -281,7 +281,7 @@ coherente de herramientas en TypeScript:
 | **Protección bots**  | Cloudflare Turnstile        | `@marsidev/react-turnstile`      | Captcha 100 % gratuito, no intrusivo y sin retos visuales para proteger el login y altas.|
 | **Correos**          | Resend SDK                  | `resend` (Capa gratuita)         | Despacho asíncrono de notificaciones de cargo, recordatorios y alertas de mora.         |
 | **Pagos SaaS**       | Mercado Pago SDK            | `mercadopago`                    | Suscripciones recurrentes en soles peruanos con tarjetas locales y webhooks seguros.    |
-| **IA Financiera**    | Groq Cloud SDK              | `groq-sdk` (Llama 3 en free tier)| Inferencia ultrarrápida para recomendaciones comerciales con control de cuotas.         |
+| **IA Financiera**    | Groq Cloud SDK              | `groq-sdk` (`openai/gpt-oss-120b`; Groq retiró Llama de chat)| Inferencia ultrarrápida para recomendaciones comerciales con control de cuotas.         |
 
 ---
 
@@ -894,7 +894,8 @@ mismo dominio: el sitio en la raíz y la webapp en **`/app`**.
 | `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET` | Envío de correos y webhook de rebotes. |
 | `MP_TRANSPORT` | Pasarela de suscripción: `mercadopago` (SDK oficial) o `local` (pasarela simulada en desarrollo y pruebas). |
 | `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` | Mercado Pago: suscripciones y validación HMAC de webhooks (`/app/api/webhooks/mercadopago`). |
-| `GROQ_API_KEY` | Recomendaciones con IA. |
+| `GROQ_API_KEY` | Recomendaciones con IA (modelo `openai/gpt-oss-120b` con razonamiento bajo, ~1 s; tiempo máximo 3 s). |
+| `AI_TRANSPORT` | `groq` o `fake`. Sin valor usa `groq` si hay `GROQ_API_KEY` o en producción y, si no, `fake` (tarjetas fijas, prohibido en producción). Sin clave, cada consulta responde "IA no disponible" y no se descuenta. Playwright usa `fake`. |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Solo Supabase Storage desde el servidor (comprobantes y QR de cobro). |
 | `QUINA_APP_DB_PASSWORD`, `QUINA_PLATFORM_DB_PASSWORD` | Contraseñas que `pnpm db:roles` asigna a los roles `quina_app` y `quina_platform`. |
 | `EMAIL_TRANSPORT` | Transporte de correo: `resend` (envía de verdad) u `outbox` (guarda los correos en la base, para desarrollo y pruebas). |

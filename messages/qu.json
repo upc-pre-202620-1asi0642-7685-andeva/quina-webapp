@@ -273,7 +273,9 @@
       }
     },
     "auditLink": "Qhawapayay",
-    "lowStockBanner": "{count, plural, =1 {1 ruru pisi kapuqniyuq} other {# rurukuna pisi kapuqniyuq}}"
+    "lowStockBanner": "{count, plural, =1 {1 ruru pisi kapuqniyuq} other {# rurukuna pisi kapuqniyuq}}",
+    "portfolioLink": "Cartera",
+    "reportsLink": "Willakuykuna"
   },
   "Profile": {
     "title": "Perfilniy",
@@ -365,7 +367,10 @@
       "sellSoon": "Rantiy, qayllaña",
       "inventory": "Rantinakuna",
       "collections": "Cobranza",
-      "audit": "Qhawapayay"
+      "audit": "Qhawapayay",
+      "rusCaps": "Topes RUS",
+      "portfolio": "Cartera",
+      "reports": "Willakuykuna"
     },
     "lowStockAlert": "{count, plural, =1 {1 rurupa pisi kapuqnin} other {# rurukunapa pisi kapuqnin}}",
     "lowStockShort": "{count} pisi"
@@ -834,6 +839,25 @@
           "IMAGE_TOO_LARGE": "Imagenqa 2 MB-manta aswan llasaq. Aswan pisi llasaq capturata hurquy."
         }
       }
+    },
+    "tax": {
+      "title": "Impuesto régimen",
+      "subtitle": "Nuevo RUSwanqa, Quina kay killapi rantikusqaykita rantisqaykitapas categoríayki topewan tupachin.",
+      "regime": "Régimen",
+      "regimeHint": "SUNATpi qillqachisqayki.",
+      "regimes": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "Régimen Especial (RER)",
+        "MYPE": "Régimen MYPE Tributario",
+        "GENERAL": "Régimen General"
+      },
+      "category": "Nuevo RUS categoría",
+      "categoryHint": "1 categoría killapi S/ 5,000 kama; 2 categoría S/ 8,000 kama.",
+      "categoryOption": "{category} Categoría",
+      "submit": "Régimenta waqaychay",
+      "submitting": "Waqaychachkan…",
+      "saved": "Régimenqa waqaychasqañam.",
+      "error": "Mana waqaychakuyta atikurqanchu. Huktawan kallpachay."
     }
   },
   "Platform": {
@@ -948,6 +972,36 @@
           "DATE_INVALID": "Elige una fecha.",
           "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
           "SOURCE_REQUIRED": "Escribe la circular de la que sale el tope.",
+          "generic": "No se pudo guardar. Intenta de nuevo."
+        }
+      }
+    },
+    "rusCaps": {
+      "title": "Topes del Nuevo RUS",
+      "subtitle": "Ingresos y compras máximos al mes de cada categoría. Quina avisa al comerciante cuando se acerca al 85 %.",
+      "historyTitle": "Vigencias",
+      "category": "Categoría {category}",
+      "income": "Ingresos al mes",
+      "purchases": "Compras al mes",
+      "inForce": "Vigente desde el {from}",
+      "period": "Del {from} al {to}",
+      "form": {
+        "title": "Nueva vigencia",
+        "subtitle": "Al guardarla, la vigencia anterior de la misma categoría se cierra el día previo.",
+        "category": "Categoría",
+        "categoryHint": "La SUNAT fija un tope por categoría.",
+        "income": "Tope de ingresos al mes (S/)",
+        "purchases": "Tope de compras al mes (S/)",
+        "amountHint": "En soles, por ejemplo 5000.",
+        "validFrom": "Vigente desde",
+        "validFromHint": "Debe ser posterior a la vigencia actual.",
+        "submit": "Guardar vigencia",
+        "submitting": "Guardando…",
+        "saved": "Vigencia guardada.",
+        "errors": {
+          "AMOUNT_INVALID": "Escribe montos en soles mayores que 0, por ejemplo 5000.",
+          "DATE_INVALID": "Elige una fecha.",
+          "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
           "generic": "No se pudo guardar. Intenta de nuevo."
         }
       }
@@ -1739,5 +1793,115 @@
       "store_subscriptions": "Suscripción",
       "subscription_payments": "Suscripción qullqikuna"
     }
+  },
+  "Tax": {
+    "rus": {
+      "title": "Impuesto yanapaq",
+      "category": "Nuevo RUS · {category} Categoría",
+      "salesLabel": "Kay killapi rantikusqayki",
+      "purchasesLabel": "Kay killapi rantisqayki",
+      "usedOf": "{used} / {cap} ({percent} %)",
+      "meterText": "Topemanta {percent} %",
+      "noCap": "Manaraqmi categoríaykipaq tope kanchu. Churakuptinmi Quina willasunki.",
+      "alerts": {
+        "warning": {
+          "sales": "Kay killapi rantikusqaykiqa categoríayki topemanta 85 % nisqatañam yallin. Rantikusqaykita qhaway, ama régimenta tikranaykipaq.",
+          "purchases": "Kay killapi rantisqaykiqa categoríayki topemanta 85 % nisqatañam yallin. Rantisqaykita qhaway, ama régimenta tikranaykipaq."
+        },
+        "over": {
+          "sales": "Kay killapi rantikusqaykiqa categoríayki topetam yallirqun. Contadoriykiwan categoríaykita qhaway.",
+          "purchases": "Kay killapi rantisqaykiqa categoríayki topetam yallirqun. Contadoriykiwan categoríaykita qhaway."
+        }
+      },
+      "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
+      "changeCategory": "Categoríata tikray"
+    }
+  },
+  "Portfolio": {
+    "title": "Cartera",
+    "subtitle": "Hayka qullqi callepi kachkan, pikunataq p’unchawninpi pagan.",
+    "metrics": {
+      "lent": "Manusqa qullqi",
+      "overdue": "Mora nisqapi tukuy",
+      "projected": "Kay killapi cobranapaq",
+      "delinquent": "Morapi kaq vecinokuna"
+    },
+    "chart": {
+      "title": "Cartera imayna purisqan",
+      "caption": "Sapa corte killapi liquidasqa, pagasqa, mana pagasqa (qhipa 6 killakuna).",
+      "period": "Killa",
+      "billed": "Liquidasqa",
+      "paid": "Pagasqa",
+      "overdue": "Vencesqa",
+      "locked": "Kay gráficoqa {plan} planwanmi hamun.",
+      "seePlans": "Plankunata qhaway"
+    },
+    "list": {
+      "title": "Fiadoyuq vecinokuna",
+      "sortLabel": "Cartera ordenay",
+      "sort": {
+        "debt": "Aswan manu",
+        "score": "Aswan pisi puntaje"
+      },
+      "debt": "Manu",
+      "limit": "Límite",
+      "delinquent": "Morapi",
+      "suggestLower": "Iskay cortepi Puka: límiteta urayachiy allinmi",
+      "empty": "Manaraqmi fiadoyuq vecinoykikuna kanchu."
+    },
+    "score": {
+      "value": "{score} · {band}",
+      "noHistory": "Mana historialniyuq",
+      "bands": {
+        "GREEN": "Allinpuni",
+        "YELLOW": "Riesgopi",
+        "RED": "Sinchi morapi"
+      }
+    }
+  },
+  "Reports": {
+    "title": "Willakuykuna",
+    "subtitle": "Hayka rantikusqayki, hayka interésta cobrasqayki, haykataq qampaq qhipakurqan, akllasqayki p’unchawkunapi.",
+    "locked": "P’unchawkunawan willakuykunaqa {plan} planwanmi hamun.",
+    "seePlans": "Plankunata qhaway",
+    "from": "Kaymanta",
+    "to": "Kaykama",
+    "submit": "Willakuyta qhaway",
+    "print": "Imprimiy utaq PDF waqaychay",
+    "rangeInvalid": "P’unchawkunata qhaway: \"Kaymanta\" ñawpaqtam rin, huk watakamallam. Kay killatam rikuchiyku.",
+    "reportTitle": "{store} willakuy",
+    "range": "{from} p’unchawmanta {to} p’unchawkama",
+    "salesCount": "{count, plural, =0 {mana rantikuyniyuq} one {1 rantikuy} other {# rantikuykuna}}",
+    "figures": {
+      "cashSales": "Qullqipi rantikusqa",
+      "creditSales": "Fiadopi rantikusqa",
+      "compensatoryInterest": "Fiadomanta cobrasqa interés",
+      "moratoryInterest": "Qhipakuymanta cobrasqa interés",
+      "costOfSales": "Rantikusqapa chanin",
+      "grossMargin": "Margen bruto"
+    },
+    "note": "Anulasqa fiadokunaqa mana yupakunchu. Interesqa kay p’unchawkunapi cobrasqallam.",
+    "ai": {
+      "title": "IA yanapayninkuna",
+      "analyze": "IAwan qhawariy",
+      "analyzing": "Qhawarichkan…",
+      "quota": "{left, plural, =0 {Kay killapaq manaña tapukuy kanchu} other {Kay killapaq {max} tapukuymanta # qhipakun}}",
+      "privacy": "Kay willakuypa tukuy yupayninkunallatam apachiyku. Manam hayk’aqpas vecinoykikunapa sutinkunata.",
+      "locked": "IA yanapaykunaqa {plan} planwanmi hamun.",
+      "errors": {
+        "QUOTA_EXHAUSTED": "Kay killapaq IA tapukuyniykikunata tukuchirqankiña. 1 p’unchawpi musuqyanqa.",
+        "UNAVAILABLE": "IAqa mana p’unchawninpi kutichirqanchu. Mana yupakurqanchu; huktawan kallpachay.",
+        "NOT_IN_PLAN": "Kunan planniykiqa mana IA yanapaykunayuqchu.",
+        "RANGE_INVALID": "Willakuypa p’unchawninkunata qhaway."
+      }
+    }
+  },
+  "Offline": {
+    "title": "Mana internetniyuq",
+    "body": "Kunanqa mana señal kanchu. Ñawpaqta kicharqanki catálogota, vecinoykikunapa manunkunatapas qhawayta atinki.",
+    "writes": "Rantinaykipaq utaq cobranaykipaqqa internetmi kanan: chhaynapim cuentaykikuna stockniykipas tupan.",
+    "catalog": "Catálogota qhaway",
+    "customers": "Vecinokunata qhaway",
+    "banner": "Mana internetniyuq: kicharqasqaykitam qhawayta atinki; rantiyqa cobranapas señal kutimunankamam suyan."
   }
 }

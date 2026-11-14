@@ -272,7 +272,9 @@
       }
     },
     "auditLink": "Auditoría",
-    "lowStockBanner": "{count, plural, =1 {1 producto con stock bajo} other {# productos con stock bajo}}"
+    "lowStockBanner": "{count, plural, =1 {1 producto con stock bajo} other {# productos con stock bajo}}",
+    "portfolioLink": "Cartera",
+    "reportsLink": "Reportes"
   },
   "Profile": {
     "title": "Mi perfil",
@@ -364,7 +366,10 @@
       "sellSoon": "Vender, disponible pronto",
       "inventory": "Inventario",
       "collections": "Cobranza",
-      "audit": "Auditoría"
+      "audit": "Auditoría",
+      "rusCaps": "Topes RUS",
+      "portfolio": "Cartera",
+      "reports": "Reportes"
     },
     "lowStockAlert": "{count, plural, =1 {1 producto por agotarse} other {# productos por agotarse}}",
     "lowStockShort": "{count} bajo"
@@ -833,6 +838,25 @@
           "IMAGE_TOO_LARGE": "La imagen pesa más de 2 MB. Toma una captura más liviana."
         }
       }
+    },
+    "tax": {
+      "title": "Régimen tributario",
+      "subtitle": "Con el Nuevo RUS, Quina compara tus ventas y compras del mes con el tope de tu categoría.",
+      "regime": "Régimen",
+      "regimeHint": "El que tienes inscrito en la SUNAT.",
+      "regimes": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "Régimen Especial (RER)",
+        "MYPE": "Régimen MYPE Tributario",
+        "GENERAL": "Régimen General"
+      },
+      "category": "Categoría del Nuevo RUS",
+      "categoryHint": "Categoría 1 hasta S/ 5,000 al mes; categoría 2 hasta S/ 8,000.",
+      "categoryOption": "Categoría {category}",
+      "submit": "Guardar régimen",
+      "submitting": "Guardando…",
+      "saved": "Régimen guardado.",
+      "error": "No se pudo guardar. Intenta de nuevo."
     }
   },
   "Platform": {
@@ -947,6 +971,36 @@
           "DATE_INVALID": "Elige una fecha.",
           "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
           "SOURCE_REQUIRED": "Escribe la circular de la que sale el tope.",
+          "generic": "No se pudo guardar. Intenta de nuevo."
+        }
+      }
+    },
+    "rusCaps": {
+      "title": "Topes del Nuevo RUS",
+      "subtitle": "Ingresos y compras máximos al mes de cada categoría. Quina avisa al comerciante cuando se acerca al 85 %.",
+      "historyTitle": "Vigencias",
+      "category": "Categoría {category}",
+      "income": "Ingresos al mes",
+      "purchases": "Compras al mes",
+      "inForce": "Vigente desde el {from}",
+      "period": "Del {from} al {to}",
+      "form": {
+        "title": "Nueva vigencia",
+        "subtitle": "Al guardarla, la vigencia anterior de la misma categoría se cierra el día previo.",
+        "category": "Categoría",
+        "categoryHint": "La SUNAT fija un tope por categoría.",
+        "income": "Tope de ingresos al mes (S/)",
+        "purchases": "Tope de compras al mes (S/)",
+        "amountHint": "En soles, por ejemplo 5000.",
+        "validFrom": "Vigente desde",
+        "validFromHint": "Debe ser posterior a la vigencia actual.",
+        "submit": "Guardar vigencia",
+        "submitting": "Guardando…",
+        "saved": "Vigencia guardada.",
+        "errors": {
+          "AMOUNT_INVALID": "Escribe montos en soles mayores que 0, por ejemplo 5000.",
+          "DATE_INVALID": "Elige una fecha.",
+          "NOT_AFTER_CURRENT": "Debe empezar después de la vigencia actual.",
           "generic": "No se pudo guardar. Intenta de nuevo."
         }
       }
@@ -1738,5 +1792,115 @@
       "store_subscriptions": "Suscripción",
       "subscription_payments": "Pagos de suscripción"
     }
+  },
+  "Tax": {
+    "rus": {
+      "title": "Asistente tributario",
+      "category": "Nuevo RUS · Categoría {category}",
+      "salesLabel": "Ventas del mes",
+      "purchasesLabel": "Compras del mes",
+      "usedOf": "{used} de {cap} ({percent} %)",
+      "meterText": "{percent} % del tope",
+      "noCap": "Todavía no hay un tope vigente para tu categoría. Quina te avisará cuando se registre.",
+      "alerts": {
+        "warning": {
+          "sales": "Tus ventas del mes ya pasan el 85 % del tope de tu categoría. Cuida tus ventas para no cambiar de régimen.",
+          "purchases": "Tus compras del mes ya pasan el 85 % del tope de tu categoría. Cuida tus compras para no cambiar de régimen."
+        },
+        "over": {
+          "sales": "Tus ventas del mes superaron el tope de tu categoría. Revisa tu categoría con tu contador.",
+          "purchases": "Tus compras del mes superaron el tope de tu categoría. Revisa tu categoría con tu contador."
+        }
+      },
+      "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
+      "changeCategory": "Cambiar categoría"
+    }
+  },
+  "Portfolio": {
+    "title": "Cartera",
+    "subtitle": "Cuánta plata está en la calle y quién paga a tiempo.",
+    "metrics": {
+      "lent": "Capital prestado",
+      "overdue": "Total vencido en mora",
+      "projected": "Cobros proyectados del mes",
+      "delinquent": "Clientes morosos activos"
+    },
+    "chart": {
+      "title": "Evolución de la cartera",
+      "caption": "Lo liquidado, lo pagado y lo que sigue vencido en cada mes de corte (últimos 6 meses).",
+      "period": "Mes",
+      "billed": "Liquidado",
+      "paid": "Pagado",
+      "overdue": "Vencido",
+      "locked": "El gráfico de evolución viene con el plan {plan}.",
+      "seePlans": "Ver planes"
+    },
+    "list": {
+      "title": "Vecinos con fiado",
+      "sortLabel": "Ordenar la cartera",
+      "sort": {
+        "debt": "Mayor deuda",
+        "score": "Menor puntaje"
+      },
+      "debt": "Deuda",
+      "limit": "Límite",
+      "delinquent": "En mora",
+      "suggestLower": "Dos cortes seguidos en Rojo: conviene bajarle el límite",
+      "empty": "Aún no tienes vecinos con fiado."
+    },
+    "score": {
+      "value": "{score} · {band}",
+      "noHistory": "Sin historial",
+      "bands": {
+        "GREEN": "Excelente",
+        "YELLOW": "En riesgo",
+        "RED": "Moroso crítico"
+      }
+    }
+  },
+  "Reports": {
+    "title": "Reportes",
+    "subtitle": "Cuánto vendiste, cuánto cobraste de intereses y cuánto te quedó, en las fechas que elijas.",
+    "locked": "Los reportes por rango de fechas vienen con el plan {plan}.",
+    "seePlans": "Ver planes",
+    "from": "Desde",
+    "to": "Hasta",
+    "submit": "Ver reporte",
+    "print": "Imprimir o guardar PDF",
+    "rangeInvalid": "Revisa las fechas: \"Desde\" va antes de \"Hasta\" y el rango es de un año como máximo. Te mostramos el mes en curso.",
+    "reportTitle": "Reporte de {store}",
+    "range": "Del {from} al {to}",
+    "salesCount": "{count, plural, =0 {sin ventas} one {1 venta} other {# ventas}}",
+    "figures": {
+      "cashSales": "Ventas al contado",
+      "creditSales": "Ventas al fiado",
+      "compensatoryInterest": "Intereses por fiar cobrados",
+      "moratoryInterest": "Intereses por atraso cobrados",
+      "costOfSales": "Costo de lo vendido",
+      "grossMargin": "Margen bruto"
+    },
+    "note": "Las ventas fiadas anuladas no se cuentan. Los intereses son los que entraron en cobros dentro de estas fechas.",
+    "ai": {
+      "title": "Recomendaciones con IA",
+      "analyze": "Analizar con IA",
+      "analyzing": "Analizando…",
+      "quota": "{left, plural, =0 {No te quedan consultas este mes} one {Te queda 1 consulta de {max} este mes} other {Te quedan # consultas de {max} este mes}}",
+      "privacy": "Solo enviamos los totales de este reporte. Nunca nombres ni datos de tus vecinos.",
+      "locked": "Las recomendaciones con IA vienen con el plan {plan}.",
+      "errors": {
+        "QUOTA_EXHAUSTED": "Ya usaste todas tus consultas de IA de este mes. Se renuevan el día 1.",
+        "UNAVAILABLE": "La IA no respondió a tiempo. No se descontó la consulta; intenta de nuevo.",
+        "NOT_IN_PLAN": "Tu plan actual no incluye recomendaciones con IA.",
+        "RANGE_INVALID": "Revisa las fechas del reporte."
+      }
+    }
+  },
+  "Offline": {
+    "title": "Sin conexión",
+    "body": "No hay señal en este momento. Puedes revisar el catálogo y las deudas de tus vecinos que ya abriste antes.",
+    "writes": "Para vender o cobrar necesitas internet: así tus cuentas y tu stock siempre cuadran.",
+    "catalog": "Ver catálogo",
+    "customers": "Ver vecinos",
+    "banner": "Sin conexión: puedes mirar lo que ya abriste, pero vender y cobrar esperan a que vuelva la señal."
   }
 }

@@ -11,6 +11,8 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
       'customers',
       'collections',
       'inventory',
+      'portfolio',
+      'reports',
       'team',
       'audit',
       'settings',
@@ -40,9 +42,9 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
   });
 
   it('el Administrador de Plataforma solo ve tiendas y topes (US01)', () => {
-    expect(keys(sidebarItems('PLATFORM_ADMIN'))).toEqual(['stores', 'rateCaps']);
+    expect(keys(sidebarItems('PLATFORM_ADMIN'))).toEqual(['stores', 'rateCaps', 'rusCaps']);
     const bottom = bottomItems('PLATFORM_ADMIN');
-    expect(keys(bottom)).toEqual(['stores', 'rateCaps', 'more']);
+    expect(keys(bottom)).toEqual(['stores', 'rateCaps', 'rusCaps', 'more']);
     expect(bottom.at(-1)?.href).toBe('/profile');
   });
 

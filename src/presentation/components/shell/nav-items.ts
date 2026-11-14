@@ -7,12 +7,15 @@ export type NavKey =
   | 'customers'
   | 'collections'
   | 'inventory'
+  | 'portfolio'
+  | 'reports'
   | 'team'
   | 'audit'
   | 'settings'
   | 'more'
   | 'stores'
-  | 'rateCaps';
+  | 'rateCaps'
+  | 'rusCaps';
 
 export type NavItem = {
   key: NavKey;
@@ -32,6 +35,8 @@ const SIDEBAR: NavDefinition[] = [
   { key: 'customers', href: '/customers', permission: 'customers.read' },
   { key: 'collections', href: '/collections', permission: 'payments.create' },
   { key: 'inventory', href: '/inventory', permission: 'stock.read' },
+  { key: 'portfolio', href: '/portfolio', permission: 'reports.view' },
+  { key: 'reports', href: '/reports', permission: 'reports.view' },
   { key: 'team', href: '/team', permission: 'team.manage' },
   { key: 'audit', href: '/audit', permission: 'settings.billing' },
   { key: 'settings', href: '/settings', permission: 'settings.billing' },
@@ -49,6 +54,7 @@ const BOTTOM: NavDefinition[] = [
 const PLATFORM: NavDefinition[] = [
   { key: 'stores', href: '/platform/stores' },
   { key: 'rateCaps', href: '/platform/rate-caps' },
+  { key: 'rusCaps', href: '/platform/rus-caps' },
 ];
 
 const allowed = (role: Role) => (item: NavDefinition) =>
