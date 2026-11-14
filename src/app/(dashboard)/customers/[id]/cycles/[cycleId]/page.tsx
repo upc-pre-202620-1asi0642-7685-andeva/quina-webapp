@@ -13,7 +13,7 @@ import {
 } from '@/presentation/components/collections/cycle-status-badge';
 import { CyclePayButton } from '@/presentation/components/collections/cycle-pay-button';
 import { Money } from '@/presentation/components/money';
-import { Notice } from '@/presentation/components/notice';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { formatDate } from '@/presentation/lib/format-date';
 
 const NOTICES = ['objected', 'confirmed', 'voided'] as const;
@@ -53,11 +53,7 @@ export default async function CyclePage({
         {t('cycle.back', { name: cycle.customer.firstName })}
       </Link>
 
-      {shownNotice ? (
-        <Notice tone="success">
-          <p>{t(`cycle.notice.${shownNotice}`)}</p>
-        </Notice>
-      ) : null}
+      {shownNotice ? <FlashToast type="success" title={t(`cycle.notice.${shownNotice}`)} /> : null}
 
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col items-start gap-2">

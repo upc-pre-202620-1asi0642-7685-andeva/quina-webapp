@@ -51,7 +51,7 @@ export default async function TeamPage() {
           <p className="text-sm text-ink-soft">
             {upgrade ? t('locked.body', { plan: tPlans(`names.${upgrade}`) }) : null}
           </p>
-          <Link href="/settings#plans" className={buttonVariants({ variant: 'secondary' })}>
+          <Link href="/settings/subscription" className={buttonVariants({ variant: 'secondary' })}>
             {tPlans('seePlans')}
           </Link>
         </section>

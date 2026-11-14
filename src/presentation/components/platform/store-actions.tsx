@@ -9,7 +9,7 @@ import {
   setStoreActiveAction,
   type PlatformActionResult,
 } from '@/presentation/actions/platform';
-import { Notice } from '@/presentation/components/notice';
+import { sileo } from 'sileo';
 import { Button } from '@/presentation/components/ui/button';
 import {
   Dialog,
@@ -33,27 +33,20 @@ export function StoreActions({
   const t = useTranslations('Platform.detail');
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
-  const [message, setMessage] = useState<{ tone: 'success' | 'error'; key: string }>();
   const [busy, startTransition] = useTransition();
 
   function run(task: () => Promise<PlatformActionResult>, successKey?: string) {
-    setMessage(undefined);
     startTransition(async () => {
       const result = await task();
       setConfirming(false);
-      if (!result.ok) setMessage({ tone: 'error', key: result.error });
-      else if (successKey) setMessage({ tone: 'success', key: successKey });
+      if (!result.ok) sileo.error({ title: t(`messages.${result.error}`) });
+      else if (successKey) sileo.success({ title: t(`messages.${successKey}`) });
       router.refresh();
     });
   }
 
   return (
     <div className="flex flex-col gap-3">
-      {message ? (
-        <Notice tone={message.tone}>
-          <p>{t(`messages.${message.key}`)}</p>
-        </Notice>
-      ) : null}
       <div className="flex flex-wrap gap-2">
         {ownerPending && isActive ? (
           <Button

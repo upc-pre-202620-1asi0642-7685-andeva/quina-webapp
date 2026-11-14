@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { z } from 'zod';
 import { getStore } from '@/infrastructure/db/queries/platform';
 import { requirePlatformAdmin } from '@/presentation/auth/guards';
-import { Notice } from '@/presentation/components/notice';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { StoreActions } from '@/presentation/components/platform/store-actions';
 import { StoreStatusBadge } from '@/presentation/components/platform/store-status-badge';
 import { formatDate } from '@/presentation/lib/format-date';
@@ -40,9 +40,10 @@ export default async function PlatformStorePage({
       </Link>
 
       {notice === 'created' || notice === 'createdNoMail' ? (
-        <Notice tone={notice === 'created' ? 'success' : 'warning'}>
-          <p>{t(notice, { email: store.owner?.email ?? store.email })}</p>
-        </Notice>
+        <FlashToast
+          type={notice === 'created' ? 'success' : 'warning'}
+          title={t(notice, { email: store.owner?.email ?? store.email })}
+        />
       ) : null}
 
       <header className="flex flex-col items-start gap-2">

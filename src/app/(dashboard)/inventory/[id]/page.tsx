@@ -14,7 +14,7 @@ import {
   productStatus,
 } from '@/presentation/components/catalog/product-status-badge';
 import { formatMoney, Money } from '@/presentation/components/money';
-import { Notice } from '@/presentation/components/notice';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
 import { formatQuantity } from '@/presentation/lib/format-quantity';
@@ -61,9 +61,7 @@ export default async function ProductPage({
       </Link>
 
       {shownNotice ? (
-        <Notice tone="success">
-          <p>{t(shownNotice, { name: product.name })}</p>
-        </Notice>
+        <FlashToast type="success" title={t(shownNotice, { name: product.name })} />
       ) : null}
 
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -138,7 +136,7 @@ export default async function ProductPage({
                     {tPlans('features.kardexAverageCost')}
                   </span>
                   <Link
-                    href="/settings#plans"
+                    href="/settings/subscription"
                     className="font-semibold text-link-active underline underline-offset-4"
                   >
                     {tPlans('seePlans')}

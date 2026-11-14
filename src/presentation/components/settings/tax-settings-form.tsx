@@ -11,7 +11,7 @@ import {
 import { saveTaxSettingsAction } from '@/presentation/actions/tax-settings';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { NativeSelect } from '@/presentation/components/forms/native-select';
-import { Notice } from '@/presentation/components/notice';
+import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Button } from '@/presentation/components/ui/button';
 
 /** US21 crit. 1: el dueño elige su régimen y, en el Nuevo RUS, su categoría. */
@@ -19,20 +19,17 @@ export function TaxSettingsForm({ initial }: { initial: TaxSettings }) {
   const t = useTranslations('Settings.tax');
   const [state, formAction, pending] = useActionState(saveTaxSettingsAction, {});
   const [regime, setRegime] = useState<TaxRegime>(initial.taxRegime);
+  useActionToast(
+    state,
+    state.saved
+      ? { type: 'success', title: t('saved') }
+      : state.error
+        ? { type: 'error', title: t('error') }
+        : null,
+  );
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      {state.saved ? (
-        <Notice tone="success">
-          <p>{t('saved')}</p>
-        </Notice>
-      ) : null}
-      {state.error ? (
-        <Notice tone="error">
-          <p>{t('error')}</p>
-        </Notice>
-      ) : null}
-
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField id="tax-regime" label={t('regime')} hint={t('regimeHint')}>
           {(props) => (

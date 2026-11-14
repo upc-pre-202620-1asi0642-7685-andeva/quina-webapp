@@ -49,9 +49,9 @@ test.describe('equipo y permisos (US05, US26)', () => {
     await expect(page.getByRole('heading', { name: 'Registrar vecino' })).toBeVisible();
   });
 
-  test('Ajustes muestra el uso del plan y lo bloqueado', async ({ page }) => {
+  test('Suscripción muestra el uso del plan y lo bloqueado', async ({ page }) => {
     await registerOwnerWithStore(page);
-    await page.goto('./settings');
+    await page.goto('./settings/subscription');
     await expect(page.getByRole('heading', { name: 'Tu plan: Bodega Pro' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Planes' })).toBeVisible();
     await expectAccessible(page);

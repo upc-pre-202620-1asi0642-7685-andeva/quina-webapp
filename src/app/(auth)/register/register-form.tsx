@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { authClient } from '@/infrastructure/auth/auth-client';
-import { clearConsentCookie, consentCookie } from '@/infrastructure/auth/consent';
+import { clearConsentCookie, consentCookie, LEGAL_URLS } from '@/infrastructure/auth/consent';
 import { AuthShell } from '@/presentation/components/auth/auth-shell';
 import { ConsentField } from '@/presentation/components/auth/consent-field';
 import { FormField } from '@/presentation/components/auth/form-field';
@@ -33,6 +33,16 @@ type ErrorKey =
   | 'rateLimited'
   | 'consentRequired'
   | 'generic';
+
+function legalLink(href: string) {
+  return function LegalLink(chunks: React.ReactNode) {
+    return (
+      <a href={href} className="font-semibold text-link-active underline underline-offset-4">
+        {chunks}
+      </a>
+    );
+  };
+}
 
 export function RegisterForm() {
   const t = useTranslations('Register.account');
@@ -66,7 +76,13 @@ export function RegisterForm() {
   function requireConsent(): boolean {
     if (consent) return true;
     setConsentError(true);
+    document.getElementById('register-consent')?.focus();
     return false;
+  }
+  // Pulsar Google junto al aviso cuenta como aceptación; auth.ts exige la cookie al crear el usuario
+  function acceptByGoogle(): boolean {
+    document.cookie = consentCookie();
+    return true;
   }
   const [submitting, setSubmitting] = useState(false);
 
@@ -161,7 +177,13 @@ export function RegisterForm() {
       }
     >
       <div className="flex flex-col gap-4">
-        <GoogleButton callbackURL="/app/register/store" onBeforeRedirect={requireConsent} />
+        <GoogleButton callbackURL="/app/register/store" onBeforeRedirect={acceptByGoogle} />
+        <p className="text-center text-xs leading-snug text-ink-soft">
+          {t.rich('googleConsent', {
+            terms: legalLink(LEGAL_URLS.terms),
+            privacy: legalLink(LEGAL_URLS.privacy),
+          })}
+        </p>
         <div className="flex items-center gap-3 text-xs text-ink-soft">
           <span className="h-px flex-1 bg-line" />
           <span>{tAuth('or')}</span>

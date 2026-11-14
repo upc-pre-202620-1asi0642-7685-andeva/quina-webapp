@@ -158,7 +158,11 @@ export function ProfileView({
         </p>
       </div>
 
-      <form onSubmit={handleLocaleSubmit} className="flex flex-col gap-4 border-t border-line pt-6">
+      <form
+        id="locale"
+        onSubmit={handleLocaleSubmit}
+        className="flex scroll-mt-24 flex-col gap-4 border-t border-line pt-6"
+      >
         <h2 className="text-lg font-semibold text-ink">{t('localeTitle')}</h2>
         <FormField id="profile-locale" label={t('localeLabel')} hint={t('localeHint')}>
           {(props) => (

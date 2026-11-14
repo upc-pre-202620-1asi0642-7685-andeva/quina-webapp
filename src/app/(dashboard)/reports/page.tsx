@@ -50,7 +50,10 @@ export default async function ReportsPage({
           <LockIcon aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           <p>
             {t('locked', { plan: tPlans(`names.${PlanLimits.featureTier('reportsExport')}`) })}{' '}
-            <Link href="/settings#plans" className="font-medium text-link-active hover:underline">
+            <Link
+              href="/settings/subscription"
+              className="font-medium text-link-active hover:underline"
+            >
               {t('seePlans')}
             </Link>
           </p>

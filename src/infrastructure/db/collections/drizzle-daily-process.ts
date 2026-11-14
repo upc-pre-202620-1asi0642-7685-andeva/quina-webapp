@@ -265,7 +265,7 @@ export class DrizzleDailyProcess implements DailyProcessGateway {
               locale: w.locale,
               daysLeft: w.daysRemaining,
               endsDate: w.endsDate,
-              url: `${appUrl}/settings#plans`,
+              url: `${appUrl}/settings/subscription`,
             },
             {
               storeId,

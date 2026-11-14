@@ -6,7 +6,7 @@ import type { AddRateCapError } from '@/core/application/platform/manage-platfor
 import { addRateCapAction, type PlatformFormState } from '@/presentation/actions/platform';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { NativeSelect } from '@/presentation/components/forms/native-select';
-import { Notice } from '@/presentation/components/notice';
+import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 
@@ -24,6 +24,14 @@ export function RateCapForm() {
   const t = useTranslations('Platform.caps.form');
   const tCaps = useTranslations('Platform.caps');
   const [state, formAction, pending] = useActionState<State, FormData>(addRateCapAction, {});
+  useActionToast(
+    state,
+    state.saved
+      ? { type: 'success', title: t('saved') }
+      : state.error === 'generic'
+        ? { type: 'error', title: t('errors.generic') }
+        : null,
+  );
 
   const errorFor = (field: 'percent' | 'validFrom' | 'source') =>
     state.error && state.error !== 'generic' && FIELD_OF[state.error] === field
@@ -32,17 +40,6 @@ export function RateCapForm() {
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
-      {state.saved ? (
-        <Notice tone="success">
-          <p>{t('saved')}</p>
-        </Notice>
-      ) : null}
-      {state.error === 'generic' ? (
-        <Notice tone="error">
-          <p>{t('errors.generic')}</p>
-        </Notice>
-      ) : null}
-
       <div className="grid gap-5 sm:grid-cols-2">
         <FormField id="cap-kind" label={t('kind')} hint={t('kindHint')}>
           {(props) => (

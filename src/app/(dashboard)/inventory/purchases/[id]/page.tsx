@@ -7,7 +7,7 @@ import { getPurchaseDetail } from '@/infrastructure/db/queries/purchases';
 import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { Money } from '@/presentation/components/money';
-import { Notice } from '@/presentation/components/notice';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatQuantity } from '@/presentation/lib/format-quantity';
 
@@ -54,11 +54,7 @@ export default async function PurchaseDetailPage({
         {t('backToPurchases')}
       </Link>
 
-      {notice === 'created' ? (
-        <Notice tone="success">
-          <p>{t('createdNotice')}</p>
-        </Notice>
-      ) : null}
+      {notice === 'created' ? <FlashToast type="success" title={t('createdNotice')} /> : null}
 
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">

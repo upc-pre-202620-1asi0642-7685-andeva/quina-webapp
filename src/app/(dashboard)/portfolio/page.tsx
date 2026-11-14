@@ -88,7 +88,10 @@ export default async function PortfolioPage({
               {t('chart.locked', {
                 plan: tPlans(`names.${PlanLimits.featureTier('reportsExport')}`),
               })}{' '}
-              <Link href="/settings#plans" className="font-medium text-link-active hover:underline">
+              <Link
+                href="/settings/subscription"
+                className="font-medium text-link-active hover:underline"
+              >
                 {t('chart.seePlans')}
               </Link>
             </span>

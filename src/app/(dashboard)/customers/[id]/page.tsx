@@ -15,6 +15,7 @@ import { CyclePayButton } from '@/presentation/components/collections/cycle-pay-
 import { CustomerActions } from '@/presentation/components/customers/customer-actions';
 import { customerStatus, StatusBadge } from '@/presentation/components/customers/status-badge';
 import { Money } from '@/presentation/components/money';
+import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { Notice } from '@/presentation/components/notice';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
@@ -77,9 +78,10 @@ export default async function CustomerPage({
       </Link>
 
       {shownNotice ? (
-        <Notice tone={shownNotice === 'createdNoMail' ? 'warning' : 'success'}>
-          <p>{t(`detail.${shownNotice}`, { name: customer.firstName })}</p>
-        </Notice>
+        <FlashToast
+          type={shownNotice === 'createdNoMail' ? 'warning' : 'success'}
+          title={t(`detail.${shownNotice}`, { name: customer.firstName })}
+        />
       ) : null}
 
       {customer.emailBouncedAt ? (
