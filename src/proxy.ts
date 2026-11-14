@@ -10,6 +10,8 @@ const PUBLIC_PATHS = new Set([
   '/auth/reset-password',
   '/portal/login',
   '/portal/enter',
+  // US22: la precarga el service worker, sin sesión
+  '/offline',
 ]);
 
 // Chequeo optimista en el borde: excluye api, _next, brand y archivos estáticos.

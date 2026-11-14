@@ -5,16 +5,20 @@ import { actionRedirect } from '@/presentation/lib/action-redirect';
 import { z } from 'zod';
 import {
   AddRateCapUseCase,
+  AddRusCapUseCase,
   CreateStoreUseCase,
   ResendOwnerLinkUseCase,
   SetStoreActiveUseCase,
   type AddRateCapError,
+  type AddRusCapError,
   type CreateStoreError,
 } from '@/core/application/platform/manage-platform';
 import { locales } from '@/core/domain/shared/locale';
+import { RUS_CATEGORIES } from '@/core/domain/tax/rus';
 import { DrizzleAccountSetupTokens } from '@/infrastructure/auth/account-setup';
 import { DrizzlePlatformStoreRepository } from '@/infrastructure/db/repositories/drizzle-platform-store-repository';
 import { DrizzleRateCapRepository } from '@/infrastructure/db/repositories/drizzle-rate-cap-repository';
+import { DrizzleRusCapRepository } from '@/infrastructure/db/repositories/drizzle-rus-cap-repository';
 import { getNotificationMailer } from '@/infrastructure/email/auth-mailer-factory';
 import { authorizePlatform } from '@/presentation/auth/guards';
 import { appUrl } from '@/presentation/lib/request-meta';
@@ -112,5 +116,30 @@ export async function addRateCapAction(
   });
   if (!result.ok) return { error: result.error };
   revalidatePath('/platform/rate-caps');
+  return { saved: true };
+}
+
+const rusCapSchema = z.object({
+  category: z.coerce.number().pipe(z.literal(RUS_CATEGORIES)),
+  monthlyIncomeCap: z.string(),
+  monthlyPurchasesCap: z.string(),
+  validFrom: z.string(),
+});
+
+/** US21 crit. 2: nueva vigencia de los topes de una categoría del Nuevo RUS. */
+export async function addRusCapAction(
+  _prev: PlatformFormState<AddRusCapError> & { saved?: boolean },
+  formData: FormData,
+): Promise<PlatformFormState<AddRusCapError> & { saved?: boolean }> {
+  const admin = await authorizePlatform();
+  if (!admin) return actionRedirect('/login');
+  const parsed = rusCapSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: 'generic' };
+  const result = await new AddRusCapUseCase(new DrizzleRusCapRepository()).execute({
+    ...parsed.data,
+    adminId: admin.id,
+  });
+  if (!result.ok) return { error: result.error };
+  revalidatePath('/platform/rus-caps');
   return { saved: true };
 }

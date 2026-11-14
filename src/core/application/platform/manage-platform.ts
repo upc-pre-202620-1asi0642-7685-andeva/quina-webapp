@@ -8,11 +8,13 @@ import type { NotificationMailer } from '@/core/domain/ports/notification-mailer
 import type {
   PlatformStoreRepository,
   RateCapRepository,
+  RusCapRepository,
 } from '@/core/domain/ports/platform-repository';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import type { Locale } from '@/core/domain/shared/locale';
-import type { Currency } from '@/core/domain/shared/money';
+import { Money, type Currency } from '@/core/domain/shared/money';
 import { err, ok, type Result } from '@/core/domain/shared/result';
+import type { RusCategory } from '@/core/domain/tax/rus';
 
 export type CreateStoreCommand = {
   adminId: string;
@@ -184,6 +186,51 @@ export class AddRateCapUseCase {
       },
       source,
       now: command.now,
+    });
+    return result === 'OK' ? ok(undefined) : err(result);
+  }
+}
+
+export type AddRusCapCommand = {
+  adminId: string;
+  category: RusCategory;
+  /** Soles, como los escribe el Administrador (p. ej. 5000 o 5,000.00). */
+  monthlyIncomeCap: string;
+  monthlyPurchasesCap: string;
+  validFrom: string;
+};
+
+export type AddRusCapError = 'AMOUNT_INVALID' | 'DATE_INVALID' | 'NOT_AFTER_CURRENT';
+
+/** Soles positivos con hasta 2 decimales, listos para `NUMERIC(12, 2)`; null si no lo son. */
+function solesCap(raw: string): string | null {
+  const text = raw.trim().replace(/,/g, '');
+  if (!/^\d{1,10}(\.\d{1,2})?$/.test(text)) return null;
+  const money = Money.of(text, 'PEN');
+  return money.isPositive() ? money.toFixed2() : null;
+}
+
+/** US21 crit. 2: el Administrador registra los topes del Nuevo RUS cuando la SUNAT los cambia. */
+export class AddRusCapUseCase {
+  constructor(private readonly caps: RusCapRepository) {}
+
+  async execute(command: AddRusCapCommand): Promise<Result<void, AddRusCapError>> {
+    const income = solesCap(command.monthlyIncomeCap);
+    const purchases = solesCap(command.monthlyPurchasesCap);
+    if (!income || !purchases) return err('AMOUNT_INVALID');
+    let validFrom: BusinessDate;
+    try {
+      validFrom = BusinessDate.parse(command.validFrom);
+    } catch {
+      return err('DATE_INVALID');
+    }
+
+    const result = await this.caps.add({
+      adminId: command.adminId,
+      category: command.category,
+      monthlyIncomeCap: income,
+      monthlyPurchasesCap: purchases,
+      validFrom,
     });
     return result === 'OK' ? ok(undefined) : err(result);
   }
