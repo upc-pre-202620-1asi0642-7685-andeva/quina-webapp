@@ -183,7 +183,8 @@
       "submitting": "Creating account…",
       "hasAccount": "Already have an account?",
       "loginLink": "Sign in",
-      "consentLabel": "I accept the <terms>Terms and conditions</terms> and the <privacy>Privacy policy</privacy>, and I authorize the processing of my personal data under Peruvian Law No. 29733."
+      "consentLabel": "I accept the <terms>Terms and conditions</terms> and the <privacy>Privacy policy</privacy>, and I authorize the processing of my personal data under Peruvian Law No. 29733.",
+      "googleConsent": "By continuing with Google you accept the <terms>Terms and conditions</terms> and the <privacy>Privacy policy</privacy>, and authorize the processing of your personal data under Peruvian Law No. 29733."
     },
     "strength": {
       "label": "Password strength",
@@ -253,13 +254,8 @@
     "logoAlt": "Quina",
     "trialBadge": "Pro Trial: {days, plural, one {# day} other {# days}}",
     "trialUntil": "Pro Trial until {date}",
-    "welcome": "Your counter is ready, {name}.",
-    "subtitle": "Start registering your neighbors and keeping clear accounts.",
     "profileLink": "My profile & language",
     "signOut": "Sign out",
-    "registerCustomer": "Register neighbor",
-    "inventoryLink": "See inventory",
-    "sellLink": "Sell",
     "cashBox": {
       "title": "Today's cash",
       "count": "{count, plural, =0 {No cash sales} one {# cash sale} other {# cash sales}}",
@@ -271,10 +267,114 @@
         "CARD": "Card"
       }
     },
-    "auditLink": "Audit log",
-    "lowStockBanner": "{count, plural, =1 {1 product low on stock} other {# products low on stock}}",
-    "portfolioLink": "Portfolio",
-    "reportsLink": "Reports"
+    "greeting": "Hi, {name}",
+    "today": "{date} · {store}",
+    "customize": {
+      "customize": "Customize",
+      "done": "Done",
+      "add": "Add widget",
+      "addShort": "Add",
+      "addOne": "Add {name}",
+      "addTitle": "Add to your Home",
+      "addSubtitle": "Pick what you want to see as soon as you open Quina.",
+      "allAdded": "All widgets are already on your Home.",
+      "reset": "Restore the default layout",
+      "hint": "Drag each card by its handle or use the arrows. Changes save automatically.",
+      "drag": "Move {name}",
+      "dragHelp": "Drag or use the arrow keys to change the order.",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "hide": "Remove {name} from Home",
+      "moved": "{name} in position {position} of {total}",
+      "hidden": "{name} removed from Home",
+      "added": "{name} added to Home",
+      "saved": "Your Home is saved",
+      "saveError": "We could not save your Home. Please try again.",
+      "empty": "Your Home is empty. Add what you want to see every morning.",
+      "gridLabel": "Home widgets"
+    },
+    "widgets": {
+      "seeAll": "See all",
+      "quickActions": {
+        "title": "Quick actions",
+        "description": "Sell, register neighbors and your daily tasks."
+      },
+      "collect": {
+        "title": "To collect",
+        "description": "Neighbors with overdue payments or due within 3 days.",
+        "overdue": "{count, plural, =0 {Nothing overdue} other {# overdue}}",
+        "soon": "{count, plural, =0 {Nothing due soon} other {# due soon}}",
+        "lateBy": "{days, plural, one {# day late} other {# days late}}",
+        "dueIn": "{days, plural, =0 {Due today} one {Due tomorrow} other {Due in # days}}",
+        "collectAction": "Collect",
+        "empty": "No overdue or upcoming payments. All caught up."
+      },
+      "cashToday": {
+        "title": "Today’s cash",
+        "description": "Today’s cash sales by payment method."
+      },
+      "salesWeek": {
+        "title": "This week’s sales",
+        "description": "Cash and credit over the last 7 days.",
+        "cash": "Cash",
+        "credit": "Credit",
+        "day": "Day",
+        "caption": "Sales over the last 7 days"
+      },
+      "moneyOut": {
+        "title": "Money on credit",
+        "description": "What your neighbors owe you and what is overdue.",
+        "lentHint": "Credit to collect from all your neighbors",
+        "overdue": "Overdue",
+        "projected": "Due this month",
+        "delinquent": "{count, plural, =0 {No neighbors behind} one {# neighbor behind} other {# neighbors behind}}"
+      },
+      "riskCustomers": {
+        "title": "Neighbors at risk",
+        "description": "Red score, behind on payments or limit to review.",
+        "balance": "To pay:",
+        "lowerLimit": "Review their limit · to pay:",
+        "empty": "No neighbors at risk. Everyone is up to date."
+      },
+      "lowStock": {
+        "title": "Low stock",
+        "description": "Products at or below their minimum stock.",
+        "stockOf": "{stock} of {min} {unit}",
+        "more": "{count, plural, one {and # more product} other {and # more products}}",
+        "empty": "All your inventory is above its minimum."
+      },
+      "rus": {
+        "title": "Nuevo RUS",
+        "description": "This month’s sales and purchases against your category.",
+        "notRus": "Your store is not under the Nuevo RUS. You can change this in Settings."
+      },
+      "plan": {
+        "title": "Your plan",
+        "description": "Current plan, trial days and limit usage.",
+        "trial": "{days, plural, one {# trial day} other {# trial days}}",
+        "grace": "{days, plural, one {# grace day} other {# grace days}}"
+      },
+      "monthSummary": {
+        "title": "This month",
+        "description": "Sales, profit and interest collected this month.",
+        "sales": "Sales",
+        "margin": "Profit",
+        "interest": "Interest collected",
+        "count": "{count, plural, =0 {No sales this month} one {# sale this month} other {# sales this month}}"
+      },
+      "purchaseDrafts": {
+        "title": "Orders to review",
+        "description": "Draft restock orders.",
+        "noSupplier": "No supplier",
+        "items": "{count, plural, one {# product} other {# products}}",
+        "empty": "You have no pending orders."
+      },
+      "notices": {
+        "title": "Today’s notices",
+        "description": "Reminders and statements sent today.",
+        "empty": "No notices have gone out today yet."
+      }
+    }
   },
   "Profile": {
     "title": "My profile",
@@ -369,10 +469,89 @@
       "audit": "Audit log",
       "rusCaps": "RUS caps",
       "portfolio": "Portfolio",
-      "reports": "Reports"
+      "reports": "Reports",
+      "products": "Products",
+      "purchases": "Purchases",
+      "suppliers": "Suppliers",
+      "subscription": "Subscription",
+      "profile": "Profile",
+      "modules": "Modules",
+      "modulesTitle": "All modules",
+      "close": "Close",
+      "groups": {
+        "counter": "Counter",
+        "business": "Business",
+        "admin": "Administration",
+        "account": "Account",
+        "platform": "Platform"
+      },
+      "logoAlt": "Quina",
+      "customersAll": "All",
+      "customersNew": "Add neighbor",
+      "collectionsDue": "To collect",
+      "collectionsOverdue": "Overdue",
+      "collectionsNotices": "Today's notices",
+      "lowStock": "Low stock",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "create": "Create"
     },
     "lowStockAlert": "{count, plural, =1 {1 low-stock item} other {# low-stock items}}",
-    "lowStockShort": "{count} low"
+    "lowStockShort": "{count} low",
+    "create": {
+      "label": "Create",
+      "title": "Add",
+      "newSale": "New sale",
+      "newCustomer": "New neighbor",
+      "newProduct": "New product",
+      "newPurchase": "New purchase",
+      "newSupplier": "New supplier",
+      "inviteEmployee": "Invite your team"
+    },
+    "account": {
+      "open": "Open your account menu",
+      "profile": "My profile",
+      "settings": "Store settings",
+      "theme": "Theme",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "Match system"
+      },
+      "language": "Language",
+      "plans": "Plans and subscription",
+      "signOut": "Sign out"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAll": "Mark all as read",
+      "empty": "Your alerts will show up here: payments coming due, overdue cycles and low stock.",
+      "open": "Notifications",
+      "openUnread": "Notifications, {count} unread",
+      "unread": "Unread",
+      "readOnlyTitle": "Your store is read-only",
+      "readOnlyBody": "Choose a plan to record sales and credit again.",
+      "graceTitle": "Your payment is pending",
+      "graceBody": "{days, plural, one {# day left} other {# days left}} before the lock.",
+      "trialTitle": "Your Pro trial is ending",
+      "trialBody": "{days, plural, =0 {Ends today} one {# day left} other {# days left}}. Choose your plan.",
+      "overdueTitle": "{name} has an overdue cycle",
+      "overdueBody": "{amount} · was due {date}",
+      "dueSoonTitle": "Collect from {name}",
+      "dueSoonBody": "{amount} · due {date}",
+      "lowStockTitle": "Products running out",
+      "lowStockBody": "{count, plural, one {# product low on stock} other {# products low on stock}}"
+    },
+    "breadcrumb": {
+      "label": "You are in",
+      "detail": "Detail",
+      "new": "New",
+      "edit": "Edit",
+      "pay": "Collect",
+      "terms": "Terms",
+      "cycle": "Cycle",
+      "billing": "Payment"
+    }
   },
   "Customers": {
     "list": {
@@ -703,6 +882,8 @@
   "Settings": {
     "title": "Settings",
     "subtitle": "Your plan and what you are using.",
+    "subscriptionTitle": "Subscription",
+    "storeSubtitle": "How your neighbors pay you and your tax details.",
     "currentPlan": "Your plan: {plan}",
     "trialUntil": "Free trial until {date} ({days, plural, one {# day left} other {# days left}}). After that you move to Casero unless you choose a plan.",
     "activeUntil": "Next renewal or expiration: {date}.",
@@ -1596,6 +1777,17 @@
       "otherSession": "Another account is signed in on this device ({email}). Continuing will sign it out.",
       "missing": "This link is incomplete. Sign in with your ID document."
     }
+  },
+  "Suppliers": {
+    "title": "Suppliers",
+    "subtitle": "Who you buy your goods from.",
+    "newButton": "Add supplier",
+    "empty": "You have no suppliers yet. Add the first one to record your purchases.",
+    "taxId": "RUC",
+    "phone": "Phone",
+    "contact": "Contact",
+    "inactive": "Inactive",
+    "seePurchases": "See purchases"
   },
   "Purchases": {
     "backToInventory": "Back to inventory",

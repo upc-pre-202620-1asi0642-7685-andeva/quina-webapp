@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "test:db": "vitest run --config vitest.integration.config.ts",
     "test:oracle": "python3 -I scripts/finance-oracle.py --check",
+    "bones": "boneyard-js build http://localhost:3000/app http://localhost:3000/app/sales http://localhost:3000/app/customers http://localhost:3000/app/customers/new http://localhost:3000/app/collections http://localhost:3000/app/inventory http://localhost:3000/app/inventory/new http://localhost:3000/app/inventory/purchases http://localhost:3000/app/inventory/suppliers http://localhost:3000/app/portfolio http://localhost:3000/app/reports http://localhost:3000/app/team http://localhost:3000/app/audit http://localhost:3000/app/settings http://localhost:3000/app/settings/subscription http://localhost:3000/app/profile --force",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

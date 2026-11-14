@@ -183,7 +183,8 @@
       "submitting": "Creando cuenta…",
       "hasAccount": "¿Ya tienes cuenta?",
       "loginLink": "Ingresa",
-      "consentLabel": "Acepto los <terms>Términos y condiciones</terms> y la <privacy>Política de privacidad</privacy>, y autorizo el tratamiento de mis datos personales según la Ley N.° 29733."
+      "consentLabel": "Acepto los <terms>Términos y condiciones</terms> y la <privacy>Política de privacidad</privacy>, y autorizo el tratamiento de mis datos personales según la Ley N.° 29733.",
+      "googleConsent": "Al continuar con Google aceptas los <terms>Términos y condiciones</terms> y la <privacy>Política de privacidad</privacy>, y autorizas el tratamiento de tus datos personales según la Ley N.° 29733."
     },
     "strength": {
       "label": "Seguridad de la contraseña",
@@ -253,13 +254,8 @@
     "logoAlt": "Quina",
     "trialBadge": "Prueba Pro: {days, plural, one {# día} other {# días}}",
     "trialUntil": "Prueba Pro hasta {date}",
-    "welcome": "Tu mostrador está listo, {name}.",
-    "subtitle": "Empieza a registrar a tus vecinos y llevar tus cuentas claras.",
     "profileLink": "Mi perfil e idioma",
     "signOut": "Cerrar sesión",
-    "registerCustomer": "Registrar vecino",
-    "inventoryLink": "Ver inventario",
-    "sellLink": "Vender",
     "cashBox": {
       "title": "Caja de hoy",
       "count": "{count, plural, =0 {Sin ventas al contado} one {# venta al contado} other {# ventas al contado}}",
@@ -271,10 +267,114 @@
         "CARD": "Tarjeta"
       }
     },
-    "auditLink": "Auditoría",
-    "lowStockBanner": "{count, plural, =1 {1 producto con stock bajo} other {# productos con stock bajo}}",
-    "portfolioLink": "Cartera",
-    "reportsLink": "Reportes"
+    "greeting": "Hola, {name}",
+    "today": "{date} · {store}",
+    "customize": {
+      "customize": "Personalizar",
+      "done": "Listo",
+      "add": "Agregar widget",
+      "addShort": "Agregar",
+      "addOne": "Agregar {name}",
+      "addTitle": "Agregar a tu Inicio",
+      "addSubtitle": "Elige lo que quieres ver apenas abres Quina.",
+      "allAdded": "Ya tienes todos los widgets en tu Inicio.",
+      "reset": "Volver al diseño inicial",
+      "hint": "Arrastra cada tarjeta desde su asa o usa las flechas. Los cambios se guardan solos.",
+      "drag": "Mover {name}",
+      "dragHelp": "Arrastra o usa las flechas del teclado para cambiar el orden.",
+      "moveUp": "Subir {name}",
+      "moveDown": "Bajar {name}",
+      "hide": "Quitar {name} de Inicio",
+      "moved": "{name} en la posición {position} de {total}",
+      "hidden": "{name} quitado de Inicio",
+      "added": "{name} agregado a Inicio",
+      "saved": "Tu Inicio quedó guardado",
+      "saveError": "No pudimos guardar tu Inicio. Inténtalo otra vez.",
+      "empty": "Tu Inicio está vacío. Agrega lo que quieres ver cada mañana.",
+      "gridLabel": "Widgets de Inicio"
+    },
+    "widgets": {
+      "seeAll": "Ver todo",
+      "quickActions": {
+        "title": "Accesos rápidos",
+        "description": "Vender, registrar vecinos y lo que haces a diario."
+      },
+      "collect": {
+        "title": "Por cobrar",
+        "description": "Vecinos con pagos vencidos o que vencen en 3 días.",
+        "overdue": "{count, plural, =0 {Sin vencidos} one {# vencido} other {# vencidos}}",
+        "soon": "{count, plural, =0 {Nada por vencer} one {# vence pronto} other {# vencen pronto}}",
+        "lateBy": "{days, plural, one {Venció hace # día} other {Venció hace # días}}",
+        "dueIn": "{days, plural, =0 {Vence hoy} one {Vence mañana} other {Vence en # días}}",
+        "collectAction": "Cobrar",
+        "empty": "Nadie tiene pagos vencidos ni por vencer. Todo al día."
+      },
+      "cashToday": {
+        "title": "Caja de hoy",
+        "description": "Ventas al contado de hoy por medio de pago."
+      },
+      "salesWeek": {
+        "title": "Ventas de la semana",
+        "description": "Contado y fiado de los últimos 7 días.",
+        "cash": "Contado",
+        "credit": "Fiado",
+        "day": "Día",
+        "caption": "Ventas de los últimos 7 días"
+      },
+      "moneyOut": {
+        "title": "Plata en la calle",
+        "description": "Lo que tus vecinos te deben y lo vencido.",
+        "lentHint": "Fiado por cobrar a todos tus vecinos",
+        "overdue": "Vencido",
+        "projected": "Vence este mes",
+        "delinquent": "{count, plural, =0 {Ningún vecino en mora} one {# vecino en mora} other {# vecinos en mora}}"
+      },
+      "riskCustomers": {
+        "title": "Vecinos en riesgo",
+        "description": "Puntaje rojo, en mora o con límite por revisar.",
+        "balance": "Por pagar:",
+        "lowerLimit": "Revisa su límite · por pagar:",
+        "empty": "Ningún vecino en riesgo. Tus caseros están al día."
+      },
+      "lowStock": {
+        "title": "Stock bajo",
+        "description": "Productos en o bajo su stock mínimo.",
+        "stockOf": "{stock} de {min} {unit}",
+        "more": "{count, plural, one {y # producto más} other {y # productos más}}",
+        "empty": "Todo tu inventario está sobre su mínimo."
+      },
+      "rus": {
+        "title": "Nuevo RUS",
+        "description": "Tus ventas y compras del mes frente a tu categoría.",
+        "notRus": "Tu tienda no está en el Nuevo RUS. Puedes cambiarlo en Ajustes."
+      },
+      "plan": {
+        "title": "Tu plan",
+        "description": "Plan actual, días de prueba y uso de tus límites.",
+        "trial": "{days, plural, one {# día de prueba} other {# días de prueba}}",
+        "grace": "{days, plural, one {# día de gracia} other {# días de gracia}}"
+      },
+      "monthSummary": {
+        "title": "Mes en curso",
+        "description": "Ventas, ganancia e intereses cobrados del mes.",
+        "sales": "Ventas",
+        "margin": "Ganancia",
+        "interest": "Intereses cobrados",
+        "count": "{count, plural, =0 {Sin ventas este mes} one {# venta este mes} other {# ventas este mes}}"
+      },
+      "purchaseDrafts": {
+        "title": "Pedidos por revisar",
+        "description": "Pedidos de reposición en borrador.",
+        "noSupplier": "Sin proveedor",
+        "items": "{count, plural, one {# producto} other {# productos}}",
+        "empty": "No tienes pedidos pendientes."
+      },
+      "notices": {
+        "title": "Avisos de hoy",
+        "description": "Recordatorios y estados de cuenta enviados hoy.",
+        "empty": "Hoy todavía no salió ningún aviso."
+      }
+    }
   },
   "Profile": {
     "title": "Mi perfil",
@@ -369,10 +469,89 @@
       "audit": "Auditoría",
       "rusCaps": "Topes RUS",
       "portfolio": "Cartera",
-      "reports": "Reportes"
+      "reports": "Reportes",
+      "products": "Productos",
+      "purchases": "Compras",
+      "suppliers": "Proveedores",
+      "subscription": "Suscripción",
+      "profile": "Perfil",
+      "modules": "Módulos",
+      "modulesTitle": "Todos los módulos",
+      "close": "Cerrar",
+      "groups": {
+        "counter": "Mostrador",
+        "business": "Negocio",
+        "admin": "Administración",
+        "account": "Cuenta",
+        "platform": "Plataforma"
+      },
+      "logoAlt": "Quina",
+      "customersAll": "Todos",
+      "customersNew": "Registrar vecino",
+      "collectionsDue": "Por cobrar",
+      "collectionsOverdue": "Vencidos",
+      "collectionsNotices": "Avisos de hoy",
+      "lowStock": "Stock bajo",
+      "collapse": "Plegar la barra",
+      "expand": "Desplegar la barra",
+      "create": "Crear"
     },
     "lowStockAlert": "{count, plural, =1 {1 producto por agotarse} other {# productos por agotarse}}",
-    "lowStockShort": "{count} bajo"
+    "lowStockShort": "{count} bajo",
+    "create": {
+      "label": "Crear",
+      "title": "Registrar",
+      "newSale": "Nueva venta",
+      "newCustomer": "Nuevo vecino",
+      "newProduct": "Nuevo producto",
+      "newPurchase": "Nueva compra",
+      "newSupplier": "Nuevo proveedor",
+      "inviteEmployee": "Invitar a tu equipo"
+    },
+    "account": {
+      "open": "Abrir el menú de tu cuenta",
+      "profile": "Mi perfil",
+      "settings": "Ajustes de la tienda",
+      "theme": "Tema",
+      "themes": {
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Como el sistema"
+      },
+      "language": "Idioma",
+      "plans": "Planes y suscripción",
+      "signOut": "Cerrar sesión"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "markAll": "Marcar todo como leído",
+      "empty": "Aquí aparecerán tus avisos: cobros por vencer, vencidos y stock bajo.",
+      "open": "Notificaciones",
+      "openUnread": "Notificaciones, {count, plural, one {# sin leer} other {# sin leer}}",
+      "unread": "Sin leer",
+      "readOnlyTitle": "Tu tienda está en solo lectura",
+      "readOnlyBody": "Elige un plan para volver a registrar ventas y fiados.",
+      "graceTitle": "Tu pago está pendiente",
+      "graceBody": "{days, plural, one {Queda # día} other {Quedan # días}} antes del bloqueo.",
+      "trialTitle": "Tu prueba Pro está por terminar",
+      "trialBody": "{days, plural, =0 {Termina hoy} one {Queda # día} other {Quedan # días}}. Elige tu plan.",
+      "overdueTitle": "{name} tiene un ciclo vencido",
+      "overdueBody": "{amount} · venció el {date}",
+      "dueSoonTitle": "Cobra a {name}",
+      "dueSoonBody": "{amount} · vence el {date}",
+      "lowStockTitle": "Productos por agotarse",
+      "lowStockBody": "{count, plural, one {# producto con stock bajo} other {# productos con stock bajo}}"
+    },
+    "breadcrumb": {
+      "label": "Estás en",
+      "detail": "Detalle",
+      "new": "Nuevo",
+      "edit": "Editar",
+      "pay": "Cobrar",
+      "terms": "Condiciones",
+      "cycle": "Ciclo",
+      "billing": "Pago"
+    }
   },
   "Customers": {
     "list": {
@@ -703,6 +882,8 @@
   "Settings": {
     "title": "Ajustes",
     "subtitle": "Tu plan y lo que estás usando.",
+    "subscriptionTitle": "Suscripción",
+    "storeSubtitle": "Cómo te cobran tus vecinos y tus datos tributarios.",
     "currentPlan": "Tu plan: {plan}",
     "trialUntil": "Prueba gratis hasta el {date} ({days, plural, one {queda # día} other {quedan # días}}). Después pasas a Casero si no eliges un plan.",
     "activeUntil": "Próxima renovación o vencimiento: {date}.",
@@ -1596,6 +1777,17 @@
       "otherSession": "En este equipo hay otra cuenta abierta ({email}). Al entrar se cerrará esa sesión.",
       "missing": "Este enlace no está completo. Entra con tu documento."
     }
+  },
+  "Suppliers": {
+    "title": "Proveedores",
+    "subtitle": "A quién le compras la mercadería.",
+    "newButton": "Registrar proveedor",
+    "empty": "Aún no tienes proveedores. Registra al primero para anotar tus compras.",
+    "taxId": "RUC",
+    "phone": "Teléfono",
+    "contact": "Contacto",
+    "inactive": "Inactivo",
+    "seePurchases": "Ver compras"
   },
   "Purchases": {
     "backToInventory": "Volver al inventario",

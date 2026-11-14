@@ -53,6 +53,8 @@ Quina o no se aplica.
 - `design-taste-frontend`: solo para revisar que una pantalla no se vea genérica;
   sus direcciones de arte de portada no aplican a la herramienta.
 - `ui-ux-pro-max`: guías de accesibilidad e interacción.
+- `apple-design`: respuesta inmediata, transiciones interrumpibles y jerarquía
+  al estilo de Apple, siempre dentro de DESIGN.md §8.
 
 ---
 
