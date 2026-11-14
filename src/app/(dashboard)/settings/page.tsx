@@ -13,6 +13,7 @@ import {
 import { can } from '@/core/domain/identity/permissions';
 import { getStorePayment } from '@/infrastructure/db/queries/store-payment';
 import { listSubscriptionPayments } from '@/infrastructure/db/queries/subscriptions';
+import { getTaxSettings } from '@/infrastructure/db/queries/tax';
 import { isLocalMpTransport } from '@/infrastructure/payments/mercado-pago-subscription-gateway';
 import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
 import { requireStoreUser } from '@/presentation/auth/guards';
@@ -20,6 +21,7 @@ import { formatMoney } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { PaymentDetailsForm } from '@/presentation/components/settings/payment-details-form';
 import { SubscriptionPlans } from '@/presentation/components/settings/subscription-plans';
+import { TaxSettingsForm } from '@/presentation/components/settings/tax-settings-form';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
 import { loadStoreContext } from '@/presentation/queries/store-context';
@@ -62,6 +64,7 @@ export default async function SettingsPage({
   const payment = can(user.role, 'store.payment_details')
     ? await getStorePayment(user.storeId)
     : null;
+  const taxSettings = can(user.role, 'rus.view') ? await getTaxSettings(user.storeId) : null;
   const qrUrl = payment?.qrPath
     ? await getPrivateFileStorage().signedUrl(payment.qrPath, QR_URL_SECONDS)
     : null;
@@ -223,6 +226,23 @@ export default async function SettingsPage({
             <p className="text-sm text-ink-soft">{t('payment.subtitle')}</p>
           </div>
           <PaymentDetailsForm initial={payment} qrUrl={qrUrl} />
+        </section>
+      ) : null}
+
+      {/* US21 crit. 1: régimen tributario y categoría del Nuevo RUS */}
+      {taxSettings ? (
+        <section
+          id="tax"
+          aria-labelledby="tax-title"
+          className="flex scroll-mt-24 flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
+        >
+          <div className="flex flex-col gap-1">
+            <h2 id="tax-title" className="text-lg font-semibold text-ink">
+              {t('tax.title')}
+            </h2>
+            <p className="text-sm text-ink-soft">{t('tax.subtitle')}</p>
+          </div>
+          <TaxSettingsForm initial={taxSettings} />
         </section>
       ) : null}
 

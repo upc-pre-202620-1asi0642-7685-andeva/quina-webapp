@@ -1,6 +1,8 @@
 import type { RateCap } from '../credit/rate-cap';
 import type { TaxId } from '../identity/tax-id';
+import type { BusinessDate } from '../shared/business-date';
 import type { Locale } from '../shared/locale';
+import type { RusCategory } from '../tax/rus';
 
 /** US01.3, D1: la tienda que crea el Administrador nace en Casero, activa y sin prueba. */
 export type CreateStoreData = {
@@ -43,4 +45,18 @@ export type AddRateCapData = {
 export interface RateCapRepository {
   /** Abre una vigencia nueva y cierra la anterior el día previo. */
   add(data: AddRateCapData): Promise<'OK' | 'NOT_AFTER_CURRENT'>;
+}
+
+/** US21 crit. 2: topes mensuales del Nuevo RUS en soles, como texto `NUMERIC(12, 2)`. */
+export type AddRusCapData = {
+  adminId: string;
+  category: RusCategory;
+  monthlyIncomeCap: string;
+  monthlyPurchasesCap: string;
+  validFrom: BusinessDate;
+};
+
+export interface RusCapRepository {
+  /** Abre una vigencia nueva de la categoría y cierra la anterior el día previo. */
+  add(data: AddRusCapData): Promise<'OK' | 'NOT_AFTER_CURRENT'>;
 }

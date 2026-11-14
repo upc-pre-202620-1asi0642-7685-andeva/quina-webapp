@@ -81,7 +81,10 @@ test.describe('plataforma (US01)', () => {
     await ownerContext.close();
   });
 
-  test('el Administrador ve los topes vigentes del BCRP', async ({ page, browser }) => {
+  test('el Administrador ve los topes vigentes del BCRP y del Nuevo RUS', async ({
+    page,
+    browser,
+  }) => {
     const adminEmail = uniqueEmail('admin');
     const link = await createPlatformAdmin({
       url: APP_DB,
@@ -98,6 +101,12 @@ test.describe('plataforma (US01)', () => {
     await expect(page).toHaveURL(/\/app\/platform\/stores/, { timeout: 45_000 });
     await page.goto('./platform/rate-caps');
     await expect(page.getByText('114.13 % efectivo anual')).toBeVisible();
+    await expectAccessible(page);
+
+    // US21 crit. 2: los topes del Nuevo RUS sembrados, con su formulario
+    await page.goto('./platform/rus-caps');
+    await expect(page.getByText('Categoría 1', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('S/ 8,000.00').first()).toBeVisible();
     await expectAccessible(page);
 
     // Sin JavaScript el formulario igual funciona y la redirección queda dentro de /app
