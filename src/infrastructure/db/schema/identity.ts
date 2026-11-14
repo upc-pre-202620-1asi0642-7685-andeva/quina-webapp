@@ -141,6 +141,8 @@ export const users = pgTable(
     role: varchar('role', { length: 20 }).notNull(),
     phone: varchar('phone', { length: 20 }),
     preferredLocale: varchar('preferred_locale', { length: 2 }).notNull().default('es'),
+    // Orden y visibilidad de los widgets de Inicio; null = diseño por defecto del rol
+    dashboardLayout: jsonb('dashboard_layout'),
     isActive: boolean('is_active').notNull().default(true),
     failedLoginAttempts: smallint('failed_login_attempts').notNull().default(0),
     lockedUntil: tstz('locked_until'),

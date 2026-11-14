@@ -1,11 +1,11 @@
-import { and, asc, count, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gte, lte, notExists, sql, type SQL } from 'drizzle-orm';
 import type { CreditAccountStatus } from '@/core/domain/ports/credit-account-repository';
 import { CASH_PAYMENT_METHODS, type CashPaymentMethod } from '@/core/domain/sales/cash-payment';
 import type { CreditAccountSnapshot } from '@/core/domain/sales/credit-sale';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { Money } from '@/core/domain/shared/money';
 import { termsFromRow } from '../repositories/drizzle-credit-account-repository';
-import { creditAccounts, customers, sales, settlementCycles } from '../schema';
+import { creditAccounts, creditChargeVoids, customers, sales, settlementCycles } from '../schema';
 import { withTenant } from '../with-tenant';
 
 export type CashBox = {
@@ -99,4 +99,45 @@ export async function listCounterCustomers(storeId: string): Promise<CounterCust
         }
       : null,
   }));
+}
+
+export type DailySales = { day: string; cash: string; credit: string };
+
+/** Ventas de los últimos `days` días de Lima (hoy incluido), sin fiados anulados. */
+export async function loadDailySales(storeId: string, now: Date, days = 7): Promise<DailySales[]> {
+  const today = BusinessDate.fromInstant(now);
+  const from = BusinessDate.addDays(today, -(days - 1));
+  const day = sql<string>`to_char(${sales.saleDate} at time zone 'America/Lima', 'YYYY-MM-DD')`;
+  const sum = (modality: SQL) =>
+    sql<string>`coalesce(sum(${sales.totalAmount}) filter (where ${modality}), 0)::numeric(12, 2)::text`;
+  const rows = await withTenant(storeId, (tx) =>
+    tx
+      .select({
+        day,
+        cash: sum(sql`${sales.saleModality} = 'CASH'`),
+        credit: sum(sql`${sales.saleModality} <> 'CASH'`),
+      })
+      .from(sales)
+      .where(
+        and(
+          eq(sales.storeId, storeId),
+          gte(sales.saleDate, BusinessDate.startInstant(from)),
+          lte(sales.saleDate, BusinessDate.endInstant(today)),
+          // Un fiado anulado no fue una venta (Plan 4, P2), igual que en Reportes
+          notExists(
+            tx
+              .select({ id: creditChargeVoids.id })
+              .from(creditChargeVoids)
+              .where(eq(creditChargeVoids.saleId, sales.id)),
+          ),
+        ),
+      )
+      .groupBy(day),
+  );
+  // Un día sin ventas también aparece, en cero
+  return Array.from({ length: days }, (_, i) => {
+    const iso = BusinessDate.toISO(BusinessDate.addDays(from, i));
+    const row = rows.find((r) => r.day === iso);
+    return { day: iso, cash: row?.cash ?? '0.00', credit: row?.credit ?? '0.00' };
+  });
 }
