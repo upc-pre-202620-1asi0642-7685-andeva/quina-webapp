@@ -64,9 +64,12 @@ export default defineConfig(
     rules: { 'no-restricted-imports': ['error', { patterns: corePatterns }] },
   },
   {
-    // D2: quina_platform solo escribe los topes del BCRP
+    // D2: quina_platform solo escribe los topes del BCRP y del Nuevo RUS (US21)
     files: ['src/app/**', 'src/presentation/**', 'src/infrastructure/**'],
-    ignores: ['src/infrastructure/db/repositories/drizzle-rate-cap-repository.ts'],
+    ignores: [
+      'src/infrastructure/db/repositories/drizzle-rate-cap-repository.ts',
+      'src/infrastructure/db/repositories/drizzle-rus-cap-repository.ts',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -74,7 +77,8 @@ export default defineConfig(
           patterns: [
             {
               group: ['@/infrastructure/db/platform-connection', '**/platform-connection'],
-              message: 'quina_platform solo se usa en drizzle-rate-cap-repository.ts (D2).',
+              message:
+                'quina_platform solo se usa en drizzle-rate-cap-repository.ts y drizzle-rus-cap-repository.ts (D2).',
             },
           ],
         },

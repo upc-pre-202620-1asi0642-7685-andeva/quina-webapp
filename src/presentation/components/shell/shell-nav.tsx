@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
+  ChartPieIcon,
+  FileChartColumnIcon,
   EllipsisIcon,
   HandCoinsIcon,
   HouseIcon,
   LandmarkIcon,
+  ReceiptTextIcon,
   PackageIcon,
   ShieldCheckIcon,
   StoreIcon,
@@ -26,12 +29,15 @@ const ICONS: Record<NavKey, LucideIcon> = {
   customers: UsersIcon,
   collections: HandCoinsIcon,
   inventory: PackageIcon,
+  portfolio: ChartPieIcon,
+  reports: FileChartColumnIcon,
   team: UserCogIcon,
   audit: ShieldCheckIcon,
   settings: SettingsIcon,
   more: EllipsisIcon,
   stores: StoreIcon,
   rateCaps: LandmarkIcon,
+  rusCaps: ReceiptTextIcon,
 };
 
 function isActive(pathname: string, href: string): boolean {

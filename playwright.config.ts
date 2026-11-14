@@ -45,6 +45,8 @@ export default defineConfig({
       EMAIL_TRANSPORT: process.env.EMAIL_TRANSPORT ?? 'outbox',
       // Imágenes del catálogo en public/uploads, nunca en el bucket real
       STORAGE_TRANSPORT: process.env.STORAGE_TRANSPORT ?? 'local',
+      // US20: recomendaciones fijas, sin llamar a Groq
+      AI_TRANSPORT: 'fake',
       EMAIL_FROM: process.env.EMAIL_FROM ?? 'Quina <hola@andeva.tech>',
       BETTER_AUTH_SECRET:
         process.env.BETTER_AUTH_SECRET ?? 'test-secret-e2e-con-32-caracteres-o-mas-ok',

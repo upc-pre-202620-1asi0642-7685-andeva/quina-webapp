@@ -2,7 +2,7 @@ import { and, asc, desc, eq, ilike, or } from 'drizzle-orm';
 import type { PlanTier, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
 import { db } from '../connection';
 import { HAS_PASSWORD } from '../repositories/drizzle-team-repository';
-import { creditRateCaps, stores, storeSubscriptions, users } from '../schema';
+import { creditRateCaps, rusCategories, stores, storeSubscriptions, users } from '../schema';
 import { withTenant } from '../with-tenant';
 
 export type PlatformStoreItem = {
@@ -122,4 +122,28 @@ export async function listRateCaps(): Promise<RateCapRow[]> {
       asc(creditRateCaps.currency),
       desc(creditRateCaps.validFrom),
     );
+}
+
+export type RusCapRow = {
+  id: string;
+  category: number;
+  monthlyIncomeCap: string;
+  monthlyPurchasesCap: string;
+  validFrom: string;
+  validTo: string | null;
+};
+
+/** US21 crit. 2: historial de topes del Nuevo RUS, la vigencia más reciente primero. */
+export async function listRusCaps(): Promise<RusCapRow[]> {
+  return db
+    .select({
+      id: rusCategories.id,
+      category: rusCategories.category,
+      monthlyIncomeCap: rusCategories.monthlyIncomeCap,
+      monthlyPurchasesCap: rusCategories.monthlyPurchasesCap,
+      validFrom: rusCategories.validFrom,
+      validTo: rusCategories.validTo,
+    })
+    .from(rusCategories)
+    .orderBy(asc(rusCategories.category), desc(rusCategories.validFrom));
 }

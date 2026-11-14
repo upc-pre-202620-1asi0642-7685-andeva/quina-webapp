@@ -1,8 +1,8 @@
 import { createDb, type Database } from './connection';
 
-// D2: quina_platform se usa SOLO para escribir credit_rate_caps, que quina_app
-// solo puede leer. Todo lo demás de la plataforma va con quina_app. ESLint
-// impide importar este módulo fuera del repositorio de topes.
+// D2: quina_platform se usa SOLO para escribir credit_rate_caps y rus_categories,
+// que quina_app solo puede leer. Todo lo demás de la plataforma va con quina_app.
+// ESLint impide importar este módulo fuera de los dos repositorios de topes.
 let instance: Database | undefined;
 
 export function getPlatformDb(): Database {

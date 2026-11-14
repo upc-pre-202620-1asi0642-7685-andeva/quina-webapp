@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { AlertTriangleIcon, CircleUserRoundIcon } from 'lucide-react';
 import type { Role } from '@/core/domain/identity/roles';
+import { OfflineBanner } from '@/presentation/components/pwa/pwa';
 import { formatDate } from '@/presentation/lib/format-date';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
 import { bottomItems, sidebarItems } from './nav-items';
@@ -150,6 +151,7 @@ export async function AppShell({
               ) : null}
             </div>
           ) : null}
+          <OfflineBanner />
           {children}
         </main>
       </div>

@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
   basePath: '/app',
   // next dev no reescribe AGENTS.md: la regla equivalente ya está en su sección 3.
   agentRules: false,
+  // US22: el service worker vive en /app/sw.js pero controla también /app (la portada)
+  async headers() {
+    return [
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Service-Worker-Allowed', value: '/app' },
+          { key: 'Cache-Control', value: 'no-cache' },
+        ],
+      },
+    ];
+  },
   experimental: {
     serverActions: {
       // El sitio público reenvía quina.andeva.tech/app/* con el Origin público.

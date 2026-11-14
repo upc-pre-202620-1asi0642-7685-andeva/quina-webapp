@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import {
   AlertTriangleIcon,
+  ChartPieIcon,
+  FileChartColumnIcon,
   PackageIcon,
   ShieldCheckIcon,
   ShoppingBasketIcon,
@@ -10,8 +12,10 @@ import {
 import { can } from '@/core/domain/identity/permissions';
 import { countLowStockProducts } from '@/infrastructure/db/queries/catalog';
 import { loadTodayCashBox } from '@/infrastructure/db/queries/sales';
+import { loadRusStatus } from '@/infrastructure/db/queries/tax';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { Money } from '@/presentation/components/money';
+import { RusCard } from '@/presentation/components/tax/rus-card';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
 import { loadStoreContext } from '@/presentation/queries/store-context';
@@ -33,9 +37,11 @@ export default async function DashboardHomePage() {
   const today = new Date();
   const now = today.getTime();
   // D6: la caja de hoy es del dueño; el empleado no ve totales del negocio
-  const cashBox = can(user.role, 'reports.view')
-    ? await loadTodayCashBox(user.storeId, today)
-    : null;
+  const [cashBox, rus] = await Promise.all([
+    can(user.role, 'reports.view') ? loadTodayCashBox(user.storeId, today) : null,
+    // US21: el asistente tributario es del dueño y solo en el Nuevo RUS
+    can(user.role, 'rus.view') ? loadRusStatus(user.storeId, today) : null,
+  ]);
   const trialDays = trialEndsAt
     ? Math.max(1, Math.ceil((trialEndsAt.getTime() - now) / DAY_MS))
     : null;
@@ -87,6 +93,19 @@ export default async function DashboardHomePage() {
               {t('inventoryLink')}
             </Link>
           ) : null}
+          {/* US19 y US20: cartera y reportes tampoco caben en la barra inferior */}
+          {can(user.role, 'reports.view') ? (
+            <>
+              <Link href="/portfolio" className={buttonVariants({ variant: 'secondary' })}>
+                <ChartPieIcon aria-hidden="true" />
+                {t('portfolioLink')}
+              </Link>
+              <Link href="/reports" className={buttonVariants({ variant: 'secondary' })}>
+                <FileChartColumnIcon aria-hidden="true" />
+                {t('reportsLink')}
+              </Link>
+            </>
+          ) : null}
           {can(user.role, 'settings.billing') ? (
             <Link href="/audit" className={buttonVariants({ variant: 'secondary' })}>
               <ShieldCheckIcon aria-hidden="true" />
@@ -134,6 +153,8 @@ export default async function DashboardHomePage() {
           <p className="text-[13px] text-ink-soft">{t('cashBox.hint')}</p>
         </section>
       ) : null}
+
+      {rus ? <RusCard status={rus} /> : null}
     </div>
   );
 }

@@ -272,7 +272,9 @@
       }
     },
     "auditLink": "Audit log",
-    "lowStockBanner": "{count, plural, =1 {1 product low on stock} other {# products low on stock}}"
+    "lowStockBanner": "{count, plural, =1 {1 product low on stock} other {# products low on stock}}",
+    "portfolioLink": "Portfolio",
+    "reportsLink": "Reports"
   },
   "Profile": {
     "title": "My profile",
@@ -364,7 +366,10 @@
       "sellSoon": "Sell, coming soon",
       "inventory": "Inventory",
       "collections": "Collections",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "rusCaps": "RUS caps",
+      "portfolio": "Portfolio",
+      "reports": "Reports"
     },
     "lowStockAlert": "{count, plural, =1 {1 low-stock item} other {# low-stock items}}",
     "lowStockShort": "{count} low"
@@ -833,6 +838,25 @@
           "IMAGE_TOO_LARGE": "The image is larger than 2 MB. Take a lighter screenshot."
         }
       }
+    },
+    "tax": {
+      "title": "Tax regime",
+      "subtitle": "With Nuevo RUS, Quina compares your sales and purchases this month with your category cap.",
+      "regime": "Regime",
+      "regimeHint": "The one you are registered under with SUNAT.",
+      "regimes": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "Special Regime (RER)",
+        "MYPE": "MYPE Tax Regime",
+        "GENERAL": "General Regime"
+      },
+      "category": "Nuevo RUS category",
+      "categoryHint": "Category 1 up to S/ 5,000 a month; category 2 up to S/ 8,000.",
+      "categoryOption": "Category {category}",
+      "submit": "Save regime",
+      "submitting": "Saving…",
+      "saved": "Regime saved.",
+      "error": "Could not save. Try again."
     }
   },
   "Platform": {
@@ -947,6 +971,36 @@
           "DATE_INVALID": "Choose a date.",
           "NOT_AFTER_CURRENT": "It must start after the current period.",
           "SOURCE_REQUIRED": "Write the circular the cap comes from.",
+          "generic": "Could not save. Try again."
+        }
+      }
+    },
+    "rusCaps": {
+      "title": "Nuevo RUS caps",
+      "subtitle": "Maximum monthly income and purchases for each category. Quina warns the shopkeeper when they reach 85 %.",
+      "historyTitle": "Periods",
+      "category": "Category {category}",
+      "income": "Monthly income",
+      "purchases": "Monthly purchases",
+      "inForce": "In force since {from}",
+      "period": "From {from} to {to}",
+      "form": {
+        "title": "New period",
+        "subtitle": "When you save it, the previous period of the same category ends the day before.",
+        "category": "Category",
+        "categoryHint": "SUNAT sets one cap per category.",
+        "income": "Monthly income cap (S/)",
+        "purchases": "Monthly purchases cap (S/)",
+        "amountHint": "In soles, for example 5000.",
+        "validFrom": "In force from",
+        "validFromHint": "It must start after the current period.",
+        "submit": "Save period",
+        "submitting": "Saving…",
+        "saved": "Period saved.",
+        "errors": {
+          "AMOUNT_INVALID": "Enter amounts in soles greater than 0, for example 5000.",
+          "DATE_INVALID": "Pick a date.",
+          "NOT_AFTER_CURRENT": "It must start after the current period.",
           "generic": "Could not save. Try again."
         }
       }
@@ -1738,5 +1792,115 @@
       "store_subscriptions": "Subscription",
       "subscription_payments": "Subscription payments"
     }
+  },
+  "Tax": {
+    "rus": {
+      "title": "Tax assistant",
+      "category": "Nuevo RUS · Category {category}",
+      "salesLabel": "Sales this month",
+      "purchasesLabel": "Purchases this month",
+      "usedOf": "{used} of {cap} ({percent} %)",
+      "meterText": "{percent} % of the cap",
+      "noCap": "There is no cap in force for your category yet. Quina will warn you once it is set.",
+      "alerts": {
+        "warning": {
+          "sales": "Your sales this month are past 85 % of your category cap. Watch your sales to stay in your regime.",
+          "purchases": "Your purchases this month are past 85 % of your category cap. Watch your purchases to stay in your regime."
+        },
+        "over": {
+          "sales": "Your sales this month went over your category cap. Check your category with your accountant.",
+          "purchases": "Your purchases this month went over your category cap. Check your category with your accountant."
+        }
+      },
+      "disclaimer": "Reference information only. Quina does not provide tax advice or file returns with SUNAT.",
+      "changeCategory": "Change category"
+    }
+  },
+  "Portfolio": {
+    "title": "Portfolio",
+    "subtitle": "How much money is out on credit and who pays on time.",
+    "metrics": {
+      "lent": "Money lent",
+      "overdue": "Total overdue",
+      "projected": "Expected collections this month",
+      "delinquent": "Customers in arrears"
+    },
+    "chart": {
+      "title": "Portfolio over time",
+      "caption": "Billed, paid and still overdue amounts by statement month (last 6 months).",
+      "period": "Month",
+      "billed": "Billed",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "locked": "The trend chart comes with the {plan} plan.",
+      "seePlans": "See plans"
+    },
+    "list": {
+      "title": "Customers on credit",
+      "sortLabel": "Sort the portfolio",
+      "sort": {
+        "debt": "Highest debt",
+        "score": "Lowest score"
+      },
+      "debt": "Debt",
+      "limit": "Limit",
+      "delinquent": "In arrears",
+      "suggestLower": "Red at two statements in a row: consider lowering the limit",
+      "empty": "You have no customers on credit yet."
+    },
+    "score": {
+      "value": "{score} · {band}",
+      "noHistory": "No history",
+      "bands": {
+        "GREEN": "Excellent",
+        "YELLOW": "At risk",
+        "RED": "Critical"
+      }
+    }
+  },
+  "Reports": {
+    "title": "Reports",
+    "subtitle": "How much you sold, how much interest you collected and what you kept, for the dates you choose.",
+    "locked": "Date range reports come with the {plan} plan.",
+    "seePlans": "See plans",
+    "from": "From",
+    "to": "To",
+    "submit": "Show report",
+    "print": "Print or save as PDF",
+    "rangeInvalid": "Check the dates: \"From\" goes before \"To\" and the range is one year at most. Showing the current month.",
+    "reportTitle": "{store} report",
+    "range": "From {from} to {to}",
+    "salesCount": "{count, plural, =0 {no sales} one {1 sale} other {# sales}}",
+    "figures": {
+      "cashSales": "Cash sales",
+      "creditSales": "Credit sales",
+      "compensatoryInterest": "Credit interest collected",
+      "moratoryInterest": "Late interest collected",
+      "costOfSales": "Cost of goods sold",
+      "grossMargin": "Gross margin"
+    },
+    "note": "Voided credit sales are not counted. Interest is what came in through payments within these dates.",
+    "ai": {
+      "title": "AI recommendations",
+      "analyze": "Analyze with AI",
+      "analyzing": "Analyzing…",
+      "quota": "{left, plural, =0 {No queries left this month} one {1 of {max} queries left this month} other {# of {max} queries left this month}}",
+      "privacy": "We only send the totals of this report. Never names or details of your customers.",
+      "locked": "AI recommendations come with the {plan} plan.",
+      "errors": {
+        "QUOTA_EXHAUSTED": "You used all your AI queries this month. They renew on the 1st.",
+        "UNAVAILABLE": "The AI did not answer in time. The query was not counted; try again.",
+        "NOT_IN_PLAN": "Your current plan does not include AI recommendations.",
+        "RANGE_INVALID": "Check the report dates."
+      }
+    }
+  },
+  "Offline": {
+    "title": "You are offline",
+    "body": "There is no signal right now. You can check the catalog and the customer balances you opened before.",
+    "writes": "Selling and collecting need internet, so your accounts and stock always match.",
+    "catalog": "See catalog",
+    "customers": "See customers",
+    "banner": "Offline: you can look at what you already opened, but selling and collecting wait for the signal."
   }
 }
