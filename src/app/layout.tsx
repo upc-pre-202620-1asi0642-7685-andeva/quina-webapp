@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { ServiceWorkerRegistration } from '@/presentation/components/pwa/pwa';
 import '@/presentation/styles/globals.css';
 
 // Una sola familia (DESIGN.md, sección 4). next/font/local respeta basePath '/app'.
@@ -43,6 +44,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('title'),
     description: t('description'),
+    // US22: en iPhone "Añadir a pantalla de inicio" abre a pantalla completa
+    appleWebApp: { capable: true, title: 'Quina', statusBarStyle: 'default' },
   };
 }
 
@@ -56,6 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

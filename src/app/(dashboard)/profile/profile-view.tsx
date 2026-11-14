@@ -13,6 +13,7 @@ import { setPasswordAction, type SetPasswordActionState } from '@/presentation/a
 import { FormField } from '@/presentation/components/auth/form-field';
 import { OtpInput } from '@/presentation/components/auth/otp-input';
 import { PasswordStrength } from '@/presentation/components/auth/password-strength';
+import { clearOfflinePages } from '@/presentation/components/pwa/pwa';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { cn } from '@/presentation/lib/utils';
@@ -140,6 +141,8 @@ export function ProfileView({
     setSigningOut(true);
     try {
       await authClient.signOut();
+      // US22: lo guardado para leer sin señal no se queda en un celular compartido
+      await clearOfflinePages();
       window.location.replace(portal ? '/app/portal/login' : '/app/login');
     } finally {
       setSigningOut(false);

@@ -222,6 +222,12 @@
   }
 }
 
+/* US22 crit. 5: sin señal se puede mirar, pero no enviar ventas ni cobros (pwa.tsx) */
+html[data-offline] form :is(button[type='submit'], button:not([type])) {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 /* Único movimiento del panel de marca de acceso (DESIGN.md §6.1): la ficha de
    ejemplo sube una vez al cargar. Sin opacidad: la ficha siempre se lee con su
    contraste completo, aun a mitad de la animación. */
