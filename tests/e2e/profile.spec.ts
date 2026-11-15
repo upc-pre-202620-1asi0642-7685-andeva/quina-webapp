@@ -62,7 +62,7 @@ test.describe('perfil, selector de idioma y cierre de sesión (US02, US27)', () 
   }) => {
     const { storeName } = await registerOwnerWithStore(page);
 
-    await page.getByRole('link', { name: 'Mi perfil e idioma' }).click();
+    await page.goto('./profile');
     await expect(page).toHaveURL(/\/app\/profile/);
 
     // Cambiar idioma a inglés (en)

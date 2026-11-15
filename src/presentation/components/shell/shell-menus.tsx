@@ -440,7 +440,8 @@ export function NotificationsMenu({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        aria-label={unread > 0 ? t('openUnread', { count: unread }) : t('open')}
+        // Con texto a la vista, el nombre sale del contenido (WCAG 2.5.3); solo la campana lleva etiqueta
+        aria-label={row ? undefined : unread > 0 ? t('openUnread', { count: unread }) : t('open')}
         className={cn(
           'relative flex shrink-0 items-center text-ink-soft hover:bg-surface-hover hover:text-ink',
           // Barra abierta: fila completa con texto, como un ítem más del menú
@@ -464,6 +465,7 @@ export function NotificationsMenu({
             {unread > 9 ? '9+' : unread}
           </span>
         ) : null}
+        {row && unread > 0 ? <span className="sr-only">{t('unread')}</span> : null}
       </PopoverTrigger>
       <PopoverContent
         side={compact ? 'bottom' : 'right'}

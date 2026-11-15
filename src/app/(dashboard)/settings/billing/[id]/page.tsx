@@ -27,7 +27,7 @@ export default async function SubscriptionReceiptPage({
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <Link
-        href="/settings#billing-history"
+        href="/settings/subscription#billing-history"
         className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline print:hidden"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />

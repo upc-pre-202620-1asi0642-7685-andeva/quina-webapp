@@ -52,7 +52,7 @@ test.describe('corte y cobranza (US10 a US13)', () => {
     await expect(page.getByText('Interés compensatorio')).toBeVisible();
     await expectAccessible(page);
 
-    await page.getByRole('link', { name: 'Cobrar' }).click();
+    await page.getByRole('link', { name: 'Cobrar', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Cobrar a Rosa Quispe' })).toBeVisible();
     await page.getByLabel('Recibido').fill('10');
     await expect(page.getByText('Vuelto')).toBeVisible();
@@ -67,7 +67,10 @@ test.describe('corte y cobranza (US10 a US13)', () => {
 
     await page.goto('./collections');
     await expect(page.getByText('No hay ciclos por cobrar.')).toBeVisible();
-    await page.getByRole('link', { name: /Avisos de hoy/ }).click();
+    await page
+      .getByRole('main')
+      .getByRole('link', { name: /Avisos de hoy/ })
+      .click();
     await expectAccessible(page);
   });
 

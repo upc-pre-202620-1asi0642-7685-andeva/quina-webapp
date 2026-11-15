@@ -64,7 +64,8 @@ test.describe('registro autoservicio del comerciante (US24)', () => {
     await page.getByRole('button', { name: 'Crear mi tienda' }).click();
 
     await expect(page).toHaveURL(/\/app\/?$/);
-    await expect(page.getByRole('heading', { level: 1, name: storeName })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Hola, Lucho' })).toBeVisible();
+    await expect(page.getByRole('main').getByText(storeName, { exact: false })).toBeVisible();
     await expect(page.getByText('Prueba Pro: 14 días')).toBeVisible();
     expect(Date.now() - startedAt).toBeLessThan(120_000);
   });
