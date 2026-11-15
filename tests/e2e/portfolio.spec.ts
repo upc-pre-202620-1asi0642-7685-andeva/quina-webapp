@@ -14,8 +14,7 @@ test.describe('panel de cartera (US19)', () => {
     await registerOwnerWithStore(page);
     await addCreditNeighbor(page, 'Rosa', '300');
 
-    await page.goto('./');
-    await page.getByRole('link', { name: 'Cartera' }).first().click();
+    await page.goto('./portfolio');
     await expect(page).toHaveURL(/\/app\/portfolio$/);
 
     // Crit. 1

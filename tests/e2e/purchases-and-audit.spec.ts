@@ -35,7 +35,7 @@ test.describe('compras, costo promedio, reposición, mermas y auditoría (US15�
 
     // 2. Verificar alerta de stock bajo en el mostrador (US17 crit. 2)
     await page.goto('./sales');
-    await expect(page.getByText('Stock bajo').first()).toBeVisible();
+    await expect(page.getByText('Stock bajo').filter({ visible: true }).first()).toBeVisible();
 
     // 3. Filtrar productos con stock bajo en Inventario y armar pedido de reposición (US17 crit. 3–5)
     await page.goto('./inventory?filter=low');
