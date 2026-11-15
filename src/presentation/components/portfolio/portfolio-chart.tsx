@@ -28,6 +28,7 @@ export function PortfolioChart({ months }: { months: PortfolioMonth[] }) {
     <figure className="flex flex-col gap-3">
       <div aria-hidden="true" className="h-64 w-full overflow-x-auto">
         <BarChart
+          accessibilityLayer={false}
           responsive
           data={data}
           margin={{ top: 8, right: 8, bottom: 0, left: 8 }}
