@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import {
   CancelInviteUseCase,
   InviteEmployeeUseCase,
@@ -13,6 +12,7 @@ import { DrizzleTeamRepository } from '@/infrastructure/db/repositories/drizzle-
 import { getNotificationMailer } from '@/infrastructure/email/auth-mailer-factory';
 import { authorizeStore } from '@/presentation/auth/guards';
 import { appUrl } from '@/presentation/lib/request-meta';
+import { inviteEmployeeSchema, memberIdSchema } from '@/presentation/lib/team-schemas';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
 export type InviteFormState = {
@@ -24,7 +24,6 @@ export type InviteFormState = {
 
 export type TeamActionResult = { ok: true } | { ok: false; error: string };
 
-const idSchema = z.uuid();
 const INVITE_ERRORS = {
   NAME_INVALID: 'nameInvalid',
   EMAIL_INVALID: 'emailInvalid',
@@ -51,7 +50,16 @@ export async function inviteEmployeeAction(
   const user = await authorizeStore('team.manage');
   if (!user) return { error: 'generic' };
 
-  const email = String(formData.get('email') ?? '');
+  const parsed = inviteEmployeeSchema.safeParse({
+    name: String(formData.get('name') ?? ''),
+    email: String(formData.get('email') ?? ''),
+  });
+  if (!parsed.success) {
+    const code = parsed.error.issues[0]?.message;
+    if (code === 'nameInvalid' || code === 'emailInvalid') return { error: code };
+    return { error: 'generic' };
+  }
+
   const result = await new InviteEmployeeUseCase(
     new DrizzleTeamRepository(),
     tokens(),
@@ -59,19 +67,19 @@ export async function inviteEmployeeAction(
   ).execute({
     storeId: user.storeId,
     actorId: user.id,
-    name: String(formData.get('name') ?? ''),
-    email,
+    name: parsed.data.name,
+    email: parsed.data.email,
     now: new Date(),
     ...(await setupMail(user.storeId)),
   });
   if (!result.ok) return { error: INVITE_ERRORS[result.error] };
   revalidatePath('/team');
-  return { invited: email.trim().toLowerCase(), mailFailed: !result.value.mailSent };
+  return { invited: parsed.data.email, mailFailed: !result.value.mailSent };
 }
 
 export async function resendInviteAction(userId: string): Promise<TeamActionResult> {
   const user = await authorizeStore('team.manage');
-  if (!user || !idSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
+  if (!user || !memberIdSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
   const result = await new ResendInviteUseCase(
     new DrizzleTeamRepository(),
     tokens(),
@@ -85,12 +93,13 @@ export async function resendInviteAction(userId: string): Promise<TeamActionResu
   });
   if (!result.ok)
     return { ok: false, error: result.error === 'MAIL_FAILED' ? 'mailFailed' : 'generic' };
+  revalidatePath('/team');
   return { ok: true };
 }
 
 export async function cancelInviteAction(userId: string): Promise<TeamActionResult> {
   const user = await authorizeStore('team.manage', { allowWhenReadOnly: true });
-  if (!user || !idSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
+  if (!user || !memberIdSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
   const result = await new CancelInviteUseCase(new DrizzleTeamRepository()).execute({
     storeId: user.storeId,
     actorId: user.id,
@@ -107,7 +116,7 @@ export async function setEmployeeActiveAction(
   active: boolean,
 ): Promise<TeamActionResult> {
   const user = await authorizeStore('team.manage', { allowWhenReadOnly: !active });
-  if (!user || !idSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
+  if (!user || !memberIdSchema.safeParse(userId).success) return { ok: false, error: 'generic' };
   const result = await new SetEmployeeActiveUseCase(new DrizzleTeamRepository()).execute({
     storeId: user.storeId,
     actorId: user.id,
