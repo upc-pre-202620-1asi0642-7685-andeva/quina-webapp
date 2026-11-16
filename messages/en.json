@@ -275,23 +275,63 @@
       "add": "Add widget",
       "addShort": "Add",
       "addOne": "Add {name}",
-      "addTitle": "Add to your Home",
-      "addSubtitle": "Pick what you want to see as soon as you open Quina.",
-      "allAdded": "All widgets are already on your Home.",
-      "reset": "Restore the default layout",
+      "addTitle": "Add to your Dashboard",
+      "addSubtitle": "Pick what you want to see as soon as you open Quina or apply a template.",
+      "allAdded": "All widgets are already on your Dashboard.",
+      "reset": "Restore default layout",
+      "resetShort": "Reset",
       "hint": "Drag each card by its handle or use the arrows. Changes save automatically.",
+      "hintDesktop": "Drag each card by its top bar or pull the bottom-right corner handle to resize it in real time.",
       "drag": "Move {name}",
       "dragHelp": "Drag or use the arrow keys to change the order.",
+      "sizeGroup": "Size of {name}",
+      "resize": "Resize {name} to {size}",
+      "resizeCorner": "Resize {name} ({dimensions})",
+      "resized": "{name} is now {size}",
+      "dimensions": "{size} · {rows, plural, one {# row} other {# rows}}",
+      "fixedSize": "Fixed size",
+      "sizes": {
+        "sm": "Small",
+        "md": "Medium",
+        "lg": "Large"
+      },
+      "sizesShort": {
+        "sm": "S",
+        "md": "M",
+        "lg": "L"
+      },
+      "presetsTitle": "Quick templates",
+      "presetApplied": "{name} template applied",
+      "presets": {
+        "daily": {
+          "title": "Counter",
+          "subtitle": "Collections & daily cash"
+        },
+        "financial": {
+          "title": "Financial",
+          "subtitle": "Cash flow & margins"
+        },
+        "complete": {
+          "title": "Complete",
+          "subtitle": "Full Bento overview"
+        }
+      },
+      "categories": {
+        "counter": "Counter",
+        "charts": "Charts",
+        "portfolio": "Portfolio",
+        "operations": "Operations"
+      },
       "moveUp": "Move {name} up",
       "moveDown": "Move {name} down",
-      "hide": "Remove {name} from Home",
+      "hide": "Remove {name} from Dashboard",
       "moved": "{name} in position {position} of {total}",
-      "hidden": "{name} removed from Home",
-      "added": "{name} added to Home",
-      "saved": "Your Home is saved",
-      "saveError": "We could not save your Home. Please try again.",
-      "empty": "Your Home is empty. Add what you want to see every morning.",
-      "gridLabel": "Home widgets"
+      "hidden": "{name} removed from Dashboard",
+      "added": "{name} added to Dashboard",
+      "saved": "Your Dashboard is saved",
+      "saveError": "We could not save your Dashboard. Please try again.",
+      "empty": "Your Dashboard is empty. Add what you want to see every morning.",
+      "gridLabel": "Dashboard widgets"
     },
     "widgets": {
       "seeAll": "See all",
@@ -373,7 +413,74 @@
         "title": "Today’s notices",
         "description": "Reminders and statements sent today.",
         "empty": "No notices have gone out today yet."
+      },
+      "cashFlow": {
+        "title": "Real income vs. Purchases",
+        "description": "Money actually received (cash sales & collections) against purchases.",
+        "realIncome": "Real income",
+        "realIncomeHint": "Real income (Cash {cash} + Collections {collections})",
+        "purchases": "Purchases",
+        "netFlow": "Net flow",
+        "caption": "Daily real income and purchases"
+      },
+      "salesByMethod": {
+        "title": "Payment methods",
+        "description": "Sales mix across cash, Yape, Plin, card and credit.",
+        "empty": "No sales recorded in this period yet.",
+        "caption": "Sales by payment method",
+        "method": "Method",
+        "salesCount": "Sales",
+        "amount": "Amount",
+        "methods": {
+          "CASH": "Cash",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Card",
+          "CREDIT": "Credit"
+        }
+      },
+      "portfolioTrend": {
+        "title": "Portfolio trend",
+        "description": "Billed, paid and overdue across your last 6 billing months."
+      },
+      "marginTrend": {
+        "title": "Daily sales & profit",
+        "description": "Daily comparison of total sales against gross profit.",
+        "sales": "Sales",
+        "margin": "Profit",
+        "caption": "Daily sales and gross margin"
+      },
+      "topProducts": {
+        "title": "Top selling products",
+        "description": "Items generating the most revenue over the last 30 days.",
+        "empty": "No product sales recorded yet."
+      },
+      "recentSales": {
+        "title": "Recent sales",
+        "description": "Latest completed sales at your counter.",
+        "walkIn": "Walk-in customer",
+        "empty": "No sales recorded yet."
+      },
+      "collectionsHealth": {
+        "title": "Collections health",
+        "description": "On-time credit share and neighbor score breakdown.",
+        "onTimeLabel": "of credit on time",
+        "currentAmount": "On time",
+        "overdueAmount": "Overdue",
+        "empty": "No neighbors with credit accounts yet.",
+        "bands": {
+          "GREEN": "{count} on time",
+          "AMBER": "{count} to watch",
+          "RED": "{count} at risk"
+        }
       }
+    },
+    "charts": {
+      "periodAria": "Day range",
+      "days7": "7d",
+      "days14": "14d",
+      "days30": "30d",
+      "day": "Day"
     }
   },
   "Profile": {
@@ -454,7 +561,8 @@
     "managePlan": "Go to Settings",
     "nav": {
       "label": "Main navigation",
-      "home": "Home",
+      "home": "Dashboard",
+      "homeMobile": "Home",
       "sell": "Sell",
       "customers": "Customers",
       "team": "Team",

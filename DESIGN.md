@@ -18,7 +18,7 @@ exactos viven en `src/presentation/styles/globals.css` (copia de
   primero. Nunca un estilo suelto "solo para esta pantalla".
 - **El sitio es la promesa; la webapp es el producto.** La ventana de la webapp
   que muestra el sitio en su portada (ficha de Rosa Quispe, barra lateral con
-  Inicio, Vender, Clientes, Créditos, Inventario y Reportes; tarjetas de saldo,
+  Dashboard, Vender, Clientes, Créditos, Inventario y Reportes; tarjetas de saldo,
   límite, corte y pago) es lo que el comerciante espera ver al entrar. La webapp
   real debe reconocerse en esa imagen.
 - **Herramienta de mostrador, no portada.** Comparte marca, colores, tipografía,
@@ -162,7 +162,7 @@ shadcn, no aceptar cambios a `globals.css`.
   ancho. Cada pantalla se diseña y revisa primero a 390 px y luego a 1440 px.
 - **Navegación:**
   - **Una sola estructura de módulos** (`shell/nav-items.ts`) para escritorio y
-    celular, agrupada: **Mostrador** (Inicio, Vender, Clientes, Cobranza),
+    celular, agrupada: **Mostrador** (Dashboard, Vender, Clientes, Cobranza),
     **Negocio** (Inventario con Productos, Compras y Proveedores; Cartera,
     Reportes), **Administración** (Equipo, Auditoría) y, bajo un separador, la
     sección secundaria sin listas (Ajustes, Suscripción). Perfil va en la tarjeta
@@ -171,7 +171,10 @@ shadcn, no aceptar cambios a `globals.css`.
     submenú desplegable con guía vertical (solo Inventario) y tarjeta de usuario al
     pie. El ítem activo usa `--color-soft` con texto `--color-soft-ink`; los
     inactivos van en `--color-ink-soft`.
-  - **Celular:** barra flotante en píldora (`shadow-float`) con Inicio, Clientes,
+  - **Grilla Bento del Dashboard (escritorio):** en `xl` usa 3 columnas densas con
+    tres anchos (`sm` Chico = 1 columna, `md` Mediano = 2 columnas y `lg` Grande =
+    3 columnas) y 1 o 2 filas de alto; en celular todas se apilan en 1 columna.
+  - **Celular:** barra flotante en píldora (`shadow-float`) con Dashboard, Clientes,
     Cobranza y **Módulos**, y a su derecha el botón circular verde **Vender**.
     Módulos abre una hoja inferior con todos los grupos: desde el celular se llega
     a todo lo que hay en escritorio.
