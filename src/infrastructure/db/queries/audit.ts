@@ -68,7 +68,14 @@ export const AUDIT_CATEGORY_ACTIONS: Record<AuditCategory, readonly string[]> = 
     'REACTIVATE_EMPLOYEE',
     'DEACTIVATE_EMPLOYEE',
   ],
-  security: ['LOGIN_FAILED', 'LOGIN_BLOCKED', 'LOCK_ACCOUNT', 'SET_PASSWORD', 'ACCEPT_TERMS'],
+  security: [
+    'LOGIN_FAILED',
+    'LOGIN_BLOCKED',
+    'LOCK_ACCOUNT',
+    'SET_PASSWORD',
+    'UPDATE_PROFILE',
+    'ACCEPT_TERMS',
+  ],
   billing: [
     'START_SUBSCRIPTION_CHECKOUT',
     'SUBSCRIPTION_PAYMENT_APPROVED',

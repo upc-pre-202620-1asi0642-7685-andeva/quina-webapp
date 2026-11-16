@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MobilePhone } from '@/core/domain/identity/mobile-phone';
 import { PasswordPolicy } from '@/core/domain/identity/password-policy';
 import { PersonName } from '@/core/domain/identity/person-name';
 import { TaxId } from '@/core/domain/identity/tax-id';
@@ -16,18 +17,31 @@ const passwordField = z
   .string()
   .refine((value) => PasswordPolicy.check(value).ok, { message: 'passwordWeak' });
 
+const personNameField = z.string().transform((raw, ctx) => {
+  const parsed = PersonName.parse(raw);
+  if (!parsed.ok) {
+    ctx.addIssue({
+      code: 'custom',
+      message: parsed.error === 'NAME_REQUIRED' ? 'nameRequired' : 'nameInvalid',
+    });
+    return z.NEVER;
+  }
+  return parsed.value;
+});
+
+const optionalPhoneField = z.string().transform((raw, ctx) => {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const parsed = MobilePhone.parse(trimmed);
+  if (!parsed.ok) {
+    ctx.addIssue({ code: 'custom', message: 'phoneInvalid' });
+    return z.NEVER;
+  }
+  return parsed.value;
+});
+
 export const accountSchema = z.object({
-  name: z.string().transform((raw, ctx) => {
-    const parsed = PersonName.parse(raw);
-    if (!parsed.ok) {
-      ctx.addIssue({
-        code: 'custom',
-        message: parsed.error === 'NAME_REQUIRED' ? 'nameRequired' : 'nameInvalid',
-      });
-      return z.NEVER;
-    }
-    return parsed.value;
-  }),
+  name: personNameField,
   email: emailField,
   password: passwordField,
 });
@@ -70,6 +84,25 @@ export const setPasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const updateProfileSchema = z.object({
+  name: personNameField,
+  phone: optionalPhoneField,
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: 'passwordRequired' }),
+    newPassword: passwordField,
+    confirmPassword: z.string(),
+    revokeOtherSessions: z.boolean().default(false),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'passwordMismatch',
+    path: ['confirmPassword'],
+  });
+
 export type AccountInput = z.infer<typeof accountSchema>;
 export type StoreInput = z.infer<typeof storeSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
