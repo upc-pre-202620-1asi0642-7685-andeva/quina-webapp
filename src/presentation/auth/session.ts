@@ -82,7 +82,9 @@ export function nextRouteFor(user: SessionUser | null, path: string): string | n
 
   // El Administrador de Plataforma solo usa su panel y su perfil
   if (user.role === 'PLATFORM_ADMIN') {
-    return isPlatformPath(clean) || clean === '/profile' ? null : PLATFORM_PREFIX;
+    return isPlatformPath(clean) || clean === '/profile' || clean.startsWith('/profile/')
+      ? null
+      : PLATFORM_PREFIX;
   }
 
   if (ALL_AUTH_PATHS.has(clean) || isPlatformPath(clean)) {

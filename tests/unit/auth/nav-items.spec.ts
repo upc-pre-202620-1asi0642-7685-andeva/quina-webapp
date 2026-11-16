@@ -92,6 +92,10 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
     expect(activeHref('/collections', hrefs, '?tab=overdue')).toBe('/collections?tab=overdue');
     expect(activeHref('/inventory', hrefs, '?filter=low')).toBe('/inventory?filter=low');
     expect(activeHref('/inventory/new', hrefs, '?filter=low')).toBe('/inventory');
+    expect(activeHref('/profile', hrefs)).toBe('/profile');
+    expect(activeHref('/profile/security', hrefs)).toBe('/profile');
+    expect(activeHref('/profile/preferences', hrefs)).toBe('/profile');
+    expect(activeHref('/profile/access', hrefs)).toBe('/profile');
   });
 });
 
@@ -134,6 +138,31 @@ describe('migas de pan (navegación interna)', () => {
     expect(trail('/platform/stores/0b6f0c1e-1111', 'PLATFORM_ADMIN')).toEqual([
       'stores:/platform/stores',
       'detail:/platform/stores/0b6f0c1e-1111',
+    ]);
+  });
+
+  it('las subpantallas de perfil construyen migas limpias', () => {
+    const profileTrail = (path: string) =>
+      breadcrumbTrail(path, navGroups('STORE_OWNER'), [
+        ...secondaryItems('STORE_OWNER'),
+        { key: 'profile', href: '/profile' },
+      ]).map((c) => ('key' in c ? `${c.key}:${c.href}` : `${c.label}:${c.href}`));
+
+    expect(profileTrail('/profile')).toEqual(['home:/', 'profile:/profile']);
+    expect(profileTrail('/profile/security')).toEqual([
+      'home:/',
+      'profile:/profile',
+      'security:/profile/security',
+    ]);
+    expect(profileTrail('/profile/preferences')).toEqual([
+      'home:/',
+      'profile:/profile',
+      'preferences:/profile/preferences',
+    ]);
+    expect(profileTrail('/profile/access')).toEqual([
+      'home:/',
+      'profile:/profile',
+      'access:/profile/access',
     ]);
   });
 });

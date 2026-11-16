@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { CircleUserRoundIcon } from 'lucide-react';
+import { AppToaster } from '@/presentation/components/feedback/app-toaster';
 import isologo from '../../../../public/brand/quina-isologo-verde.svg';
 
 /**
@@ -29,6 +30,7 @@ export async function PortalShell({ children }: { children: React.ReactNode }) {
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pt-6 pb-16 text-lg leading-relaxed">
         {children}
       </main>
+      <AppToaster />
     </div>
   );
 }

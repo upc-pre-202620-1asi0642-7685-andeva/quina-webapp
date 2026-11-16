@@ -231,7 +231,17 @@ export function allHrefs(groups: NavGroup[], extra: NavItem[] = []): string[] {
   ];
 }
 
-export type CrumbLabel = 'detail' | 'new' | 'edit' | 'pay' | 'terms' | 'cycle' | 'billing';
+export type CrumbLabel =
+  | 'detail'
+  | 'new'
+  | 'edit'
+  | 'pay'
+  | 'terms'
+  | 'cycle'
+  | 'billing'
+  | 'security'
+  | 'preferences'
+  | 'access';
 export type Crumb = { href: string } & ({ key: NavKey } | { label: CrumbLabel });
 
 const SEGMENT_LABELS: Record<string, CrumbLabel> = {
@@ -241,6 +251,9 @@ const SEGMENT_LABELS: Record<string, CrumbLabel> = {
   terms: 'terms',
   cycles: 'cycle',
   billing: 'billing',
+  security: 'security',
+  preferences: 'preferences',
+  access: 'access',
 };
 const isId = (segment: string) => /^[0-9a-f-]{8,}$/i.test(segment) || /^\d+$/.test(segment);
 
