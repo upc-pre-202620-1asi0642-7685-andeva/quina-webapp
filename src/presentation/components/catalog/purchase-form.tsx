@@ -1,10 +1,15 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { LockIcon, PaperclipIcon, PlusIcon, Trash2Icon } from 'lucide-react';
+import { LockIcon, PaperclipIcon, PlusIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { PURCHASE_DOCUMENT_TYPES, type PurchaseDocumentType } from '@/core/domain/catalog/purchase';
+import {
+  ATTACHMENT_MIME_TYPES,
+  type AttachmentMimeType,
+  MAX_ATTACHMENT_BYTES,
+} from '@/core/domain/catalog/purchase-attachment';
 import type { SupplierOption } from '@/core/domain/ports/purchase-repository';
 import {
   registerPurchaseAction,
@@ -12,6 +17,8 @@ import {
   type PurchaseFormState,
 } from '@/presentation/actions/purchases';
 import { FormField } from '@/presentation/components/auth/form-field';
+import { NativeSelect } from '@/presentation/components/forms/native-select';
+import { formatMoney } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { Button, buttonVariants } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -40,6 +47,11 @@ type LineState = {
   quantity: string;
   unitCost: string;
 };
+
+function parseLineNumber(raw: string): number | null {
+  const value = Number(raw.trim().replace(',', '.'));
+  return Number.isFinite(value) ? value : null;
+}
 
 export function PurchaseForm({
   suppliers: initialSuppliers,
@@ -72,6 +84,12 @@ export function PurchaseForm({
   const [documentNumber, setDocumentNumber] = useState('');
   const [issueDate, setIssueDate] = useState(defaultDate);
   const [notes, setNotes] = useState('');
+  const [selectedAttachment, setSelectedAttachment] = useState<{
+    name: string;
+    sizeKb: number;
+  } | null>(null);
+  const [clientErrors, setClientErrors] = useState<Partial<Record<PurchaseField, string>>>({});
+  const attachmentRef = useRef<HTMLInputElement | null>(null);
 
   const [lines, setLines] = useState<LineState[]>(() => {
     if (initialOrder && initialOrder.items.length > 0) {
@@ -104,29 +122,37 @@ export function PurchaseForm({
   const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
 
   const addLine = () => {
+    const usedIds = new Set(lines.map((l) => l.productId));
+    const nextProduct = products.find((p) => !usedIds.has(p.id)) ?? products[0];
     setLines((prev) => [
       ...prev,
       {
         key: `line-${Date.now()}-${prev.length}`,
-        productId: products[0]?.id ?? '',
+        productId: nextProduct?.id ?? '',
         quantity: '1',
-        unitCost: '',
+        unitCost:
+          nextProduct && Number(nextProduct.currentAverageCost) > 0
+            ? nextProduct.currentAverageCost
+            : '',
       },
     ]);
+    setClientErrors((prev) => ({ ...prev, lines: undefined }));
   };
 
   const removeLine = (key: string) => {
     setLines((prev) => (prev.length > 1 ? prev.filter((l) => l.key !== key) : prev));
+    setClientErrors((prev) => ({ ...prev, lines: undefined }));
   };
 
   const updateLine = (key: string, patch: Partial<LineState>) => {
     setLines((prev) => prev.map((l) => (l.key === key ? { ...l, ...patch } : l)));
+    setClientErrors((prev) => ({ ...prev, lines: undefined }));
   };
 
   const totalEstimate = lines.reduce((acc, line) => {
-    const q = Number(line.quantity.replace(',', '.'));
-    const c = Number(line.unitCost.replace(',', '.'));
-    if (Number.isFinite(q) && Number.isFinite(c) && q > 0 && c >= 0) {
+    const q = parseLineNumber(line.quantity);
+    const c = parseLineNumber(line.unitCost);
+    if (q !== null && c !== null && q > 0 && c >= 0) {
       return acc + q * c;
     }
     return acc;
@@ -140,18 +166,88 @@ export function PurchaseForm({
     })),
   );
 
+  const errors = { ...state.errors, ...clientErrors };
   const fieldError = (field: PurchaseField) =>
-    state.errors?.[field] ? t(`errors.${state.errors[field]}`) : undefined;
+    errors[field] ? t(`errors.${errors[field]}`) : undefined;
+
+  function handleAttachmentChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setClientErrors((prev) => ({ ...prev, attachment: undefined }));
+    const file = event.target.files?.[0];
+    if (!file) {
+      setSelectedAttachment(null);
+      return;
+    }
+    if (!ATTACHMENT_MIME_TYPES.includes(file.type as AttachmentMimeType)) {
+      setClientErrors((prev) => ({ ...prev, attachment: 'attachmentType' }));
+      setSelectedAttachment(null);
+      return;
+    }
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      setClientErrors((prev) => ({ ...prev, attachment: 'attachmentTooLarge' }));
+      setSelectedAttachment(null);
+      return;
+    }
+    setSelectedAttachment({
+      name: file.name,
+      sizeKb: Math.max(1, Math.round(file.size / 1024)),
+    });
+  }
+
+  function clearAttachment() {
+    if (attachmentRef.current) attachmentRef.current.value = '';
+    setSelectedAttachment(null);
+    setClientErrors((prev) => ({ ...prev, attachment: undefined }));
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const next: Partial<Record<PurchaseField, string>> = {};
+    if (!supplierId.trim()) next.supplierId = 'supplierRequired';
+    if (!documentNumber.trim()) next.documentNumber = 'documentNumberInvalid';
+    if (!issueDate.trim()) next.issueDate = 'issueDateInvalid';
+
+    const seenProducts = new Set<string>();
+    for (const line of lines) {
+      if (!line.productId) {
+        next.lines = 'productInvalid';
+        break;
+      }
+      if (seenProducts.has(line.productId)) {
+        next.lines = 'duplicateProduct';
+        break;
+      }
+      seenProducts.add(line.productId);
+      const q = parseLineNumber(line.quantity);
+      const c = parseLineNumber(line.unitCost);
+      if (q === null || q <= 0) {
+        next.lines = 'quantityInvalid';
+        break;
+      }
+      if (c === null || c <= 0) {
+        next.lines = 'unitCostInvalid';
+        break;
+      }
+    }
+
+    const file = attachmentRef.current?.files?.[0];
+    if (file && !ATTACHMENT_MIME_TYPES.includes(file.type as AttachmentMimeType)) {
+      next.attachment = 'attachmentType';
+    } else if (file && file.size > MAX_ATTACHMENT_BYTES) {
+      next.attachment = 'attachmentTooLarge';
+    }
+
+    setClientErrors(next);
+    if (Object.keys(next).length > 0) event.preventDefault();
+  }
 
   return (
     <>
-      <form action={formAction} className="flex flex-col gap-6">
+      <form action={formAction} onSubmit={handleSubmit} className="flex flex-col gap-6">
         {initialOrder ? (
           <input type="hidden" name="purchaseOrderId" value={initialOrder.id} />
         ) : null}
         <input type="hidden" name="linesJson" value={linesJson} />
 
-        {state.errors?.form ? (
+        {errors.form ? (
           <Notice tone="error">
             <p>{fieldError('form')}</p>
           </Notice>
@@ -179,13 +275,15 @@ export function PurchaseForm({
               error={fieldError('supplierId')}
             >
               {(props) => (
-                <select
+                <NativeSelect
                   {...props}
                   name="supplierId"
                   value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
+                  onChange={(e) => {
+                    setSupplierId(e.target.value);
+                    setClientErrors((prev) => ({ ...prev, supplierId: undefined }));
+                  }}
                   required
-                  className="h-11 w-full rounded-field border border-line bg-surface px-3.5 text-base text-ink focus-visible:outline-2 focus-visible:outline-link-active"
                 >
                   <option value="">{t('supplierNone')}</option>
                   {suppliers.map((s) => (
@@ -193,7 +291,7 @@ export function PurchaseForm({
                       {s.tradeName} ({s.taxIdNumber})
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               )}
             </FormField>
 
@@ -222,19 +320,18 @@ export function PurchaseForm({
               error={fieldError('documentType')}
             >
               {(props) => (
-                <select
+                <NativeSelect
                   {...props}
                   name="documentType"
                   value={documentType}
                   onChange={(e) => setDocumentType(e.target.value as PurchaseDocumentType)}
-                  className="h-11 w-full rounded-field border border-line bg-surface px-3.5 text-base text-ink focus-visible:outline-2 focus-visible:outline-link-active"
                 >
                   {PURCHASE_DOCUMENT_TYPES.map((dt) => (
                     <option key={dt} value={dt}>
                       {tDocs(dt)}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               )}
             </FormField>
 
@@ -267,7 +364,10 @@ export function PurchaseForm({
                     {...props}
                     name="documentNumber"
                     value={documentNumber}
-                    onChange={(e) => setDocumentNumber(e.target.value)}
+                    onChange={(e) => {
+                      setDocumentNumber(e.target.value);
+                      setClientErrors((prev) => ({ ...prev, documentNumber: undefined }));
+                    }}
                     placeholder="000123"
                     required
                     maxLength={20}
@@ -309,79 +409,102 @@ export function PurchaseForm({
           <div className="flex flex-col gap-3">
             {lines.map((line, index) => {
               const selectedProduct = products.find((p) => p.id === line.productId);
+              const q = parseLineNumber(line.quantity);
+              const c = parseLineNumber(line.unitCost);
+              const lineSubtotal =
+                q !== null && c !== null && q > 0 && c > 0 ? (q * c).toFixed(2) : null;
+              const otherSelectedIds = new Set(
+                lines.filter((l) => l.key !== line.key).map((l) => l.productId),
+              );
+
               return (
                 <div
                   key={line.key}
-                  className="grid gap-3 rounded-field border border-line bg-paper p-3 sm:grid-cols-[1fr_130px_150px_auto] sm:items-end"
+                  className="flex flex-col gap-3 rounded-field border border-line bg-paper p-3.5"
                 >
-                  <FormField
-                    id={`line-product-${index}`}
-                    label={t('productLabel')}
-                    hint={t('productHint')}
-                  >
-                    {(props) => (
-                      <select
-                        {...props}
-                        value={line.productId}
-                        onChange={(e) => updateLine(line.key, { productId: e.target.value })}
-                        required
-                        className="h-11 w-full rounded-field border border-line bg-surface px-3 text-sm text-ink focus-visible:outline-2 focus-visible:outline-link-active"
-                      >
-                        {products.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} ({p.unitCode})
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </FormField>
+                  <div className="grid gap-3 sm:grid-cols-[1fr_120px_140px_auto] sm:items-end">
+                    <FormField
+                      id={`line-product-${index}`}
+                      label={t('productLabel')}
+                      hint={t('productHint')}
+                    >
+                      {(props) => (
+                        <NativeSelect
+                          {...props}
+                          value={line.productId}
+                          onChange={(e) => updateLine(line.key, { productId: e.target.value })}
+                          required
+                        >
+                          {products.map((p) => (
+                            <option key={p.id} value={p.id} disabled={otherSelectedIds.has(p.id)}>
+                              {p.name} ({p.unitCode})
+                            </option>
+                          ))}
+                        </NativeSelect>
+                      )}
+                    </FormField>
 
-                  <FormField
-                    id={`line-qty-${index}`}
-                    label={`${t('quantityLabel')} (${selectedProduct?.unitCode ?? 'UND'})`}
-                    hint={t('quantityHint')}
-                  >
-                    {(props) => (
-                      <Input
-                        {...props}
-                        inputMode="decimal"
-                        value={line.quantity}
-                        onChange={(e) => updateLine(line.key, { quantity: e.target.value })}
-                        required
-                        className="tabular-nums"
-                      />
-                    )}
-                  </FormField>
+                    <FormField
+                      id={`line-qty-${index}`}
+                      label={`${t('quantityLabel')} (${selectedProduct?.unitCode ?? 'UND'})`}
+                      hint={t('quantityHint')}
+                    >
+                      {(props) => (
+                        <Input
+                          {...props}
+                          inputMode="decimal"
+                          value={line.quantity}
+                          onChange={(e) => updateLine(line.key, { quantity: e.target.value })}
+                          required
+                          className="tabular-nums"
+                        />
+                      )}
+                    </FormField>
 
-                  <FormField
-                    id={`line-cost-${index}`}
-                    label={t('unitCostLabel')}
-                    hint={t('unitCostHint')}
-                  >
-                    {(props) => (
-                      <Input
-                        {...props}
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        value={line.unitCost}
-                        onChange={(e) => updateLine(line.key, { unitCost: e.target.value })}
-                        required
-                        className="tabular-nums"
-                      />
-                    )}
-                  </FormField>
+                    <FormField
+                      id={`line-cost-${index}`}
+                      label={t('unitCostLabel')}
+                      hint={t('unitCostHint')}
+                    >
+                      {(props) => (
+                        <Input
+                          {...props}
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={line.unitCost}
+                          onChange={(e) => updateLine(line.key, { unitCost: e.target.value })}
+                          required
+                          className="tabular-nums"
+                        />
+                      )}
+                    </FormField>
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    disabled={lines.length <= 1}
-                    onClick={() => removeLine(line.key)}
-                    aria-label={t('removeLineAria')}
-                    className="text-error-ink hover:bg-error/12 hover:text-error-ink"
-                  >
-                    <Trash2Icon aria-hidden="true" className="size-4" />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={lines.length <= 1}
+                      onClick={() => removeLine(line.key)}
+                      aria-label={t('removeLineAria')}
+                      className="text-error-ink hover:bg-error/12 hover:text-error-ink"
+                    >
+                      <Trash2Icon aria-hidden="true" className="size-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line/70 pt-2 text-xs text-ink-soft tabular-nums">
+                    <span>
+                      {selectedProduct && Number(selectedProduct.currentAverageCost) > 0
+                        ? t('currentAvgCostRef', {
+                            cost: `S/ ${selectedProduct.currentAverageCost}`,
+                          })
+                        : t('noAvgCostYet')}
+                    </span>
+                    <span className="font-medium text-ink">
+                      {t('lineSubtotalLabel')}:{' '}
+                      {lineSubtotal ? formatMoney(lineSubtotal, 'PEN') : '—'}
+                    </span>
+                  </div>
                 </div>
               );
             })}
@@ -390,7 +513,7 @@ export function PurchaseForm({
           <div className="flex items-center justify-end gap-2 border-t border-line pt-3">
             <span className="text-sm text-ink-soft">{t('estimatedTotal')}:</span>
             <span className="text-lg font-semibold text-ink tabular-nums">
-              S/ {totalEstimate.toFixed(2)}
+              {formatMoney(totalEstimate.toFixed(2), 'PEN')}
             </span>
           </div>
         </section>
@@ -403,22 +526,41 @@ export function PurchaseForm({
           </div>
 
           {canAttachReceipt ? (
-            <FormField
-              id="purchase-receipt"
-              label={t('receiptLabel')}
-              hint={t('receiptHint')}
-              error={fieldError('attachment')}
-            >
-              {(props) => (
-                <input
-                  {...props}
-                  type="file"
-                  name="attachments"
-                  accept="image/jpeg,image/png,image/webp,application/pdf"
-                  className="block w-full text-sm text-ink file:mr-4 file:rounded-full file:border-0 file:bg-paper-deep file:px-4 file:py-2 file:text-sm file:font-medium file:text-ink hover:file:bg-surface-hover"
-                />
-              )}
-            </FormField>
+            <div className="flex flex-col gap-3">
+              <FormField
+                id="purchase-receipt"
+                label={t('receiptLabel')}
+                hint={t('receiptHint')}
+                error={fieldError('attachment')}
+              >
+                {(props) => (
+                  <input
+                    {...props}
+                    ref={attachmentRef}
+                    type="file"
+                    name="attachments"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={handleAttachmentChange}
+                    className="block w-full text-sm text-ink file:mr-4 file:rounded-full file:border-0 file:bg-paper-deep file:px-4 file:py-2 file:text-sm file:font-medium file:text-ink hover:file:bg-surface-hover"
+                  />
+                )}
+              </FormField>
+              {selectedAttachment ? (
+                <div className="flex items-center justify-between gap-3 rounded-field bg-paper-deep px-3.5 py-2 text-xs text-ink">
+                  <span className="truncate font-medium">
+                    {selectedAttachment.name} ({selectedAttachment.sizeKb} KB)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearAttachment}
+                    aria-label={t('clearReceipt')}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-ink-soft hover:bg-surface-hover hover:text-ink"
+                  >
+                    <XIcon aria-hidden="true" className="size-4" />
+                  </button>
+                </div>
+              ) : null}
+            </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-field bg-paper-deep p-3 text-sm text-ink-soft">
               <span className="flex items-center gap-2">
@@ -435,7 +577,7 @@ export function PurchaseForm({
           )}
         </section>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link href="/inventory/purchases" className={buttonVariants({ variant: 'secondary' })}>
             {t('cancel')}
           </Link>
@@ -451,6 +593,7 @@ export function PurchaseForm({
         onCreated={(supplier) => {
           setSuppliers((prev) => [...prev, supplier]);
           setSupplierId(supplier.id);
+          setClientErrors((prev) => ({ ...prev, supplierId: undefined }));
         }}
       />
     </>
