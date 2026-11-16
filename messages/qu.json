@@ -800,6 +800,7 @@
       "customersNew": "Llaqtamasita qillqay",
       "collectionsDue": "Cobranapaq",
       "collectionsOverdue": "Pachan pasasqa",
+      "collectionsPayments": "Recibos",
       "collectionsNotices": "Kunan willakuykuna",
       "lowStock": "Pisi stock",
       "collapse": "Barrata pakay",
@@ -2125,7 +2126,18 @@
       "paymentsTitle": "Pagokuna",
       "receipt": "Recibo {number} · {date}",
       "pay": "Cobray",
-      "remaining": "Kobranapaq puchuq"
+      "remaining": "Kobranapaq puchuq",
+      "statementSent": "{date} p'unchawpi cuentapa willakuynin kachasqa",
+      "olderPayableNotice": "Kay vecinopa ñawpaq mana pagasqa ciclonmi kan. Ñawpaq ciclomantam qallarina cobranapaq.",
+      "olderPayableLink": "Ñawpaq cicloman riy",
+      "filterLabel": "Ciclopa cargonkunata akllay",
+      "filter": {
+        "all": "Llapan",
+        "pending": "Confirmanapaq",
+        "objected": "Observasqa",
+        "voided": "Anulasqa"
+      },
+      "noMatchingLines": "Mana ima cargopas kay akllaywan tupanchu."
     },
     "charge": {
       "purchase": "{date} rantiy",
@@ -2184,7 +2196,8 @@
         "returnedItems": "Rurukunata kutichirqan",
         "pricingError": "Chanin pantay"
       },
-      "noteHint": "Pachapa qillqanpi qhipanqa."
+      "noteHint": "Pachapa qillqanpi qhipanqa.",
+      "clearNote": "Pichay"
     },
     "pay": {
       "back": "{name}man kutiy",
@@ -2229,7 +2242,23 @@
         "RECEIVED_TOO_LOW": "Chaskisqaqa llapanmanta pisim."
       },
       "exactChip": "Chaylla ({amount})",
-      "submitting": "Pagota qillqachkan..."
+      "submitting": "Pagota qillqachkan...",
+      "alreadyPaid": "Ña pagasqa",
+      "clearReceived": "Chaskisqa qullqita pichay",
+      "counterDetailsTitle": "Pago chaskinapaq datokuna",
+      "showQr": "QR qhawachiy",
+      "qrTitle": "{store}pa QRnin",
+      "qrHint": "Vecinota niy kay QRta escaneanampaq {amount}manta.",
+      "qrAlt": "Tiendapa cobro QR código",
+      "closeQr": "Wichqay",
+      "bankLabel": "Banco",
+      "accountLabel": "Cuenta yupay",
+      "cciLabel": "CCI",
+      "copy": "Copiay",
+      "copiedShort": "Copiasqa",
+      "copyDetailLabel": "{label}ta copiay",
+      "copiedDetail": "{label} copiasqa.",
+      "copyError": "Mana copiayta atikurqachu."
     },
     "receipt": {
       "back": "{name}man kutiy",
@@ -2238,6 +2267,7 @@
       "nextCycle": "Qhaway huk ciclo cobranapaq kanchu",
       "title": "Recibo {number}",
       "customer": "Vecino",
+      "documentNumber": "Doc. {doc}",
       "cycle": "Ciclopa kuchuynin",
       "method": "Imawan pagan",
       "collector": "Cobraq",
@@ -2245,22 +2275,75 @@
       "compensatory": "Compensatorio interés",
       "moratory": "{days, plural, one {# p'unchaw} other {# p'unchawkuna}} moratorio interés",
       "total": "Llapan pagasqa",
-      "print": "Imprimiy"
+      "print": "Imprimiy",
+      "copy": "Resumenta copiay",
+      "copiedShort": "Copiasqa",
+      "copied": "Recibopa resumen copiasqa.",
+      "copyError": "Mana resumenta copiayta atikurqachu.",
+      "whatsapp": "WhatsAppwan kachay",
+      "shareSummary": "{store}pa {number} comprobante ({date}) — {customer}: {amount} ({method})."
     },
     "page": {
       "title": "Cobranza",
       "subtitleManual": "Plan Caseropi willakuykunaqa mañakuptiykim lluqsin.",
       "subtitleAutomatic": "Resumenkuna, yuyarichiykuna, mora willakuykuna ima sapa paqarin kikinmanta lluqsin.",
+      "viewPortfolio": "Carterata qhaway",
+      "kpi": {
+        "collectable": "Cobranapaq",
+        "overdue": "Pasasqa",
+        "dueSoon": "3 p'unchawpi vencen",
+        "dueSoonHint": "Manaraq p'unchaw chayachkaptin yuyarichiy",
+        "objections": "Qhawanapaq observaciones",
+        "objectionsOwnerHint": "Confirmay utaq anulay",
+        "objectionsEmployeeHint": "Dueñopa qhawananta suyachkan",
+        "collectedToday": "Kunan cobrasqa",
+        "cyclesCount": "{count, plural, one {# ciclo} other {# ciclokuna}}",
+        "paymentsCount": "{count, plural, one {# cobro} other {# cobrokuna}}"
+      },
       "tabsLabel": "Cobranzapa partenkuna",
       "tabs": {
         "due": "Cobranapaq",
         "overdue": "Pasasqa",
+        "objections": "Observaciones",
+        "payments": "Recibos",
         "notices": "Kunan willakuykuna"
       },
       "noDue": "Mana ciclokuna cobranapaqchu kan.",
       "noOverdue": "Mana mayqen vecinopas pasasqa pagoyuqchu.",
       "noNotices": "Kunanqa manaraq willakuy lluqsinchu.",
+      "noObjections": "Mana observasqa cargokuna suyachkanchu.",
+      "noPayments": "Manaraq pagokuna qillqasqachu kan.",
+      "filteredEmpty": "Mana kay akllaywan tupanchu.",
+      "fixEmail": "Correota allichay",
+      "viewCustomer": "Vecinota qhaway",
       "dueOn": "{date} p'unchawkama pagay",
+      "daysLate": "{count, plural, one {# p'unchaw qhipasqa} other {# p'unchawkuna qhipasqa}}",
+      "dueToday": "Kunan p'unchaw vencen",
+      "dueInDays": "{count, plural, one {# p'unchawpi vencen} other {# p'unchawkunapi vencen}}",
+      "cycleNumber": "Ciclo {number} · {date}",
+      "objectedCount": "{count, plural, one {# observasqa cargo} other {# observasqa cargokuna}}",
+      "bouncedBadge": "Correo kutimurqa",
+      "viewCycle": "Ciclota qhaway",
+      "review": "Qhaway",
+      "blocked": "Wisqasqa",
+      "whatsappCustomer": "{name}man WhatsAppwan qillqay",
+      "whatsappReminder": "Allillanchu {name}, {date} p'unchawpi pagana {amount} fiadoykita yuyarichiyki. Sulpayki.",
+      "table": {
+        "customer": "Vecino",
+        "cycle": "Ciclo",
+        "due": "Vencimiento",
+        "status": "Imayna kachkan",
+        "amount": "Cobranapaq",
+        "actions": "Ruranakuna"
+      },
+      "paymentsTable": {
+        "receipt": "Recibo",
+        "customer": "Vecino",
+        "method": "Imawan",
+        "collector": "Cobraq",
+        "amount": "Chanin",
+        "viewReceipt": "Recibota qhaway"
+      },
       "noticeType": {
         "CHARGE_DIGEST": "Rantikunapa resumen",
         "CYCLE_STATEMENT": "Cuentapa willakuynin",
@@ -2276,11 +2359,39 @@
         "FAILED": "Pantarqa"
       }
     },
+    "controls": {
+      "searchLabel": "Cobranzapi maskay",
+      "searchPlaceholder": "Vecinopa sutinwan maskay...",
+      "searchPaymentsPlaceholder": "Vecinowan, recibowan utaq cobraqwan maskay...",
+      "clearSearch": "Maskayta pichay",
+      "searchSubmit": "Maskay",
+      "sortLabel": "Cobranzata allichay",
+      "sort": {
+        "dueDate": "Astawan qaylla vencimiento",
+        "amountDesc": "Hatun chanin",
+        "name": "Suti (A-Z)"
+      },
+      "filters": {
+        "all": "Llapan",
+        "dueSoon": "Qayllapi vencen",
+        "blocked": "Observasqa",
+        "bounced": "Correo kutimusqa"
+      },
+      "clearAll": "Akllayta pichay"
+    },
+    "objections": {
+      "cycleLabel": "{number} ciclo ({date} kuchuy)",
+      "viewCycle": "Ciclopi qhaway"
+    },
     "manual": {
       "title": "Vecinoykikunaman willakuykuna",
       "hint": "Rantikunapa resumenqa 48 horakunata kichan vecino huk cargota observananpaq. Yuyarichiyqa 3 p'unchawpi utaq pisipi pagaqkunamanmi rin.",
       "digests": "Rantikunapa resumenta kachay",
       "reminders": "Yuyarichiykunata kachay",
+      "previewDigests": "{count, plural, one {# resumen suyachkan} other {# resumenkuna suyachkan}}",
+      "previewReminders": "{count, plural, one {# yuyarichiy qayllapi} other {# yuyarichiykuna qayllapi}}",
+      "bouncedNotice": "{count, plural, one {# vecinopa correon kutimurqa, manam willakuykunata chaskinchu.} other {# vecinokunapa correon kutimurqa, manam willakuykunata chaskinkuchu.}}",
+      "seeBounced": "Pikunamanta qhaway",
       "nothing": "Mana kachanapaq willakuykuna karqachu.",
       "sent": "{sent, plural, one {# willakuy kachakurqa.} other {# willakuykuna kachakurqa.}} {failed, plural, =0 {} one {# pantarqa; paqarin yapamanta kachakunqa.} other {# pantarqa; paqarin yapamanta kachakunqa.}}",
       "errors": {

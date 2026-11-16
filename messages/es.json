@@ -799,6 +799,7 @@
       "customersNew": "Registrar vecino",
       "collectionsDue": "Por cobrar",
       "collectionsOverdue": "Vencidos",
+      "collectionsPayments": "Recibos",
       "collectionsNotices": "Avisos de hoy",
       "lowStock": "Stock bajo",
       "collapse": "Plegar la barra",
@@ -2124,7 +2125,18 @@
       "paymentsTitle": "Pagos",
       "receipt": "Recibo {number} · {date}",
       "pay": "Cobrar",
-      "remaining": "Saldo por cobrar"
+      "remaining": "Saldo por cobrar",
+      "statementSent": "Estado de cuenta enviado el {date}",
+      "olderPayableNotice": "Este vecino tiene un ciclo anterior pendiente. Para cobrar en orden, primero se cobra el ciclo más antiguo.",
+      "olderPayableLink": "Ir al ciclo más antiguo",
+      "filterLabel": "Filtrar cargos del ciclo",
+      "filter": {
+        "all": "Todos",
+        "pending": "Por confirmar",
+        "objected": "Observados",
+        "voided": "Anulados"
+      },
+      "noMatchingLines": "Ningún cargo coincide con ese filtro."
     },
     "charge": {
       "purchase": "Compra del {date}",
@@ -2183,7 +2195,8 @@
         "returnedItems": "Devolvió los productos",
         "pricingError": "Error de precio o cantidad"
       },
-      "noteHint": "Queda registrado en el historial del ciclo."
+      "noteHint": "Queda registrado en el historial del ciclo.",
+      "clearNote": "Limpiar"
     },
     "pay": {
       "back": "Volver a {name}",
@@ -2228,7 +2241,23 @@
         "RECEIVED_TOO_LOW": "Lo recibido es menos que el total."
       },
       "exactChip": "Exacto ({amount})",
-      "submitting": "Registrando cobro..."
+      "submitting": "Registrando cobro...",
+      "alreadyPaid": "Ya abonado",
+      "clearReceived": "Limpiar monto recibido",
+      "counterDetailsTitle": "Datos para recibir el pago",
+      "showQr": "Mostrar QR",
+      "qrTitle": "QR de {store}",
+      "qrHint": "Pídele al vecino que escanee este QR por {amount}.",
+      "qrAlt": "Código QR de cobro de la tienda",
+      "closeQr": "Cerrar",
+      "bankLabel": "Banco",
+      "accountLabel": "Número de cuenta",
+      "cciLabel": "CCI",
+      "copy": "Copiar",
+      "copiedShort": "Copiado",
+      "copyDetailLabel": "Copiar {label}",
+      "copiedDetail": "{label} copiado.",
+      "copyError": "No se pudo copiar."
     },
     "receipt": {
       "back": "Volver a {name}",
@@ -2237,6 +2266,7 @@
       "nextCycle": "Ver si queda otro ciclo por cobrar",
       "title": "Recibo {number}",
       "customer": "Vecino",
+      "documentNumber": "Doc. {doc}",
       "cycle": "Ciclo con corte",
       "method": "Medio de pago",
       "collector": "Cobró",
@@ -2244,22 +2274,75 @@
       "compensatory": "Interés compensatorio",
       "moratory": "Intereses moratorios por {days, plural, one {# día} other {# días}}",
       "total": "Total pagado",
-      "print": "Imprimir"
+      "print": "Imprimir",
+      "copy": "Copiar resumen",
+      "copiedShort": "Copiado",
+      "copied": "Resumen del recibo copiado.",
+      "copyError": "No se pudo copiar el resumen.",
+      "whatsapp": "Enviar por WhatsApp",
+      "shareSummary": "Comprobante {number} de {store} ({date}) — {customer}: {amount} por {method}."
     },
     "page": {
       "title": "Cobranza",
       "subtitleManual": "En el Plan Casero los avisos salen cuando tú lo pides.",
       "subtitleAutomatic": "Los resúmenes, recordatorios y avisos de mora salen solos cada mañana.",
+      "viewPortfolio": "Ver cartera",
+      "kpi": {
+        "collectable": "Por cobrar",
+        "overdue": "Vencidos",
+        "dueSoon": "Vencen en 3 días",
+        "dueSoonHint": "Para recordar antes del vencimiento",
+        "objections": "Observaciones por revisar",
+        "objectionsOwnerHint": "Toca para confirmar o anular",
+        "objectionsEmployeeHint": "Pendiente de revisión del dueño",
+        "collectedToday": "Cobrado hoy",
+        "cyclesCount": "{count, plural, one {# ciclo} other {# ciclos}}",
+        "paymentsCount": "{count, plural, one {# cobro} other {# cobros}}"
+      },
       "tabsLabel": "Secciones de cobranza",
       "tabs": {
         "due": "Por cobrar",
         "overdue": "Vencidos",
+        "objections": "Observaciones",
+        "payments": "Recibos",
         "notices": "Avisos de hoy"
       },
       "noDue": "No hay ciclos por cobrar.",
       "noOverdue": "Ningún vecino tiene pagos vencidos.",
       "noNotices": "Hoy todavía no salió ningún aviso.",
+      "noObjections": "No hay cargos observados pendientes.",
+      "noPayments": "Todavía no hay cobros registrados.",
+      "filteredEmpty": "No hay resultados con esos filtros.",
+      "fixEmail": "Corregir correo",
+      "viewCustomer": "Ver ficha",
       "dueOn": "Paga hasta el {date}",
+      "daysLate": "{count, plural, one {# día de atraso} other {# días de atraso}}",
+      "dueToday": "Vence hoy",
+      "dueInDays": "Vence en {count, plural, one {# día} other {# días}}",
+      "cycleNumber": "Ciclo {number} · {date}",
+      "objectedCount": "{count, plural, one {# cargo observado} other {# cargos observados}}",
+      "bouncedBadge": "Correo rebotó",
+      "viewCycle": "Ver ciclo",
+      "review": "Revisar",
+      "blocked": "Bloqueado",
+      "whatsappCustomer": "Escribir por WhatsApp a {name}",
+      "whatsappReminder": "Hola {name}, te recordamos tu fiado de {amount} con fecha de pago {date}. Gracias.",
+      "table": {
+        "customer": "Vecino",
+        "cycle": "Ciclo",
+        "due": "Vencimiento",
+        "status": "Estado",
+        "amount": "Por cobrar",
+        "actions": "Acciones"
+      },
+      "paymentsTable": {
+        "receipt": "Recibo",
+        "customer": "Vecino",
+        "method": "Medio",
+        "collector": "Cobró",
+        "amount": "Monto",
+        "viewReceipt": "Ver recibo"
+      },
       "noticeType": {
         "CHARGE_DIGEST": "Resumen de compras",
         "CYCLE_STATEMENT": "Estado de cuenta",
@@ -2275,11 +2358,39 @@
         "FAILED": "Falló"
       }
     },
+    "controls": {
+      "searchLabel": "Buscar en cobranza",
+      "searchPlaceholder": "Buscar por nombre del vecino...",
+      "searchPaymentsPlaceholder": "Buscar por vecino, recibo o cobrador...",
+      "clearSearch": "Limpiar búsqueda",
+      "searchSubmit": "Buscar",
+      "sortLabel": "Ordenar cobranza",
+      "sort": {
+        "dueDate": "Más próximo a vencer",
+        "amountDesc": "Mayor monto",
+        "name": "Nombre (A-Z)"
+      },
+      "filters": {
+        "all": "Todos",
+        "dueSoon": "Vencen pronto",
+        "blocked": "Con observación",
+        "bounced": "Correo rebotado"
+      },
+      "clearAll": "Limpiar filtros"
+    },
+    "objections": {
+      "cycleLabel": "ciclo {number} (corte {date})",
+      "viewCycle": "Ver en el ciclo"
+    },
     "manual": {
       "title": "Avisos a tus vecinos",
       "hint": "El resumen de compras abre las 48 horas para que el vecino observe un cargo. El recordatorio va a quienes pagan en 3 días o menos.",
       "digests": "Enviar resumen de compras",
       "reminders": "Enviar recordatorios",
+      "previewDigests": "{count, plural, one {# resumen pendiente} other {# resúmenes pendientes}}",
+      "previewReminders": "{count, plural, one {# recordatorio por vencer} other {# recordatorios por vencer}}",
+      "bouncedNotice": "{count, plural, one {# vecino tiene el correo rebotado y no recibirá avisos.} other {# vecinos tienen el correo rebotado y no recibirán avisos.}}",
+      "seeBounced": "Ver cuáles",
       "nothing": "No había avisos pendientes por enviar.",
       "sent": "{sent, plural, one {Se envió # aviso.} other {Se enviaron # avisos.}} {failed, plural, =0 {} one {# falló; se reintenta mañana.} other {# fallaron; se reintentan mañana.}}",
       "errors": {
