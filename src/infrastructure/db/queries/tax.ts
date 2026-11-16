@@ -1,6 +1,7 @@
-import { and, desc, eq, gte, isNull, lte, notExists, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, lte, notExists, or, sql } from 'drizzle-orm';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import {
+  RUS_CATEGORIES,
   rusMonth,
   type RusCategory,
   type TaxRegime,
@@ -91,4 +92,60 @@ export async function loadRusStatus(storeId: string, now: Date): Promise<RusStat
   });
 
   return { category: settings.rusCategory, ...totals, caps: cap ?? null };
+}
+
+export type RusCategoryCaps = { income: string; purchases: string };
+
+export type StoreTaxContext = {
+  taxIdType: 'RUC' | 'DNI';
+  taxIdNumber: string;
+  rusCaps: Record<RusCategory, RusCategoryCaps | null>;
+};
+
+/** Contexto tributario de la tienda: RUC/DNI y topes vigentes de Categoría 1 y 2 del Nuevo RUS. */
+export async function getStoreTaxContext(
+  storeId: string,
+  now: Date = new Date(),
+): Promise<StoreTaxContext> {
+  const { from, to } = rusMonth(now);
+  const fromISO = BusinessDate.toISO(from);
+  const toISO = BusinessDate.toISO(to);
+
+  return withTenant(storeId, async (tx) => {
+    const [store] = await tx
+      .select({ taxIdType: stores.taxIdType, taxIdNumber: stores.taxIdNumber })
+      .from(stores)
+      .where(eq(stores.id, storeId));
+    if (!store) throw new Error(`La tienda ${storeId} no existe`);
+
+    const rows = await tx
+      .select({
+        category: rusCategories.category,
+        income: rusCategories.monthlyIncomeCap,
+        purchases: rusCategories.monthlyPurchasesCap,
+      })
+      .from(rusCategories)
+      .where(
+        and(
+          inArray(rusCategories.category, [...RUS_CATEGORIES]),
+          lte(rusCategories.validFrom, toISO),
+          or(isNull(rusCategories.validTo), gte(rusCategories.validTo, fromISO)),
+        ),
+      )
+      .orderBy(desc(rusCategories.validFrom));
+
+    const rusCaps: Record<RusCategory, RusCategoryCaps | null> = { 1: null, 2: null };
+    for (const row of rows) {
+      const cat = row.category as RusCategory;
+      if ((cat === 1 || cat === 2) && rusCaps[cat] === null) {
+        rusCaps[cat] = { income: row.income, purchases: row.purchases };
+      }
+    }
+
+    return {
+      taxIdType: store.taxIdType as 'RUC' | 'DNI',
+      taxIdNumber: store.taxIdNumber,
+      rusCaps,
+    };
+  });
 }
