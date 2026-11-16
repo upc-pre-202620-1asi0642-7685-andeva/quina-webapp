@@ -25,7 +25,7 @@ export async function ReceiptCard({
   const currency = receipt.currency;
 
   return (
-    <article className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6 print:border-0 print:p-0">
+    <article className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6 print:border-0 print:p-0 print:shadow-none">
       <header className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className={cn('text-ink-soft', meta)}>
@@ -48,6 +48,11 @@ export async function ReceiptCard({
           <dd className="font-medium text-ink">
             {receipt.customer.firstName} {receipt.customer.lastName}
           </dd>
+          {receipt.customer.documentNumber ? (
+            <dd className="text-[13px] text-ink-soft tabular-nums">
+              {t('documentNumber', { doc: receipt.customer.documentNumber })}
+            </dd>
+          ) : null}
         </div>
         <div className="flex flex-col gap-0.5">
           <dt className="text-ink-soft">{t('cycle')}</dt>
