@@ -10,7 +10,13 @@ import { cn } from '@/presentation/lib/utils';
 const BAR: Record<RusLevel, string> = { ok: 'bg-primary', warning: 'bg-amber', over: 'bg-error' };
 
 /** US21: asistente tributario informativo con las ventas y compras del mes frente a los topes. */
-export async function RusCard({ status }: { status: RusStatus }) {
+export async function RusCard({
+  status,
+  embedded = false,
+}: {
+  status: RusStatus;
+  embedded?: boolean;
+}) {
   const t = await getTranslations('Tax.rus');
   const rows = status.caps
     ? (['sales', 'purchases'] as const).map((kind) => {
@@ -26,19 +32,13 @@ export async function RusCard({ status }: { status: RusStatus }) {
     : [];
   const alert = rows.find((row) => row.level === 'over') ?? rows.find((r) => r.level !== 'ok');
 
-  return (
-    <section
-      aria-labelledby="rus-title"
-      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-6"
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="rus-title" className="text-lg font-semibold text-ink">
-          {t('title')}
-        </h2>
-        <span className="text-sm text-ink-soft">
+  const body = (
+    <>
+      {embedded ? (
+        <span className="inline-flex w-fit rounded-full bg-paper-deep px-2.5 py-0.5 text-xs font-medium text-ink-soft">
           {t('category', { category: status.category })}
         </span>
-      </div>
+      ) : null}
 
       {status.caps ? (
         <>
@@ -88,6 +88,25 @@ export async function RusCard({ status }: { status: RusStatus }) {
           {t('changeCategory')}
         </Link>
       </p>
+    </>
+  );
+
+  if (embedded) return <div className="flex flex-1 flex-col justify-between gap-4">{body}</div>;
+
+  return (
+    <section
+      aria-labelledby="rus-title"
+      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-6"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="rus-title" className="text-lg font-semibold text-ink">
+          {t('title')}
+        </h2>
+        <span className="text-sm text-ink-soft">
+          {t('category', { category: status.category })}
+        </span>
+      </div>
+      {body}
     </section>
   );
 }

@@ -458,7 +458,7 @@ export function NotificationsMenu({
         {unread > 0 ? (
           <span
             className={cn(
-              'flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-error px-1 text-[0.625rem] font-bold text-white tabular-nums',
+              'flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-error px-1 text-[0.625rem] font-bold text-white tabular-nums',
               row ? 'ml-auto' : 'absolute top-1.5 right-1.5 ring-2 ring-surface',
             )}
           >
@@ -468,11 +468,14 @@ export function NotificationsMenu({
         {row && unread > 0 ? <span className="sr-only">{t('unread')}</span> : null}
       </PopoverTrigger>
       <PopoverContent
-        side={compact ? 'bottom' : 'right'}
+        // Con la barra abierta sube sobre el botón (donde ya está el cursor); plegada sale al costado
+        side={compact ? 'bottom' : collapsed ? 'right' : 'top'}
         align={compact ? 'end' : collapsed ? 'end' : 'start'}
-        sideOffset={12}
+        sideOffset={8}
+        collisionPadding={16}
         className={cn(
-          'flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden p-0',
+          'flex max-h-[min(32rem,calc(100dvh-2rem))] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden p-0',
+          '--ease-out-expo duration-120 data-[side=top]:slide-in-from-bottom-1 data-[state=closed]:duration-75',
           layer,
           'p-0',
         )}
@@ -525,7 +528,7 @@ export function NotificationsMenu({
                         TONE[item.tone],
                       )}
                     >
-                      <Icon className="size-[18px]" />
+                      <Icon className="size-4.5" />
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <span

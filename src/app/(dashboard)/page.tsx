@@ -37,6 +37,8 @@ export default async function DashboardHomePage() {
       layout={layout}
       defaultLayout={defaultLayout}
       nodes={nodes}
+      role={user.role}
+      tier={store.tier}
       heading={
         <header className="flex min-w-0 flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight text-ink">

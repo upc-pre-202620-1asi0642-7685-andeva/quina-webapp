@@ -15,6 +15,7 @@ import {
   GemIcon,
   HandCoinsIcon,
   HouseIcon,
+  LayoutDashboard,
   LandmarkIcon,
   LayoutGridIcon,
   ListIcon,
@@ -57,7 +58,7 @@ import {
 import { CreateMenu, NotificationsMenu, ProfileMenu } from './shell-menus';
 
 const ICONS: Record<NavKey, LucideIcon> = {
-  home: HouseIcon,
+  home: LayoutDashboard,
   sell: ShoppingBasketIcon,
   customers: UsersIcon,
   customersAll: ListIcon,
@@ -278,7 +279,7 @@ function SidebarGroupItem({
         <ChevronDownIcon
           aria-hidden="true"
           className={cn(
-            'size-4 shrink-0 transition-transform duration-200 ease-(--ease-out-expo) motion-reduce:transition-none',
+            '--ease-out-expo size-4 shrink-0 transition-transform duration-200 motion-reduce:transition-none',
             item.badge && !open ? '' : 'ml-auto',
             open ? 'rotate-180' : '',
           )}
@@ -288,13 +289,13 @@ function SidebarGroupItem({
       <div
         id={panelId}
         className={cn(
-          'grid transition-[grid-template-rows] duration-200 ease-(--ease-out-expo) motion-reduce:transition-none',
+          '--ease-out-expo grid transition-[grid-template-rows] duration-200 motion-reduce:transition-none',
           open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
         )}
         inert={!open}
       >
         <div className="overflow-hidden">
-          <div className="ml-[1.625rem] flex flex-col gap-0.5 border-l border-line py-1 pl-2">
+          <div className="ml-6.5 flex flex-col gap-0.5 border-l border-line py-1 pl-2">
             {item.children.map((child) => (
               <SidebarLink key={child.key} item={child} active={child.href === active} nested />
             ))}
@@ -330,7 +331,7 @@ function SidebarNav({
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 rounded-full bg-soft transition-[transform,opacity] duration-250 ease-(--ease-out-expo) motion-reduce:transition-none"
+        className="--ease-out-expo pointer-events-none absolute top-0 left-0 rounded-full bg-soft transition-[transform,opacity] duration-250 motion-reduce:transition-none"
         style={{
           width: box?.w ?? 0,
           height: box?.h ?? 0,
@@ -420,7 +421,7 @@ export function Sidebar({
       <aside
         className={cn(
           'sticky top-0 hidden h-dvh shrink-0 flex-col gap-3 border-r border-line bg-surface py-4 lg:flex print:hidden',
-          collapsed ? 'w-[76px] px-2' : 'w-64 px-4',
+          collapsed ? 'w-19 px-2' : 'w-64 px-4',
         )}
       >
         <div
@@ -571,7 +572,8 @@ function ModuleTile({
   onPick: () => void;
 }) {
   const t = useTranslations('Shell.nav');
-  const Icon = ICONS[item.key];
+  const Icon = item.key === 'home' ? HouseIcon : ICONS[item.key];
+  const label = item.key === 'home' ? t('homeMobile') : t(item.key);
   return (
     <Link
       href={item.href}
@@ -585,7 +587,7 @@ function ModuleTile({
       )}
     >
       <Icon aria-hidden="true" className="size-6" />
-      <span className="line-clamp-2">{t(item.key)}</span>
+      <span className="line-clamp-2">{label}</span>
       {item.badge ? (
         <span className="absolute top-1.5 right-1.5 rounded-full bg-amber/12 px-1.5 text-[0.6875rem] font-semibold text-amber-ink tabular-nums">
           {item.badge}
@@ -634,7 +636,7 @@ export function MobileNav({
         <ul className="pointer-events-auto relative flex h-16 flex-1 items-stretch rounded-full border border-line bg-surface p-1.5 shadow-float">
           <li
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-1.5 left-1.5 rounded-full bg-paper-deep transition-transform duration-250 ease-(--ease-out-expo) motion-reduce:transition-none"
+            className="--ease-out-expo pointer-events-none absolute inset-y-1.5 left-1.5 rounded-full bg-paper-deep transition-transform duration-250 motion-reduce:transition-none"
             style={{
               width: `calc((100% - 0.75rem) / ${slots})`,
               transform: `translateX(${Math.max(0, indicatorIndex) * 100}%)`,
@@ -642,7 +644,8 @@ export function MobileNav({
             }}
           />
           {tabs.map((item) => {
-            const Icon = ICONS[item.key];
+            const Icon = item.key === 'home' ? HouseIcon : ICONS[item.key];
+            const label = item.key === 'home' ? t('homeMobile') : t(item.key);
             const isActive = contains(item, active);
             return (
               <li key={item.key} className="relative flex flex-1">
@@ -657,7 +660,7 @@ export function MobileNav({
                   )}
                 >
                   <Icon aria-hidden="true" className="size-5" strokeWidth={isActive ? 2.25 : 2} />
-                  {t(item.key)}
+                  {label}
                 </Link>
               </li>
             );
@@ -703,7 +706,7 @@ export function MobileNav({
           side="bottom"
           showCloseButton={false}
           aria-describedby={undefined}
-          className="max-h-[85dvh] gap-0 rounded-t-sheet border-line bg-surface pb-[max(1rem,env(safe-area-inset-bottom))] data-[state=closed]:duration-200 data-[state=open]:duration-250 lg:hidden"
+          className="max-h-[85dvh] gap-0 rounded-t-sheet border-line bg-surface pb-[max(1.25rem,env(safe-area-inset-bottom))] data-[state=closed]:duration-200 data-[state=open]:duration-250 lg:hidden"
           style={{
             transform: dy ? `translateY(${dy}px)` : undefined,
             transition: dy ? 'none' : undefined,
@@ -711,16 +714,16 @@ export function MobileNav({
         >
           <div
             {...handlers}
-            className="flex cursor-grab touch-none flex-col items-center gap-3 px-4 pt-3 pb-2"
+            className="flex shrink-0 cursor-grab touch-none flex-col items-center gap-3 px-4 pt-3 pb-2"
           >
             <span aria-hidden="true" className="h-1.5 w-10 rounded-full bg-line" />
             <SheetTitle className="self-start text-lg font-semibold text-ink">
               {t('modulesTitle')}
             </SheetTitle>
           </div>
-          <div className="flex flex-col gap-5 overflow-y-auto overscroll-contain px-4 pb-2">
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-1 pb-2">
             {groups.map((group) => (
-              <section key={group.key} className="flex flex-col gap-2">
+              <section key={group.key} className="flex shrink-0 flex-col gap-2">
                 <h3 className="text-[0.6875rem] font-semibold tracking-wider text-ink-soft uppercase">
                   {t(`groups.${group.key}`)}
                 </h3>
@@ -736,30 +739,49 @@ export function MobileNav({
                 </div>
               </section>
             ))}
-            <section className="flex flex-col overflow-hidden rounded-card border border-line">
+            <section className="flex shrink-0 flex-col overflow-hidden rounded-card border border-line bg-paper">
               {secondary.map((item) => {
                 const Icon = ICONS[item.key];
+                const isActive = item.href === active;
                 return (
                   <Link
                     key={item.key}
                     href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={close}
                     className={cn(
-                      'flex h-13 items-center gap-3 border-b border-line px-4 text-sm font-medium text-ink last:border-b-0',
+                      'flex min-h-12 shrink-0 items-center gap-3 border-b border-line px-4 text-sm font-medium transition-colors',
+                      isActive ? 'bg-soft text-soft-ink' : 'text-ink hover:bg-surface-hover',
                       focusRing,
+                      press,
                     )}
                   >
-                    <Icon aria-hidden="true" className="size-5 text-ink-soft" />
+                    <Icon
+                      aria-hidden="true"
+                      className={cn('size-5', isActive ? 'text-soft-ink' : 'text-ink-soft')}
+                    />
                     {t(item.key)}
                   </Link>
                 );
               })}
               <Link
                 href="/profile"
+                aria-current={active === '/profile' ? 'page' : undefined}
                 onClick={close}
-                className={cn('flex h-15 items-center gap-3 px-4 text-sm', focusRing)}
+                className={cn(
+                  'flex min-h-14 shrink-0 items-center gap-3 px-4 py-2 text-sm transition-colors',
+                  active === '/profile' ? 'bg-soft text-soft-ink' : 'hover:bg-surface-hover',
+                  focusRing,
+                  press,
+                )}
               >
-                <CircleUserRoundIcon aria-hidden="true" className="size-6 text-ink-soft" />
+                <CircleUserRoundIcon
+                  aria-hidden="true"
+                  className={cn(
+                    'size-6 shrink-0',
+                    active === '/profile' ? 'text-soft-ink' : 'text-ink-soft',
+                  )}
+                />
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate font-medium text-ink">{user.name}</span>
                   <span className="truncate text-xs text-ink-soft">{user.storeName}</span>

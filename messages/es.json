@@ -275,23 +275,63 @@
       "add": "Agregar widget",
       "addShort": "Agregar",
       "addOne": "Agregar {name}",
-      "addTitle": "Agregar a tu Inicio",
-      "addSubtitle": "Elige lo que quieres ver apenas abres Quina.",
-      "allAdded": "Ya tienes todos los widgets en tu Inicio.",
+      "addTitle": "Agregar a tu Dashboard",
+      "addSubtitle": "Elige lo que quieres ver apenas abres Quina o aplica una plantilla.",
+      "allAdded": "Ya tienes todos los widgets en tu Dashboard.",
       "reset": "Volver al diseño inicial",
+      "resetShort": "Restablecer",
       "hint": "Arrastra cada tarjeta desde su asa o usa las flechas. Los cambios se guardan solos.",
+      "hintDesktop": "Arrastra cada tarjeta desde su barra superior o tira de la esquina inferior derecha para agrandarla o achicarla en tiempo real.",
       "drag": "Mover {name}",
       "dragHelp": "Arrastra o usa las flechas del teclado para cambiar el orden.",
+      "sizeGroup": "Tamaño de {name}",
+      "resize": "Cambiar tamaño de {name} a {size}",
+      "resizeCorner": "Cambiar tamaño de {name} ({dimensions})",
+      "resized": "{name} ahora en tamaño {size}",
+      "dimensions": "{size} · {rows, plural, one {# fila} other {# filas}}",
+      "fixedSize": "Tamaño fijo",
+      "sizes": {
+        "sm": "Chico",
+        "md": "Mediano",
+        "lg": "Grande"
+      },
+      "sizesShort": {
+        "sm": "Chico",
+        "md": "Med",
+        "lg": "Grande"
+      },
+      "presetsTitle": "Plantillas rápidas",
+      "presetApplied": "Plantilla {name} aplicada",
+      "presets": {
+        "daily": {
+          "title": "Mostrador",
+          "subtitle": "Cobros y caja de hoy"
+        },
+        "financial": {
+          "title": "Finanzas",
+          "subtitle": "Ingresos, compras y margen"
+        },
+        "complete": {
+          "title": "Completo",
+          "subtitle": "Vista general Bento"
+        }
+      },
+      "categories": {
+        "counter": "Mostrador",
+        "charts": "Gráficos",
+        "portfolio": "Cartera",
+        "operations": "Operación"
+      },
       "moveUp": "Subir {name}",
       "moveDown": "Bajar {name}",
-      "hide": "Quitar {name} de Inicio",
+      "hide": "Quitar {name} del Dashboard",
       "moved": "{name} en la posición {position} de {total}",
-      "hidden": "{name} quitado de Inicio",
-      "added": "{name} agregado a Inicio",
-      "saved": "Tu Inicio quedó guardado",
-      "saveError": "No pudimos guardar tu Inicio. Inténtalo otra vez.",
-      "empty": "Tu Inicio está vacío. Agrega lo que quieres ver cada mañana.",
-      "gridLabel": "Widgets de Inicio"
+      "hidden": "{name} quitado del Dashboard",
+      "added": "{name} agregado al Dashboard",
+      "saved": "Tu Dashboard quedó guardado",
+      "saveError": "No pudimos guardar tu Dashboard. Inténtalo otra vez.",
+      "empty": "Tu Dashboard está vacío. Agrega lo que quieres ver cada mañana.",
+      "gridLabel": "Widgets del Dashboard"
     },
     "widgets": {
       "seeAll": "Ver todo",
@@ -373,7 +413,74 @@
         "title": "Avisos de hoy",
         "description": "Recordatorios y estados de cuenta enviados hoy.",
         "empty": "Hoy todavía no salió ningún aviso."
+      },
+      "cashFlow": {
+        "title": "Ingresos reales vs. Compras",
+        "description": "Plata que entró (contado y cobranzas) frente a tus compras.",
+        "realIncome": "Ingresos reales",
+        "realIncomeHint": "Ingresos reales (Contado {cash} + Cobranzas {collections})",
+        "purchases": "Compras",
+        "netFlow": "Flujo neto",
+        "caption": "Ingresos reales y compras por día"
+      },
+      "salesByMethod": {
+        "title": "Medios de pago",
+        "description": "Reparto de tus ventas por efectivo, Yape, Plin, tarjeta y fiado.",
+        "empty": "Todavía no hay ventas en este período.",
+        "caption": "Ventas por medio de pago",
+        "method": "Medio",
+        "salesCount": "Ventas",
+        "amount": "Monto",
+        "methods": {
+          "CASH": "Efectivo",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Tarjeta",
+          "CREDIT": "Fiado"
+        }
+      },
+      "portfolioTrend": {
+        "title": "Evolución de cartera",
+        "description": "Liquidado, pagado y vencido de tus últimos 6 meses de corte."
+      },
+      "marginTrend": {
+        "title": "Ventas y ganancia diaria",
+        "description": "Comparación diaria entre lo vendido y el margen ganado.",
+        "sales": "Ventas",
+        "margin": "Ganancia",
+        "caption": "Ventas y ganancia diaria"
+      },
+      "topProducts": {
+        "title": "Productos más vendidos",
+        "description": "Los artículos con más ingresos en los últimos 30 días.",
+        "empty": "Aún no hay ventas de productos registradas."
+      },
+      "recentSales": {
+        "title": "Últimas ventas",
+        "description": "Movimientos recientes de tu mostrador.",
+        "walkIn": "Venta al paso",
+        "empty": "Todavía no registraste ninguna venta."
+      },
+      "collectionsHealth": {
+        "title": "Salud de cobranza",
+        "description": "Porcentaje de cartera al día y distribución de puntajes.",
+        "onTimeLabel": "de tu fiado al día",
+        "currentAmount": "Al día",
+        "overdueAmount": "Vencido",
+        "empty": "Aún no tienes vecinos con cuenta de fiado.",
+        "bands": {
+          "GREEN": "{count} al día",
+          "AMBER": "{count} por cuidar",
+          "RED": "{count} en riesgo"
+        }
       }
+    },
+    "charts": {
+      "periodAria": "Rango de días",
+      "days7": "7d",
+      "days14": "14d",
+      "days30": "30d",
+      "day": "Día"
     }
   },
   "Profile": {
@@ -454,7 +561,8 @@
     "managePlan": "Ir a Ajustes",
     "nav": {
       "label": "Navegación principal",
-      "home": "Inicio",
+      "home": "Dashboard",
+      "homeMobile": "Inicio",
       "sell": "Vender",
       "customers": "Clientes",
       "team": "Equipo",

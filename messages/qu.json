@@ -276,23 +276,63 @@
       "add": "Widget yapay",
       "addShort": "Yapay",
       "addOne": "{name} yapay",
-      "addTitle": "Qallariyniykiman yapay",
-      "addSubtitle": "Quina kichaspa imata rikuyta munasqaykita akllay.",
-      "allAdded": "Llapan widgetkuna qallariyniykipi kachkanña.",
+      "addTitle": "Dashboardniykiman yapay",
+      "addSubtitle": "Quina kichaspa imata rikuyta munasqaykita akllay utaq plantillata akllay.",
+      "allAdded": "Llapan widgetkuna Dashboardniykipi kachkanña.",
       "reset": "Ñawpaq kaqman kutichiy",
+      "resetShort": "Kutichiy",
       "hint": "Sapa tarjetata hapinanmanta aysay utaq flechakunawan. Tikraykuna kikillanmanta waqaychakun.",
+      "hintDesktop": "Sapa tarjetata hawanmanta aysay utaq ura paña kuchunmanta aysaspa hatunyachiy utaq huchuyyachiy.",
       "drag": "{name} kuyuchiy",
       "dragHelp": "Aysay utaq teclado flechakunawan ñiqinta tikray.",
+      "sizeGroup": "{name} hatun kaynin",
+      "resize": "{name} {size}man tikray",
+      "resizeCorner": "{name} hatun kayninta tikray ({dimensions})",
+      "resized": "{name} kunan {size} hatun kayninpi",
+      "dimensions": "{size} · {rows} siq'i",
+      "fixedSize": "Kikin hatun kay",
+      "sizes": {
+        "sm": "Huchuy",
+        "md": "Chawpi",
+        "lg": "Hatun"
+      },
+      "sizesShort": {
+        "sm": "Huchuy",
+        "md": "Chawpi",
+        "lg": "Hatun"
+      },
+      "presetsTitle": "Utqay plantillakuna",
+      "presetApplied": "{name} plantilla churasqa",
+      "presets": {
+        "daily": {
+          "title": "Mostrador",
+          "subtitle": "Cobranza kunan caja"
+        },
+        "financial": {
+          "title": "Qullqi",
+          "subtitle": "Ingresokuna, rantiypas"
+        },
+        "complete": {
+          "title": "Llapan",
+          "subtitle": "Tukuy Bento qhawariy"
+        }
+      },
+      "categories": {
+        "counter": "Mostrador",
+        "charts": "Gráficokuna",
+        "portfolio": "Cartera",
+        "operations": "Llamkaykuna"
+      },
       "moveUp": "{name} wichachiy",
       "moveDown": "{name} uraykachiy",
-      "hide": "{name} qallariymanta qichuy",
+      "hide": "{name} Dashboardmanta qichuy",
       "moved": "{name} {position} kaqpi, {total} ukhupi",
-      "hidden": "{name} qichusqa",
-      "added": "{name} yapasqa",
-      "saved": "Qallariyniyki waqaychasqa",
-      "saveError": "Mana waqaychayta atirqanchikchu. Huktawan ruway.",
-      "empty": "Qallariyniyki chusaq. Sapa paqarin rikuyta munasqaykita yapay.",
-      "gridLabel": "Qallariy widgetkuna"
+      "hidden": "{name} Dashboardmanta qichusqa",
+      "added": "{name} Dashboardman yapasqa",
+      "saved": "Dashboardniyki waqaychasqa",
+      "saveError": "Mana Dashboardniykita waqaychayta atirqanchikchu. Huktawan ruway.",
+      "empty": "Dashboardniyki chusaq. Sapa paqarin rikuyta munasqaykita yapay.",
+      "gridLabel": "Dashboard widgetkuna"
     },
     "widgets": {
       "seeAll": "Llapanta rikuy",
@@ -374,7 +414,74 @@
         "title": "Kunan willakuykuna",
         "description": "Kunan kachasqa willakuykuna.",
         "empty": "Kunan manaraq willakuy lluqsinchu."
+      },
+      "cashFlow": {
+        "title": "Chiqap ingreso vs. Rantikuna",
+        "description": "Chiqap yaykuq qullqi (contado cobranzapas) rantikusqaykipas.",
+        "realIncome": "Chiqap ingreso",
+        "realIncomeHint": "Chiqap ingreso (Contado {cash} + Cobranzas {collections})",
+        "purchases": "Rantikuna",
+        "netFlow": "Puchuq qullqi",
+        "caption": "Sapa punchaw chiqap ingreso rantiypas"
+      },
+      "salesByMethod": {
+        "title": "Pago ñankuna",
+        "description": "Efectivo, Yape, Plin, tarjeta, fiadowan rantichiykuna.",
+        "empty": "Kay pachapi manaraq rantichiy kanchu.",
+        "caption": "Pago ñankunaman rantichiykuna",
+        "method": "Ñan",
+        "salesCount": "Rantichiykuna",
+        "amount": "Qullqi",
+        "methods": {
+          "CASH": "Efectivo",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Tarjeta",
+          "CREDIT": "Fiado"
+        }
+      },
+      "portfolioTrend": {
+        "title": "Cartera wiñaynin",
+        "description": "Qhipa 6 killapi liquidasqa, pagasqa, pasasqapas."
+      },
+      "marginTrend": {
+        "title": "Sapa punchaw rantichiy gananciapas",
+        "description": "Sapa punchaw rantichisqa gananciapas.",
+        "sales": "Rantichiy",
+        "margin": "Ganancia",
+        "caption": "Sapa punchaw rantichiy ganancia"
+      },
+      "topProducts": {
+        "title": "Aswan rantisqa productokuna",
+        "description": "Qhipa 30 punchawpi aswan qullqita quq productokuna.",
+        "empty": "Manaraq rantisqa productokuna kanchu."
+      },
+      "recentSales": {
+        "title": "Qhipa rantichiykuna",
+        "description": "Mostradorniykipi kunan rantichiykuna.",
+        "walkIn": "Purikuq rantiq",
+        "empty": "Manaraq rantichiychu kanchu."
+      },
+      "collectionsHealth": {
+        "title": "Cobranza allin kaynin",
+        "description": "Pachanpi cartera puntajekunapas.",
+        "onTimeLabel": "pachanpi fiado",
+        "currentAmount": "Pachanpi",
+        "overdueAmount": "Pasasqa",
+        "empty": "Manaraq fiadoyuq llaqtamasikuna kanchu.",
+        "bands": {
+          "GREEN": "{count} allin",
+          "AMBER": "{count} qhawana",
+          "RED": "{count} riesgopi"
+        }
       }
+    },
+    "charts": {
+      "periodAria": "Punchawkuna",
+      "days7": "7d",
+      "days14": "14d",
+      "days30": "30d",
+      "day": "Punchaw"
     }
   },
   "Profile": {
@@ -455,7 +562,8 @@
     "managePlan": "Allichanakunaman riy",
     "nav": {
       "label": "Hatun purina",
-      "home": "Qallariy",
+      "home": "Dashboard",
+      "homeMobile": "Qallariy",
       "sell": "Rantiy",
       "customers": "Llaqtamasikuna",
       "team": "Llamkaqkuna",
