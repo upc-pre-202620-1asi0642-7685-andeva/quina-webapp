@@ -485,43 +485,243 @@
   },
   "Profile": {
     "title": "My profile",
-    "subtitle": "Adjust your language, email and password.",
+    "subtitle": "Manage your account, security, preferences, and role access.",
     "backToDashboard": "Back to counter",
+    "backToPortal": "Back to my account",
+    "subtitlePortal": "Adjust your language, appearance, password, and active sessions.",
+    "roles": {
+      "PLATFORM_ADMIN": "Platform admin",
+      "STORE_OWNER": "Store owner",
+      "STORE_EMPLOYEE": "Counter staff",
+      "CUSTOMER": "Neighbor",
+      "PENDING_OWNER": "Pending setup"
+    },
+    "identity": {
+      "verified": "Verified",
+      "lastLogin": "Last sign-in: {date}",
+      "memberSince": "Member since {date}"
+    },
+    "nav": {
+      "ariaLabel": "Profile sections",
+      "account": {
+        "label": "Account",
+        "hint": "Name, phone, and email"
+      },
+      "security": {
+        "label": "Security & sessions",
+        "hint": "Password, Google, and devices"
+      },
+      "preferences": {
+        "label": "Preferences",
+        "hint": "Theme, language, and Home layout"
+      },
+      "access": {
+        "label": "Role & access",
+        "hint": "Your role and permissions in Quina"
+      }
+    },
+    "personal": {
+      "title": "Personal details",
+      "subtitle": "Your name appears in the sidebar, receipts, and audit history.",
+      "subtitleOwner": "Your name identifies the store owner across Quina and receipts.",
+      "nameLabel": "Full name",
+      "nameHint": "Use letters only; spaces, apostrophe ('), and hyphen (-) are allowed.",
+      "nameHintOwner": "Saving also updates the store owner name.",
+      "phoneLabel": "Contact mobile (optional)",
+      "phoneHint": "9 digits starting with 9, such as 987 654 321. Leave blank to remove.",
+      "phonePlaceholder": "987 654 321",
+      "phoneInvalid": "Enter a 9-digit Peruvian mobile starting with 9 (or leave blank).",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "undo": "Undo changes",
+      "saved": "Your personal details were updated."
+    },
+    "emailTitle": "Email address",
+    "currentEmail": "Current email: {email}",
+    "newEmailLabel": "New email address",
+    "newEmailHint": "We will send a 6-digit code to your new email before updating it.",
+    "sendChangeCode": "Send code to new email",
+    "emailCodeSent": "We sent a 6-digit code to {email}.",
+    "otpLabel": "Code sent to {email}",
+    "otpHint": "Enter the 6 digits sent to your new email address.",
+    "confirmEmailChange": "Confirm new email",
+    "resendCode": "Resend code",
+    "resendIn": "Resend in {seconds} s",
+    "cancelEmailChange": "Back & edit email",
+    "emailChanged": "Your email was updated.",
+    "signOutSection": {
+      "title": "Session on this device",
+      "description": "Sign out here and clear offline cached pages from this browser."
+    },
+    "signOut": "Sign out",
     "localeTitle": "Quina language",
     "localeLabel": "Interface and email language",
-    "localeHint": "Changes the language of screens and the emails you receive.",
+    "localeHint": "Changes the language for Quina screens and the emails you receive.",
     "locales": {
       "es": "Castellano",
       "en": "English",
       "qu": "Runasimi (draft)"
     },
+    "localeDescriptions": {
+      "es": "Primary counter interface and alerts in Spanish.",
+      "en": "Full interface and email notifications in English.",
+      "qu": "Draft pending native translator review."
+    },
     "saveLocale": "Save language",
     "localeSaved": "Language updated.",
-    "emailTitle": "Change email address",
-    "currentEmail": "Current email: {email}",
-    "newEmailLabel": "New email address",
-    "newEmailHint": "We'll send a 6-digit code to the new email before changing it.",
-    "sendChangeCode": "Send code to new email",
-    "otpLabel": "Code sent to {email}",
-    "otpHint": "Enter the 6 digits sent to your new email.",
-    "confirmEmailChange": "Confirm new email",
-    "emailChanged": "Your email has been updated.",
+    "theme": {
+      "title": "Appearance",
+      "subtitle": "Choose how Quina looks on this device. Syncs with the quick menu.",
+      "saved": "Appearance updated.",
+      "options": {
+        "light": {
+          "label": "Light",
+          "hint": "Crisp and clear for bright daytime counters."
+        },
+        "dark": {
+          "label": "Dark",
+          "hint": "Easier on the eyes during evening shifts."
+        },
+        "system": {
+          "label": "System",
+          "hint": "Matches your device appearance automatically."
+        }
+      }
+    },
+    "workspace": {
+      "title": "Home dashboard layout",
+      "description": "If you reordered or hid Home dashboard widgets, you can restore the default layout for your role.",
+      "statusCustom": "Customized",
+      "statusDefault": "Default",
+      "resetButton": "Reset Home layout",
+      "resetSuccess": "Home dashboard restored to default layout.",
+      "resetError": "Could not reset the layout. Please try again.",
+      "confirmTitle": "Reset Home dashboard layout?",
+      "confirmBody": "Widgets will return to the recommended order and sizes for your role.",
+      "confirmHint": "This only resets your Home layout; sales, customers, and data stay untouched.",
+      "confirmAction": "Yes, reset layout",
+      "cancel": "Cancel"
+    },
     "password": {
       "title": "Password",
-      "lead": "You signed in with Google. Create a password to also sign in with your email.",
+      "statusConfigured": "Configured",
+      "statusNotSet": "No password",
+      "lead": "You signed in with Google. Set a password to also sign in with your email.",
+      "leadPortal": "Optionally set a password to also sign in with your email.",
+      "hasPassword": "Update your password anytime or sign out other devices when changing it.",
+      "currentLabel": "Current password",
+      "currentHint": "The password you currently use to sign in.",
+      "wrongCurrentPassword": "Current password is incorrect. Check it and try again.",
       "newLabel": "New password",
-      "newHint": "At least 8 characters, with an uppercase letter, a number and a symbol.",
-      "confirmLabel": "Repeat the password",
+      "newHint": "At least 8 characters, with an uppercase letter, a number, and a symbol.",
+      "confirmLabel": "Repeat password",
       "confirmHint": "Type it again to avoid typos.",
+      "revokeOthersLabel": "Sign out other devices",
+      "revokeOthersHint": "Recommended if you share a phone or tablet at the store.",
       "submit": "Create password",
+      "changeSubmit": "Update password",
+      "forgotCurrent": "Forgot your current password?",
       "created": "Done: you can now sign in with your email and this password.",
-      "hasPassword": "You already sign in with your email and password.",
-      "change": "Change password",
-      "leadPortal": "If you like, create a password to also sign in with your email."
+      "updated": "Your password was updated.",
+      "change": "Change password"
     },
-    "signOut": "Sign out",
-    "backToPortal": "Back to my account",
-    "subtitlePortal": "Adjust your language and password."
+    "accounts": {
+      "title": "Connected sign-in methods",
+      "subtitle": "Manage how you sign in without creating duplicate accounts.",
+      "credentialLabel": "Email and password",
+      "credentialActive": "You can sign in using your email and password.",
+      "credentialInactive": "No password set yet; you can create one above.",
+      "googleLabel": "Google",
+      "googleActive": "Your Google account is linked for one-tap sign-in.",
+      "googleOnlyHint": "Create a password above before unlinking Google.",
+      "googleAvailable": "Connect Google for faster sign-in on this device.",
+      "googleDisabled": "Google sign-in is not configured in this environment.",
+      "connected": "Connected",
+      "notConfigured": "Not connected",
+      "linkGoogle": "Link Google",
+      "unlinkGoogle": "Unlink",
+      "linkError": "Could not start Google account linking.",
+      "unlinkError": "Could not unlink your Google account.",
+      "freshSessionRequired": "For security, sign out and sign back in before unlinking Google.",
+      "unlinked": "Google account unlinked.",
+      "unlinkConfirmTitle": "Unlink your Google account?",
+      "unlinkConfirmBody": "You will still be able to sign in with your email and password.",
+      "unlinkConfirmHint": "You can link Google again anytime from this screen.",
+      "unlinkConfirmAction": "Yes, unlink",
+      "cancel": "Cancel"
+    },
+    "sessions": {
+      "title": "Active sessions & devices",
+      "subtitle": "Check where your account is signed in and close sessions on devices you no longer use.",
+      "empty": "No active sessions found right now.",
+      "currentBadge": "Current session",
+      "deviceWithOs": "{browser} on {os}",
+      "unknownDevice": "Web browser",
+      "lastActive": "Last active: {date}",
+      "revokeOne": "Sign out",
+      "revokeOthersButton": "Sign out other devices",
+      "revokedOne": "Device session closed.",
+      "revokedOthers": "All other active sessions were closed.",
+      "revokeError": "Could not close the session. Try again.",
+      "confirmOthersTitle": "Sign out of {count} other devices?",
+      "confirmOthersBody": "Your current session on this device will stay open.",
+      "confirmOthersHint": "Anyone else signed in on those devices will need to sign in again.",
+      "confirmOthersAction": "Sign out others",
+      "cancel": "Cancel"
+    },
+    "offline": {
+      "title": "Offline cache on this device",
+      "description": "Clear pages saved for offline reading if you are using a shared phone or computer.",
+      "emptyDescription": "No offline pages are currently cached in this browser.",
+      "clearButton": "Clear offline cache",
+      "cleared": "Offline cached pages were cleared."
+    },
+    "access": {
+      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
+      "taxRegimeLabel": "Tax regime",
+      "rusCategory": "Category {category}",
+      "teamSeatsLabel": "Team seats",
+      "ownerLinksAria": "Store management shortcuts",
+      "ownerScopeTitle": "Store permissions",
+      "ownerLinks": {
+        "settings": {
+          "label": "Store settings",
+          "meta": "Yape, Plin, bank, and taxes"
+        },
+        "subscription": {
+          "label": "Subscription & plan",
+          "meta": "Plan tier and monthly usage"
+        },
+        "team": {
+          "label": "Counter team",
+          "meta": "Invites and staff"
+        },
+        "audit": {
+          "label": "Audit log",
+          "meta": "Activity history"
+        }
+      },
+      "employeeTitle": "Staff member at {store}",
+      "employeeSubtitle": "Your access is focused on daily counter operations. Prices, credit rules, and billing remain owner-only.",
+      "employeeAllowedHeading": "What you can do",
+      "employeeRestrictedHeading": "Owner only",
+      "platformTitle": "Platform Administrator",
+      "platformSubtitle": "You manage store onboarding/status, BCRP interest caps, and Nuevo RUS limits.",
+      "platformLinksAria": "Platform shortcuts",
+      "platformLinks": {
+        "stores": "Stores",
+        "rateCaps": "BCRP Caps",
+        "rusCaps": "RUS Caps"
+      }
+    },
+    "portalTabs": {
+      "account": "Account & language",
+      "security": "Security & sessions"
+    },
+    "portalStores": {
+      "title": "Stores linked to your account",
+      "subtitle": "Your email automatically connects you with these stores in read-only mode."
+    }
   },
   "AuthAside": {
     "register": {
@@ -658,7 +858,10 @@
       "pay": "Collect",
       "terms": "Terms",
       "cycle": "Cycle",
-      "billing": "Payment"
+      "billing": "Payment",
+      "security": "Security & sessions",
+      "preferences": "Preferences",
+      "access": "Role & access"
     }
   },
   "Customers": {
@@ -2323,7 +2526,8 @@
       "START_SUBSCRIPTION_CHECKOUT": "Subscription checkout started",
       "SUBSCRIPTION_PAYMENT_APPROVED": "Subscription payment approved",
       "SUBSCRIPTION_PAYMENT_REJECTED": "Subscription payment rejected",
-      "SUBSCRIPTION_PAYMENT_REFUNDED": "Subscription payment refunded"
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Subscription payment refunded",
+      "UPDATE_PROFILE": "Profile updated"
     },
     "entities": {
       "sales": "Sales",

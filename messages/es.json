@@ -485,43 +485,243 @@
   },
   "Profile": {
     "title": "Mi perfil",
-    "subtitle": "Ajusta tu idioma, tu correo y tu contraseña.",
+    "subtitle": "Administra tu cuenta, seguridad, preferencias y permisos.",
     "backToDashboard": "Volver al mostrador",
+    "backToPortal": "Volver a mi cuenta",
+    "subtitlePortal": "Ajusta tu idioma, apariencia, contraseña y sesiones activas.",
+    "roles": {
+      "PLATFORM_ADMIN": "Admin. de plataforma",
+      "STORE_OWNER": "Dueño de tienda",
+      "STORE_EMPLOYEE": "Empleado de mostrador",
+      "CUSTOMER": "Vecino",
+      "PENDING_OWNER": "Registro pendiente"
+    },
+    "identity": {
+      "verified": "Verificado",
+      "lastLogin": "Último ingreso: {date}",
+      "memberSince": "En Quina desde {date}"
+    },
+    "nav": {
+      "ariaLabel": "Secciones de mi perfil",
+      "account": {
+        "label": "Mi cuenta",
+        "hint": "Nombre, celular y correo"
+      },
+      "security": {
+        "label": "Seguridad y sesiones",
+        "hint": "Contraseña, Google y dispositivos"
+      },
+      "preferences": {
+        "label": "Preferencias",
+        "hint": "Tema, idioma y vista de Inicio"
+      },
+      "access": {
+        "label": "Rol y accesos",
+        "hint": "Tu rol y permisos en Quina"
+      }
+    },
+    "personal": {
+      "title": "Datos personales",
+      "subtitle": "Tu nombre aparece en la barra lateral, recibos y auditoría de movimientos.",
+      "subtitleOwner": "Tu nombre identifica al titular de la tienda en Quina y en tus recibos.",
+      "nameLabel": "Nombre completo",
+      "nameHint": "Usa solo letras; puedes incluir espacios, apóstrofo (') y guion (-).",
+      "nameHintOwner": "Al guardar, también se actualiza el nombre del titular de la tienda.",
+      "phoneLabel": "Celular de contacto (opcional)",
+      "phoneHint": "9 dígitos empezando en 9, como 987 654 321. Déjalo vacío si prefieres quitarlo.",
+      "phonePlaceholder": "987 654 321",
+      "phoneInvalid": "Escribe un celular peruano de 9 dígitos empezando en 9 (o déjalo vacío).",
+      "save": "Guardar cambios",
+      "saving": "Guardando...",
+      "undo": "Deshacer cambios",
+      "saved": "Tus datos personales fueron actualizados."
+    },
+    "emailTitle": "Correo electrónico",
+    "currentEmail": "Correo actual: {email}",
+    "newEmailLabel": "Nuevo correo electrónico",
+    "newEmailHint": "Enviaremos un código de 6 números al nuevo correo antes de reemplazarlo.",
+    "sendChangeCode": "Enviar código al nuevo correo",
+    "emailCodeSent": "Enviamos un código de 6 números a {email}.",
+    "otpLabel": "Código enviado a {email}",
+    "otpHint": "Escribe los 6 números que llegaron a tu nuevo correo.",
+    "confirmEmailChange": "Confirmar nuevo correo",
+    "resendCode": "Reenviar código",
+    "resendIn": "Reenviar en {seconds} s",
+    "cancelEmailChange": "Volver y corregir correo",
+    "emailChanged": "Tu correo fue actualizado.",
+    "signOutSection": {
+      "title": "Sesión en este dispositivo",
+      "description": "Cierra tu sesión aquí y borra las páginas guardadas sin señal."
+    },
+    "signOut": "Cerrar sesión",
     "localeTitle": "Idioma de Quina",
     "localeLabel": "Idioma de la interfaz y correos",
-    "localeHint": "Cambia el idioma de las pantallas y de los correos que recibes.",
+    "localeHint": "Cambia el idioma de las pantallas de Quina y de los correos que recibes.",
     "locales": {
       "es": "Castellano",
       "en": "English",
       "qu": "Runasimi (borrador)"
     },
+    "localeDescriptions": {
+      "es": "Idioma principal de mostrador y avisos.",
+      "en": "Full interface and email notifications in English.",
+      "qu": "Borrador en revisión por traductor nativo."
+    },
     "saveLocale": "Guardar idioma",
     "localeSaved": "Idioma actualizado.",
-    "emailTitle": "Cambiar correo electrónico",
-    "currentEmail": "Correo actual: {email}",
-    "newEmailLabel": "Nuevo correo electrónico",
-    "newEmailHint": "Enviaremos un código de 6 números al nuevo correo antes de cambiarlo.",
-    "sendChangeCode": "Enviar código al nuevo correo",
-    "otpLabel": "Código enviado a {email}",
-    "otpHint": "Escribe los 6 números que llegaron a tu nuevo correo.",
-    "confirmEmailChange": "Confirmar nuevo correo",
-    "emailChanged": "Tu correo fue actualizado.",
+    "theme": {
+      "title": "Apariencia",
+      "subtitle": "Elige cómo se ve Quina en este dispositivo. Se sincroniza con el menú rápido.",
+      "saved": "Apariencia actualizada.",
+      "options": {
+        "light": {
+          "label": "Claro",
+          "hint": "Ideal para mostradores con buena luz de día."
+        },
+        "dark": {
+          "label": "Oscuro",
+          "hint": "Descansa la vista en turnos de noche."
+        },
+        "system": {
+          "label": "Como el sistema",
+          "hint": "Sigue el tema automático de tu dispositivo."
+        }
+      }
+    },
+    "workspace": {
+      "title": "Diseño de Inicio",
+      "description": "Si reorganizaste los bloques del tablero principal, puedes volver al diseño original de tu rol.",
+      "statusCustom": "Personalizado",
+      "statusDefault": "Predeterminado",
+      "resetButton": "Restablecer diseño del Inicio",
+      "resetSuccess": "El tablero de Inicio volvió a su diseño original.",
+      "resetError": "No pudimos restablecer el diseño. Inténtalo de nuevo.",
+      "confirmTitle": "¿Restablecer el diseño de Inicio?",
+      "confirmBody": "Tus tarjetas volverán al orden y tamaño sugerido para tu rol.",
+      "confirmHint": "Solo afecta la vista del Inicio en tu cuenta; tus datos, ventas y clientes no cambian.",
+      "confirmAction": "Sí, restablecer",
+      "cancel": "Cancelar"
+    },
     "password": {
       "title": "Contraseña",
+      "statusConfigured": "Configurada",
+      "statusNotSet": "Sin contraseña",
       "lead": "Entraste con Google. Crea una contraseña para ingresar también con tu correo.",
+      "leadPortal": "Si prefieres, crea una contraseña para ingresar también con tu correo.",
+      "hasPassword": "Actualiza tu clave periódicamente o cierra sesión en otros equipos al cambiarla.",
+      "currentLabel": "Contraseña actual",
+      "currentHint": "La que usas hoy para entrar a Quina.",
+      "wrongCurrentPassword": "La contraseña actual no es correcta. Revísala e inténtalo de nuevo.",
       "newLabel": "Nueva contraseña",
       "newHint": "Mínimo 8 caracteres, con una mayúscula, un número y un símbolo.",
       "confirmLabel": "Repite la contraseña",
       "confirmHint": "Escríbela otra vez para evitar errores de tipeo.",
+      "revokeOthersLabel": "Cerrar sesión en otros dispositivos",
+      "revokeOthersHint": "Recomendado si compartes un celular o tablet en la bodega.",
       "submit": "Crear contraseña",
+      "changeSubmit": "Actualizar contraseña",
+      "forgotCurrent": "¿Olvidaste tu contraseña actual?",
       "created": "Listo: ya puedes ingresar con tu correo y esta contraseña.",
-      "hasPassword": "Ya ingresas con tu correo y contraseña.",
-      "change": "Cambiar contraseña",
-      "leadPortal": "Si prefieres, crea una contraseña para ingresar también con tu correo."
+      "updated": "Tu contraseña fue actualizada.",
+      "change": "Cambiar contraseña"
     },
-    "signOut": "Cerrar sesión",
-    "backToPortal": "Volver a mi cuenta",
-    "subtitlePortal": "Ajusta tu idioma y tu contraseña."
+    "accounts": {
+      "title": "Métodos de acceso vinculados",
+      "subtitle": "Administra cómo puedes entrar a esta cuenta sin duplicar tu usuario.",
+      "credentialLabel": "Correo y contraseña",
+      "credentialActive": "Puedes ingresar escribiendo tu correo y contraseña.",
+      "credentialInactive": "Aún no creaste contraseña; puedes hacerlo arriba.",
+      "googleLabel": "Google",
+      "googleActive": "Tu cuenta de Google está vinculada para entrar en un toque.",
+      "googleOnlyHint": "Crea una contraseña arriba antes de poder desvincular Google.",
+      "googleAvailable": "Conecta Google para iniciar sesión más rápido en este dispositivo.",
+      "googleDisabled": "El acceso con Google no está configurado en este entorno.",
+      "connected": "Conectado",
+      "notConfigured": "No conectado",
+      "linkGoogle": "Vincular Google",
+      "unlinkGoogle": "Desvincular",
+      "linkError": "No se pudo iniciar la vinculación con Google.",
+      "unlinkError": "No se pudo desvincular tu cuenta de Google.",
+      "freshSessionRequired": "Por seguridad, cierra sesión y vuelve a entrar para desvincular Google.",
+      "unlinked": "Se desvinculó tu cuenta de Google.",
+      "unlinkConfirmTitle": "¿Desvincular tu cuenta de Google?",
+      "unlinkConfirmBody": "Seguirás entrando con tu correo y contraseña.",
+      "unlinkConfirmHint": "Puedes volver a vincular Google cuando quieras desde esta misma pantalla.",
+      "unlinkConfirmAction": "Sí, desvincular",
+      "cancel": "Cancelar"
+    },
+    "sessions": {
+      "title": "Sesiones y dispositivos activos",
+      "subtitle": "Revisa dónde está abierta tu cuenta y cierra sesiones en equipos que ya no uses.",
+      "empty": "No encontramos otras sesiones activas en este momento.",
+      "currentBadge": "Sesión actual",
+      "deviceWithOs": "{browser} en {os}",
+      "unknownDevice": "Navegador web",
+      "lastActive": "Última actividad: {date}",
+      "revokeOne": "Cerrar sesión",
+      "revokeOthersButton": "Cerrar otras sesiones",
+      "revokedOne": "La sesión del dispositivo fue cerrada.",
+      "revokedOthers": "Se cerraron todas las demás sesiones activas.",
+      "revokeError": "No pudimos cerrar la sesión. Inténtalo de nuevo.",
+      "confirmOthersTitle": "¿Cerrar sesión en {count} dispositivos?",
+      "confirmOthersBody": "Tu sesión actual en este dispositivo seguirá abierta.",
+      "confirmOthersHint": "Cualquier otra persona que tenga tu cuenta abierta tendrá que volver a ingresar.",
+      "confirmOthersAction": "Cerrar otras sesiones",
+      "cancel": "Cancelar"
+    },
+    "offline": {
+      "title": "Copia sin conexión en este equipo",
+      "description": "Borra las páginas guardadas para lectura sin señal si estás usando un teléfono o PC compartido.",
+      "emptyDescription": "No hay páginas guardadas sin conexión en este navegador.",
+      "clearButton": "Borrar caché sin conexión",
+      "cleared": "Se borraron las páginas guardadas sin conexión."
+    },
+    "access": {
+      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
+      "taxRegimeLabel": "Régimen tributario",
+      "rusCategory": "Categoría {category}",
+      "teamSeatsLabel": "Cupo de equipo",
+      "ownerLinksAria": "Accesos de gestión de la tienda",
+      "ownerScopeTitle": "Permisos de tu tienda",
+      "ownerLinks": {
+        "settings": {
+          "label": "Ajustes de la tienda",
+          "meta": "Yape, Plin, banco y tributos"
+        },
+        "subscription": {
+          "label": "Suscripción y plan",
+          "meta": "Plan y consumo mensual"
+        },
+        "team": {
+          "label": "Equipo de mostrador",
+          "meta": "Invitaciones y empleados"
+        },
+        "audit": {
+          "label": "Auditoría",
+          "meta": "Registro de movimientos"
+        }
+      },
+      "employeeTitle": "Empleado en {store}",
+      "employeeSubtitle": "Tu acceso está enfocado en la atención diaria del mostrador. Los cambios de precios, reglas de fiado y suscripción los maneja el dueño.",
+      "employeeAllowedHeading": "Lo que puedes hacer",
+      "employeeRestrictedHeading": "Reservado para el dueño",
+      "platformTitle": "Administrador de Plataforma",
+      "platformSubtitle": "Gestionas el alta/baja de tiendas, las tasas máximas del BCRP y los topes del Nuevo RUS.",
+      "platformLinksAria": "Accesos de plataforma",
+      "platformLinks": {
+        "stores": "Tiendas",
+        "rateCaps": "Topes BCRP",
+        "rusCaps": "Topes RUS"
+      }
+    },
+    "portalTabs": {
+      "account": "Cuenta e idioma",
+      "security": "Seguridad y sesiones"
+    },
+    "portalStores": {
+      "title": "Tiendas donde tienes fiado",
+      "subtitle": "Tu correo te conecta automáticamente con estos comercios en modo consulta."
+    }
   },
   "AuthAside": {
     "register": {
@@ -658,7 +858,10 @@
       "pay": "Cobrar",
       "terms": "Condiciones",
       "cycle": "Ciclo",
-      "billing": "Pago"
+      "billing": "Pago",
+      "security": "Seguridad y sesiones",
+      "preferences": "Preferencias",
+      "access": "Rol y accesos"
     }
   },
   "Customers": {
@@ -2323,7 +2526,8 @@
       "START_SUBSCRIPTION_CHECKOUT": "Inicio de suscripción",
       "SUBSCRIPTION_PAYMENT_APPROVED": "Pago de suscripción aprobado",
       "SUBSCRIPTION_PAYMENT_REJECTED": "Pago de suscripción rechazado",
-      "SUBSCRIPTION_PAYMENT_REFUNDED": "Pago de suscripción devuelto"
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Pago de suscripción devuelto",
+      "UPDATE_PROFILE": "Actualización de perfil"
     },
     "entities": {
       "sales": "Ventas",
