@@ -57,29 +57,31 @@ export function PortfolioChart({ months }: { months: PortfolioMonth[] }) {
         </BarChart>
       </div>
       {/* Los lectores de pantalla leen la misma información como tabla */}
-      <table className="sr-only">
-        <caption>{t('caption')}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{t('period')}</th>
-            {SERIES.map((s) => (
-              <th key={s.key} scope="col">
-                {t(s.key)}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {months.map((m) => (
-            <tr key={m.period}>
-              <th scope="row">{m.period}</th>
+      <div className="sr-only">
+        <table>
+          <caption>{t('caption')}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('period')}</th>
               {SERIES.map((s) => (
-                <td key={s.key}>{formatMoney(m[s.key], 'PEN')}</td>
+                <th key={s.key} scope="col">
+                  {t(s.key)}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {months.map((m) => (
+              <tr key={m.period}>
+                <th scope="row">{m.period}</th>
+                {SERIES.map((s) => (
+                  <td key={s.key}>{formatMoney(m[s.key], 'PEN')}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <figcaption className="text-[13px] text-ink-soft">{t('caption')}</figcaption>
     </figure>
   );

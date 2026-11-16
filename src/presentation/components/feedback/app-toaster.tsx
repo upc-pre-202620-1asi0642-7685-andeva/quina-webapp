@@ -29,10 +29,10 @@ export function AppToaster() {
       options={{
         fill: 'var(--color-surface)',
         duration: 4000,
-        // Sileo pinta el texto para un fondo invertido y capitaliza cada palabra:
-        // con la superficie de Quina el texto va con los tokens de tinta
+        // Sileo capitaliza cada palabra y pinta blanco sobre oscuro: la paleta
+        // por estado (--sileo-state-*) se mapea a tokens `-ink` en globals.css
         styles: {
-          title: 'normal-case! text-success-ink!',
+          title: 'normal-case!',
           description: 'text-ink-soft! tabular-nums',
         },
       }}
