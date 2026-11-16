@@ -16,13 +16,6 @@ import { objectChargeFromPortalAction } from '@/presentation/actions/portal';
 import { formatMoney, Money } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from '@/presentation/components/ui/dialog';
 import { Label } from '@/presentation/components/ui/label';
 import { ResponsiveSheet } from '@/presentation/components/ui/responsive-sheet';
 import { Textarea } from '@/presentation/components/ui/textarea';
@@ -31,6 +24,11 @@ import { cn } from '@/presentation/lib/utils';
 
 const NOTE_MAX = 500;
 const QUICK_REASON_KEYS = ['notMine', 'wrongAmount', 'wrongItem'] as const;
+const MERCHANT_QUICK_REASONS = {
+  object: ['notMine', 'wrongAmount', 'wrongItem'],
+  confirm: ['confirmedWithNeighbor', 'receiptVerified'],
+  void: ['duplicateCharge', 'returnedItems', 'pricingError'],
+} as const;
 
 type Action = 'object' | 'confirm' | 'void';
 
@@ -257,6 +255,14 @@ function ChargeActions({
     });
   }
 
+  const quickReasons = action
+    ? portalStoreId && action === 'object'
+      ? QUICK_REASON_KEYS.map((key) => tPortal(`quickReasons.${key}`))
+      : !portalStoreId
+        ? MERCHANT_QUICK_REASONS[action].map((key) => tStore(`quickReasons.${key}`))
+        : []
+    : [];
+
   const formFields = action ? (
     <>
       {error ? (
@@ -264,14 +270,13 @@ function ChargeActions({
           <p>{t(`errors.${error}`)}</p>
         </Notice>
       ) : null}
-      {portalStoreId && action === 'object' ? (
+      {quickReasons.length > 0 ? (
         <div className="flex flex-wrap gap-2">
-          {QUICK_REASON_KEYS.map((key) => {
-            const reasonText = tPortal(`quickReasons.${key}`);
+          {quickReasons.map((reasonText) => {
             const selected = note.trim() === reasonText;
             return (
               <button
-                key={key}
+                key={reasonText}
                 type="button"
                 onClick={() => {
                   setNote(reasonText);
@@ -301,14 +306,14 @@ function ChargeActions({
           id={noteId}
           value={note}
           maxLength={NOTE_MAX}
-          aria-describedby={portalStoreId ? hintId : undefined}
+          aria-describedby={hintId}
           onChange={(event) => {
             setNote(event.target.value);
             if (error) setError(null);
           }}
         />
         <div className="flex items-center justify-between gap-2 text-[13px] text-ink-soft">
-          {portalStoreId ? <p id={hintId}>{tPortal('objectHint')}</p> : <span />}
+          <p id={hintId}>{portalStoreId ? tPortal('objectHint') : tStore('noteHint')}</p>
           <span className="shrink-0 tabular-nums">
             {note.length}/{NOTE_MAX}
           </span>
@@ -345,64 +350,37 @@ function ChargeActions({
         ) : null}
       </div>
 
-      {portalStoreId ? (
-        <ResponsiveSheet
-          open={action !== null}
-          onOpenChange={(open) => (open ? null : setAction(null))}
-          title={action ? t(`${action}Title`) : ''}
-          description={action ? t(`${action}Body`) : undefined}
-          footer={
-            action ? (
-              <>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => setAction(null)}
-                  disabled={busy}
-                >
-                  {t('cancel')}
-                </Button>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  disabled={busy || note.trim().length === 0}
-                  onClick={submit}
-                >
-                  {t(`${action}Submit`)}
-                </Button>
-              </>
-            ) : null
-          }
-        >
-          {formFields}
-        </ResponsiveSheet>
-      ) : (
-        <Dialog open={action !== null} onOpenChange={(open) => (open ? null : setAction(null))}>
-          <DialogContent showCloseButton={false} className="rounded-card border-line bg-surface">
-            {action ? (
-              <>
-                <DialogTitle className="text-lg text-ink">{t(`${action}Title`)}</DialogTitle>
-                <DialogDescription className="text-sm text-ink-soft">
-                  {t(`${action}Body`)}
-                </DialogDescription>
-                {formFields}
-                <DialogFooter>
-                  <Button variant="secondary" onClick={() => setAction(null)} disabled={busy}>
-                    {t('cancel')}
-                  </Button>
-                  <Button
-                    variant={action === 'void' ? 'destructive' : 'default'}
-                    disabled={busy || note.trim().length === 0}
-                    onClick={submit}
-                  >
-                    {t(`${action}Submit`)}
-                  </Button>
-                </DialogFooter>
-              </>
-            ) : null}
-          </DialogContent>
-        </Dialog>
-      )}
+      <ResponsiveSheet
+        open={action !== null}
+        onOpenChange={(open) => (open ? null : setAction(null))}
+        closeLabel={t('cancel')}
+        title={action ? t(`${action}Title`) : ''}
+        description={action ? t(`${action}Body`) : undefined}
+        footer={
+          action ? (
+            <>
+              <Button
+                variant="secondary"
+                size={portalStoreId ? 'lg' : 'default'}
+                onClick={() => setAction(null)}
+                disabled={busy}
+              >
+                {t('cancel')}
+              </Button>
+              <Button
+                variant={action === 'void' && !portalStoreId ? 'destructive' : 'primary'}
+                size={portalStoreId ? 'lg' : 'default'}
+                disabled={busy || note.trim().length === 0}
+                onClick={submit}
+              >
+                {t(`${action}Submit`)}
+              </Button>
+            </>
+          ) : null
+        }
+      >
+        {formFields}
+      </ResponsiveSheet>
     </>
   );
 }

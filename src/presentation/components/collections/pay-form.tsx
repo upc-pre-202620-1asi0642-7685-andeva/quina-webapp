@@ -3,7 +3,7 @@
 import { useId, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { BanknoteIcon } from 'lucide-react';
+import { BanknoteIcon, LandmarkIcon, Loader2Icon, SmartphoneIcon } from 'lucide-react';
 import {
   DEBT_PAYMENT_METHODS,
   type DebtPaymentMethod,
@@ -19,6 +19,13 @@ import { cn } from '@/presentation/lib/utils';
 
 const BILLS = ['10', '20', '50', '100', '200'];
 
+const METHOD_ICONS = {
+  CASH: BanknoteIcon,
+  YAPE: SmartphoneIcon,
+  PLIN: SmartphoneIcon,
+  TRANSFER: LandmarkIcon,
+} as const;
+
 /**
  * Cobro del ciclo (US13): el monto no se edita porque no hay pagos parciales
  * (crit. 4). En efectivo se calcula el vuelto como en el mostrador (D13 del Plan 3).
@@ -28,11 +35,13 @@ export function PayForm({
   cycleId,
   amountDue,
   currency,
+  isReadOnly = false,
 }: {
   customerId: string;
   cycleId: string;
   amountDue: string;
   currency: Currency;
+  isReadOnly?: boolean;
 }) {
   const t = useTranslations('Collections.pay');
   const id = useId();
@@ -44,8 +53,10 @@ export function PayForm({
 
   const total = MoneyValue.of(amountDue, currency);
   const cash = settleCashPayment(total, method === 'CASH' ? 'CASH' : 'YAPE', received);
+  const symbol = currency === 'PEN' ? 'S/' : 'US$';
 
   function submit() {
+    if (isReadOnly) return;
     setError(null);
     if (!cash.ok) {
       setError(cash.error);
@@ -72,39 +83,50 @@ export function PayForm({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+      noValidate
+      className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 sm:p-6"
+    >
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-2 text-sm font-medium text-ink">{t('methodLabel')}</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {DEBT_PAYMENT_METHODS.map((value) => (
-            <label
-              key={value}
-              className={cn(
-                'flex h-11 cursor-pointer items-center justify-center rounded-field border text-sm font-medium transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-link-active',
-                method === value
-                  ? 'border-link-active bg-soft text-soft-ink'
-                  : 'border-line bg-surface text-ink hover:bg-surface-hover',
-              )}
-            >
-              <input
-                type="radio"
-                name={`${id}-method`}
-                value={value}
-                checked={method === value}
-                onChange={() => {
-                  setMethod(value);
-                  setError(null);
-                }}
-                className="sr-only"
-              />
-              {t(`methods.${value}`)}
-            </label>
-          ))}
+          {DEBT_PAYMENT_METHODS.map((value) => {
+            const Icon = METHOD_ICONS[value];
+            return (
+              <label
+                key={value}
+                className={cn(
+                  'flex min-h-11 cursor-pointer items-center justify-center gap-1.5 rounded-field border px-2 text-sm font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) active:scale-[0.97] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-link-active',
+                  method === value
+                    ? 'border-link-active bg-soft text-soft-ink'
+                    : 'border-line bg-surface text-ink hover:bg-surface-hover',
+                )}
+              >
+                <input
+                  type="radio"
+                  name={`${id}-method`}
+                  value={value}
+                  checked={method === value}
+                  onChange={() => {
+                    setMethod(value);
+                    setError(null);
+                  }}
+                  className="sr-only"
+                />
+                <Icon aria-hidden="true" className="size-4 shrink-0" />
+                <span>{t(`methods.${value}`)}</span>
+              </label>
+            );
+          })}
         </div>
       </fieldset>
 
       {method === 'CASH' ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
           <label htmlFor={`${id}-received`} className="text-sm font-medium text-ink">
             {t('receivedLabel')}
           </label>
@@ -113,7 +135,7 @@ export function PayForm({
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-ink-soft"
             >
-              S/
+              {symbol}
             </span>
             <Input
               id={`${id}-received`}
@@ -125,10 +147,22 @@ export function PayForm({
                 setError(null);
               }}
               aria-describedby={`${id}-received-hint`}
-              className="pl-10 tabular-nums"
+              className={currency === 'PEN' ? 'pl-10 tabular-nums' : 'pl-14 tabular-nums'}
             />
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className={cn(received === '' && 'border-link-active bg-soft text-soft-ink')}
+              onClick={() => {
+                setReceived('');
+                setError(null);
+              }}
+            >
+              {t('exactChip', { amount: formatMoney(amountDue, currency) })}
+            </Button>
             {BILLS.filter((bill) => MoneyValue.of(bill, currency).compare(total) >= 0)
               .slice(0, 3)
               .map((bill) => (
@@ -137,7 +171,11 @@ export function PayForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={() => setReceived(bill)}
+                  className={cn(received === bill && 'border-link-active bg-soft text-soft-ink')}
+                  onClick={() => {
+                    setReceived(bill);
+                    setError(null);
+                  }}
                 >
                   {formatMoney(bill, currency)}
                 </Button>
@@ -168,10 +206,14 @@ export function PayForm({
         </Notice>
       ) : null}
 
-      <Button size="lg" onClick={submit} disabled={busy}>
-        <BanknoteIcon aria-hidden="true" />
-        {t('submit', { amount: formatMoney(amountDue, currency) })}
+      <Button type="submit" size="lg" disabled={busy || isReadOnly}>
+        {busy ? (
+          <Loader2Icon aria-hidden="true" className="animate-spin" />
+        ) : (
+          <BanknoteIcon aria-hidden="true" />
+        )}
+        {busy ? t('submitting') : t('submit', { amount: formatMoney(amountDue, currency) })}
       </Button>
-    </div>
+    </form>
   );
 }
