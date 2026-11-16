@@ -110,6 +110,7 @@ function accountBlock(account: CreditAccountSnapshot | null) {
 export function Counter({
   products,
   customers,
+  initialCustomerId = null,
   topProductIds = [],
   todaySummary,
   canManageCatalog = false,
@@ -118,6 +119,7 @@ export function Counter({
 }: {
   products: ProductListItem[];
   customers: CounterCustomer[];
+  initialCustomerId?: string | null;
   topProductIds?: string[];
   todaySummary?: TodayCounterSummary;
   canManageCatalog?: boolean;
@@ -126,12 +128,16 @@ export function Counter({
 }) {
   const t = useTranslations('Sales');
   const router = useRouter();
+  const preselectedCustomer =
+    initialCustomerId && customers.some((c) => c.id === initialCustomerId)
+      ? initialCustomerId
+      : null;
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<CatalogFilter>('all');
   const [cart, setCart] = useState<CartLine[]>([]);
   const [undoState, setUndoState] = useState<UndoSnapshot | null>(null);
-  const [modality, setModality] = useState<SaleModality>('CASH');
-  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [modality, setModality] = useState<SaleModality>(preselectedCustomer ? 'CREDIT' : 'CASH');
+  const [customerId, setCustomerId] = useState<string | null>(preselectedCustomer);
   const [plan, setPlan] = useState<CreditPlan>({ mode: 'SINGLE' });
   const [method, setMethod] = useState<CashPaymentMethod>('CASH');
   const [received, setReceived] = useState('');

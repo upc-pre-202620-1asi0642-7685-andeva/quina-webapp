@@ -6,9 +6,14 @@ import { listCounterCustomers, loadTodayCounterSales } from '@/infrastructure/db
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { Counter } from '@/presentation/components/sales/counter';
 
-export default async function SalesPage() {
+export default async function SalesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ customerId?: string }>;
+}) {
   const user = await requireStoreUser('/sales', 'sales.create');
   const t = await getTranslations('Sales');
+  const { customerId } = await searchParams;
   const now = new Date();
   const [products, customers, topProducts, todaySummary] = await Promise.all([
     listProducts(user.storeId, '', { activeOnly: true }),
@@ -21,6 +26,7 @@ export default async function SalesPage() {
     <Counter
       products={products}
       customers={customers}
+      initialCustomerId={customerId ?? null}
       topProductIds={topProducts.map((p) => p.productId)}
       todaySummary={todaySummary}
       canManageCatalog={can(user.role, 'catalog.manage')}

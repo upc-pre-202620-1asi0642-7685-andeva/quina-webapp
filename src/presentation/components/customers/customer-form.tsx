@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { parseCustomerProfile } from '@/core/application/customers/customer-profile';
-import { DOCUMENT_TYPES, type DocumentType } from '@/core/domain/identity/document-id';
+import { RotateCcwIcon } from 'lucide-react';
+import { DOCUMENT_TYPES, DocumentId, type DocumentType } from '@/core/domain/identity/document-id';
+import { EmailAddress } from '@/core/domain/identity/email-address';
+import { MobilePhone } from '@/core/domain/identity/mobile-phone';
+import { PersonName } from '@/core/domain/identity/person-name';
 import { locales } from '@/core/domain/shared/locale';
 import type { CustomerFormState } from '@/presentation/actions/customers';
 import { FormField } from '@/presentation/components/auth/form-field';
@@ -13,7 +16,7 @@ import { Notice } from '@/presentation/components/notice';
 import { Button, buttonVariants } from '@/presentation/components/ui/button';
 import { Checkbox } from '@/presentation/components/ui/checkbox';
 import { Input } from '@/presentation/components/ui/input';
-import { customerError, type CustomerField } from '@/presentation/validation/customer-form';
+import { type CustomerField } from '@/presentation/validation/customer-form';
 
 export type CustomerFormValues = {
   documentType: DocumentType;
@@ -39,6 +42,42 @@ const EMPTY: CustomerFormValues = {
 
 type Action = (state: CustomerFormState, formData: FormData) => Promise<CustomerFormState>;
 
+function validateAll(
+  values: CustomerFormValues,
+  requireConsent: boolean,
+  consent: boolean,
+): Partial<Record<CustomerField, string>> {
+  const next: Partial<Record<CustomerField, string>> = {};
+  if (!DocumentId.parse(values.documentType, values.documentNumber).ok) {
+    next.documentNumber = 'documentInvalid';
+  }
+  if (!PersonName.parse(values.firstName).ok) {
+    next.firstName = 'firstNameInvalid';
+  }
+  if (!PersonName.parse(values.lastName).ok) {
+    next.lastName = 'lastNameInvalid';
+  }
+  if (!MobilePhone.parse(values.phone).ok) {
+    next.phone = 'phoneInvalid';
+  }
+  if (!EmailAddress.parse(values.email).ok) {
+    next.email = 'emailInvalid';
+  }
+  if (requireConsent && !consent) {
+    next.consent = 'consentRequired';
+  }
+  return next;
+}
+
+const FIELD_INPUT_IDS: Partial<Record<CustomerField, string>> = {
+  documentNumber: 'customer-document-number',
+  firstName: 'customer-first-name',
+  lastName: 'customer-last-name',
+  phone: 'customer-phone',
+  email: 'customer-email',
+  consent: 'customer-consent',
+};
+
 export function CustomerForm({
   mode,
   action,
@@ -46,6 +85,7 @@ export function CustomerForm({
   privacyHref,
   cancelHref,
   initial = EMPTY,
+  isReadOnly = false,
 }: {
   mode: 'new' | 'edit';
   action: Action;
@@ -53,8 +93,10 @@ export function CustomerForm({
   privacyHref: string;
   cancelHref: string;
   initial?: CustomerFormValues;
+  isReadOnly?: boolean;
 }) {
   const t = useTranslations('Customers.form');
+  const tList = useTranslations('Customers.list');
   const tDoc = useTranslations('Customers.documentTypes');
   const [state, formAction, pending] = useActionState(action, {});
   const [values, setValues] = useState(initial);
@@ -72,170 +114,200 @@ export function CustomerForm({
     }));
   };
 
-  // Misma validación que el servidor (DESIGN.md §7.2): se adelanta el primer error
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    const parsed = parseCustomerProfile({
-      ...values,
-      preferredLocale: null,
-    });
-    const next: Partial<Record<CustomerField, string>> = {};
-    if (!parsed.ok) {
-      const [field, key] = customerError(parsed.error);
-      next[field] = key;
-    }
-    if (mode === 'new' && !consent) next.consent = 'consentRequired';
-    setClientErrors(next);
-    if (Object.keys(next).length > 0) event.preventDefault();
+  const isDirty =
+    mode === 'edit' &&
+    (Object.keys(initial) as (keyof CustomerFormValues)[]).some(
+      (key) => values[key] !== initial[key],
+    );
+
+  function resetChanges() {
+    setValues(initial);
+    setClientErrors({});
   }
+
+  // Misma validación que el servidor (DESIGN.md §7.2): valida todos los campos a la vez
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (isReadOnly) {
+      event.preventDefault();
+      return;
+    }
+    const next = validateAll(values, mode === 'new', consent);
+    setClientErrors(next);
+    if (Object.keys(next).length > 0) {
+      event.preventDefault();
+      const firstInvalid = (Object.keys(next) as CustomerField[])[0];
+      const inputId = firstInvalid ? FIELD_INPUT_IDS[firstInvalid] : undefined;
+      if (inputId) document.getElementById(inputId)?.focus();
+    }
+  }
+
+  const documentNumberHint =
+    values.documentType === 'DNI' ? t('documentNumberHintDni') : t('documentNumberHintOther');
 
   return (
     <form action={formAction} onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+      {isReadOnly ? (
+        <Notice tone="warning">
+          <p>{tList('readOnlyNotice')}</p>
+        </Notice>
+      ) : null}
+
       {errors.form ? <Notice tone="error">{t(`errors.${errors.form}`)}</Notice> : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField
-          id="customer-document-type"
-          label={t('documentTypeLabel')}
-          hint={t('documentTypeHint')}
-        >
-          {(props) => (
-            <NativeSelect
-              {...props}
-              name="documentType"
-              value={values.documentType}
-              onChange={(e) => set('documentType')(e.target.value)}
-            >
-              {DOCUMENT_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {tDoc(type)}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </FormField>
-        <FormField
-          id="customer-document-number"
-          label={t('documentNumberLabel')}
-          hint={t('documentNumberHint')}
-          error={error('documentNumber')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="documentNumber"
-              inputMode={values.documentType === 'DNI' ? 'numeric' : 'text'}
-              autoComplete="off"
-              autoCapitalize="characters"
-              required
-              value={values.documentNumber}
-              onChange={(e) => set('documentNumber')(e.target.value)}
-              className="tabular-nums"
-            />
-          )}
-        </FormField>
-        <FormField
-          id="customer-first-name"
-          label={t('firstNameLabel')}
-          hint={t('firstNameHint')}
-          error={error('firstName')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="firstName"
-              autoComplete="off"
-              required
-              value={values.firstName}
-              onChange={(e) => set('firstName')(e.target.value)}
-            />
-          )}
-        </FormField>
-        <FormField
-          id="customer-last-name"
-          label={t('lastNameLabel')}
-          hint={t('lastNameHint')}
-          error={error('lastName')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="lastName"
-              autoComplete="off"
-              required
-              value={values.lastName}
-              onChange={(e) => set('lastName')(e.target.value)}
-            />
-          )}
-        </FormField>
-        <FormField
-          id="customer-phone"
-          label={t('phoneLabel')}
-          hint={t('phoneHint')}
-          error={error('phone')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="phone"
-              type="tel"
-              inputMode="tel"
-              autoComplete="off"
-              required
-              value={values.phone}
-              onChange={(e) => set('phone')(e.target.value)}
-              className="tabular-nums"
-            />
-          )}
-        </FormField>
-        <FormField
-          id="customer-email"
-          label={t('emailLabel')}
-          hint={t('emailHint')}
-          error={error('email')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="email"
-              type="email"
-              inputMode="email"
-              autoComplete="off"
-              autoCapitalize="none"
-              required
-              value={values.email}
-              onChange={(e) => set('email')(e.target.value)}
-            />
-          )}
-        </FormField>
-        <FormField id="customer-address" label={t('addressLabel')} hint={t('addressHint')}>
-          {(props) => (
-            <Input
-              {...props}
-              name="address"
-              autoComplete="off"
-              value={values.address}
-              onChange={(e) => set('address')(e.target.value)}
-            />
-          )}
-        </FormField>
-        <FormField id="customer-locale" label={t('localeLabel')} hint={t('localeHint')}>
-          {(props) => (
-            <NativeSelect
-              {...props}
-              name="preferredLocale"
-              value={values.preferredLocale}
-              onChange={(e) => set('preferredLocale')(e.target.value)}
-            >
-              <option value="">{t('localeStore')}</option>
-              {locales.map((locale) => (
-                <option key={locale} value={locale}>
-                  {t(`locales.${locale}`)}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </FormField>
-      </div>
+      <fieldset className="flex flex-col gap-4">
+        <legend className="text-base font-semibold text-ink">{t('sectionIdentity')}</legend>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            id="customer-document-type"
+            label={t('documentTypeLabel')}
+            hint={t('documentTypeHint')}
+          >
+            {(props) => (
+              <NativeSelect
+                {...props}
+                name="documentType"
+                value={values.documentType}
+                onChange={(e) => set('documentType')(e.target.value)}
+              >
+                {DOCUMENT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {tDoc(type)}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+          <FormField
+            id="customer-document-number"
+            label={t('documentNumberLabel')}
+            hint={documentNumberHint}
+            error={error('documentNumber')}
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="documentNumber"
+                inputMode={values.documentType === 'DNI' ? 'numeric' : 'text'}
+                maxLength={values.documentType === 'DNI' ? 8 : 15}
+                autoComplete="off"
+                autoCapitalize="characters"
+                required
+                value={values.documentNumber}
+                onChange={(e) => set('documentNumber')(e.target.value)}
+                className="tabular-nums"
+              />
+            )}
+          </FormField>
+          <FormField
+            id="customer-first-name"
+            label={t('firstNameLabel')}
+            hint={t('firstNameHint')}
+            error={error('firstName')}
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="firstName"
+                autoComplete="off"
+                required
+                value={values.firstName}
+                onChange={(e) => set('firstName')(e.target.value)}
+              />
+            )}
+          </FormField>
+          <FormField
+            id="customer-last-name"
+            label={t('lastNameLabel')}
+            hint={t('lastNameHint')}
+            error={error('lastName')}
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="lastName"
+                autoComplete="off"
+                required
+                value={values.lastName}
+                onChange={(e) => set('lastName')(e.target.value)}
+              />
+            )}
+          </FormField>
+        </div>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-4 border-t border-line pt-6">
+        <legend className="pt-4 text-base font-semibold text-ink">{t('sectionContact')}</legend>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            id="customer-phone"
+            label={t('phoneLabel')}
+            hint={t('phoneHint')}
+            error={error('phone')}
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="off"
+                required
+                value={values.phone}
+                onChange={(e) => set('phone')(e.target.value)}
+                className="tabular-nums"
+              />
+            )}
+          </FormField>
+          <FormField
+            id="customer-email"
+            label={t('emailLabel')}
+            hint={t('emailHint')}
+            error={error('email')}
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="off"
+                autoCapitalize="none"
+                required
+                value={values.email}
+                onChange={(e) => set('email')(e.target.value)}
+              />
+            )}
+          </FormField>
+          <FormField id="customer-address" label={t('addressLabel')} hint={t('addressHint')}>
+            {(props) => (
+              <Input
+                {...props}
+                name="address"
+                autoComplete="off"
+                value={values.address}
+                onChange={(e) => set('address')(e.target.value)}
+              />
+            )}
+          </FormField>
+          <FormField id="customer-locale" label={t('localeLabel')} hint={t('localeHint')}>
+            {(props) => (
+              <NativeSelect
+                {...props}
+                name="preferredLocale"
+                value={values.preferredLocale}
+                onChange={(e) => set('preferredLocale')(e.target.value)}
+              >
+                <option value="">{t('localeStore')}</option>
+                {locales.map((locale) => (
+                  <option key={locale} value={locale}>
+                    {t(`locales.${locale}`)}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+        </div>
+      </fieldset>
 
       {mode === 'new' ? (
         <fieldset className="flex flex-col gap-3 rounded-card border border-line bg-paper-deep p-4">
@@ -259,7 +331,7 @@ export function CustomerForm({
             />
             <label
               htmlFor="customer-consent"
-              className="cursor-pointer text-sm leading-snug text-ink"
+              className="min-h-11 cursor-pointer py-0.5 text-sm leading-snug text-ink"
             >
               {t.rich('consentLabel', {
                 store: storeName,
@@ -289,14 +361,20 @@ export function CustomerForm({
         </fieldset>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-end">
+        {isDirty ? (
+          <Button type="button" variant="ghost" onClick={resetChanges} className="sm:mr-auto">
+            <RotateCcwIcon aria-hidden="true" />
+            {t('undoChanges')}
+          </Button>
+        ) : null}
         <Link href={cancelHref} className={buttonVariants({ variant: 'secondary' })}>
           {t('cancel')}
         </Link>
         <Button
           type="submit"
           // US04 crit. 3: sin la casilla marcada no se puede registrar
-          disabled={pending || (mode === 'new' && !consent)}
+          disabled={pending || isReadOnly || (mode === 'new' && !consent)}
         >
           {mode === 'new'
             ? pending
