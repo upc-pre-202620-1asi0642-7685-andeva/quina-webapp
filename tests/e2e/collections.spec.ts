@@ -69,6 +69,12 @@ test.describe('corte y cobranza (US10 a US13)', () => {
     await expect(page.getByText('No hay ciclos por cobrar.')).toBeVisible();
     await page
       .getByRole('main')
+      .getByRole('link', { name: /Recibos/ })
+      .click();
+    await expect(page.getByRole('link', { name: /R-000001/ })).toBeVisible();
+    await expectAccessible(page);
+    await page
+      .getByRole('main')
       .getByRole('link', { name: /Avisos de hoy/ })
       .click();
     await expectAccessible(page);
@@ -103,10 +109,23 @@ test.describe('corte y cobranza (US10 a US13)', () => {
     await expect(page.getByText('Observación registrada.', { exact: false })).toBeVisible();
     await expect(page.getByText('Lo que dijo el vecino: Dice que no compró arroz')).toBeVisible();
 
+    // La observación aparece también en la cola de Cobranza (?tab=objections)
+    await page.goto('./collections?tab=objections');
+    await expect(page.getByText('Lo que dijo el vecino: Dice que no compró arroz')).toBeVisible();
+    await expectAccessible(page);
+
     await page.getByRole('button', { name: 'Anular' }).click();
     await page.getByRole('dialog').getByLabel('Motivo de la anulación').fill('Se cobró por error');
     await page.getByRole('dialog').getByRole('button', { name: 'Anular cargo' }).click();
     await expect(page.getByText(/Cargo anulado\. Los productos volvieron al stock/)).toBeVisible();
+    await expect(page.getByText('No hay cargos observados pendientes.')).toBeVisible();
+    await expectAccessible(page);
+
+    await openRosa(page);
+    await page
+      .getByRole('link', { name: /Corte del/ })
+      .first()
+      .click();
     await expect(page.getByText('Anulado', { exact: true })).toBeVisible();
     await expectAccessible(page);
   });

@@ -799,6 +799,7 @@
       "customersNew": "Add neighbor",
       "collectionsDue": "To collect",
       "collectionsOverdue": "Overdue",
+      "collectionsPayments": "Receipts",
       "collectionsNotices": "Today's notices",
       "lowStock": "Low stock",
       "collapse": "Collapse sidebar",
@@ -2124,7 +2125,18 @@
       "paymentsTitle": "Payments",
       "receipt": "Receipt {number} · {date}",
       "pay": "Collect",
-      "remaining": "Remaining balance"
+      "remaining": "Remaining balance",
+      "statementSent": "Statement sent on {date}",
+      "olderPayableNotice": "This customer has an older unpaid cycle. Cycles are collected from oldest to newest.",
+      "olderPayableLink": "Go to oldest cycle",
+      "filterLabel": "Filter cycle charges",
+      "filter": {
+        "all": "All",
+        "pending": "Awaiting confirmation",
+        "objected": "Objected",
+        "voided": "Voided"
+      },
+      "noMatchingLines": "No charges match that filter."
     },
     "charge": {
       "purchase": "Purchase on {date}",
@@ -2183,7 +2195,8 @@
         "returnedItems": "Returned items",
         "pricingError": "Price or quantity error"
       },
-      "noteHint": "Saved in the cycle audit trail."
+      "noteHint": "Saved in the cycle audit trail.",
+      "clearNote": "Clear"
     },
     "pay": {
       "back": "Back to {name}",
@@ -2228,7 +2241,23 @@
         "RECEIVED_TOO_LOW": "The received amount is less than the total."
       },
       "exactChip": "Exact ({amount})",
-      "submitting": "Recording payment..."
+      "submitting": "Recording payment...",
+      "alreadyPaid": "Already paid",
+      "clearReceived": "Clear received amount",
+      "counterDetailsTitle": "Details to receive payment",
+      "showQr": "Show QR",
+      "qrTitle": "{store}'s QR",
+      "qrHint": "Ask the customer to scan this QR for {amount}.",
+      "qrAlt": "Store payment QR code",
+      "closeQr": "Close",
+      "bankLabel": "Bank",
+      "accountLabel": "Account number",
+      "cciLabel": "CCI",
+      "copy": "Copy",
+      "copiedShort": "Copied",
+      "copyDetailLabel": "Copy {label}",
+      "copiedDetail": "{label} copied.",
+      "copyError": "Couldn't copy."
     },
     "receipt": {
       "back": "Back to {name}",
@@ -2237,6 +2266,7 @@
       "nextCycle": "Check whether another cycle is left to collect",
       "title": "Receipt {number}",
       "customer": "Customer",
+      "documentNumber": "ID {doc}",
       "cycle": "Cycle cut-off",
       "method": "Payment method",
       "collector": "Collected by",
@@ -2244,22 +2274,75 @@
       "compensatory": "Compensatory interest",
       "moratory": "Late interest for {days, plural, one {# day} other {# days}}",
       "total": "Total paid",
-      "print": "Print"
+      "print": "Print",
+      "copy": "Copy summary",
+      "copiedShort": "Copied",
+      "copied": "Receipt summary copied.",
+      "copyError": "Couldn't copy summary.",
+      "whatsapp": "Send via WhatsApp",
+      "shareSummary": "Receipt {number} from {store} ({date}) — {customer}: {amount} via {method}."
     },
     "page": {
       "title": "Collections",
       "subtitleManual": "On the Casero plan, notices go out when you send them.",
       "subtitleAutomatic": "Summaries, reminders and late notices go out on their own every morning.",
+      "viewPortfolio": "View portfolio",
+      "kpi": {
+        "collectable": "To collect",
+        "overdue": "Overdue",
+        "dueSoon": "Due in 3 days",
+        "dueSoonHint": "Remind before due date",
+        "objections": "Objections to review",
+        "objectionsOwnerHint": "Tap to confirm or void",
+        "objectionsEmployeeHint": "Waiting for owner review",
+        "collectedToday": "Collected today",
+        "cyclesCount": "{count, plural, one {# cycle} other {# cycles}}",
+        "paymentsCount": "{count, plural, one {# payment} other {# payments}}"
+      },
       "tabsLabel": "Collections sections",
       "tabs": {
         "due": "To collect",
         "overdue": "Overdue",
+        "objections": "Objections",
+        "payments": "Receipts",
         "notices": "Today's notices"
       },
       "noDue": "No cycles to collect.",
       "noOverdue": "No customer has overdue payments.",
       "noNotices": "No notices have gone out today yet.",
+      "noObjections": "No pending objected charges.",
+      "noPayments": "No payments recorded yet.",
+      "filteredEmpty": "No results match those filters.",
+      "fixEmail": "Fix email",
+      "viewCustomer": "View customer",
       "dueOn": "Pay by {date}",
+      "daysLate": "{count, plural, one {# day late} other {# days late}}",
+      "dueToday": "Due today",
+      "dueInDays": "Due in {count, plural, one {# day} other {# days}}",
+      "cycleNumber": "Cycle {number} · {date}",
+      "objectedCount": "{count, plural, one {# objected charge} other {# objected charges}}",
+      "bouncedBadge": "Email bounced",
+      "viewCycle": "View cycle",
+      "review": "Review",
+      "blocked": "Blocked",
+      "whatsappCustomer": "Message {name} on WhatsApp",
+      "whatsappReminder": "Hi {name}, a friendly reminder for your credit of {amount} due on {date}. Thank you.",
+      "table": {
+        "customer": "Customer",
+        "cycle": "Cycle",
+        "due": "Due date",
+        "status": "Status",
+        "amount": "To collect",
+        "actions": "Actions"
+      },
+      "paymentsTable": {
+        "receipt": "Receipt",
+        "customer": "Customer",
+        "method": "Method",
+        "collector": "Collected by",
+        "amount": "Amount",
+        "viewReceipt": "View receipt"
+      },
       "noticeType": {
         "CHARGE_DIGEST": "Purchase summary",
         "CYCLE_STATEMENT": "Account statement",
@@ -2275,11 +2358,39 @@
         "FAILED": "Failed"
       }
     },
+    "controls": {
+      "searchLabel": "Search collections",
+      "searchPlaceholder": "Search by customer name...",
+      "searchPaymentsPlaceholder": "Search by customer, receipt or collector...",
+      "clearSearch": "Clear search",
+      "searchSubmit": "Search",
+      "sortLabel": "Sort collections",
+      "sort": {
+        "dueDate": "Soonest due",
+        "amountDesc": "Highest amount",
+        "name": "Name (A-Z)"
+      },
+      "filters": {
+        "all": "All",
+        "dueSoon": "Due soon",
+        "blocked": "Objected",
+        "bounced": "Bounced email"
+      },
+      "clearAll": "Clear filters"
+    },
+    "objections": {
+      "cycleLabel": "cycle {number} (cut-off {date})",
+      "viewCycle": "View in cycle"
+    },
     "manual": {
       "title": "Notices to your customers",
       "hint": "The purchase summary opens the 48 hours for the customer to object to a charge. The reminder goes to those who pay in 3 days or less.",
       "digests": "Send purchase summary",
       "reminders": "Send reminders",
+      "previewDigests": "{count, plural, one {# pending summary} other {# pending summaries}}",
+      "previewReminders": "{count, plural, one {# due-soon reminder} other {# due-soon reminders}}",
+      "bouncedNotice": "{count, plural, one {# customer has a bounced email and won't receive notices.} other {# customers have bounced emails and won't receive notices.}}",
+      "seeBounced": "View them",
       "nothing": "There were no pending notices to send.",
       "sent": "{sent, plural, one {# notice was sent.} other {# notices were sent.}} {failed, plural, =0 {} one {# failed; it will be retried tomorrow.} other {# failed; they will be retried tomorrow.}}",
       "errors": {

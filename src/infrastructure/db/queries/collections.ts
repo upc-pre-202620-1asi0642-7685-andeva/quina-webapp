@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lt, lte, ne, sql } from 'drizzle-orm';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { Money, type Currency } from '@/core/domain/shared/money';
 import { loadCycleLedger } from '../collections/cycle-ledger';
@@ -121,7 +121,15 @@ export type CycleDetail = {
   currency: Currency;
   cutOffDate: Date;
   paymentDueDate: Date;
-  customer: { id: string; firstName: string; lastName: string; emailBouncedAt: Date | null };
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string | null;
+    emailBouncedAt: Date | null;
+  };
+  accountStatus: string;
+  olderPayableCycleId: string | null;
   lines: CycleDetailLine[];
   installmentPurchases: InstallmentPurchase[];
   purchasesTotal: string;
@@ -244,15 +252,29 @@ export async function getCycleDetail(
         voidReason,
       }));
 
-    const payments = await tx
-      .select({
-        id: debtPayments.id,
-        receiptNumber: debtPayments.receiptNumber,
-        amountPaid: debtPayments.amountPaid,
-        paymentDate: debtPayments.paymentDate,
-      })
-      .from(debtPayments)
-      .where(eq(debtPayments.settlementCycleId, cycle.id));
+    const [payments, olderPayables] = await Promise.all([
+      tx
+        .select({
+          id: debtPayments.id,
+          receiptNumber: debtPayments.receiptNumber,
+          amountPaid: debtPayments.amountPaid,
+          paymentDate: debtPayments.paymentDate,
+        })
+        .from(debtPayments)
+        .where(eq(debtPayments.settlementCycleId, cycle.id)),
+      tx
+        .select({ id: settlementCycles.id })
+        .from(settlementCycles)
+        .where(
+          and(
+            eq(settlementCycles.creditAccountId, account.id),
+            inArray(settlementCycles.status, ['BILLED', 'OVERDUE']),
+          ),
+        )
+        .orderBy(asc(settlementCycles.cutOffDate))
+        .limit(1),
+    ]);
+    const oldestPayableId = olderPayables[0]?.id ?? null;
 
     const settlement = ledger.value.settlement;
     return {
@@ -266,8 +288,11 @@ export async function getCycleDetail(
         id: customer.id,
         firstName: customer.firstName,
         lastName: customer.lastName,
+        phone: customer.phone,
         emailBouncedAt: customer.emailBouncedAt,
       },
+      accountStatus: account.status,
+      olderPayableCycleId: oldestPayableId && oldestPayableId !== cycle.id ? oldestPayableId : null,
       lines,
       installmentPurchases,
       purchasesTotal: billed ? cycle.purchasesTotal : settlement.purchasesTotal.toFixed2(),
@@ -310,7 +335,13 @@ export type Receipt = {
   notes: string | null;
   collector: string;
   store: { name: string; taxIdType: string; taxIdNumber: string };
-  customer: { id: string; firstName: string; lastName: string; documentNumber: string };
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
+    phone: string | null;
+  };
   cycle: { id: string; cutOffDate: Date; paymentDueDate: Date };
 };
 
@@ -367,6 +398,7 @@ export function getReceipt(
         firstName: customer.firstName,
         lastName: customer.lastName,
         documentNumber: customer.documentNumber,
+        phone: customer.phone,
       },
       cycle: { id: cycle.id, cutOffDate: cycle.cutOffDate, paymentDueDate: cycle.paymentDueDate },
     };
@@ -375,12 +407,19 @@ export function getReceipt(
 
 export type CollectionRow = {
   cycleId: string;
+  cycleNumber: number;
   customerId: string;
   name: string;
+  phone: string | null;
+  emailBouncedAt: Date | null;
+  accountStatus: string;
   status: 'BILLED' | 'OVERDUE';
   currency: Currency;
   totalDue: string;
+  amountPaid: string;
+  cutOffDate: Date;
   paymentDueDate: Date;
+  objectedCount: number;
 };
 
 /** Ciclos por cobrar y vencidos de la tienda, del pago más próximo al más lejano. */
@@ -389,12 +428,18 @@ export function listCollections(storeId: string): Promise<CollectionRow[]> {
     const rows = await tx
       .select({
         cycleId: settlementCycles.id,
+        cycleNumber: settlementCycles.cycleNumber,
         customerId: customers.id,
         firstName: customers.firstName,
         lastName: customers.lastName,
+        phone: customers.phone,
+        emailBouncedAt: customers.emailBouncedAt,
+        accountStatus: creditAccounts.status,
         status: settlementCycles.status,
         currency: creditAccounts.currency,
         totalDue: settlementCycles.totalDue,
+        amountPaid: settlementCycles.amountPaid,
+        cutOffDate: settlementCycles.cutOffDate,
         paymentDueDate: settlementCycles.paymentDueDate,
       })
       .from(settlementCycles)
@@ -402,15 +447,247 @@ export function listCollections(storeId: string): Promise<CollectionRow[]> {
       .innerJoin(customers, eq(customers.id, creditAccounts.customerId))
       .where(inArray(settlementCycles.status, ['BILLED', 'OVERDUE']))
       .orderBy(asc(settlementCycles.paymentDueDate), asc(customers.firstName));
+
+    const cycleIds = rows.map((r) => r.cycleId);
+    const objectedByCycle = new Map<string, number>();
+    if (cycleIds.length > 0) {
+      const objectedRows = await tx
+        .select({
+          cycleId: creditCharges.settlementCycleId,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(creditCharges)
+        .where(
+          and(
+            inArray(creditCharges.settlementCycleId, cycleIds),
+            eq(creditCharges.consentStatus, 'OBJECTED'),
+            ne(creditCharges.status, 'VOIDED'),
+          ),
+        )
+        .groupBy(creditCharges.settlementCycleId);
+      for (const o of objectedRows) {
+        objectedByCycle.set(o.cycleId, o.count);
+      }
+    }
+
+    return rows.map((r) => {
+      const currency = r.currency as Currency;
+      const remaining = Money.of(r.totalDue, currency).minus(Money.of(r.amountPaid, currency));
+      return {
+        cycleId: r.cycleId,
+        cycleNumber: r.cycleNumber,
+        customerId: r.customerId,
+        name: `${r.firstName} ${r.lastName}`,
+        phone: r.phone,
+        emailBouncedAt: r.emailBouncedAt,
+        accountStatus: r.accountStatus,
+        status: r.status as 'BILLED' | 'OVERDUE',
+        currency,
+        totalDue: (remaining.isPositive() ? remaining : Money.zero(currency)).toFixed2(),
+        amountPaid: r.amountPaid,
+        cutOffDate: r.cutOffDate,
+        paymentDueDate: r.paymentDueDate,
+        objectedCount: objectedByCycle.get(r.cycleId) ?? 0,
+      };
+    });
+  });
+}
+
+export type ObjectedChargeRow = {
+  chargeId: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string | null;
+  cycleId: string;
+  cycleNumber: number;
+  cutOffDate: Date;
+  purchaseDate: Date;
+  currency: Currency;
+  principalAmount: string;
+  items: { name: string; quantity: string; amount: string }[];
+  objectionNote: string | null;
+  objectedAt: Date | null;
+};
+
+/** Cargos observados sin resolver para la cola de revisión en Cobranza (US11). */
+export function listObjectedCharges(storeId: string): Promise<ObjectedChargeRow[]> {
+  return withTenant(storeId, async (tx) => {
+    const rows = await tx
+      .select({
+        charge: creditCharges,
+        cycleNumber: settlementCycles.cycleNumber,
+        cutOffDate: settlementCycles.cutOffDate,
+        currency: creditAccounts.currency,
+        customerId: customers.id,
+        firstName: customers.firstName,
+        lastName: customers.lastName,
+        phone: customers.phone,
+      })
+      .from(creditCharges)
+      .innerJoin(settlementCycles, eq(settlementCycles.id, creditCharges.settlementCycleId))
+      .innerJoin(creditAccounts, eq(creditAccounts.id, creditCharges.creditAccountId))
+      .innerJoin(customers, eq(customers.id, creditAccounts.customerId))
+      .where(
+        and(
+          eq(creditCharges.consentStatus, 'OBJECTED'),
+          ne(creditCharges.status, 'VOIDED'),
+          ne(creditCharges.status, 'PAID'),
+        ),
+      )
+      .orderBy(asc(creditCharges.objectedAt), asc(creditCharges.purchaseDate));
+
+    if (rows.length === 0) return [];
+    const items = await itemsOf(
+      tx,
+      rows.map((r) => r.charge.saleId),
+    );
     return rows.map((r) => ({
-      cycleId: r.cycleId,
+      chargeId: r.charge.id,
       customerId: r.customerId,
-      name: `${r.firstName} ${r.lastName}`,
-      status: r.status as 'BILLED' | 'OVERDUE',
+      customerName: `${r.firstName} ${r.lastName}`,
+      customerPhone: r.phone,
+      cycleId: r.charge.settlementCycleId,
+      cycleNumber: r.cycleNumber,
+      cutOffDate: r.cutOffDate,
+      purchaseDate: r.charge.purchaseDate,
       currency: r.currency as Currency,
-      totalDue: r.totalDue,
-      paymentDueDate: r.paymentDueDate,
+      principalAmount: r.charge.principalAmount,
+      items: items.get(r.charge.saleId) ?? [],
+      objectionNote: r.charge.objectionNote,
+      objectedAt: r.charge.objectedAt,
     }));
+  });
+}
+
+export type RecentPaymentRow = {
+  id: string;
+  receiptNumber: string;
+  paymentDate: Date;
+  paymentMethod: string;
+  amountPaid: string;
+  daysLate: number;
+  currency: Currency;
+  customerId: string;
+  customerName: string;
+  collectorName: string;
+  cycleId: string;
+  cutOffDate: Date;
+};
+
+/** Pagos recientes registrados en la tienda, del más nuevo al más antiguo (US13). */
+export function listRecentPayments(storeId: string, limit = 50): Promise<RecentPaymentRow[]> {
+  return withTenant(storeId, async (tx) => {
+    const rows = await tx
+      .select({
+        id: debtPayments.id,
+        receiptNumber: debtPayments.receiptNumber,
+        paymentDate: debtPayments.paymentDate,
+        paymentMethod: debtPayments.paymentMethod,
+        amountPaid: debtPayments.amountPaid,
+        daysLate: debtPayments.daysLate,
+        currency: creditAccounts.currency,
+        customerId: customers.id,
+        firstName: customers.firstName,
+        lastName: customers.lastName,
+        collectorName: users.name,
+        cycleId: settlementCycles.id,
+        cutOffDate: settlementCycles.cutOffDate,
+      })
+      .from(debtPayments)
+      .innerJoin(creditAccounts, eq(creditAccounts.id, debtPayments.creditAccountId))
+      .innerJoin(customers, eq(customers.id, creditAccounts.customerId))
+      .innerJoin(settlementCycles, eq(settlementCycles.id, debtPayments.settlementCycleId))
+      .innerJoin(users, eq(users.id, debtPayments.userIdCollector))
+      .orderBy(desc(debtPayments.paymentDate), desc(debtPayments.createdAt))
+      .limit(limit);
+
+    return rows.map((r) => ({
+      id: r.id,
+      receiptNumber: r.receiptNumber,
+      paymentDate: r.paymentDate,
+      paymentMethod: r.paymentMethod,
+      amountPaid: r.amountPaid,
+      daysLate: r.daysLate,
+      currency: r.currency as Currency,
+      customerId: r.customerId,
+      customerName: `${r.firstName} ${r.lastName}`,
+      collectorName: r.collectorName,
+      cycleId: r.cycleId,
+      cutOffDate: r.cutOffDate,
+    }));
+  });
+}
+
+export type ManualNoticePreview = {
+  pendingDigests: number;
+  pendingReminders: number;
+  bouncedCustomers: number;
+};
+
+/** Conteo previo de avisos manuales en Plan Casero y correos rebotados (P5). */
+export function getManualNoticePreview(storeId: string, now: Date): Promise<ManualNoticePreview> {
+  const today = BusinessDate.fromInstant(now);
+  const todayIso = BusinessDate.toISO(today);
+  const start = BusinessDate.startInstant(today);
+  const limit = BusinessDate.endInstant(
+    BusinessDate.fromInstant(new Date(start.getTime() + 3 * 86_400_000)),
+  );
+
+  return withTenant(storeId, async (tx) => {
+    const [pendingDigestCustomers, sentDigestsToday, dueSoonCycles, sentReminders, bouncedRows] =
+      await Promise.all([
+        tx
+          .selectDistinct({ customerId: creditAccounts.customerId })
+          .from(creditCharges)
+          .innerJoin(creditAccounts, eq(creditAccounts.id, creditCharges.creditAccountId))
+          .where(
+            and(
+              isNull(creditCharges.notifiedAt),
+              ne(creditCharges.status, 'VOIDED'),
+              lt(creditCharges.createdAt, now),
+            ),
+          ),
+        tx
+          .select({ customerId: notificationLogs.customerId })
+          .from(notificationLogs)
+          .where(
+            and(
+              eq(notificationLogs.notificationType, 'CHARGE_DIGEST'),
+              eq(notificationLogs.digestDate, todayIso),
+            ),
+          ),
+        tx
+          .select({ id: settlementCycles.id })
+          .from(settlementCycles)
+          .where(
+            and(
+              eq(settlementCycles.status, 'BILLED'),
+              gte(settlementCycles.paymentDueDate, start),
+              lte(settlementCycles.paymentDueDate, limit),
+            ),
+          ),
+        tx
+          .select({ referenceId: notificationLogs.referenceId })
+          .from(notificationLogs)
+          .where(eq(notificationLogs.notificationType, 'PAYMENT_REMINDER')),
+        tx
+          .select({ id: customers.id })
+          .from(customers)
+          .where(and(eq(customers.isActive, true), isNotNull(customers.emailBouncedAt))),
+      ]);
+
+    const sentDigestSet = new Set(
+      sentDigestsToday.map((r) => r.customerId).filter((v): v is string => Boolean(v)),
+    );
+    const sentReminderSet = new Set(
+      sentReminders.map((r) => r.referenceId).filter((v): v is string => Boolean(v)),
+    );
+
+    return {
+      pendingDigests: pendingDigestCustomers.filter((r) => !sentDigestSet.has(r.customerId)).length,
+      pendingReminders: dueSoonCycles.filter((c) => !sentReminderSet.has(c.id)).length,
+      bouncedCustomers: bouncedRows.length,
+    };
   });
 }
 

@@ -32,6 +32,7 @@ describe('navegación por rol (DESIGN.md §5, US05)', () => {
     expect(keys(counter[3]?.children ?? [])).toEqual([
       'collectionsDue',
       'collectionsOverdue',
+      'collectionsPayments',
       'collectionsNotices',
     ]);
     expect(keys(secondaryItems('STORE_OWNER'))).toEqual(['settings', 'subscription']);

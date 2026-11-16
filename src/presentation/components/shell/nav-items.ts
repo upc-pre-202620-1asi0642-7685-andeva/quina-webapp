@@ -13,6 +13,7 @@ export type NavKey =
   | 'collections'
   | 'collectionsDue'
   | 'collectionsOverdue'
+  | 'collectionsPayments'
   | 'collectionsNotices'
   | 'inventory'
   | 'products'
@@ -85,6 +86,11 @@ const STORE: { key: NavGroupKey; items: NavDefinition[] }[] = [
             href: '/collections?tab=overdue',
             permission: 'payments.create',
             badge: 'overdue',
+          },
+          {
+            key: 'collectionsPayments',
+            href: '/collections?tab=payments',
+            permission: 'payments.create',
           },
           {
             key: 'collectionsNotices',

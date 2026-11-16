@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { ChevronRightIcon, ReceiptTextIcon } from 'lucide-react';
 import type { CycleDetail } from '@/infrastructure/db/queries/collections';
 import { ChargeLine } from '@/presentation/components/collections/charge-line';
+import { CycleLinesList } from '@/presentation/components/collections/cycle-lines-list';
 import { Money } from '@/presentation/components/money';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
@@ -59,21 +60,15 @@ export async function CycleStatement({
         {cycle.lines.length === 0 ? (
           <p className={cn('text-ink-soft', body)}>{t('cycle.noLines')}</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-line">
-            {cycle.lines.map((line, index) => (
-              <li key={`${line.kind}-${line.chargeId}-${index}`} className="py-3">
-                <ChargeLine
-                  line={line}
-                  currency={currency}
-                  customerId={customerId}
-                  cycleId={cycle.id}
-                  permissions={permissions}
-                  now={now}
-                  portalStoreId={portalStoreId}
-                />
-              </li>
-            ))}
-          </ul>
+          <CycleLinesList
+            lines={cycle.lines}
+            currency={currency}
+            customerId={customerId}
+            cycleId={cycle.id}
+            permissions={permissions}
+            nowIso={now.toISOString()}
+            portalStoreId={portalStoreId}
+          />
         )}
 
         <dl className={cn('flex flex-col gap-2 border-t border-line pt-4', body)}>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, MailCheckIcon } from 'lucide-react';
 import { z } from 'zod';
 import { can } from '@/core/domain/identity/permissions';
 import { Money as MoneyValue } from '@/core/domain/shared/money';
@@ -15,6 +15,7 @@ import {
 } from '@/presentation/components/collections/cycle-status-badge';
 import { FlashToast } from '@/presentation/components/feedback/flash-toast';
 import { Money } from '@/presentation/components/money';
+import { Notice } from '@/presentation/components/notice';
 import { formatDate } from '@/presentation/lib/format-date';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
@@ -52,16 +53,28 @@ export default async function CyclePage({
     MoneyValue.of(cycle.amountPaid, currency),
   );
   const showPay = payable && can(user.role, 'payments.create');
+  const canEditCustomer = can(user.role, 'customers.update') && !store.isReadOnly;
+  const hasMoratory = MoneyValue.of(cycle.moratoryInterestTotal, currency).isPositive();
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <Link
-        href={`/customers/${id}`}
-        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
-      >
-        <ArrowLeftIcon aria-hidden="true" className="size-4" />
-        {t('cycle.back', { name: cycle.customer.firstName })}
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link
+          href={`/customers/${id}`}
+          className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        >
+          <ArrowLeftIcon aria-hidden="true" className="size-4" />
+          {t('cycle.back', { name: cycle.customer.firstName })}
+        </Link>
+        {can(user.role, 'payments.create') ? (
+          <Link
+            href="/collections"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-ink-soft hover:text-ink hover:underline"
+          >
+            {t('page.title')}
+          </Link>
+        ) : null}
+      </div>
 
       {shownNotice ? <FlashToast type="success" title={t(`cycle.notice.${shownNotice}`)} /> : null}
 
@@ -76,12 +89,52 @@ export default async function CyclePage({
               number: cycle.cycleNumber,
             })}
           </p>
-          <CycleStatusBadge status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)} />
+          <div className="flex flex-wrap items-center gap-2">
+            <CycleStatusBadge status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)} />
+            {cycle.statementSentAt ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-paper-deep px-2.5 py-0.5 text-[13px] text-ink-soft">
+                <MailCheckIcon aria-hidden="true" className="size-3.5" />
+                {t('cycle.statementSent', { date: formatDate(cycle.statementSentAt) })}
+              </span>
+            ) : null}
+          </div>
         </div>
         {showPay ? <CyclePayButton customerId={id} /> : null}
       </header>
 
-      <dl className="grid grid-cols-2 divide-x divide-line overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-3">
+      {cycle.customer.emailBouncedAt ? (
+        <Notice tone="warning">
+          <p>{t('bounce', { date: formatDate(cycle.customer.emailBouncedAt) })}</p>
+          {canEditCustomer ? (
+            <Link
+              href={`/customers/${id}/edit`}
+              className="font-semibold underline underline-offset-4"
+            >
+              {t('page.fixEmail')}
+            </Link>
+          ) : null}
+        </Notice>
+      ) : null}
+
+      {cycle.olderPayableCycleId && showPay ? (
+        <Notice tone="warning">
+          <p>{t('cycle.olderPayableNotice')}</p>
+          <Link
+            href={`/customers/${id}/cycles/${cycle.olderPayableCycleId}`}
+            className="font-semibold underline underline-offset-4"
+          >
+            {t('cycle.olderPayableLink')}
+          </Link>
+        </Notice>
+      ) : null}
+
+      <dl
+        className={
+          hasMoratory
+            ? 'grid grid-cols-2 divide-x divide-line overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-4'
+            : 'grid grid-cols-2 divide-x divide-line overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-3'
+        }
+      >
         <div className="col-span-2 flex flex-col gap-1 p-4 sm:col-span-1">
           <dt className="text-[13px] text-ink-soft">
             {billed
@@ -113,6 +166,14 @@ export default async function CyclePage({
             <Money amount={cycle.amountPaid} currency={currency} />
           </dd>
         </div>
+        {hasMoratory ? (
+          <div className="col-span-2 flex flex-col gap-1 border-t border-line p-4 sm:col-span-1 sm:border-t-0">
+            <dt className="text-[13px] text-error-ink">{t('cycle.moratory')}</dt>
+            <dd className="text-lg font-semibold whitespace-nowrap text-error-ink">
+              <Money amount={cycle.moratoryInterestTotal} currency={currency} />
+            </dd>
+          </div>
+        ) : null}
       </dl>
 
       <CycleStatement

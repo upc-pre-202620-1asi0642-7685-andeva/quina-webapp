@@ -66,6 +66,7 @@ const ICONS: Record<NavKey, LucideIcon> = {
   collections: HandCoinsIcon,
   collectionsDue: CalendarClockIcon,
   collectionsOverdue: TriangleAlertIcon,
+  collectionsPayments: ReceiptTextIcon,
   collectionsNotices: BellRingIcon,
   inventory: PackageIcon,
   products: PackageIcon,
