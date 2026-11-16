@@ -58,11 +58,27 @@ test.describe('venta al contado en el mostrador (US07)', () => {
 async function payBreadWithYape(page: Page) {
   await addProduct(page, 'Pan francés', '0.40', '10');
   await page.goto('./sales');
+
+  // Ventas de hoy muestra lo ya cobrado en el turno
+  await page.getByRole('button', { name: /^Ventas de hoy ·/ }).click();
+  const sheet = page.getByRole('dialog', { name: 'Ventas de hoy' });
+  await expect(sheet.getByText('Arroz Costeño 1 kg')).toBeVisible();
+  await sheet.getByRole('button', { name: 'Cerrar ventas de hoy' }).click();
+
   const bread = page.getByRole('button', { name: /^Pan francés/ });
   await bread.click();
   await bread.click();
   await bread.click();
+  await bread.click();
+  // Descuenta 1 directo desde la grilla sin abrir el carrito
+  await page.getByRole('button', { name: 'Quitar uno de Pan francés' }).first().click();
+
   const panel = await cart(page);
+  // Vaciar y deshacer recuperan el carrito al instante
+  await panel.getByRole('button', { name: 'Vaciar el carrito' }).click();
+  await expect(panel.getByText('Carrito vaciado (1)')).toBeVisible();
+  await panel.getByRole('button', { name: 'Deshacer' }).click();
+
   await panel.getByText('Yape', { exact: true }).click();
   await expect(panel.getByLabel('Recibido')).toBeHidden();
   await panel.getByRole('button', { name: 'Cobrar S/ 1.20' }).click();

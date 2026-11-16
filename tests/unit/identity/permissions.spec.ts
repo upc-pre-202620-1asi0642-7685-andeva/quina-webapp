@@ -31,6 +31,7 @@ describe('can', () => {
       'catalog.prices',
       'rus.view',
       'team.manage',
+      'audit.view',
       'settings.billing',
       'store.payment_details',
     ] as const) {

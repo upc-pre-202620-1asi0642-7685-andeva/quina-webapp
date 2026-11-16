@@ -1,8 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 import type { PortfolioMonth } from '@/infrastructure/db/queries/portfolio';
+import { QuinaChartTooltip } from '@/presentation/components/dashboard/chart-primitives';
 import { formatMoney } from '@/presentation/components/money';
 
 // DESIGN.md §2.4: liquidado (por pagar), pagado (al día) y vencido (en mora)
@@ -11,6 +12,9 @@ const SERIES = [
   { key: 'paid', color: 'var(--color-success)' },
   { key: 'overdue', color: 'var(--color-error)' },
 ] as const;
+
+const compactMoney = (v: number) =>
+  v >= 1000 ? `S/ ${(v / 1000).toFixed(1)}k` : `S/ ${Math.round(v)}`;
 
 /** US19 crit. 6: evolución de la cartera, los últimos 6 meses de corte. */
 export function PortfolioChart({ months }: { months: PortfolioMonth[] }) {
@@ -22,40 +26,69 @@ export function PortfolioChart({ months }: { months: PortfolioMonth[] }) {
     paid: Number(m.paid),
     overdue: Number(m.overdue),
   }));
-  const money = (value: unknown) => formatMoney(Number(value).toFixed(2), 'PEN');
+  const nameMap = {
+    billed: t('billed'),
+    paid: t('paid'),
+    overdue: t('overdue'),
+  };
 
   return (
-    <figure className="flex flex-col gap-3">
-      <div aria-hidden="true" className="h-64 w-full overflow-x-auto">
+    <figure className="relative flex flex-1 flex-col justify-between gap-3">
+      <div aria-hidden="true" className="h-64 w-full">
         <BarChart
           accessibilityLayer={false}
           responsive
           data={data}
-          margin={{ top: 8, right: 8, bottom: 0, left: 8 }}
-          style={{ width: '100%', height: '100%', minWidth: 320 }}
+          margin={{ top: 8, right: 6, bottom: 0, left: -8 }}
+          style={{ width: '100%', height: '100%' }}
         >
-          <CartesianGrid vertical={false} stroke="var(--color-line)" />
-          <XAxis dataKey="period" tick={{ fill: 'var(--color-ink-soft)', fontSize: 12 }} />
+          <CartesianGrid vertical={false} stroke="var(--color-line)" strokeDasharray="3 3" />
+          <XAxis
+            dataKey="period"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: 'var(--color-ink-soft)', fontSize: 11 }}
+          />
           <YAxis
-            width={72}
-            tick={{ fill: 'var(--color-ink-soft)', fontSize: 12 }}
-            tickFormatter={money}
+            width={52}
+            axisLine={false}
+            tickLine={false}
+            allowDecimals={false}
+            domain={[0, (max: number) => Math.max(max, 100)]}
+            tickFormatter={compactMoney}
+            tick={{ fill: 'var(--color-ink-soft)', fontSize: 11 }}
           />
           <Tooltip
-            formatter={(value, name) => [money(value), t(name as (typeof SERIES)[number]['key'])]}
-            contentStyle={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-line)',
-              borderRadius: 12,
-              color: 'var(--color-ink)',
-            }}
+            cursor={{ fill: 'var(--color-surface-hover)' }}
+            allowEscapeViewBox={{ x: false, y: true }}
+            content={(props) => (
+              <QuinaChartTooltip
+                active={props.active}
+                payload={props.payload}
+                label={props.label}
+                nameMap={nameMap}
+              />
+            )}
           />
-          <Legend formatter={(name) => t(name as (typeof SERIES)[number]['key'])} />
           {SERIES.map((s) => (
             <Bar key={s.key} dataKey={s.key} fill={s.color} radius={[4, 4, 0, 0]} />
           ))}
         </BarChart>
       </div>
+
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
+        {SERIES.map((s) => (
+          <li key={s.key} className="flex items-center gap-1.5 text-ink-soft">
+            <span
+              aria-hidden="true"
+              className="size-2.5 rounded-full"
+              style={{ background: s.color }}
+            />
+            {t(s.key)}
+          </li>
+        ))}
+      </ul>
+
       {/* Los lectores de pantalla leen la misma información como tabla */}
       <div className="sr-only">
         <table>

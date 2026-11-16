@@ -3,21 +3,24 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { CheckIcon, LockIcon } from 'lucide-react';
+import { sileo } from 'sileo';
 import {
   PLAN_PRICES,
   PLAN_TIERS,
   PlanLimits,
   type BillingInterval,
+  type CountedResource,
+  type Feature,
   type PaidPlanTier,
   type PlanTier,
+  type SubscriptionStatus,
 } from '@/core/domain/billing/plan-limits';
 import {
-  cancelSubscriptionRenewalAction,
   simulateLocalSubscriptionPaymentAction,
   startSubscriptionCheckoutAction,
 } from '@/presentation/actions/billing';
 import { formatMoney } from '@/presentation/components/money';
-import { sileo } from 'sileo';
 import { Button } from '@/presentation/components/ui/button';
 import { cn } from '@/presentation/lib/utils';
 
@@ -27,19 +30,29 @@ type LocalCheckoutState = {
   preapprovalId: string | null;
 } | null;
 
+const FEATURES: Feature[] = [
+  'automaticNotifications',
+  'receipts',
+  'kardexAverageCost',
+  'reportsExport',
+  'ai',
+];
+
 export function SubscriptionPlans({
   currentTier,
   subscriptionStatus,
   billingInterval: currentInterval,
   cancelAtPeriodEnd,
-  currentPeriodEndLabel,
+  isReadOnly,
+  usage,
   initialLocalCheckout = null,
 }: {
   currentTier: PlanTier;
-  subscriptionStatus: 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELED';
+  subscriptionStatus: SubscriptionStatus;
   billingInterval: BillingInterval | null;
   cancelAtPeriodEnd: boolean;
-  currentPeriodEndLabel: string | null;
+  isReadOnly: boolean;
+  usage: Record<CountedResource, number>;
   initialLocalCheckout?: LocalCheckoutState;
 }) {
   const t = useTranslations('Settings');
@@ -49,15 +62,24 @@ export function SubscriptionPlans({
     currentInterval ?? 'MONTHLY',
   );
   const [busyTier, setBusyTier] = useState<PaidPlanTier | null>(null);
-  const [confirmCancel, setConfirmCancel] = useState(false);
-  // El resultado del pago o la cancelación se avisa con Sileo (DESIGN.md §7.3)
-  const setNotice = (notice: { tone: 'success' | 'warning' | 'error'; message: string } | null) => {
-    if (notice) sileo[notice.tone]({ title: notice.message });
-  };
   const [localCheckout, setLocalCheckout] = useState<LocalCheckoutState>(initialLocalCheckout);
   const [isPending, startTransition] = useTransition();
 
+  // DESIGN.md §7.3: el resultado del pago se avisa con Sileo
+  const setNotice = (notice: { tone: 'success' | 'warning' | 'error'; message: string } | null) => {
+    if (notice) sileo[notice.tone]({ title: notice.message });
+  };
+
   const unlimited = (max: number | null) => (max === null ? tPlans('unlimited') : String(max));
+
+  // DESIGN.md §7.1: una sola acción principal verde por pantalla
+  const recommendedTier: PaidPlanTier | null = isReadOnly
+    ? PlanLimits.upgradeForUsage(usage)
+    : subscriptionStatus === 'ACTIVE' && currentTier === 'BODEGA_PRO'
+      ? 'NEGOCIO_PLUS'
+      : subscriptionStatus === 'ACTIVE' && currentTier === 'NEGOCIO_PLUS' && !cancelAtPeriodEnd
+        ? null
+        : 'BODEGA_PRO';
 
   const handleCheckout = (tier: PaidPlanTier) => {
     setNotice(null);
@@ -115,33 +137,13 @@ export function SubscriptionPlans({
     });
   };
 
-  const handleCancelRenewal = () => {
-    setNotice(null);
-    startTransition(async () => {
-      const result = await cancelSubscriptionRenewalAction();
-      setConfirmCancel(false);
-      if (!result.ok) {
-        setNotice({ tone: 'error', message: t('billingNotice.checkoutError') });
-        return;
-      }
-      setNotice({ tone: 'success', message: t('billingNotice.canceled') });
-      router.refresh();
-    });
-  };
-
-  const canCancelAutoRenew =
-    currentTier !== 'CASERO' &&
-    subscriptionStatus !== 'TRIALING' &&
-    subscriptionStatus !== 'CANCELED' &&
-    !cancelAtPeriodEnd;
-
   return (
     <div className="flex flex-col gap-4">
       {localCheckout ? (
         <div
           role="region"
           aria-labelledby="local-checkout-title"
-          className="flex flex-col gap-3 rounded-card border border-primary bg-surface p-4"
+          className="flex flex-col gap-3 rounded-card border border-primary bg-surface p-4 sm:p-5"
         >
           <div className="flex flex-col gap-1">
             <h3 id="local-checkout-title" className="font-semibold text-ink">
@@ -161,6 +163,7 @@ export function SubscriptionPlans({
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
+              variant="primary"
               disabled={isPending}
               onClick={() => handleSimulateLocal('approved')}
             >
@@ -182,16 +185,16 @@ export function SubscriptionPlans({
         <div
           role="group"
           aria-label={t('intervalLabel')}
-          className="inline-flex rounded-full border border-line bg-paper p-1"
+          className="inline-flex rounded-full border border-line bg-paper-deep p-1"
         >
           <button
             type="button"
             aria-pressed={selectedInterval === 'MONTHLY'}
             onClick={() => setSelectedInterval('MONTHLY')}
             className={cn(
-              'min-h-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+              'min-h-11 cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active',
               selectedInterval === 'MONTHLY'
-                ? 'bg-primary text-primary-dark'
+                ? 'bg-surface text-ink'
                 : 'text-ink-soft hover:text-ink',
             )}
           >
@@ -202,9 +205,9 @@ export function SubscriptionPlans({
             aria-pressed={selectedInterval === 'YEARLY'}
             onClick={() => setSelectedInterval('YEARLY')}
             className={cn(
-              'min-h-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+              'min-h-11 cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active',
               selectedInterval === 'YEARLY'
-                ? 'bg-primary text-primary-dark'
+                ? 'bg-surface text-ink'
                 : 'text-ink-soft hover:text-ink',
             )}
           >
@@ -223,6 +226,7 @@ export function SubscriptionPlans({
             currentInterval === selectedInterval &&
             !cancelAtPeriodEnd;
           const isCurrentBadge = tier === currentTier;
+          const isRecommended = tier !== 'CASERO' && tier === recommendedTier;
           const displayAmount =
             tier === 'CASERO'
               ? price.monthly
@@ -234,16 +238,24 @@ export function SubscriptionPlans({
             <article
               key={tier}
               className={cn(
-                'flex flex-col justify-between gap-4 rounded-card border bg-surface p-4',
-                isCurrentBadge ? 'border-primary' : 'border-line',
+                'flex flex-col justify-between gap-5 rounded-card border bg-surface p-4 sm:p-5',
+                isCurrentBadge
+                  ? 'border-primary'
+                  : isRecommended
+                    ? 'border-link-active/50'
+                    : 'border-line',
               )}
             >
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold text-ink">{tPlans(`names.${tier}`)}</h3>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="text-lg font-semibold text-ink">{tPlans(`names.${tier}`)}</h3>
                   {isCurrentBadge ? (
                     <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-[13px] font-medium text-success-ink dark:bg-success/12">
                       {t('yourPlan')}
+                    </span>
+                  ) : isRecommended ? (
+                    <span className="rounded-full bg-soft px-2.5 py-0.5 text-[13px] font-medium text-soft-ink">
+                      {t('recommended')}
                     </span>
                   ) : null}
                 </div>
@@ -261,7 +273,7 @@ export function SubscriptionPlans({
                     </span>
                   </p>
                   {price.annual ? (
-                    <p className="mt-0.5 text-[13px] text-ink-soft">
+                    <p className="mt-1 text-[13px] text-ink-soft tabular-nums">
                       {selectedInterval === 'YEARLY'
                         ? tPlans('annualSavings', {
                             monthly: formatMoney((Number(price.annual) / 12).toFixed(2), 'PEN'),
@@ -269,11 +281,11 @@ export function SubscriptionPlans({
                         : tPlans('annual', { price: formatMoney(price.annual, 'PEN') })}
                     </p>
                   ) : (
-                    <p className="mt-0.5 text-[13px] text-ink-soft">{tPlans('freeForever')}</p>
+                    <p className="mt-1 text-[13px] text-ink-soft">{tPlans('freeForever')}</p>
                   )}
                 </div>
 
-                <ul className="flex flex-col gap-1.5 text-sm text-ink">
+                <ul className="flex flex-col gap-1.5 border-t border-line pt-3 text-sm text-ink tabular-nums">
                   <li>
                     {tPlans('limits.activeCreditCustomers', {
                       max: unlimited(plan.activeCreditCustomers),
@@ -288,12 +300,36 @@ export function SubscriptionPlans({
                     {tPlans('limits.aiQueriesPerMonth', { max: unlimited(plan.aiQueriesPerMonth) })}
                   </li>
                 </ul>
+
+                <ul className="flex flex-col gap-2 border-t border-line pt-3 text-sm">
+                  {FEATURES.map((feature) => {
+                    const enabled = plan.features[feature];
+                    return (
+                      <li key={feature} className="flex items-start gap-2">
+                        {enabled ? (
+                          <CheckIcon
+                            aria-hidden="true"
+                            className="mt-0.5 size-4 shrink-0 text-success-ink"
+                          />
+                        ) : (
+                          <LockIcon
+                            aria-hidden="true"
+                            className="mt-0.5 size-4 shrink-0 text-ink-soft"
+                          />
+                        )}
+                        <span className={enabled ? 'text-ink' : 'text-ink-soft'}>
+                          {tPlans(`features.${feature}`)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
 
               {tier !== 'CASERO' ? (
                 <Button
                   type="button"
-                  variant={isPaidActiveSamePlan ? 'secondary' : 'default'}
+                  variant={!isPaidActiveSamePlan && isRecommended ? 'primary' : 'secondary'}
                   disabled={isPending || isPaidActiveSamePlan}
                   onClick={() => handleCheckout(tier)}
                   className="w-full"
@@ -309,53 +345,6 @@ export function SubscriptionPlans({
           );
         })}
       </div>
-
-      {canCancelAutoRenew ? (
-        <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4">
-          {!confirmCancel ? (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-ink-soft">
-                {currentPeriodEndLabel ? t('activeUntil', { date: currentPeriodEndLabel }) : null}
-              </p>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setConfirmCancel(true)}
-                disabled={isPending}
-              >
-                {t('cancelRenewal')}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <h3 className="font-semibold text-ink">{t('cancelConfirmTitle')}</h3>
-                <p className="text-sm text-ink-soft">
-                  {t('cancelConfirmBody', { date: currentPeriodEndLabel ?? '—' })}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  disabled={isPending}
-                  onClick={handleCancelRenewal}
-                >
-                  {isPending ? t('cancelingRenewal') : t('cancelConfirmAction')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isPending}
-                  onClick={() => setConfirmCancel(false)}
-                >
-                  {t('cancelKeepAction')}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : null}
     </div>
   );
 }

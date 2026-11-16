@@ -23,6 +23,7 @@ export const PERMISSIONS = [
   'reports.view',
   'rus.view',
   'team.manage',
+  'audit.view',
   'settings.billing',
   // Plan 5, D12: Yape, Plin, cuenta y QR que ve el vecino (solo el dueño)
   'store.payment_details',

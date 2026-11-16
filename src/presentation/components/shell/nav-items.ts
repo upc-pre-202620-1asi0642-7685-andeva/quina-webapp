@@ -123,7 +123,7 @@ const STORE: { key: NavGroupKey; items: NavDefinition[] }[] = [
     key: 'admin',
     items: [
       { key: 'team', href: '/team', permission: 'team.manage' },
-      { key: 'audit', href: '/audit', permission: 'settings.billing' },
+      { key: 'audit', href: '/audit', permission: 'audit.view' },
     ],
   },
 ];
@@ -141,7 +141,7 @@ const QUICK: (QuickAction & { permission: Permission })[] = [
   { key: 'newProduct', href: '/inventory/new', permission: 'catalog.manage' },
   { key: 'newPurchase', href: '/inventory/purchases/new', permission: 'purchases.manage' },
   { key: 'newSupplier', href: '/inventory/suppliers?new=1', permission: 'purchases.manage' },
-  { key: 'inviteEmployee', href: '/team', permission: 'team.manage' },
+  { key: 'inviteEmployee', href: '/team?invite=1', permission: 'team.manage' },
 ];
 
 /** El Administrador de Plataforma solo ve tiendas y topes (US01, decisión 4). */

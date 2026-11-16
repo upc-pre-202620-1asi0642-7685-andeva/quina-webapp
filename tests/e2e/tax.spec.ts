@@ -14,7 +14,7 @@ test.describe('asistente tributario del Nuevo RUS (US21)', () => {
 
     // Crit. 3 y 5: dos barras contra el tope de la categoría 1, con el descargo literal
     await page.goto('./');
-    const card = page.getByRole('region', { name: 'Asistente tributario' });
+    const card = page.getByRole('region', { name: 'Nuevo RUS' });
     await expect(card.getByText('Nuevo RUS · Categoría 1')).toBeVisible();
     await expect(card.getByRole('meter', { name: 'Ventas del mes' })).toBeVisible();
     await expect(card.getByRole('meter', { name: 'Compras del mes' })).toBeVisible();
@@ -43,6 +43,9 @@ test.describe('asistente tributario del Nuevo RUS (US21)', () => {
     await page.getByRole('button', { name: 'Guardar régimen' }).click();
     await expect(page.getByText('Régimen guardado.')).toBeVisible();
     await page.goto('./');
-    await expect(page.getByRole('region', { name: 'Asistente tributario' })).toHaveCount(0);
+    await expect(page.getByRole('meter', { name: 'Ventas del mes' })).toHaveCount(0);
+    await expect(
+      page.getByText('Tu tienda no está en el Nuevo RUS. Puedes cambiarlo en Ajustes.'),
+    ).toBeVisible();
   });
 });

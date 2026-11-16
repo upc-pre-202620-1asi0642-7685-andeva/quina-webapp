@@ -64,7 +64,10 @@ export function ProductActions({
         <Notice tone={error === 'planLimit' ? 'warning' : 'error'}>
           <p>{t(`errors.${error}`)}</p>
           {error === 'planLimit' ? (
-            <Link href="/settings" className="font-semibold underline underline-offset-4">
+            <Link
+              href="/settings/subscription"
+              className="font-semibold underline underline-offset-4"
+            >
               {tPlans('seePlans')}
             </Link>
           ) : null}

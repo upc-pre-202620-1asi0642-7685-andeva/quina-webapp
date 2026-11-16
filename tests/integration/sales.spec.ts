@@ -8,7 +8,7 @@ import {
 } from '@/core/application/sales/register-cash-sale';
 import { RegisterCreditSaleUseCase } from '@/core/application/sales/register-credit-sale';
 import { closeDb, db } from '@/infrastructure/db/connection';
-import { loadTodayCashBox } from '@/infrastructure/db/queries/sales';
+import { loadTodayCashBox, loadTodayCounterSales } from '@/infrastructure/db/queries/sales';
 import { DrizzleProductRepository } from '@/infrastructure/db/repositories/drizzle-product-repository';
 import { DrizzleSaleRepository } from '@/infrastructure/db/repositories/drizzle-sale-repository';
 import { BASE_UNITS } from '@/infrastructure/db/repositories/drizzle-store-registration-repository';
@@ -559,6 +559,15 @@ describe('venta al fiado en PostgreSQL (US08)', () => {
       now: NOW,
     });
     if (!result.ok) throw new Error('fiado fallido');
+    const summary = await loadTodayCounterSales(ctx.storeId, NOW);
+    expect(summary.creditTotal).toBe('4.50');
+    expect(summary.creditCount).toBe(1);
+    expect(summary.sales).toHaveLength(1);
+    expect(summary.sales[0]!.items[0]).toMatchObject({
+      productId: milk,
+      quantity: '1.000',
+      subtotal: '4.50',
+    });
     await expect(
       withTenant(ctx.storeId, (tx) => tx.delete(sales).where(eq(sales.id, result.value.saleId))),
     ).rejects.toThrow();

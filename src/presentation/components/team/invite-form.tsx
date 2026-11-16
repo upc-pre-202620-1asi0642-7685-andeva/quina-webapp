@@ -1,102 +1,184 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
-import { SendIcon } from 'lucide-react';
+import { Loader2Icon, SendIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { sileo } from 'sileo';
 import { inviteEmployeeAction } from '@/presentation/actions/team';
 import { FormField } from '@/presentation/components/auth/form-field';
-import { useActionToast } from '@/presentation/components/feedback/use-action-toast';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { inviteEmployeeSchema } from '@/presentation/lib/team-schemas';
+import { cn } from '@/presentation/lib/utils';
 
-export function InviteForm() {
+type FieldErrors = { name?: string; email?: string };
+
+export function InviteForm({ onSuccess }: { onSuccess?: (email: string) => void }) {
   const t = useTranslations('Team.invite');
   const tPlans = useTranslations('Plans');
-  const [state, formAction, pending] = useActionState(inviteEmployeeAction, {});
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [planLimitError, setPlanLimitError] = useState(false);
+  const [pending, startTransition] = useTransition();
+
   const nameRef = useRef<HTMLInputElement>(null);
-  useActionToast(
-    state,
-    state.invited
-      ? state.mailFailed
-        ? { type: 'warning', title: t('mailFailed', { email: state.invited }) }
-        : { type: 'success', title: t('sent', { email: state.invited }) }
-      : state.error === 'generic'
-        ? { type: 'error', title: t('errors.generic') }
-        : null,
-  );
+  const emailRef = useRef<HTMLInputElement>(null);
 
-  // Tras invitar, el formulario se vacía (React 19) y el foco vuelve al nombre
-  useEffect(() => {
-    if (state.invited) nameRef.current?.focus();
-  }, [state.invited]);
+  const validateField = (field: 'name' | 'email', value: string): string | undefined => {
+    const res = inviteEmployeeSchema.shape[field].safeParse(value);
+    if (res.success) return undefined;
+    return t(field === 'name' ? 'errors.nameInvalid' : 'errors.emailInvalid');
+  };
 
-  const fieldError = (field: 'name' | 'email') => {
-    if (field === 'name' && state.error === 'nameInvalid') return t('errors.nameInvalid');
-    if (field === 'email' && (state.error === 'emailInvalid' || state.error === 'emailTaken')) {
-      return t(`errors.${state.error}`);
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPlanLimitError(false);
+
+    const parsed = inviteEmployeeSchema.safeParse({ name, email });
+    if (!parsed.success) {
+      const nextErrors: FieldErrors = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0];
+        if (key === 'name' && !nextErrors.name) nextErrors.name = t('errors.nameInvalid');
+        if (key === 'email' && !nextErrors.email) nextErrors.email = t('errors.emailInvalid');
+      }
+      setErrors(nextErrors);
+      if (nextErrors.name) nameRef.current?.focus();
+      else if (nextErrors.email) emailRef.current?.focus();
+      return;
     }
-    return undefined;
+
+    const formData = new FormData();
+    formData.set('name', name);
+    formData.set('email', email);
+
+    startTransition(async () => {
+      const result = await inviteEmployeeAction({}, formData);
+      if (result.invited) {
+        if (result.mailFailed) {
+          sileo.warning({ title: t('mailFailed', { email: result.invited }) });
+        } else {
+          sileo.success({ title: t('sent', { email: result.invited }) });
+        }
+        setName('');
+        setEmail('');
+        setErrors({});
+        setPlanLimitError(false);
+        onSuccess?.(result.invited);
+        return;
+      }
+
+      if (result.error === 'nameInvalid') {
+        setErrors({ name: t('errors.nameInvalid') });
+        nameRef.current?.focus();
+      } else if (result.error === 'emailInvalid' || result.error === 'emailTaken') {
+        setErrors({ email: t(`errors.${result.error}`) });
+        emailRef.current?.focus();
+      } else if (result.error === 'planLimit') {
+        setPlanLimitError(true);
+      } else {
+        sileo.error({ title: t('errors.generic') });
+      }
+    });
   };
 
   return (
-    <form action={formAction} noValidate className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       {/* El tope del plan exige una acción: se queda en pantalla con el enlace (DESIGN §7.3) */}
-      {state.error === 'planLimit' ? (
+      {planLimitError ? (
         <Notice tone="warning">
           <p>{t('errors.planLimit')}</p>
           <Link
             href="/settings/subscription"
-            className="font-semibold underline underline-offset-4"
+            className="w-fit font-semibold underline underline-offset-4"
           >
             {tPlans('seePlans')}
           </Link>
         </Notice>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField
-          id="invite-name"
-          label={t('name')}
-          hint={t('nameHint')}
-          error={fieldError('name')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              ref={nameRef}
-              name="name"
-              autoComplete="off"
-              maxLength={150}
-              required
-            />
-          )}
-        </FormField>
-        <FormField
-          id="invite-email"
-          label={t('email')}
-          hint={t('emailHint')}
-          error={fieldError('email')}
-        >
-          {(props) => (
-            <Input
-              {...props}
-              name="email"
-              type="email"
-              inputMode="email"
-              autoComplete="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              maxLength={150}
-              required
-            />
-          )}
-        </FormField>
-      </div>
-      <Button type="submit" disabled={pending} className="self-start">
-        <SendIcon aria-hidden="true" />
-        {pending ? t('sending') : t('submit')}
+      <FormField id="invite-name" label={t('name')} hint={t('nameHint')} error={errors.name}>
+        {(props) => (
+          <Input
+            {...props}
+            ref={nameRef}
+            name="name"
+            value={name}
+            onChange={(e) => {
+              const next = e.target.value;
+              setName(next);
+              if (errors.name) {
+                setErrors((prev) => ({ ...prev, name: validateField('name', next) }));
+              }
+            }}
+            onBlur={() => setErrors((prev) => ({ ...prev, name: validateField('name', name) }))}
+            autoComplete="off"
+            maxLength={150}
+            className="text-base"
+            required
+          />
+        )}
+      </FormField>
+
+      <FormField id="invite-email" label={t('email')} hint={t('emailHint')} error={errors.email}>
+        {(props) => (
+          <Input
+            {...props}
+            ref={emailRef}
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              const next = e.target.value;
+              setEmail(next);
+              if (errors.email) {
+                setErrors((prev) => ({ ...prev, email: validateField('email', next) }));
+              }
+            }}
+            onBlur={() => setErrors((prev) => ({ ...prev, email: validateField('email', email) }))}
+            inputMode="email"
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            maxLength={150}
+            className="text-base"
+            required
+          />
+        )}
+      </FormField>
+
+      <Button
+        type="submit"
+        variant="primary"
+        disabled={pending}
+        className="w-full sm:w-auto sm:self-end"
+      >
+        <span className="inline-grid items-center justify-items-center">
+          <span
+            aria-hidden={pending}
+            className={cn(
+              'col-start-1 row-start-1 inline-flex items-center gap-2',
+              pending && 'invisible',
+            )}
+          >
+            <SendIcon aria-hidden="true" />
+            {t('submit')}
+          </span>
+          <span
+            aria-hidden={!pending}
+            className={cn(
+              'col-start-1 row-start-1 inline-flex items-center gap-2',
+              !pending && 'invisible',
+            )}
+          >
+            <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+            {t('sending')}
+          </span>
+        </span>
       </Button>
     </form>
   );

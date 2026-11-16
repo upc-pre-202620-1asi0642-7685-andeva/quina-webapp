@@ -171,7 +171,10 @@ export function ProductForm({
         <Notice tone={errors.form === 'planLimit' ? 'warning' : 'error'}>
           <p>{t(`errors.${errors.form}`)}</p>
           {errors.form === 'planLimit' ? (
-            <Link href="/settings" className="font-semibold underline underline-offset-4">
+            <Link
+              href="/settings/subscription"
+              className="font-semibold underline underline-offset-4"
+            >
               {tPlans('seePlans')}
             </Link>
           ) : null}

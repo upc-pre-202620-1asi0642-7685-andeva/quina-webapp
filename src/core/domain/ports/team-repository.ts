@@ -13,6 +13,9 @@ export type TeamMember = {
   email: string;
   role: 'STORE_OWNER' | 'STORE_EMPLOYEE';
   status: TeamMemberStatus;
+  createdAt: Date;
+  lastLoginAt: Date | null;
+  inviteExpiresAt: Date | null;
 };
 
 /** ¿Cabe uno más? `seats` ya cuenta al dueño y a los invitados (US26.2). */

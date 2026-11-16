@@ -129,6 +129,11 @@ describe('equipo (US05, US26) contra PostgreSQL', () => {
     });
     expect(invited).toMatchObject({ ok: true, value: { mailSent: true } });
     const token = tokenOf(team.mailer.lastUrl);
+    const userId = invited.ok ? invited.value.userId : '';
+    const invitedMember = (await listTeam(storeId)).find((m) => m.userId === userId);
+    expect(invitedMember?.status).toBe('INVITED');
+    expect(invitedMember?.createdAt).toBeInstanceOf(Date);
+    expect(invitedMember?.inviteExpiresAt).toBeInstanceOf(Date);
 
     expect(await readAccountSetup(token, new Date())).toMatchObject({ email: address });
     const meta = { ip: '203.0.113.9', userAgent: 'vitest' };
@@ -147,7 +152,6 @@ describe('equipo (US05, US26) contra PostgreSQL', () => {
     expect(signedIn.user.email).toBe(address);
 
     // Con contraseña ya no es invitado: no se cancela ni se reenvía, y la lista lo ve activo
-    const userId = invited.ok ? invited.value.userId : '';
     const member = { storeId, actorId: ownerId, userId, now: new Date() };
     expect(await team.cancel.execute(member)).toEqual({ ok: false, error: 'NOT_FOUND' });
     expect(await team.resend.execute({ ...member, ...mail })).toEqual({
@@ -156,6 +160,7 @@ describe('equipo (US05, US26) contra PostgreSQL', () => {
     });
     const listed = (await listTeam(storeId)).find((m) => m.userId === userId);
     expect(listed?.status).toBe('ACTIVE');
+    expect(listed?.inviteExpiresAt).toBeNull();
   });
 
   it('el enlace vencido y el anterior a un reenvío no sirven', async () => {
