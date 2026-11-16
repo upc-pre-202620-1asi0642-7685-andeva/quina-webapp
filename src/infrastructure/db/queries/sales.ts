@@ -1,11 +1,32 @@
-import { and, asc, count, eq, gte, lte, notExists, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  inArray,
+  lte,
+  notExists,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import type { CreditAccountStatus } from '@/core/domain/ports/credit-account-repository';
 import { CASH_PAYMENT_METHODS, type CashPaymentMethod } from '@/core/domain/sales/cash-payment';
 import type { CreditAccountSnapshot } from '@/core/domain/sales/credit-sale';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { Money } from '@/core/domain/shared/money';
 import { termsFromRow } from '../repositories/drizzle-credit-account-repository';
-import { creditAccounts, creditChargeVoids, customers, sales, settlementCycles } from '../schema';
+import {
+  creditAccounts,
+  creditChargeVoids,
+  customers,
+  products,
+  saleItems,
+  sales,
+  settlementCycles,
+  units,
+} from '../schema';
 import { withTenant } from '../with-tenant';
 
 export type CashBox = {
@@ -140,4 +161,158 @@ export async function loadDailySales(storeId: string, now: Date, days = 7): Prom
     const row = rows.find((r) => r.day === iso);
     return { day: iso, cash: row?.cash ?? '0.00', credit: row?.credit ?? '0.00' };
   });
+}
+
+export type TodayCounterSaleItem = {
+  productId: string;
+  productName: string;
+  unitCode: string;
+  quantity: string;
+  unitPrice: string;
+  subtotal: string;
+};
+
+export type TodayCounterSale = {
+  id: string;
+  saleDate: Date;
+  saleModality: 'CASH' | 'SINGLE_PAYMENT_CREDIT' | 'INSTALLMENTS_CREDIT';
+  paymentMethod: CashPaymentMethod | 'CREDIT';
+  totalAmount: string;
+  amountReceived: string | null;
+  changeGiven: string | null;
+  customerId: string | null;
+  customerName: string | null;
+  items: TodayCounterSaleItem[];
+};
+
+export type TodayCounterSummary = {
+  cashBox: CashBox;
+  creditTotal: string;
+  creditCount: number;
+  sales: TodayCounterSale[];
+};
+
+/**
+ * Resumen y bitácora del mostrador del día actual en Lima (ventas al contado y
+ * al fiado vigentes, con sus líneas para consulta o repetición en el carrito).
+ */
+export async function loadTodayCounterSales(
+  storeId: string,
+  now: Date,
+  limit = 15,
+): Promise<TodayCounterSummary> {
+  const today = BusinessDate.fromInstant(now);
+  const start = BusinessDate.startInstant(today);
+  const end = BusinessDate.endInstant(today);
+
+  const [cashBox, creditSummary, saleRows] = await Promise.all([
+    loadTodayCashBox(storeId, now),
+    withTenant(storeId, async (tx) => {
+      const [row] = await tx
+        .select({
+          total: sql<string>`coalesce(sum(${sales.totalAmount}), 0)::numeric(12, 2)::text`,
+          count: count(),
+        })
+        .from(sales)
+        .where(
+          and(
+            eq(sales.storeId, storeId),
+            sql`${sales.saleModality} <> 'CASH'`,
+            gte(sales.saleDate, start),
+            lte(sales.saleDate, end),
+            notExists(
+              tx
+                .select({ id: creditChargeVoids.id })
+                .from(creditChargeVoids)
+                .where(eq(creditChargeVoids.saleId, sales.id)),
+            ),
+          ),
+        );
+      return { total: row?.total ?? '0.00', count: row?.count ?? 0 };
+    }),
+    withTenant(storeId, async (tx) => {
+      const headers = await tx
+        .select({
+          id: sales.id,
+          saleDate: sales.saleDate,
+          saleModality: sales.saleModality,
+          paymentMethod: sales.paymentMethod,
+          totalAmount: sales.totalAmount,
+          amountReceived: sales.amountReceived,
+          changeGiven: sales.changeGiven,
+          customerId: sales.customerId,
+          firstName: customers.firstName,
+          lastName: customers.lastName,
+        })
+        .from(sales)
+        .leftJoin(customers, eq(customers.id, sales.customerId))
+        .where(
+          and(
+            eq(sales.storeId, storeId),
+            gte(sales.saleDate, start),
+            lte(sales.saleDate, end),
+            notExists(
+              tx
+                .select({ id: creditChargeVoids.id })
+                .from(creditChargeVoids)
+                .where(eq(creditChargeVoids.saleId, sales.id)),
+            ),
+          ),
+        )
+        .orderBy(desc(sales.saleDate))
+        .limit(limit);
+
+      if (headers.length === 0) return [];
+      const ids = headers.map((h) => h.id);
+      const lines = await tx
+        .select({
+          saleId: saleItems.saleId,
+          productId: saleItems.productId,
+          productName: products.name,
+          unitCode: units.code,
+          quantity: saleItems.quantity,
+          unitPrice: saleItems.unitPrice,
+          subtotal: saleItems.subtotal,
+        })
+        .from(saleItems)
+        .innerJoin(products, eq(products.id, saleItems.productId))
+        .innerJoin(units, eq(units.id, products.unitId))
+        .where(and(eq(saleItems.storeId, storeId), inArray(saleItems.saleId, ids)))
+        .orderBy(asc(products.name));
+
+      const bySale = new Map<string, TodayCounterSaleItem[]>();
+      for (const line of lines) {
+        const list = bySale.get(line.saleId) ?? [];
+        list.push({
+          productId: line.productId,
+          productName: line.productName,
+          unitCode: line.unitCode,
+          quantity: line.quantity,
+          unitPrice: line.unitPrice,
+          subtotal: line.subtotal,
+        });
+        bySale.set(line.saleId, list);
+      }
+
+      return headers.map((h) => ({
+        id: h.id,
+        saleDate: h.saleDate,
+        saleModality: h.saleModality as TodayCounterSale['saleModality'],
+        paymentMethod: h.paymentMethod as TodayCounterSale['paymentMethod'],
+        totalAmount: h.totalAmount,
+        amountReceived: h.amountReceived,
+        changeGiven: h.changeGiven,
+        customerId: h.customerId,
+        customerName: h.firstName && h.lastName ? `${h.firstName} ${h.lastName}` : null,
+        items: bySale.get(h.id) ?? [],
+      }));
+    }),
+  ]);
+
+  return {
+    cashBox,
+    creditTotal: creditSummary.total,
+    creditCount: creditSummary.count,
+    sales: saleRows,
+  };
 }
