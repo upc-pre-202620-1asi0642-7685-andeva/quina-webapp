@@ -22,16 +22,25 @@ export type ScoredCycle = {
 };
 
 export type CreditScore = { score: number; band: ScoreBand; hasHistory: boolean };
+export type CreditScoreBreakdown = CreditScore & {
+  onTimeCycles: number;
+  lateCycles: number;
+  daysLate: number;
+};
 
 export function scoreBand(score: number): ScoreBand {
   return score >= 70 ? 'GREEN' : score >= 40 ? 'YELLOW' : 'RED';
 }
 
-/** Puntaje como se veía el día `asOf`: un pago posterior a ese día aún no cuenta. */
-export function creditScore(cycles: readonly ScoredCycle[], asOf: BusinessDate): CreditScore {
+/** Desglose del puntaje al día `asOf`: un pago posterior a ese día aún no cuenta. */
+export function creditScoreBreakdown(
+  cycles: readonly ScoredCycle[],
+  asOf: BusinessDate,
+): CreditScoreBreakdown {
   const windowStart = BusinessDate.addCalendarMonths(asOf, -WINDOW_MONTHS);
   let daysLate = 0;
-  let onTime = 0;
+  let onTimeCycles = 0;
+  let lateCycles = 0;
   let counted = 0;
   for (const cycle of cycles) {
     const due = cycle.paymentDueDate;
@@ -43,18 +52,35 @@ export function creditScore(cycles: readonly ScoredCycle[], asOf: BusinessDate):
     if (paid) {
       const late = Math.max(0, days30360(due, paid));
       counted += 1;
-      if (late === 0) onTime += 1;
-      else daysLate += late;
+      if (late === 0) onTimeCycles += 1;
+      else {
+        lateCycles += 1;
+        daysLate += late;
+      }
     } else if (BusinessDate.compare(due, asOf) < 0) {
       // Vencido y sin pagar a esa fecha: la mora sigue sumando
       counted += 1;
+      lateCycles += 1;
       daysLate += Math.max(0, days30360(due, asOf));
     }
     // Vence hoy y aún no se paga: todavía no es puntual ni moroso
   }
-  const raw = BASE - PENALTY_PER_DAY * daysLate + ON_TIME_BONUS * onTime;
+  const raw = BASE - PENALTY_PER_DAY * daysLate + ON_TIME_BONUS * onTimeCycles;
   const score = Math.min(100, Math.max(0, raw));
-  return { score, band: scoreBand(score), hasHistory: counted > 0 };
+  return {
+    score,
+    band: scoreBand(score),
+    hasHistory: counted > 0,
+    onTimeCycles,
+    lateCycles,
+    daysLate,
+  };
+}
+
+/** Puntaje como se veía el día `asOf`: un pago posterior a ese día aún no cuenta. */
+export function creditScore(cycles: readonly ScoredCycle[], asOf: BusinessDate): CreditScore {
+  const { score, band, hasHistory } = creditScoreBreakdown(cycles, asOf);
+  return { score, band, hasHistory };
 }
 
 /**
