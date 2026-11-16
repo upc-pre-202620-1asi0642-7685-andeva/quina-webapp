@@ -346,8 +346,12 @@ export function PasswordCard({
             className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-field border border-line bg-paper-deep/60 px-3.5 py-2.5"
           >
             <span className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-ink">{t('revokeOthersLabel')}</span>
-              <span className="text-[13px] text-ink-soft">{t('revokeOthersHint')}</span>
+              <span className={cn('font-medium text-ink', portal ? 'text-base' : 'text-sm')}>
+                {t('revokeOthersLabel')}
+              </span>
+              <span className={cn('text-ink-soft', portal ? 'text-sm' : 'text-[13px]')}>
+                {t('revokeOthersHint')}
+              </span>
             </span>
             <Switch
               id="profile-revoke-others"

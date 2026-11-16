@@ -240,23 +240,40 @@ Lo usa Doña Rosa desde su celular, una o dos veces al mes. Es modo **Operate**
 como el mostrador, con los mismos tokens, pero un escalón más grande:
 
 - **Escala:** el cuerpo usa 18 px (`text-lg`) y las cifras clave (lo que debe
-  hoy, lo que tiene por pagar) 32–40 px (`text-3xl`/`text-4xl`). No hay una
-  segunda tipografía ni colores propios.
+  hoy, lo que tiene por pagar) 32–40 px (`text-3xl`/`text-4xl`) con
+  `tabular-nums`. En la configuración del perfil (`variant="portal"`), las
+  etiquetas y ayudas suben un escalón (`text-base` / `text-sm`) para mantener la
+  misma legibilidad. No hay una segunda tipografía ni colores propios.
 - **Áreas táctiles:** las acciones del portal (ver el detalle, "No reconozco este
-  cargo", "Ver mi estado de cuenta") usan el botón `lg` de 56 px.
-- **Marco:** `PortalShell`, una columna de 672 px como máximo, con el isologo
-  (vuelve a "Mis cuentas") y "Mi perfil" (idioma, contraseña y salir). Sin la
-  navegación del comerciante.
+  cargo", "Ver mi estado de cuenta", "Enviar código", "Ver mi cuenta", "Imprimir"
+  y "Compartir") usan el botón `lg` de 56 px. Todo botón de copiado rápido o
+  enlace de cabecera conserva un mínimo de 44 × 44 px y respuesta inmediata al
+  toque (`active:scale-[0.97]`).
+- **Marco:** `PortalShell`, una columna de 672 px como máximo, cabecera
+  translúcida (`backdrop-blur` con respaldo sólido ante
+  `prefers-reduced-transparency: reduce`) con el isologo (vuelve a "Mis cuentas")
+  y "Mi perfil" (tiendas, tema, idioma, contraseña, sesiones, caché sin conexión y
+  salir), además del aviso de sin señal (`OfflineBanner`) y espaciado inferior
+  seguro (`env(safe-area-inset-bottom)`). Sin la navegación del comerciante.
 - **Ingreso:** `/portal/login` y `/portal/enter` usan `AuthShell` (§6.1) con el
   panel `aside="portal"`: el titular y la ficha le hablan al vecino ("Lo que
   debes"), no al bodeguero. En `/portal/enter` el token se canjea al tocar el
   botón, nunca al abrir la página.
-- **Componentes compartidos:** `CycleStatement`, `ChargeLine` y `AccountCycles`
-  suben un escalón en el portal (cuerpo 18 px, detalle 16 px, títulos de sección
-  20 px) y el perfil vive dentro de `PortalShell`. Las secciones del portal
-  usan el mismo título: `text-xl`, sin ícono.
+- **Resumen y cobro sin fricción:** la vista de tienda muestra lo que debe hoy,
+  el medidor de límite disponible (`role="meter"`), el próximo pago o el ciclo
+  abierto del mes, y botones de copiado en un toque para Yape, Plin, cuenta y
+  CCI, además de una hoja inferior (`ResponsiveSheet`) para ampliar el QR.
+- **Componentes compartidos:** `CycleStatement`, `ChargeLine`, `AccountCycles` y
+  `ReceiptCard` suben un escalón en el portal (cuerpo 18 px, detalle 16 px,
+  títulos de sección 20 px). Observar un cargo usa `ResponsiveSheet` (hoja
+  inferior arrastrable 1:1 en celular y diálogo centrado en escritorio) con
+  chips de motivo rápido y ayuda de campo.
 - **Solo lectura,** salvo observar un cargo, la contraseña y el idioma. Los textos
   hablan de "lo que debes" y "por pagar", nunca de "saldo deudor" ni "liquidación".
+  Nunca se muestra el puntaje interno de cartera ni datos de costos del negocio.
+- **Lectura sin conexión:** el service worker guarda las vistas de solo lectura de
+  `/portal` mientras haya sesión abierta y borra esa caché al cerrar sesión o
+  volver a `/portal/login`.
 
 ---
 

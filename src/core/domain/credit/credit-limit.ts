@@ -1,3 +1,4 @@
+import { Dec } from '@/core/domain/shared/decimal';
 import { Money, type Currency } from '@/core/domain/shared/money';
 import { err, ok, type Result } from '@/core/domain/shared/result';
 
@@ -14,5 +15,28 @@ export const CreditLimit = {
     const limit = Money.of(clean, currency);
     if (!limit.isPositive()) return err('CREDIT_LIMIT_NOT_POSITIVE');
     return ok(limit);
+  },
+
+  /** Calcula el disponible y porcentaje usado con aritmética decimal exacta (sin `number` en montos). */
+  usage(
+    balanceRaw: string,
+    limitRaw: string,
+    currency: Currency,
+  ): { availableCredit: string; overLimit: boolean; usedPercent: number } {
+    const balance = Money.of(balanceRaw, currency);
+    const limit = Money.of(limitRaw, currency);
+    const diff = limit.minus(balance);
+    const overLimit = diff.isNegative();
+    const availableCredit = overLimit ? Money.zero(currency).toFixed2() : diff.toFixed2();
+    const ratio = limit.isZero()
+      ? 0
+      : balance
+          .decimal()
+          .dividedBy(limit.decimal())
+          .times(100)
+          .toDecimalPlaces(0, Dec.ROUND_HALF_UP)
+          .toNumber();
+    const usedPercent = Math.min(100, Math.max(0, ratio));
+    return { availableCredit, overLimit, usedPercent };
   },
 };

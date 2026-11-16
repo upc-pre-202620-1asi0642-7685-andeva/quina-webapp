@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { Loader2Icon } from 'lucide-react';
 import { DOCUMENT_TYPES, type DocumentType } from '@/core/domain/identity/document-id';
 import {
   requestPortalCodeAction,
@@ -23,6 +24,8 @@ import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 
+const COOLDOWN_SECONDS = 60;
+
 /** US14.3 y US14.4: el vecino entra con Google o con su documento y un código. */
 export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }) {
   const t = useTranslations('Portal.login');
@@ -37,15 +40,31 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
   const [captchaToken, setCaptchaToken] = useState(TURNSTILE_DUMMY_TOKEN);
   const [error, setError] = useState<PortalCodeError | null>(null);
   const [sending, setSending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setInterval(() => {
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [cooldown]);
 
   async function requestCode(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setSending(true);
     try {
-      const result = await requestPortalCodeAction({ documentType, documentNumber, captchaToken });
+      const cleanNumber = documentNumber.trim();
+      setDocumentNumber(cleanNumber);
+      const result = await requestPortalCodeAction({
+        documentType,
+        documentNumber: cleanNumber,
+        captchaToken,
+      });
       if (!result.ok) return setError(result.error);
       setCode('');
+      setCooldown(COOLDOWN_SECONDS);
       setStep('code');
     } catch {
       setError('GENERIC');
@@ -60,7 +79,11 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
     if (!/^\d{6}$/.test(code)) return setError('CODE_INVALID');
     setSending(true);
     try {
-      const result = await verifyPortalCodeAction({ documentType, documentNumber, code });
+      const result = await verifyPortalCodeAction({
+        documentType,
+        documentNumber: documentNumber.trim(),
+        code,
+      });
       if (!result.ok) return setError(result.error);
       router.push('/portal');
       router.refresh();
@@ -96,8 +119,12 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
       {step === 'document' ? (
         <>
           <div className="flex flex-col gap-4">
-            <GoogleButton callbackURL="/app/portal" errorCallbackURL="/app/portal/login" />
-            <div className="flex items-center gap-3 text-xs text-ink-soft">
+            <GoogleButton
+              size="lg"
+              callbackURL="/app/portal"
+              errorCallbackURL="/app/portal/login"
+            />
+            <div className="flex items-center gap-3 text-sm text-ink-soft">
               <span className="h-px flex-1 bg-line" />
               <span>{t('or')}</span>
               <span className="h-px flex-1 bg-line" />
@@ -111,7 +138,10 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
                   {...props}
                   name="documentType"
                   value={documentType}
-                  onChange={(e) => setDocumentType(e.target.value as DocumentType)}
+                  onChange={(e) => {
+                    setDocumentType(e.target.value as DocumentType);
+                    if (error) setError(null);
+                  }}
                 >
                   {DOCUMENT_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -124,7 +154,7 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
             <FormField
               id="portal-document-number"
               label={t('numberLabel')}
-              hint={t('numberHint')}
+              hint={documentType === 'DNI' ? t('numberHintDni') : t('numberHint')}
               error={error && error !== 'CAPTCHA_REQUIRED' ? t(`errors.${error}`) : undefined}
             >
               {(props) => (
@@ -136,7 +166,10 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
                   autoCapitalize="characters"
                   required
                   value={documentNumber}
-                  onChange={(e) => setDocumentNumber(e.target.value)}
+                  onChange={(e) => {
+                    setDocumentNumber(e.target.value);
+                    if (error) setError(null);
+                  }}
                   className="tabular-nums"
                 />
               )}
@@ -147,12 +180,13 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
                 {t('errors.CAPTCHA_REQUIRED')}
               </p>
             ) : null}
-            <Button type="submit" variant="primary" className="w-full" disabled={sending}>
-              {sending ? t('sending') : t('send')}
+            <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
+              {sending ? <Loader2Icon aria-hidden="true" className="animate-spin" /> : null}
+              <span>{sending ? t('sending') : t('send')}</span>
             </Button>
           </form>
 
-          <p className="text-sm text-ink-soft">
+          <p className="text-base text-ink-soft">
             {t('passwordQuestion')}{' '}
             <Link
               href="/login"
@@ -166,38 +200,53 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
         <form onSubmit={verifyCode} noValidate className="flex flex-col gap-4">
           <Notice tone="success">
             <p>{t('sent')}</p>
+            <p className="text-sm font-medium tabular-nums">
+              {t('documentSummary', {
+                type: tDoc(documentType),
+                number: documentNumber,
+              })}
+            </p>
           </Notice>
-          <div className="flex flex-col gap-1.5">
-            <span id="portal-code-label" className="text-sm font-medium text-ink">
+          <div className="flex flex-col gap-2">
+            <span id="portal-code-label" className="text-base font-medium text-ink">
               {t('codeLabel')}
             </span>
             <OtpInput
               value={code}
-              onChange={setCode}
+              onChange={(next) => {
+                setCode(next);
+                if (error) setError(null);
+              }}
               describedBy="portal-code-label portal-code-hint"
               invalid={error === 'CODE_INVALID'}
               disabled={sending}
             />
-            <p id="portal-code-hint" className="text-[13px] leading-snug text-ink-soft">
+            <p id="portal-code-hint" className="text-sm leading-snug text-ink-soft">
               {t('codeHint')}
             </p>
             {error ? (
-              <p role="alert" className="text-[13px] font-medium text-error-ink">
+              <p role="alert" className="text-sm font-medium text-error-ink">
                 {t(`errors.${error}`)}
               </p>
             ) : null}
           </div>
-          <Button type="submit" variant="primary" className="w-full" disabled={sending}>
-            {sending ? t('verifying') : t('verify')}
+          <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
+            {sending ? <Loader2Icon aria-hidden="true" className="animate-spin" /> : null}
+            <span>{sending ? t('verifying') : t('verify')}</span>
           </Button>
           {/* El token de Turnstile es de un solo uso: otro código se pide desde el primer paso */}
           <Button
             type="button"
             variant="ghost"
-            className="self-start"
-            onClick={() => setStep('document')}
+            size="lg"
+            className="w-full"
+            disabled={cooldown > 0}
+            onClick={() => {
+              setError(null);
+              setStep('document');
+            }}
           >
-            {t('again')}
+            {cooldown > 0 ? t('cooldown', { seconds: cooldown }) : t('again')}
           </Button>
         </form>
       )}

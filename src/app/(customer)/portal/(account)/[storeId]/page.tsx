@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { ArrowLeftIcon, PhoneIcon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  CircleCheckIcon,
+  MapPinIcon,
+  PhoneIcon,
+  ShieldCheckIcon,
+} from 'lucide-react';
 import { z } from 'zod';
 import { listCycles } from '@/infrastructure/db/queries/collections';
 import { getInstallmentPlans, getPortalAccount } from '@/infrastructure/db/queries/portal';
@@ -13,10 +19,13 @@ import {
   CycleStatusBadge,
   cycleBadgeStatus,
 } from '@/presentation/components/collections/cycle-status-badge';
-import { Money } from '@/presentation/components/money';
+import { formatMoney, Money } from '@/presentation/components/money';
+import { Notice } from '@/presentation/components/notice';
 import { InstallmentPlans } from '@/presentation/components/portal/installment-plans';
 import { PaymentInfo } from '@/presentation/components/portal/payment-info';
+import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
+import { cn } from '@/presentation/lib/utils';
 
 // La URL firmada del QR dura lo que una visita a la página
 const QR_URL_SECONDS = 15 * 60;
@@ -48,15 +57,23 @@ export default async function PortalAccountPage({
     ? await getPrivateFileStorage().signedUrl(payment.qrPath, QR_URL_SECONDS)
     : null;
 
+  const payableBadge = account?.payable
+    ? cycleBadgeStatus(
+        account.payable.status as 'BILLED' | 'OVERDUE',
+        account.payable.paymentDueDate,
+        now,
+      )
+    : null;
+
   return (
     <>
       {links.length > 1 ? (
         <Link
           href="/portal"
-          className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline"
+          className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
         >
           <ArrowLeftIcon aria-hidden="true" className="size-5" />
-          {t('allStores')}
+          <span>{t('allStores')}</span>
         </Link>
       ) : null}
 
@@ -67,6 +84,18 @@ export default async function PortalAccountPage({
         </h1>
       </header>
 
+      {portal.emailBouncedAt ? (
+        <Notice tone="warning" className="text-base">
+          <p>{t('emailBounced')}</p>
+        </Notice>
+      ) : null}
+
+      {account && account.status !== 'ACTIVE' ? (
+        <Notice tone="warning" className="text-base">
+          <p>{t('blocked')}</p>
+        </Notice>
+      ) : null}
+
       {account ? (
         <section
           aria-labelledby="summary-title"
@@ -76,60 +105,146 @@ export default async function PortalAccountPage({
             {t('summaryTitle')}
           </h2>
           <div className="flex flex-col gap-1">
-            <span className="text-ink-soft">{t('balance')}</span>
+            <span className="text-base text-ink-soft">{t('balance')}</span>
             <Money
               amount={account.balance}
               currency={account.currency}
-              className="text-4xl font-semibold tracking-tight text-ink"
+              className="text-amount font-bold tracking-tight text-ink"
             />
           </div>
 
-          {account.payable ? (
-            <div className="flex flex-col gap-2 rounded-field bg-paper-deep p-4">
+          <div className="flex flex-col gap-2">
+            <div
+              role="meter"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={account.usedPercent}
+              aria-label={t('limitUsed', { percent: account.usedPercent })}
+              className="h-2 overflow-hidden rounded-full bg-paper-deep"
+            >
+              <div
+                className={cn(
+                  'h-full rounded-full transition-[width] duration-250 ease-(--ease-out-expo)',
+                  account.overLimit || account.usedPercent >= 95
+                    ? 'bg-error'
+                    : account.usedPercent >= 85
+                      ? 'bg-amber'
+                      : 'bg-primary',
+                )}
+                style={{ width: `${account.usedPercent}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-base tabular-nums">
+              <span
+                className={cn(account.overLimit ? 'font-medium text-error-ink' : 'text-ink-soft')}
+              >
+                {account.overLimit
+                  ? t('overLimit')
+                  : t('available', {
+                      amount: formatMoney(account.availableCredit, account.currency),
+                    })}
+              </span>
+              <span className="text-ink-soft">
+                {t('limitShort', {
+                  amount: formatMoney(account.creditLimit, account.currency),
+                })}
+              </span>
+            </div>
+          </div>
+
+          {account.payable && payableBadge ? (
+            <div
+              className={cn(
+                'flex flex-col gap-3 rounded-field p-4 sm:p-5',
+                payableBadge === 'OVERDUE'
+                  ? 'bg-error/12'
+                  : payableBadge === 'DUE_SOON'
+                    ? 'bg-amber/12'
+                    : 'bg-soft',
+              )}
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-medium text-ink">{t('toPay')}</span>
-                <CycleStatusBadge
-                  status={cycleBadgeStatus(
-                    account.payable.status as 'BILLED' | 'OVERDUE',
-                    account.payable.paymentDueDate,
-                    now,
-                  )}
-                />
+                <span className="font-semibold text-ink">{t('toPay')}</span>
+                <CycleStatusBadge status={payableBadge} />
               </div>
               <Money
                 amount={account.payable.totalDue}
                 currency={account.currency}
-                className="text-3xl font-semibold text-ink"
+                className="text-3xl font-bold tracking-tight text-ink"
               />
-              <p className="text-ink-soft">
+              <p
+                className={cn(
+                  'text-base font-medium',
+                  payableBadge === 'OVERDUE'
+                    ? 'text-error-ink'
+                    : payableBadge === 'DUE_SOON'
+                      ? 'text-amber-ink'
+                      : 'text-soft-ink-2',
+                )}
+              >
                 {t('payBy', { date: formatDate(account.payable.paymentDueDate) })}
               </p>
-              <Link
-                href={`/portal/${storeId}/cycles/${account.payable.cycleId}`}
-                className="inline-flex min-h-11 items-center self-start font-semibold text-link-active underline-offset-4 hover:underline"
-              >
-                {t('seeStatement')}
-              </Link>
+              <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
+                <Link
+                  href={`/portal/${storeId}/cycles/${account.payable.cycleId}`}
+                  className={buttonVariants({
+                    variant: 'primary',
+                    size: 'lg',
+                    className: 'w-full sm:w-auto',
+                  })}
+                >
+                  {t('seeStatement')}
+                </Link>
+                <a
+                  href="#payment-info"
+                  className={buttonVariants({
+                    variant: 'secondary',
+                    size: 'lg',
+                    className: 'w-full sm:w-auto',
+                  })}
+                >
+                  {t('howToPay')}
+                </a>
+              </div>
             </div>
           ) : (
-            <p className="rounded-field bg-paper-deep p-4 text-ink-soft">{t('nothingDue')}</p>
+            <div className="flex flex-col gap-3 rounded-field bg-paper-deep p-4 sm:p-5">
+              <div className="flex items-center gap-2 font-semibold text-success-ink">
+                <CircleCheckIcon aria-hidden="true" className="size-5 shrink-0" />
+                <span>{t('allGood')}</span>
+              </div>
+              <p className="text-base text-ink-soft">{t('nothingDue')}</p>
+              {account.openCycle && account.openCycle.amount !== '0.00' ? (
+                <Link
+                  href={`/portal/${storeId}/cycles/${account.openCycle.cycleId}`}
+                  className={buttonVariants({
+                    variant: 'secondary',
+                    size: 'lg',
+                    className: 'w-full sm:w-auto sm:self-start',
+                  })}
+                >
+                  {t('openCycleCta', {
+                    amount: formatMoney(account.openCycle.amount, account.currency),
+                  })}
+                </Link>
+              ) : null}
+            </div>
           )}
 
-          <dl className="grid gap-3 sm:grid-cols-2">
+          <dl className="grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
             <div className="flex flex-col gap-0.5">
               <dt className="text-base text-ink-soft">{t('nextCutOff')}</dt>
-              <dd className="font-semibold text-ink">{formatDate(account.nextCutOffDate)}</dd>
+              <dd className="font-semibold text-ink tabular-nums">
+                {formatDate(account.nextCutOffDate)}
+              </dd>
             </div>
             <div className="flex flex-col gap-0.5">
-              <dt className="text-base text-ink-soft">{t('creditLimit')}</dt>
-              <dd className="font-semibold text-ink">
-                <Money amount={account.creditLimit} currency={account.currency} />
+              <dt className="text-base text-ink-soft">{t('paymentDayTitle')}</dt>
+              <dd className="font-semibold text-ink tabular-nums">
+                {t('paymentDay', { day: account.paymentDueDay })}
               </dd>
             </div>
           </dl>
-          {account.status !== 'ACTIVE' ? (
-            <p className="text-base text-ink-soft">{t('blocked')}</p>
-          ) : null}
         </section>
       ) : (
         <p className="rounded-card border border-line bg-surface p-5 text-ink-soft">
@@ -137,7 +252,13 @@ export default async function PortalAccountPage({
         </p>
       )}
 
-      <PaymentInfo payment={payment} qrUrl={qrUrl} />
+      <PaymentInfo
+        payment={payment}
+        qrUrl={qrUrl}
+        storeName={portal.storeName}
+        suggestedAmount={account?.payable?.totalDue ?? null}
+        currency={account?.currency}
+      />
 
       {account && plans.length > 0 ? (
         <InstallmentPlans plans={plans} currency={account.currency} />
@@ -153,15 +274,36 @@ export default async function PortalAccountPage({
         />
       ) : null}
 
-      {portal.storeContact ? (
-        <a
-          href={`tel:${portal.storeContact}`}
-          className="inline-flex min-h-11 items-center gap-2 self-start font-medium text-link-active hover:underline"
-        >
-          <PhoneIcon aria-hidden="true" className="size-5" />
-          {t('callStore', { phone: portal.storeContact })}
-        </a>
-      ) : null}
+      <footer className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:p-6">
+        {portal.storeAddress ? (
+          <p className="flex items-start gap-2.5 text-base text-ink-soft">
+            <MapPinIcon aria-hidden="true" className="mt-1 size-5 shrink-0" />
+            <span>{portal.storeAddress}</span>
+          </p>
+        ) : null}
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          {portal.storeContact ? (
+            <a
+              href={`tel:${portal.storeContact}`}
+              className={buttonVariants({
+                variant: 'secondary',
+                size: 'lg',
+                className: 'w-full sm:w-auto',
+              })}
+            >
+              <PhoneIcon aria-hidden="true" className="size-5" />
+              <span>{t('callStore', { phone: portal.storeContact })}</span>
+            </a>
+          ) : null}
+          <Link
+            href={`/privacy/customers/${storeId}`}
+            className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline"
+          >
+            <ShieldCheckIcon aria-hidden="true" className="size-5 shrink-0" />
+            <span>{t('privacyLink')}</span>
+          </Link>
+        </div>
+      </footer>
     </>
   );
 }

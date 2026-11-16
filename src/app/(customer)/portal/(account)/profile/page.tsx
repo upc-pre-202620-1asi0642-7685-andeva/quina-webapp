@@ -12,9 +12,14 @@ export default async function PortalProfilePage() {
     Promise.all(links.map((link) => getPortalAccount(link, now))),
   ]);
 
-  const linkedStores = accounts
-    .filter((account): account is NonNullable<typeof account> => account !== null)
-    .map((account) => ({ storeId: account.storeId, storeName: account.storeName }));
+  const resolvedAccounts = accounts.filter(
+    (account): account is NonNullable<typeof account> => account !== null,
+  );
+  const linkedStores = resolvedAccounts.map((account) => ({
+    storeId: account.storeId,
+    storeName: account.storeName,
+  }));
+  const fallbackName = resolvedAccounts[0]?.customerName ?? null;
 
-  return <PortalProfileView profile={summary} stores={linkedStores} />;
+  return <PortalProfileView profile={summary} stores={linkedStores} fallbackName={fallbackName} />;
 }

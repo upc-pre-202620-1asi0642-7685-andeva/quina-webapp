@@ -85,7 +85,13 @@ test.describe('portal del vecino (US14)', () => {
     await portal.getByRole('button', { name: 'Ver mi estado de cuenta' }).click();
     await expect(portal).toHaveURL(new RegExp(`/app/portal/${storeId}$`));
     await expect(portal.getByText('Hola, Rosa')).toBeVisible();
+    await expect(portal.getByText('Disponible: S/ 95.00')).toBeVisible();
+    await expect(portal.getByRole('meter')).toHaveAttribute('aria-valuenow', '5');
     await expect(portal.getByText('987654321')).toBeVisible();
+    await expect(portal.getByRole('button', { name: 'Copiar Yape' })).toBeVisible();
+    await expect(
+      portal.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).resolves.toBe(true);
     await expectAccessible(portal);
 
     await portal
@@ -94,6 +100,8 @@ test.describe('portal del vecino (US14)', () => {
       .click();
     await portal.getByRole('button', { name: 'No reconozco este cargo' }).click();
     const dialog = portal.getByRole('dialog');
+    await dialog.getByRole('button', { name: 'No hice esta compra' }).click();
+    await expect(dialog.getByLabel('Tu observación')).toHaveValue('No hice esta compra');
     await dialog.getByLabel('Tu observación').fill('Yo no saqué ese arroz');
     await expectAccessible(portal);
     await dialog.getByRole('button', { name: 'Enviar a la tienda' }).click();
@@ -140,7 +148,12 @@ test.describe('portal del vecino (US14)', () => {
     await expect(portal.getByText('Hola, Rosa')).toBeVisible();
 
     await portal.getByRole('link', { name: 'Mi perfil' }).click();
+    await expect(portal).toHaveURL(/\/app\/portal\/profile$/);
+    await expect(portal.getByRole('tab', { name: 'Seguridad' })).toBeVisible();
+    await expectAccessible(portal);
+    await portal.getByRole('tab', { name: 'Seguridad' }).click();
     await expect(portal.getByText('Si prefieres, crea una contraseña')).toBeVisible();
+    await expectAccessible(portal);
     await expect(portal.getByText('Entraste con Google')).toHaveCount(0);
     await portal.getByLabel('Nueva contraseña').fill(STRONG_PASSWORD);
     await portal.getByLabel('Repite la contraseña').fill(STRONG_PASSWORD);

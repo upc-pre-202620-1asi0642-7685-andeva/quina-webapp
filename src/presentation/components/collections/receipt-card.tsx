@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { CircleCheckIcon } from 'lucide-react';
 import type { Receipt } from '@/infrastructure/db/queries/collections';
 import { Money } from '@/presentation/components/money';
 import { formatDate } from '@/presentation/lib/format-date';
@@ -17,17 +18,24 @@ export async function ReceiptCard({
   large?: boolean;
 }) {
   const t = await getTranslations('Collections.receipt');
+  const tPortal = await getTranslations('Portal.receipt');
   const meta = large ? 'text-base' : 'text-sm';
   const body = large ? 'text-lg' : 'text-sm';
   const tPay = await getTranslations('Collections.pay');
   const currency = receipt.currency;
 
   return (
-    <article className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 sm:p-6 print:border-0 print:p-0">
-      <header className="flex flex-col gap-1">
-        <p className={cn('text-ink-soft', meta)}>
-          {receipt.store.name} · {receipt.store.taxIdType} {receipt.store.taxIdNumber}
-        </p>
+    <article className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6 print:border-0 print:p-0">
+      <header className="flex flex-col gap-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className={cn('text-ink-soft', meta)}>
+            {receipt.store.name} · {receipt.store.taxIdType} {receipt.store.taxIdNumber}
+          </p>
+          <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-0.5 text-[13px] font-medium text-success-ink">
+            <CircleCheckIcon aria-hidden="true" className="size-4" />
+            {tPortal('paidBadge')}
+          </span>
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight text-ink">
           {t('title', { number: receipt.receiptNumber })}
         </h1>
@@ -92,6 +100,13 @@ export async function ReceiptCard({
           </dd>
         </div>
       </dl>
+
+      {receipt.notes ? (
+        <div className="rounded-field bg-paper-deep p-3.5">
+          <p className={cn('font-medium text-ink-soft', meta)}>{tPortal('notes')}</p>
+          <p className={cn('mt-0.5 text-ink', meta)}>{receipt.notes}</p>
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -132,14 +132,23 @@ export function ActiveSessionsCard({
 
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-semibold text-ink">{deviceLabel}</span>
+                      <span
+                        className={cn('font-semibold text-ink', portal ? 'text-base' : 'text-sm')}
+                      >
+                        {deviceLabel}
+                      </span>
                       {session.isCurrent ? (
                         <span className="rounded-full bg-soft px-2 py-0.5 text-xs font-semibold text-soft-ink">
                           {t('currentBadge')}
                         </span>
                       ) : null}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-ink-soft tabular-nums">
+                    <div
+                      className={cn(
+                        'flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ink-soft tabular-nums',
+                        portal ? 'text-sm' : 'text-[13px]',
+                      )}
+                    >
                       <span>
                         {t('lastActive', { date: formatDateTime(new Date(session.updatedAt)) })}
                       </span>
@@ -179,14 +188,15 @@ export function ActiveSessionsCard({
       <ResponsiveSheet
         open={confirmOthers}
         onOpenChange={setConfirmOthers}
-        title={t('confirmOthersTitle')}
-        description={t('confirmOthersBody', { count: otherSessions.length })}
+        title={t('confirmOthersTitle', { count: otherSessions.length })}
+        description={t('confirmOthersBody')}
         closeLabel={t('cancel')}
         footer={
           <>
             <Button
               type="button"
               variant="secondary"
+              size={portal ? 'lg' : 'default'}
               disabled={revokingOthers}
               onClick={() => setConfirmOthers(false)}
             >
@@ -195,6 +205,7 @@ export function ActiveSessionsCard({
             <Button
               type="button"
               variant="destructive"
+              size={portal ? 'lg' : 'default'}
               disabled={revokingOthers}
               onClick={handleRevokeOthers}
             >
@@ -204,7 +215,9 @@ export function ActiveSessionsCard({
           </>
         }
       >
-        <p className="text-sm text-ink-soft">{t('confirmOthersHint')}</p>
+        <p className={cn('text-ink-soft', portal ? 'text-base' : 'text-sm')}>
+          {t('confirmOthersHint')}
+        </p>
       </ResponsiveSheet>
     </section>
   );

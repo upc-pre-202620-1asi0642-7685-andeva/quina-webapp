@@ -26,42 +26,48 @@ function getInitials(name: string): string {
 export function PortalProfileView({
   profile,
   stores,
+  fallbackName = null,
 }: {
   profile: ProfileSummary;
   stores: { storeId: string; storeName: string }[];
+  fallbackName?: string | null;
 }) {
   const t = useTranslations('Profile');
+  const displayName =
+    profile.user.name.trim() || fallbackName?.trim() || profile.user.email.split('@')[0] || '';
+
+  const backHref = stores.length === 1 ? `/portal/${stores[0]!.storeId}` : '/portal';
+  const backLabel =
+    stores.length === 1 ? t('backToStore', { store: stores[0]!.storeName }) : t('backToPortal');
 
   return (
     <>
       <Link
-        href="/portal"
-        className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active"
+        href={backHref}
+        className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-5" />
-        <span>{t('backToPortal')}</span>
+        <span>{backLabel}</span>
       </Link>
 
       {/* Cabecera amigable del vecino (DESIGN.md §6.2: escala legible) */}
-      <header className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5">
+      <header className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:p-6">
         <div className="flex items-center gap-4">
           <Avatar className="size-14 shrink-0 border border-line bg-soft text-base font-semibold text-soft-ink">
-            {profile.user.image ? (
-              <AvatarImage src={profile.user.image} alt={profile.user.name} />
-            ) : null}
+            {profile.user.image ? <AvatarImage src={profile.user.image} alt={displayName} /> : null}
             <AvatarFallback className="bg-soft font-semibold text-soft-ink">
-              {getInitials(profile.user.name)}
+              {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-col gap-1">
             <h1 className="truncate text-2xl font-semibold tracking-tight text-ink">
-              {profile.user.name}
+              {displayName}
             </h1>
             <div className="flex flex-wrap items-center gap-2 text-base text-ink-soft">
               <span className="truncate">{profile.user.email}</span>
               {profile.user.emailVerified ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-0.5 text-xs font-medium text-success-ink">
-                  <BadgeCheckIcon aria-hidden="true" className="size-3.5 shrink-0" />
+                <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-0.5 text-sm font-medium text-success-ink">
+                  <BadgeCheckIcon aria-hidden="true" className="size-4 shrink-0" />
                   {t('identity.verified')}
                 </span>
               ) : null}
@@ -72,16 +78,16 @@ export function PortalProfileView({
       </header>
 
       <Tabs defaultValue="account" className="flex flex-col gap-5">
-        <TabsList className="grid h-auto w-full grid-cols-2 rounded-field bg-paper-deep p-1">
+        <TabsList className="grid h-auto w-full grid-cols-2 items-stretch rounded-field bg-paper-deep p-1">
           <TabsTrigger
             value="account"
-            className="min-h-12 rounded-field px-3 text-base font-semibold data-[state=active]:bg-surface data-[state=active]:text-ink"
+            className="h-full min-h-12 rounded-field px-3 py-2 text-center text-sm leading-tight font-semibold whitespace-normal data-[state=active]:bg-surface data-[state=active]:text-ink sm:text-base"
           >
             {t('portalTabs.account')}
           </TabsTrigger>
           <TabsTrigger
             value="security"
-            className="min-h-12 rounded-field px-3 text-base font-semibold data-[state=active]:bg-surface data-[state=active]:text-ink"
+            className="h-full min-h-12 rounded-field px-3 py-2 text-center text-sm leading-tight font-semibold whitespace-normal data-[state=active]:bg-surface data-[state=active]:text-ink sm:text-base"
           >
             {t('portalTabs.security')}
           </TabsTrigger>
@@ -91,7 +97,7 @@ export function PortalProfileView({
           {stores.length > 0 ? (
             <section
               aria-labelledby="portal-stores-title"
-              className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5"
+              className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:p-6"
             >
               <div className="flex flex-col gap-1">
                 <h2 id="portal-stores-title" className="text-xl font-semibold text-ink">
@@ -104,7 +110,7 @@ export function PortalProfileView({
                   <li key={store.storeId}>
                     <Link
                       href={`/portal/${store.storeId}`}
-                      className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 text-base font-semibold text-ink hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-link-active"
+                      className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 text-lg font-semibold text-ink transition-[transform,background-color] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-link-active active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100"
                     >
                       <span className="flex min-w-0 items-center gap-3">
                         <StoreIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />

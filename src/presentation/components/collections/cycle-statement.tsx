@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { ChevronRightIcon, ReceiptTextIcon } from 'lucide-react';
 import type { CycleDetail } from '@/infrastructure/db/queries/collections';
 import { ChargeLine } from '@/presentation/components/collections/charge-line';
 import { Money } from '@/presentation/components/money';
@@ -187,11 +188,12 @@ export async function CycleStatement({
                 <Link
                   href={paymentHref(payment.id)}
                   className={cn(
-                    'flex min-h-12 items-center justify-between gap-3 py-2 hover:bg-surface-hover',
-                    large ? 'min-h-14 text-lg' : 'text-sm',
+                    'flex min-h-14 items-center gap-3 rounded-field px-2 py-2.5 transition-[transform,background-color] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100',
+                    large ? 'text-lg' : 'text-sm',
                   )}
                 >
-                  <span className="font-medium text-ink">
+                  <ReceiptTextIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
+                  <span className="min-w-0 flex-1 font-medium text-ink">
                     {t('cycle.receipt', {
                       number: payment.receiptNumber,
                       date: formatDate(payment.paymentDate),
@@ -200,8 +202,9 @@ export async function CycleStatement({
                   <Money
                     amount={payment.amountPaid}
                     currency={currency}
-                    className="font-semibold"
+                    className="font-semibold whitespace-nowrap text-ink"
                   />
+                  <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
                 </Link>
               </li>
             ))}
