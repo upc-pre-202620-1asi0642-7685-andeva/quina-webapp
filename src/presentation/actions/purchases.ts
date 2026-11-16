@@ -6,9 +6,12 @@ import {
   CreateSupplierUseCase,
   GenerateReplenishmentOrdersUseCase,
   RegisterPurchaseUseCase,
+  SetSupplierActiveUseCase,
+  UpdateSupplierUseCase,
   type AttachmentUpload,
   type CreateSupplierError,
   type RegisterPurchaseError,
+  type UpdateSupplierError,
 } from '@/core/application/catalog/manage-purchases';
 import { DrizzlePurchaseRepository } from '@/infrastructure/db/repositories/drizzle-purchase-repository';
 import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
@@ -52,7 +55,7 @@ const purchaseLineSchema = z.object({
 });
 
 function mapSupplierError(
-  code: CreateSupplierError,
+  code: CreateSupplierError | UpdateSupplierError,
 ): ['taxIdNumber' | 'tradeName' | 'contactName' | 'phone' | 'email' | 'form', string] {
   switch (code) {
     case 'TAX_ID_INVALID':
@@ -67,6 +70,8 @@ function mapSupplierError(
       return ['phone', 'phoneInvalid'];
     case 'EMAIL_INVALID':
       return ['email', 'emailInvalid'];
+    case 'NOT_FOUND':
+      return ['form', 'notFound'];
   }
 }
 
@@ -135,6 +140,62 @@ export async function createSupplierAction(input: {
   revalidatePath('/inventory/purchases/new');
   revalidatePath('/inventory/suppliers');
   return { ok: true, supplierId: result.value };
+}
+
+export async function updateSupplierAction(
+  supplierId: string,
+  input: {
+    taxIdNumber: string;
+    tradeName: string;
+    contactName?: string;
+    phone?: string;
+    email?: string;
+  },
+): Promise<SupplierActionResult> {
+  const user = await authorizeStore('purchases.manage');
+  if (!user || !z.uuid().safeParse(supplierId).success) {
+    return { ok: false, field: 'form', error: 'generic' };
+  }
+  const parsed = supplierInputSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, field: 'form', error: 'generic' };
+
+  const result = await new UpdateSupplierUseCase(new DrizzlePurchaseRepository()).execute({
+    storeId: user.storeId,
+    actorId: user.id,
+    supplierId,
+    input: parsed.data,
+    now: new Date(),
+  });
+  if (!result.ok) {
+    const [field, error] = mapSupplierError(result.error);
+    return { ok: false, field, error };
+  }
+  revalidatePath('/inventory');
+  revalidatePath('/inventory/purchases');
+  revalidatePath('/inventory/purchases/new');
+  revalidatePath('/inventory/suppliers');
+  return { ok: true, supplierId };
+}
+
+export async function setSupplierActiveAction(
+  supplierId: string,
+  active: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const user = await authorizeStore('purchases.manage');
+  if (!user || !z.uuid().safeParse(supplierId).success) return { ok: false, error: 'generic' };
+  const result = await new SetSupplierActiveUseCase(new DrizzlePurchaseRepository()).execute({
+    storeId: user.storeId,
+    actorId: user.id,
+    supplierId,
+    active,
+    now: new Date(),
+  });
+  if (!result.ok) return { ok: false, error: 'notFound' };
+  revalidatePath('/inventory');
+  revalidatePath('/inventory/purchases');
+  revalidatePath('/inventory/purchases/new');
+  revalidatePath('/inventory/suppliers');
+  return { ok: true };
 }
 
 async function readAttachments(formData: FormData): Promise<AttachmentUpload[]> {

@@ -1,6 +1,7 @@
-import { and, asc, count, desc, eq, gte, inArray, lte } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, inArray, lte, max, sql } from 'drizzle-orm';
 import type { PurchaseDocumentType } from '@/core/domain/catalog/purchase';
 import type { AttachmentMimeType } from '@/core/domain/catalog/purchase-attachment';
+import type { SupplierOption } from '@/core/domain/ports/purchase-repository';
 import { currentLimaMonthRange } from '../repositories/drizzle-purchase-repository';
 import {
   products,
@@ -290,5 +291,52 @@ export async function countMonthlyPurchaseReceipts(
         ),
       );
     return row?.total ?? 0;
+  });
+}
+
+export type SupplierListItem = SupplierOption & {
+  purchasesCount: number;
+  totalPurchased: string;
+  lastPurchaseDate: string | null;
+};
+
+export async function listSuppliersWithStats(storeId: string): Promise<SupplierListItem[]> {
+  return withTenant(storeId, async (tx) => {
+    const [rows, stats] = await Promise.all([
+      tx
+        .select({
+          id: suppliers.id,
+          taxIdNumber: suppliers.taxIdNumber,
+          tradeName: suppliers.tradeName,
+          contactName: suppliers.contactName,
+          phone: suppliers.phone,
+          email: suppliers.email,
+          isActive: suppliers.isActive,
+        })
+        .from(suppliers)
+        .where(eq(suppliers.storeId, storeId))
+        .orderBy(desc(suppliers.isActive), asc(suppliers.tradeName)),
+      tx
+        .select({
+          supplierId: purchases.supplierId,
+          purchasesCount: count(),
+          totalPurchased: sql<string>`COALESCE(SUM(${purchases.totalAmount}), 0)::text`,
+          lastPurchaseDate: max(purchases.issueDate),
+        })
+        .from(purchases)
+        .where(eq(purchases.storeId, storeId))
+        .groupBy(purchases.supplierId),
+    ]);
+
+    const bySupplier = new Map(stats.map((s) => [s.supplierId, s]));
+    return rows.map((row) => {
+      const st = bySupplier.get(row.id);
+      return {
+        ...row,
+        purchasesCount: st?.purchasesCount ?? 0,
+        totalPurchased: st?.totalPurchased ?? '0.00',
+        lastPurchaseDate: st?.lastPurchaseDate ?? null,
+      };
+    });
   });
 }
