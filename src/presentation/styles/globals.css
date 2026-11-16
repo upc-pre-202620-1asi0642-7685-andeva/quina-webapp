@@ -292,6 +292,14 @@ table.sr-only > caption {
   clip-path: inset(50%);
 }
 
+@media (prefers-reduced-transparency: reduce) {
+  .portal-chrome {
+    background-color: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

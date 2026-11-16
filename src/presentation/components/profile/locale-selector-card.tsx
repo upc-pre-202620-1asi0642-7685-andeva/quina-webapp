@@ -101,13 +101,20 @@ export function LocaleSelectorCard({
                   <LanguagesIcon className="size-4.5" />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
+                  <span
+                    className={cn(
+                      'flex items-center justify-between gap-2 font-semibold text-ink',
+                      portal ? 'text-base' : 'text-sm',
+                    )}
+                  >
                     <span>{t(`locales.${loc}`)}</span>
                     {selected ? (
                       <CheckIcon aria-hidden="true" className="size-4 shrink-0 text-link-active" />
                     ) : null}
                   </span>
-                  <span className="text-[13px] leading-snug text-ink-soft">
+                  <span
+                    className={cn('leading-snug text-ink-soft', portal ? 'text-sm' : 'text-[13px]')}
+                  >
                     {t(`localeDescriptions.${loc}`)}
                   </span>
                 </span>

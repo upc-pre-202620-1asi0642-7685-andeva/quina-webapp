@@ -36,15 +36,19 @@ export default async function PortalEnterPage({
           ) : null}
           <input type="hidden" name="token" value={token} />
           <input type="hidden" name="to" value={to ?? '/portal'} />
-          <Button type="submit" size="lg" className="w-full text-lg">
+          <Button type="submit" variant="primary" size="lg" className="w-full text-lg">
             {t('submit')}
           </Button>
+          <p className="text-sm text-ink-soft">{t('singleUseHint')}</p>
         </form>
       ) : (
         <Notice tone="error">
           <p>
             {t('missing')}{' '}
-            <Link href="/portal/login" className="font-medium text-link-active underline">
+            <Link
+              href="/portal/login"
+              className="inline-flex min-h-11 items-center font-medium text-link-active underline"
+            >
               {tAuth('login.customerLink')}
             </Link>
           </p>

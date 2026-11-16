@@ -4,6 +4,7 @@ import type { InstallmentPlan } from '@/infrastructure/db/queries/portal';
 import { formatMoney, Money } from '@/presentation/components/money';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
+import { InstallmentScheduleList } from './installment-schedule-list';
 
 // DESIGN.md §2.4: los mismos colores de estado que los ciclos
 const STATUS_STYLES: Record<string, string> = {
@@ -46,48 +47,51 @@ export async function InstallmentPlans({
       </h2>
       {plans.map((plan) => {
         const paid = plan.rows.filter((row) => row.status === 'PAID').length;
+        const total = plan.rows.length;
+        const percent = total > 0 ? Math.round((paid / total) * 100) : 0;
+        const nextRow = plan.rows.find(
+          (row) => row.status === 'OVERDUE' || row.status === 'PENDING',
+        );
         return (
           <div key={plan.chargeId} className="flex flex-col gap-3">
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-ink">
-                {t('purchase', {
-                  date: formatDate(plan.purchaseDate),
-                  amount: formatMoney(plan.principal, currency),
-                })}
-              </h3>
-              <p className="text-base text-ink-soft">
-                {t('progress', { paid, total: plan.rows.length })}
-              </p>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="font-semibold text-ink">
+                  {t('purchase', {
+                    date: formatDate(plan.purchaseDate),
+                    amount: formatMoney(plan.principal, currency),
+                  })}
+                </h3>
+                <span className="text-base font-medium text-ink-soft tabular-nums">
+                  {t('progress', { paid, total })}
+                </span>
+              </div>
+              <div
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={total}
+                aria-valuenow={paid}
+                aria-label={t('progress', { paid, total })}
+                className="h-2 overflow-hidden rounded-full bg-paper-deep"
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-250 ease-(--ease-out-expo)"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              {nextRow ? (
+                <p className="text-base text-ink-soft">
+                  {t('nextDue', {
+                    number: nextRow.number,
+                    date: formatDate(nextRow.dueDate),
+                    amount: formatMoney(nextRow.installment, currency),
+                  })}
+                </p>
+              ) : null}
             </div>
-            {/* Seis columnas no caben en 390 px: en el celular cada cuota es una fila con su desglose */}
-            <ul className="flex flex-col divide-y divide-line rounded-field border border-line sm:hidden">
-              {plan.rows.map((row) => (
-                <li key={row.number} className="flex flex-col gap-1 px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-ink tabular-nums">
-                      {t('row', { number: row.number, total: row.total })}
-                    </span>
-                    <Money
-                      amount={row.installment}
-                      currency={currency}
-                      className="font-semibold whitespace-nowrap text-ink"
-                    />
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-ink-soft">
-                      {t('dueOn', { date: formatDate(row.dueDate) })}
-                    </span>
-                    <StatusBadge status={row.status} label={statusLabel(row.status)} />
-                  </div>
-                  <span className="text-base text-ink-soft">
-                    {t('breakdown', {
-                      principal: formatMoney(row.principal, currency),
-                      interest: formatMoney(row.interest, currency),
-                    })}
-                  </span>
-                </li>
-              ))}
-            </ul>
+
+            <InstallmentScheduleList rows={plan.rows} currency={currency} />
+
             <div className="hidden rounded-field border border-line sm:block">
               <table className="w-full text-base">
                 <caption className="sr-only">{t('caption')}</caption>

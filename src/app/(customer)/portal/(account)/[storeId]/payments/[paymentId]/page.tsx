@@ -7,6 +7,9 @@ import { getReceipt } from '@/infrastructure/db/queries/collections';
 import { requirePortalUser } from '@/presentation/auth/guards';
 import { PrintButton } from '@/presentation/components/collections/print-button';
 import { ReceiptCard } from '@/presentation/components/collections/receipt-card';
+import { formatMoney } from '@/presentation/components/money';
+import { ShareReceiptButton } from '@/presentation/components/portal/share-receipt-button';
+import { formatDate } from '@/presentation/lib/format-date';
 
 /** US14.6: el vecino ve e imprime el recibo de cada pago que hizo. */
 export default async function PortalReceiptPage({
@@ -21,24 +24,44 @@ export default async function PortalReceiptPage({
   if (!link) notFound();
   const receipt = await getReceipt(storeId, paymentId, link.customerId);
   if (!receipt) notFound();
-  const t = await getTranslations('Portal.cycle');
+  const t = await getTranslations('Portal.receipt');
+  const tCollections = await getTranslations('Collections.receipt');
+
+  const summary = t('shareText', {
+    number: receipt.receiptNumber,
+    store: receipt.store.name,
+    amount: formatMoney(receipt.amountPaid, receipt.currency),
+    date: formatDate(receipt.paymentDate),
+  });
 
   return (
     <>
-      <Link
-        href={`/portal/${storeId}`}
-        className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline print:hidden"
-      >
-        <ArrowLeftIcon aria-hidden="true" className="size-5" />
-        {t('back')}
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
+        <Link
+          href={`/portal/${storeId}/cycles/${receipt.cycle.id}`}
+          className="inline-flex min-h-11 items-center gap-2 text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+        >
+          <ArrowLeftIcon aria-hidden="true" className="size-5" />
+          <span>{t('backToCycle')}</span>
+        </Link>
+        <Link
+          href={`/portal/${storeId}`}
+          className="inline-flex min-h-11 items-center text-base font-medium text-ink-soft hover:text-ink hover:underline"
+        >
+          {t('backToAccount')}
+        </Link>
+      </div>
       <ReceiptCard
         receipt={receipt}
         cycleHref={`/portal/${storeId}/cycles/${receipt.cycle.id}`}
         large
       />
-      <div className="flex justify-end">
-        <PrintButton />
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end print:hidden">
+        <PrintButton size="lg" />
+        <ShareReceiptButton
+          title={tCollections('title', { number: receipt.receiptNumber })}
+          summary={summary}
+        />
       </div>
     </>
   );

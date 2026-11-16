@@ -11,6 +11,7 @@ export type GoogleButtonProps = {
   errorCallbackURL?: string;
   /** Se corre antes de ir a Google; si devuelve false, no se sale de la página. */
   onBeforeRedirect?: () => boolean;
+  size?: 'default' | 'lg';
 };
 
 // Una cuenta nueva sin la casilla de términos aceptada vuelve a /register con
@@ -23,6 +24,7 @@ export function GoogleButton({
   callbackURL = '/app',
   errorCallbackURL = ERROR_CALLBACK_URL,
   onBeforeRedirect,
+  size = 'default',
 }: GoogleButtonProps) {
   const t = useTranslations('Auth');
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ export function GoogleButton({
     <Button
       type="button"
       variant="secondary"
+      size={size}
       className="relative w-full"
       disabled={loading}
       onClick={handleGoogle}

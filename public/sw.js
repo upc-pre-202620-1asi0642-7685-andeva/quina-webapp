@@ -10,7 +10,11 @@ const STATIC_CACHE = `quina-static-${VERSION}`;
 const PAGES_CACHE = 'quina-pages';
 const OFFLINE_URL = '/app/offline';
 const PRECACHE = [OFFLINE_URL, '/app/brand/pwa-icon-192.png', '/app/brand/pwa-icon-512.png'];
-const READABLE_OFFLINE = [/^\/app\/inventory(\/|$)/, /^\/app\/customers(\/|$)/];
+const READABLE_OFFLINE = [
+  /^\/app\/inventory(\/|$)/,
+  /^\/app\/customers(\/|$)/,
+  /^\/app\/portal(\/(?!login|enter).*)?$/,
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -43,8 +47,10 @@ const pageKey = (url) => new Request(`${url.origin}${url.pathname}${url.search}`
 
 async function navigate(request) {
   const url = new URL(request.url);
-  // Llegar al login (sesión vencida o cerrada) borra lo guardado de la tienda
-  if (url.pathname.startsWith('/app/login')) await caches.delete(PAGES_CACHE);
+  // Llegar al login (sesión vencida o cerrada) borra lo guardado de la tienda o del vecino
+  if (url.pathname.startsWith('/app/login') || url.pathname.startsWith('/app/portal/login')) {
+    await caches.delete(PAGES_CACHE);
+  }
   try {
     const response = await fetch(request);
     if (response.ok && isReadable(url)) {
