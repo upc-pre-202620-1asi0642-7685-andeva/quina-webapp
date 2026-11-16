@@ -15,7 +15,7 @@ export default async function NewCustomerPage() {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <Link
         href="/customers"
-        className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />
         {t('detail.back')}
@@ -34,6 +34,7 @@ export default async function NewCustomerPage() {
           storeName={store.name}
           privacyHref={`/app/privacy/customers/${user.storeId}`}
           cancelHref="/customers"
+          isReadOnly={store.isReadOnly}
         />
       </section>
     </div>

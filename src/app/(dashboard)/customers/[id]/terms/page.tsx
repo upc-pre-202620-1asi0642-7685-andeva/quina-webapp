@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { z } from 'zod';
 import { RateCaps, type RateKind } from '@/core/domain/credit/rate-cap';
 import { RatePercent } from '@/core/domain/credit/rate-percent';
-import type { RateInput } from '@/core/domain/finance/rate';
+import type { RateInput, RatePeriod } from '@/core/domain/finance/rate';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import type { Currency } from '@/core/domain/shared/money';
 import { listAccountTermsHistory } from '@/infrastructure/db/queries/audit';
@@ -20,7 +20,9 @@ import {
   type TermsFormValues,
 } from '@/presentation/components/customers/terms-form';
 import { FlashToast } from '@/presentation/components/feedback/flash-toast';
+import { formatMoney } from '@/presentation/components/money';
 import { formatDate } from '@/presentation/lib/format-date';
+import { loadStoreContext } from '@/presentation/queries/store-context';
 
 // Ejemplo de la historia US06: corte el 20, pago el 26 y hasta 3 cuotas
 const DEFAULTS: TermsFormValues = {
@@ -59,11 +61,12 @@ export default async function CustomerTermsPage({
   const t = await getTranslations('Customers');
   const { new: isNew, notice } = await searchParams;
 
-  const [caps, termsHistory] = await Promise.all([
+  const [caps, termsHistory, store] = await Promise.all([
     new DrizzleCreditAccountRepository().rateCaps(),
     customer.accountId
       ? listAccountTermsHistory(user.storeId, customer.accountId)
       : Promise.resolve([]),
+    loadStoreContext(user.storeId),
   ]);
   const today = BusinessDate.fromInstant(new Date());
   const capPercent = (kind: RateKind, currency: Currency) => {
@@ -94,11 +97,43 @@ export default async function CustomerTermsPage({
     : DEFAULTS;
   const back = `/customers/${id}`;
 
+  function summarizeTerms(data: Record<string, unknown>): string {
+    const currency = (data.currency === 'USD' ? 'USD' : 'PEN') as Currency;
+    const limit = data.creditLimit
+      ? t('terms.historyLimit', { amount: formatMoney(String(data.creditLimit), currency) })
+      : '';
+    const formatRate = (
+      kind: 'historyComp' | 'historyMora',
+      rate:
+        | { type?: string; value?: string; period?: RatePeriod; capitalization?: RatePeriod | null }
+        | undefined,
+    ) => {
+      if (!rate?.value || !rate.period) return '';
+      const percent = RatePercent.fromFraction(rate.value);
+      const period = t(`terms.periodAdjective.${rate.period}`);
+      const text =
+        rate.type === 'NOMINAL' && rate.capitalization
+          ? t('terms.rateNominal', {
+              percent,
+              period,
+              capitalization: t(`terms.capitalizationAdverb.${rate.capitalization}`),
+            })
+          : t('terms.rateEffective', { percent, period });
+      return `${t(`terms.${kind}`)}: ${text}`;
+    };
+    const compText = formatRate(
+      'historyComp',
+      data.compensatory as Parameters<typeof formatRate>[1],
+    );
+    const morText = formatRate('historyMora', data.moratory as Parameters<typeof formatRate>[1]);
+    return [limit, compText, morText].filter(Boolean).join(' · ');
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <Link
         href={back}
-        className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />
         {customer.firstName} {customer.lastName}
@@ -128,6 +163,7 @@ export default async function CustomerTermsPage({
           caps={capsByCurrency}
           isOpen={customer.terms !== null}
           cancelHref={back}
+          isReadOnly={store.isReadOnly}
           {...(isNew && !customer.terms ? { cashOnlyHref: back } : {})}
         />
       </section>
@@ -158,17 +194,4 @@ export default async function CustomerTermsPage({
       ) : null}
     </div>
   );
-}
-
-function summarizeTerms(data: Record<string, unknown>): string {
-  const limit = data.creditLimit
-    ? `${String(data.currency ?? 'PEN')} ${String(data.creditLimit)}`
-    : '';
-  const comp = data.compensatory as { type?: string; value?: string; period?: string } | undefined;
-  const mor = data.moratory as { type?: string; value?: string; period?: string } | undefined;
-  const compText = comp?.value
-    ? `Comp: ${RatePercent.fromFraction(comp.value)}% (${comp.type})`
-    : '';
-  const morText = mor?.value ? `Mora: ${RatePercent.fromFraction(mor.value)}% (${mor.type})` : '';
-  return [limit, compText, morText].filter(Boolean).join(' · ');
 }

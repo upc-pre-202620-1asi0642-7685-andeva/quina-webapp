@@ -17,11 +17,20 @@ const STATUS_STYLES: Record<string, string> = {
   OVERDUE: 'bg-error/12 text-error-ink',
 };
 
-function StatusBadge({ status, label }: { status: string; label: string }) {
+function StatusBadge({
+  status,
+  label,
+  compact = false,
+}: {
+  status: string;
+  label: string;
+  compact?: boolean;
+}) {
   return (
     <span
       className={cn(
-        'inline-flex rounded-full px-2.5 py-0.5 text-[15px] font-medium whitespace-nowrap',
+        'inline-flex rounded-full px-2.5 py-0.5 font-medium whitespace-nowrap',
+        compact ? 'text-[13px]' : 'text-[15px]',
         STATUS_STYLES[status] ?? STATUS_STYLES.PENDING,
       )}
     >
@@ -35,9 +44,11 @@ const INITIAL_MOBILE_ROWS = 4;
 export function InstallmentScheduleList({
   rows,
   currency,
+  compact = false,
 }: {
   rows: InstallmentRow[];
   currency: Currency;
+  compact?: boolean;
 }) {
   const t = useTranslations('Portal.installments');
   const [expanded, setExpanded] = useState(false);
@@ -83,12 +94,16 @@ export function InstallmentScheduleList({
                 />
               </div>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-ink-soft">
+                <span className={cn('text-ink-soft', compact && 'text-sm')}>
                   {t('dueOn', { date: formatDate(row.dueDate) })}
                 </span>
-                <StatusBadge status={row.status} label={statusLabel(row.status)} />
+                <StatusBadge
+                  status={row.status}
+                  label={statusLabel(row.status)}
+                  compact={compact}
+                />
               </div>
-              <span className="text-base text-ink-soft">
+              <span className={cn('text-ink-soft', compact ? 'text-[13px]' : 'text-base')}>
                 {t('breakdown', {
                   principal: formatMoney(row.principal, currency),
                   interest: formatMoney(row.interest, currency),
