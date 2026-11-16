@@ -1,7 +1,8 @@
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import { cycleFor } from '@/core/domain/credit/billing-cycle';
+import { CreditLimit } from '@/core/domain/credit/credit-limit';
 import type { PortalLink } from '@/core/domain/ports/portal-directory';
-import type { Currency } from '@/core/domain/shared/money';
+import { Money, type Currency } from '@/core/domain/shared/money';
 import {
   creditAccounts,
   creditCharges,
@@ -17,18 +18,27 @@ export type PortalAccount = {
   storeName: string;
   /** Teléfono o WhatsApp de la tienda, para preguntar u observar por fuera. */
   storeContact: string | null;
+  storeAddress: string | null;
   customerId: string;
   customerName: string;
+  emailBouncedAt: Date | null;
   /** null: la tienda aún no le pactó condiciones de fiado. */
   account: {
     id: string;
     currency: Currency;
     balance: string;
     creditLimit: string;
+    availableCredit: string;
+    overLimit: boolean;
+    usedPercent: number;
     status: string;
+    cutOffDay: number;
+    paymentDueDay: number;
     nextCutOffDate: Date;
     /** Ciclo más antiguo por pagar (D6 del Plan 4): lo que el vecino debe pagar primero. */
     payable: { cycleId: string; totalDue: string; paymentDueDate: Date; status: string } | null;
+    /** Ciclo abierto en curso, para entrar en 1 toque cuando aún no hay deuda liquidada. */
+    openCycle: { cycleId: string; amount: string; cutOffDate: Date } | null;
   } | null;
 };
 
@@ -45,18 +55,33 @@ export async function getPortalAccount(link: PortalLink, now: Date): Promise<Por
     const { customer, store, account } = row;
 
     let payable: NonNullable<PortalAccount['account']>['payable'] = null;
+    let openCycle: NonNullable<PortalAccount['account']>['openCycle'] = null;
     if (account) {
-      const [cycle] = await tx
-        .select()
-        .from(settlementCycles)
-        .where(
-          and(
-            eq(settlementCycles.creditAccountId, account.id),
-            inArray(settlementCycles.status, ['BILLED', 'OVERDUE']),
-          ),
-        )
-        .orderBy(asc(settlementCycles.cutOffDate))
-        .limit(1);
+      const currency = account.currency as Currency;
+      const [[cycle], [latestOpen]] = await Promise.all([
+        tx
+          .select()
+          .from(settlementCycles)
+          .where(
+            and(
+              eq(settlementCycles.creditAccountId, account.id),
+              inArray(settlementCycles.status, ['BILLED', 'OVERDUE']),
+            ),
+          )
+          .orderBy(asc(settlementCycles.cutOffDate))
+          .limit(1),
+        tx
+          .select()
+          .from(settlementCycles)
+          .where(
+            and(
+              eq(settlementCycles.creditAccountId, account.id),
+              eq(settlementCycles.status, 'OPEN'),
+            ),
+          )
+          .orderBy(desc(settlementCycles.cutOffDate))
+          .limit(1),
+      ]);
       if (cycle) {
         payable = {
           cycleId: cycle.id,
@@ -65,26 +90,61 @@ export async function getPortalAccount(link: PortalLink, now: Date): Promise<Por
           status: cycle.status,
         };
       }
+      if (latestOpen) {
+        const charges = await tx
+          .select({
+            amount: creditCharges.principalAmount,
+            modality: creditCharges.chargeModality,
+            status: creditCharges.status,
+          })
+          .from(creditCharges)
+          .where(eq(creditCharges.settlementCycleId, latestOpen.id));
+        const openTotal = Money.sum(
+          charges
+            .filter((c) => c.modality === 'SINGLE_PAYMENT' && c.status !== 'VOIDED')
+            .map((c) => Money.of(c.amount, currency)),
+          currency,
+        );
+        openCycle = {
+          cycleId: latestOpen.id,
+          amount: openTotal.toFixed2(),
+          cutOffDate: latestOpen.cutOffDate,
+        };
+      }
     }
+
+    const currency = (account?.currency ?? 'PEN') as Currency;
+    const usage = account
+      ? CreditLimit.usage(account.currentBalance, account.creditLimit, currency)
+      : null;
 
     return {
       storeId: store.id,
       storeName: store.commercialName,
       storeContact: store.contactPhone,
+      storeAddress: store.address,
       customerId: customer.id,
       customerName: customer.firstName,
-      account: account
-        ? {
-            id: account.id,
-            currency: account.currency as Currency,
-            balance: account.currentBalance,
-            creditLimit: account.creditLimit,
-            status: account.status,
-            // La compra de hoy entra en este corte (US10 crit. 1)
-            nextCutOffDate: cycleFor(now, account).cutOffInstant,
-            payable,
-          }
-        : null,
+      emailBouncedAt: customer.emailBouncedAt,
+      account:
+        account && usage
+          ? {
+              id: account.id,
+              currency,
+              balance: account.currentBalance,
+              creditLimit: account.creditLimit,
+              availableCredit: usage.availableCredit,
+              overLimit: usage.overLimit,
+              usedPercent: usage.usedPercent,
+              status: account.status,
+              cutOffDay: account.cutOffDay,
+              paymentDueDay: account.paymentDueDay,
+              // La compra de hoy entra en este corte (US10 crit. 1)
+              nextCutOffDate: cycleFor(now, account).cutOffInstant,
+              payable,
+              openCycle,
+            }
+          : null,
     };
   });
 }

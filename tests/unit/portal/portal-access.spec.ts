@@ -3,6 +3,7 @@ import {
   RequestPortalCodeUseCase,
   VerifyPortalCodeUseCase,
 } from '@/core/application/portal/portal-code';
+import { CreditLimit } from '@/core/domain/credit/credit-limit';
 import { decideNewUserRole } from '@/core/domain/identity/new-user-role';
 import type { PortalCodes, PortalDirectory } from '@/core/domain/ports/portal-directory';
 import { nextRouteFor, type SessionUser } from '@/presentation/auth/session';
@@ -187,5 +188,25 @@ describe('enlace mágico en los correos (US14.2)', () => {
     expect(withLink.html).toContain('href="https://x.test/app/portal/enter?token=t"');
     expect(withLink.text).toContain('https://x.test/app/portal/enter?token=t');
     expect(renderCollectionsEmail(mail).html).not.toContain('portal/enter');
+  });
+});
+
+describe('CreditLimit.usage para el resumen del portal', () => {
+  it('calcula disponible exacto y porcentaje dentro de [0, 100]', () => {
+    expect(CreditLimit.usage('186.40', '300.00', 'PEN')).toEqual({
+      availableCredit: '113.60',
+      overLimit: false,
+      usedPercent: 62,
+    });
+    expect(CreditLimit.usage('0.00', '200.00', 'PEN')).toEqual({
+      availableCredit: '200.00',
+      overLimit: false,
+      usedPercent: 0,
+    });
+    expect(CreditLimit.usage('350.00', '300.00', 'PEN')).toEqual({
+      availableCredit: '0.00',
+      overLimit: true,
+      usedPercent: 100,
+    });
   });
 });
