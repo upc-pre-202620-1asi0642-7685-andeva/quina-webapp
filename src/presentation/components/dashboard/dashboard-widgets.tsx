@@ -2,16 +2,22 @@ import { cache } from 'react';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import {
+  ActivityIcon,
+  ArrowLeftRightIcon,
+  AwardIcon,
   BadgeCheckIcon,
   BanknoteIcon,
   CalendarRangeIcon,
   ChartColumnIcon,
   CircleCheckIcon,
   ClipboardListIcon,
+  CreditCardIcon,
   HandCoinsIcon,
+  HistoryIcon,
   MailIcon,
   PackageIcon,
   ShoppingBasketIcon,
+  TrendingUpIcon,
   TriangleAlertIcon,
   UsersIcon,
   WalletIcon,
@@ -22,9 +28,17 @@ import { PlanLimits, COUNTED_RESOURCES } from '@/core/domain/billing/plan-limits
 import { can } from '@/core/domain/identity/permissions';
 import type { Role } from '@/core/domain/identity/roles';
 import { BusinessDate } from '@/core/domain/shared/business-date';
+import { Dec } from '@/core/domain/shared/decimal';
 import { Money as MoneyValue } from '@/core/domain/shared/money';
 import { listProducts } from '@/infrastructure/db/queries/catalog';
 import { listCollections, listTodayNotices } from '@/infrastructure/db/queries/collections';
+import {
+  loadDailyCashFlow,
+  loadDailyPerformance,
+  loadRecentSales,
+  loadSalesByPaymentMethod,
+  loadTopProducts,
+} from '@/infrastructure/db/queries/dashboard-analytics';
 import { loadPortfolio } from '@/infrastructure/db/queries/portfolio';
 import { listDraftPurchaseOrders } from '@/infrastructure/db/queries/purchases';
 import { loadReport } from '@/infrastructure/db/queries/reports';
@@ -36,17 +50,26 @@ import { ScoreBadge } from '@/presentation/components/portfolio/score-badge';
 import { quickActions } from '@/presentation/components/shell/nav-items';
 import { RusCard } from '@/presentation/components/tax/rus-card';
 import { buttonVariants } from '@/presentation/components/ui/button';
+import { formatQuantity } from '@/presentation/lib/format-quantity';
 import { cn } from '@/presentation/lib/utils';
 import { loadStoreContext } from '@/presentation/queries/store-context';
+import { BentoList, CashMixBar } from './dashboard-bento-helpers';
+import {
+  CashFlowChart,
+  MarginTrendChart,
+  PaymentMethodsChart,
+  PortfolioTrendChart,
+} from './dashboard-charts';
 import { SalesWeekChart } from './sales-week-chart';
 import type { WidgetId } from './widgets';
 
 export type WidgetProps = { storeId: string; role: Role; now: Date };
 
-const LIST_SIZE = 5;
+const COMPACT_LIMIT = 3;
+const EXPANDED_LIMIT = 8;
 const DUE_SOON_DAYS = 3;
 
-// Los dos widgets de cartera comparten una sola consulta por petición
+// Los widgets de cartera comparten una sola consulta por petición
 const portfolioOf = cache(loadPortfolio);
 
 const sumPen = (amounts: string[]) =>
@@ -80,13 +103,13 @@ export async function WidgetCard({
     >
       <header className="flex items-center justify-between gap-3">
         <h2 id={`widget-${id}`} className="flex items-center gap-2 text-lg font-semibold text-ink">
-          <Icon aria-hidden="true" className="size-5 text-ink-soft" />
-          {t(`${id}.title`)}
+          <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
+          <span className="truncate">{t(`${id}.title`)}</span>
         </h2>
         {href ? (
           <Link
             href={href}
-            className="-my-2 inline-flex min-h-11 items-center rounded-full px-2 text-sm font-medium text-link-active hover:underline"
+            className="-my-2 inline-flex min-h-11 shrink-0 items-center rounded-full px-2 text-sm font-medium text-link-active hover:underline"
           >
             {t('seeAll')}
             <span className="sr-only">: {t(`${id}.title`)}</span>
@@ -178,7 +201,8 @@ async function CollectWidget({ storeId, now }: WidgetProps) {
   }));
   const overdue = withDays.filter((row) => row.status === 'OVERDUE');
   const soon = withDays.filter((row) => row.status === 'BILLED' && row.days <= DUE_SOON_DAYS);
-  const list = [...overdue, ...soon].slice(0, LIST_SIZE);
+  const all = [...overdue, ...soon];
+  const list = all.slice(0, EXPANDED_LIMIT);
   const pen = (items: typeof rows) =>
     sumPen(items.filter((r) => r.currency === 'PEN').map((r) => r.totalDue));
 
@@ -199,8 +223,8 @@ async function CollectWidget({ storeId, now }: WidgetProps) {
       {list.length === 0 ? (
         <Empty icon={CircleCheckIcon}>{t('empty')}</Empty>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
-          {list.map((row) => (
+        <BentoList
+          items={list.map((row) => (
             <li key={row.cycleId} className="flex items-center gap-3 py-2">
               <div className="flex min-w-0 flex-1 flex-col">
                 <Link
@@ -230,7 +254,7 @@ async function CollectWidget({ storeId, now }: WidgetProps) {
               </Link>
             </li>
           ))}
-        </ul>
+        />
       )}
     </WidgetCard>
   );
@@ -239,6 +263,16 @@ async function CollectWidget({ storeId, now }: WidgetProps) {
 async function CashTodayWidget({ storeId, now }: WidgetProps) {
   const t = await getTranslations('Dashboard.cashBox');
   const cashBox = await loadTodayCashBox(storeId, now);
+  const labels = {
+    CASH: t('methods.CASH'),
+    YAPE: t('methods.YAPE'),
+    PLIN: t('methods.PLIN'),
+    CARD: t('methods.CARD'),
+  };
+  const counts = Object.fromEntries(
+    cashBox.byMethod.map((r) => [r.method, t('count', { count: r.count })]),
+  ) as Record<'CASH' | 'YAPE' | 'PLIN' | 'CARD', string>;
+
   return (
     <WidgetCard id="cashToday" icon={BanknoteIcon} href="/reports">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -247,13 +281,19 @@ async function CashTodayWidget({ storeId, now }: WidgetProps) {
           {t('count', { count: cashBox.count })}
         </span>
       </div>
+      <CashMixBar
+        total={cashBox.total}
+        byMethod={cashBox.byMethod}
+        labels={labels}
+        counts={counts}
+      />
       <dl className="grid grid-cols-2 gap-2">
         {cashBox.byMethod.map((row) => (
           <div
             key={row.method}
             className="flex flex-col gap-0.5 rounded-field bg-paper-deep px-3 py-2"
           >
-            <dt className="text-[13px] text-ink-soft">{t(`methods.${row.method}`)}</dt>
+            <dt className="text-[13px] text-ink-soft">{labels[row.method]}</dt>
             <dd>
               <Money
                 amount={row.total}
@@ -270,34 +310,10 @@ async function CashTodayWidget({ storeId, now }: WidgetProps) {
 }
 
 async function SalesWeekWidget({ storeId, now }: WidgetProps) {
-  const t = await getTranslations('Dashboard.widgets.salesWeek');
-  const days = await loadDailySales(storeId, now, 7);
-  const cash = sumPen(days.map((d) => d.cash));
-  const credit = sumPen(days.map((d) => d.credit));
+  const days = await loadDailySales(storeId, now, 30);
   return (
     <WidgetCard id="salesWeek" icon={ChartColumnIcon} href="/reports">
-      <Money
-        amount={sumPen([cash, credit])}
-        currency="PEN"
-        className="text-3xl font-semibold text-ink"
-      />
       <SalesWeekChart days={days} />
-      <dl className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-        <div className="flex items-center gap-2">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-success" />
-          <dt className="text-ink-soft">{t('cash')}</dt>
-          <dd>
-            <Money amount={cash} currency="PEN" className="font-medium text-ink" />
-          </dd>
-        </div>
-        <div className="flex items-center gap-2">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-soft-ink-2" />
-          <dt className="text-ink-soft">{t('credit')}</dt>
-          <dd>
-            <Money amount={credit} currency="PEN" className="font-medium text-ink" />
-          </dd>
-        </div>
-      </dl>
     </WidgetCard>
   );
 }
@@ -331,15 +347,16 @@ async function RiskCustomersWidget({ storeId, now }: WidgetProps) {
   const { rows } = await portfolioOf(storeId, now);
   const risky = rows
     .filter((row) => row.band === 'RED' || row.isDelinquent || row.suggestLowerLimit)
-    .sort((a, b) => a.score - b.score)
-    .slice(0, LIST_SIZE);
+    .sort((a, b) => a.score - b.score);
+  const list = risky.slice(0, EXPANDED_LIMIT);
+
   return (
     <WidgetCard id="riskCustomers" icon={UsersIcon} href="/portfolio">
-      {risky.length === 0 ? (
+      {list.length === 0 ? (
         <Empty icon={CircleCheckIcon}>{t('empty')}</Empty>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
-          {risky.map((row) => (
+        <BentoList
+          items={list.map((row) => (
             <li key={row.customerId} className="flex items-center gap-3 py-2">
               <div className="flex min-w-0 flex-1 flex-col">
                 <Link
@@ -356,7 +373,7 @@ async function RiskCustomersWidget({ storeId, now }: WidgetProps) {
               <ScoreBadge score={row.score} band={row.band} hasHistory={row.hasHistory} />
             </li>
           ))}
-        </ul>
+        />
       )}
     </WidgetCard>
   );
@@ -365,14 +382,26 @@ async function RiskCustomersWidget({ storeId, now }: WidgetProps) {
 async function LowStockWidget({ storeId, role }: WidgetProps) {
   const t = await getTranslations('Dashboard.widgets.lowStock');
   const products = await listProducts(storeId, '', { activeOnly: true, lowStockOnly: true });
+  const list = products.slice(0, EXPANDED_LIMIT);
+
   return (
     <WidgetCard id="lowStock" icon={PackageIcon} href="/inventory?filter=low">
       {products.length === 0 ? (
         <Empty icon={CircleCheckIcon}>{t('empty')}</Empty>
       ) : (
         <>
-          <ul className="flex flex-col divide-y divide-line">
-            {products.slice(0, LIST_SIZE).map((product) => (
+          <BentoList
+            moreOnCompact={
+              products.length > COMPACT_LIMIT
+                ? t('more', { count: products.length - COMPACT_LIMIT })
+                : null
+            }
+            moreOnExpanded={
+              products.length > EXPANDED_LIMIT
+                ? t('more', { count: products.length - EXPANDED_LIMIT })
+                : null
+            }
+            items={list.map((product) => (
               <li key={product.id} className="flex items-center gap-3 py-2">
                 <Link
                   href={`/inventory/${product.id}`}
@@ -383,19 +412,14 @@ async function LowStockWidget({ storeId, role }: WidgetProps) {
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber/12 px-2.5 py-0.5 text-[13px] font-medium whitespace-nowrap text-amber-ink tabular-nums">
                   <TriangleAlertIcon aria-hidden="true" className="size-3.5" />
                   {t('stockOf', {
-                    stock: product.currentStock,
-                    min: product.minimumStock,
+                    stock: formatQuantity(product.currentStock),
+                    min: formatQuantity(product.minimumStock),
                     unit: product.unitCode,
                   })}
                 </span>
               </li>
             ))}
-          </ul>
-          {products.length > LIST_SIZE ? (
-            <p className="text-[13px] text-ink-soft">
-              {t('more', { count: products.length - LIST_SIZE })}
-            </p>
-          ) : null}
+          />
           {can(role, 'purchases.manage') ? <ReplenishButton /> : null}
         </>
       )}
@@ -406,10 +430,13 @@ async function LowStockWidget({ storeId, role }: WidgetProps) {
 async function RusWidget({ storeId, now }: WidgetProps) {
   const t = await getTranslations('Dashboard.widgets.rus');
   const status = await loadRusStatus(storeId, now);
-  if (status) return <RusCard status={status} />;
   return (
-    <WidgetCard id="rus" icon={BadgeCheckIcon} href="/settings">
-      <p className="text-sm text-ink-soft">{t('notRus')}</p>
+    <WidgetCard id="rus" icon={BadgeCheckIcon} href="/settings#tax">
+      {status ? (
+        <RusCard status={status} embedded />
+      ) : (
+        <p className="text-sm text-ink-soft">{t('notRus')}</p>
+      )}
     </WidgetCard>
   );
 }
@@ -417,7 +444,6 @@ async function RusWidget({ storeId, now }: WidgetProps) {
 async function PlanWidget({ storeId }: WidgetProps) {
   const t = await getTranslations('Dashboard.widgets.plan');
   const tPlans = await getTranslations('Plans');
-  // Las etiquetas de uso viven con la pantalla de Ajustes
   const tUsage = await getTranslations('Settings');
   const store = await loadStoreContext(storeId);
   const limits = PlanLimits.of(store.tier);
@@ -442,23 +468,46 @@ async function PlanWidget({ storeId }: WidgetProps) {
           </span>
         ) : null}
       </div>
-      <dl className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-3">
         {COUNTED_RESOURCES.map((resource) => {
           const used = store.usage[resource];
           const max = limits[resource];
           const over = store.overLimitResources.includes(resource);
+          const pct = max === null || max === 0 ? 0 : Math.min(100, Math.round((used / max) * 100));
+          const barColor = over ? 'bg-error' : pct >= 80 ? 'bg-amber' : 'bg-primary';
+          const valueText =
+            max === null ? tUsage('usageUnlimited', { used }) : tUsage('usageOf', { used, max });
+
           return (
-            <div key={resource} className="flex items-center justify-between gap-3 text-sm">
-              <dt className="text-ink-soft">{tUsage(`usage.${resource}`)}</dt>
-              <dd className={cn('font-medium tabular-nums', over ? 'text-error-ink' : 'text-ink')}>
-                {max === null
-                  ? tUsage('usageUnlimited', { used })
-                  : tUsage('usageOf', { used, max })}
-              </dd>
-            </div>
+            <li key={resource} className="flex flex-col gap-1">
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-ink-soft">{tUsage(`usage.${resource}`)}</span>
+                <span
+                  className={cn('font-medium tabular-nums', over ? 'text-error-ink' : 'text-ink')}
+                >
+                  {valueText}
+                </span>
+              </div>
+              {max !== null ? (
+                <div
+                  role="meter"
+                  aria-label={tUsage(`usage.${resource}`)}
+                  aria-valuemin={0}
+                  aria-valuemax={max}
+                  aria-valuenow={Math.min(used, max)}
+                  aria-valuetext={valueText}
+                  className="h-1.5 overflow-hidden rounded-full bg-paper-deep"
+                >
+                  <div
+                    className={cn('h-full rounded-full', barColor)}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              ) : null}
+            </li>
           );
         })}
-      </dl>
+      </ul>
     </WidgetCard>
   );
 }
@@ -499,13 +548,14 @@ async function MonthSummaryWidget({ storeId, now }: WidgetProps) {
 async function PurchaseDraftsWidget({ storeId }: WidgetProps) {
   const t = await getTranslations('Dashboard.widgets.purchaseDrafts');
   const drafts = await listDraftPurchaseOrders(storeId);
+  const list = drafts.slice(0, EXPANDED_LIMIT);
   return (
     <WidgetCard id="purchaseDrafts" icon={ClipboardListIcon} href="/inventory/purchases">
       {drafts.length === 0 ? (
         <Empty icon={CircleCheckIcon}>{t('empty')}</Empty>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
-          {drafts.slice(0, LIST_SIZE).map((draft) => (
+        <BentoList
+          items={list.map((draft) => (
             <li key={draft.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <span className="truncate font-medium text-ink">
                 {draft.supplierName ?? t('noSupplier')}
@@ -515,7 +565,7 @@ async function PurchaseDraftsWidget({ storeId }: WidgetProps) {
               </span>
             </li>
           ))}
-        </ul>
+        />
       )}
     </WidgetCard>
   );
@@ -525,13 +575,14 @@ async function NoticesWidget({ storeId, now }: WidgetProps) {
   const t = await getTranslations('Dashboard.widgets.notices');
   const tPage = await getTranslations('Collections.page');
   const notices = await listTodayNotices(storeId, now);
+  const list = notices.slice(0, EXPANDED_LIMIT);
   return (
     <WidgetCard id="notices" icon={MailIcon} href="/collections?tab=notices">
       {notices.length === 0 ? (
         <p className="rounded-field bg-paper-deep px-4 py-5 text-sm text-ink-soft">{t('empty')}</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
-          {notices.slice(0, LIST_SIZE).map((notice) => (
+        <BentoList
+          items={list.map((notice) => (
             <li key={notice.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <div className="flex min-w-0 flex-col">
                 <span className="truncate font-medium text-ink">
@@ -550,7 +601,200 @@ async function NoticesWidget({ storeId, now }: WidgetProps) {
               </span>
             </li>
           ))}
-        </ul>
+        />
+      )}
+    </WidgetCard>
+  );
+}
+
+/* =============================================================================
+ * 7 nuevos widgets en "Agregar widget"
+ * ============================================================================= */
+
+async function CashFlowWidget({ storeId, now }: WidgetProps) {
+  const days = await loadDailyCashFlow(storeId, now, 30);
+  return (
+    <WidgetCard id="cashFlow" icon={ArrowLeftRightIcon} href="/reports">
+      <CashFlowChart days={days} />
+    </WidgetCard>
+  );
+}
+
+async function SalesByMethodWidget({ storeId, now }: WidgetProps) {
+  const data = await loadSalesByPaymentMethod(storeId, now);
+  return (
+    <WidgetCard id="salesByMethod" icon={CreditCardIcon} href="/reports">
+      <PaymentMethodsChart data={data} />
+    </WidgetCard>
+  );
+}
+
+async function PortfolioTrendWidget({ storeId, now }: WidgetProps) {
+  const { months } = await portfolioOf(storeId, now);
+  return (
+    <WidgetCard id="portfolioTrend" icon={TrendingUpIcon} href="/portfolio">
+      <PortfolioTrendChart months={months} />
+    </WidgetCard>
+  );
+}
+
+async function MarginTrendWidget({ storeId, now }: WidgetProps) {
+  const days = await loadDailyPerformance(storeId, now, 30);
+  return (
+    <WidgetCard id="marginTrend" icon={ActivityIcon} href="/reports">
+      <MarginTrendChart days={days} />
+    </WidgetCard>
+  );
+}
+
+async function TopProductsWidget({ storeId, now }: WidgetProps) {
+  const t = await getTranslations('Dashboard.widgets.topProducts');
+  const rows = await loadTopProducts(storeId, now, 30, EXPANDED_LIMIT);
+  return (
+    <WidgetCard id="topProducts" icon={AwardIcon} href="/inventory">
+      {rows.length === 0 ? (
+        <Empty icon={PackageIcon}>{t('empty')}</Empty>
+      ) : (
+        <BentoList
+          items={rows.map((item, idx) => (
+            <li key={item.productId} className="flex items-center gap-3 py-2">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-paper-deep text-xs font-semibold text-ink-soft tabular-nums">
+                {idx + 1}
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <Link
+                  href={`/inventory/${item.productId}`}
+                  className="truncate text-sm font-medium text-ink hover:underline"
+                >
+                  {item.name}
+                </Link>
+                <span className="text-[13px] text-ink-soft tabular-nums">
+                  {formatQuantity(item.quantitySold)} {item.unitCode}
+                </span>
+              </div>
+              <Money
+                amount={item.revenue}
+                currency="PEN"
+                className="text-sm font-semibold text-ink"
+              />
+            </li>
+          ))}
+        />
+      )}
+    </WidgetCard>
+  );
+}
+
+const saleTimeFormatter = new Intl.DateTimeFormat('es-PE', {
+  day: '2-digit',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'America/Lima',
+});
+
+async function RecentSalesWidget({ storeId }: WidgetProps) {
+  const t = await getTranslations('Dashboard.widgets.recentSales');
+  const tm = await getTranslations('Dashboard.widgets.salesByMethod.methods');
+  const rows = await loadRecentSales(storeId, EXPANDED_LIMIT);
+
+  return (
+    <WidgetCard id="recentSales" icon={HistoryIcon} href="/reports">
+      {rows.length === 0 ? (
+        <Empty icon={ShoppingBasketIcon}>{t('empty')}</Empty>
+      ) : (
+        <BentoList
+          items={rows.map((sale) => {
+            const methodKey = sale.paymentMethod as 'CASH' | 'YAPE' | 'PLIN' | 'CARD' | 'CREDIT';
+            return (
+              <li key={sale.id} className="flex items-center justify-between gap-3 py-2">
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-sm font-medium text-ink">
+                    {sale.customerName ?? t('walkIn')}
+                  </span>
+                  <span className="text-[13px] text-ink-soft tabular-nums">
+                    {tm.has(methodKey) ? tm(methodKey) : sale.paymentMethod} ·{' '}
+                    {saleTimeFormatter.format(sale.saleDate)}
+                  </span>
+                </div>
+                <Money
+                  amount={sale.totalAmount}
+                  currency="PEN"
+                  className="text-sm font-semibold text-ink"
+                />
+              </li>
+            );
+          })}
+        />
+      )}
+    </WidgetCard>
+  );
+}
+
+async function CollectionsHealthWidget({ storeId, now }: WidgetProps) {
+  const t = await getTranslations('Dashboard.widgets.collectionsHealth');
+  const { metrics, rows } = await portfolioOf(storeId, now);
+  const lentDec = new Dec(metrics.lent);
+  const overdueDec = new Dec(metrics.overdue);
+  const overduePct = lentDec.isZero()
+    ? 0
+    : Math.min(100, Math.round(overdueDec.dividedBy(lentDec).times(100).toNumber()));
+  const onTimePct = 100 - overduePct;
+  const onTimeAmount = MoneyValue.of(metrics.lent, 'PEN')
+    .minus(MoneyValue.of(metrics.overdue, 'PEN'))
+    .toFixed2();
+
+  const bands = {
+    GREEN: rows.filter((r) => r.band === 'GREEN').length,
+    YELLOW: rows.filter((r) => r.band === 'YELLOW').length,
+    RED: rows.filter((r) => r.band === 'RED').length,
+  };
+
+  return (
+    <WidgetCard id="collectionsHealth" icon={HandCoinsIcon} href="/portfolio">
+      {rows.length === 0 ? (
+        <Empty icon={CircleCheckIcon}>{t('empty')}</Empty>
+      ) : (
+        <>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-3xl font-semibold text-ink tabular-nums">{onTimePct}%</span>
+              <span className="text-xs text-ink-soft tabular-nums">{t('onTimeLabel')}</span>
+            </div>
+            <div
+              role="meter"
+              aria-label={t('onTimeLabel')}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={onTimePct}
+              className="flex h-2.5 overflow-hidden rounded-full bg-paper-deep"
+            >
+              <div className="h-full bg-success" style={{ width: `${onTimePct}%` }} />
+              <div className="h-full bg-error" style={{ width: `${overduePct}%` }} />
+            </div>
+          </div>
+
+          <dl className="grid grid-cols-2 gap-2">
+            <Stat label={t('currentAmount')} amount={onTimeAmount} tone="neutral" />
+            <Stat
+              label={t('overdueAmount')}
+              amount={metrics.overdue}
+              tone={MoneyValue.of(metrics.overdue, 'PEN').isZero() ? 'neutral' : 'error'}
+            />
+          </dl>
+
+          <ul className="flex flex-wrap gap-2 text-xs">
+            <li className="rounded-full bg-soft px-2.5 py-1 font-medium text-soft-ink tabular-nums">
+              {t('bands.GREEN', { count: bands.GREEN })}
+            </li>
+            <li className="rounded-full bg-amber/12 px-2.5 py-1 font-medium text-amber-ink tabular-nums">
+              {t('bands.AMBER', { count: bands.YELLOW })}
+            </li>
+            <li className="rounded-full bg-error/12 px-2.5 py-1 font-medium text-error-ink tabular-nums">
+              {t('bands.RED', { count: bands.RED })}
+            </li>
+          </ul>
+        </>
       )}
     </WidgetCard>
   );
@@ -571,4 +815,11 @@ export const WIDGET_COMPONENTS: Record<WidgetId, (props: WidgetProps) => Promise
     monthSummary: MonthSummaryWidget,
     purchaseDrafts: PurchaseDraftsWidget,
     notices: NoticesWidget,
+    cashFlow: CashFlowWidget,
+    salesByMethod: SalesByMethodWidget,
+    portfolioTrend: PortfolioTrendWidget,
+    marginTrend: MarginTrendWidget,
+    topProducts: TopProductsWidget,
+    recentSales: RecentSalesWidget,
+    collectionsHealth: CollectionsHealthWidget,
   };
