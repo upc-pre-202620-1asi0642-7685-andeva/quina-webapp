@@ -941,7 +941,8 @@
       "OWNER": "Dueño",
       "ACTIVE": "Activo",
       "INVITED": "Invitado",
-      "DEACTIVATED": "Desactivado"
+      "DEACTIVATED": "Desactivado",
+      "EXPIRED": "Invitación vencida"
     },
     "invite": {
       "title": "Invitar a alguien",
@@ -960,7 +961,8 @@
         "emailTaken": "Ese correo ya tiene una cuenta en Quina. Usa otro.",
         "planLimit": "Llegaste al límite de usuarios de tu plan.",
         "generic": "No se pudo invitar. Intenta de nuevo."
-      }
+      },
+      "openButton": "Invitar empleado"
     },
     "locked": {
       "caseroTitle": "El plan Casero es solo para ti",
@@ -983,8 +985,64 @@
         "resent": "Le enviamos un enlace nuevo; el anterior ya no sirve.",
         "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
         "planLimit": "No hay cupo en tu plan para reactivarle.",
-        "generic": "No se pudo completar. Intenta de nuevo."
-      }
+        "generic": "No se pudo completar. Intenta de nuevo.",
+        "canceled": "Invitación de {name} cancelada.",
+        "deactivated": "{name} fue desactivado.",
+        "reactivated": "{name} volvió a quedar activo."
+      },
+      "undo": "Deshacer"
+    },
+    "subtitle": "Invita a quienes atienden el mostrador y controla quién entra a tu bodega.",
+    "close": "Cerrar",
+    "capacity": {
+      "planBadge": "Plan {plan}",
+      "meterLabel": "Uso de usuarios del plan",
+      "nearLimit": "Estás cerca del límite de usuarios de tu plan.",
+      "activeChip": "{count, plural, one {# activo} other {# activos}}",
+      "invitedChip": "{count, plural, one {# invitado} other {# invitados}}",
+      "deactivatedChip": "{count, plural, one {# desactivado} other {# desactivados}}",
+      "readOnlyUsersTitle": "Tu tienda está en modo solo lectura",
+      "readOnlyUsersBody": "Tienes {seats} usuarios activos o invitados, pero tu plan {plan} admite hasta {max}. Cancela una invitación pendiente o desactiva un empleado para liberar cupo al instante, o cambia de plan.",
+      "readOnlyOtherTitle": "Tu tienda está en modo solo lectura",
+      "readOnlyOtherBody": "Tu tienda superó el límite de tu plan {plan} en otro recurso. Mientras tanto no puedes invitar, reenviar ni reactivar empleados, pero sí cancelar invitaciones o desactivar."
+    },
+    "roles": {
+      "toggleTitle": "¿Qué puede hacer un empleado de mostrador?",
+      "toggleSubtitle": "Tu equipo atiende la caja diaria; las reglas del fiado y los precios siguen siendo solo tuyos.",
+      "employeeHeading": "Empleado de mostrador",
+      "employee1": "Registrar ventas al contado y al fiado, y cobrar cuotas.",
+      "employee2": "Registrar vecinos nuevos y revisar su saldo disponible.",
+      "employee3": "Consultar stock, observar cargos y enviar avisos manuales de cobranza.",
+      "ownerHeading": "Solo tú como dueño",
+      "owner1": "Fijar límites de fiado, tasas y cuentas de pago (Yape, Plin, banco).",
+      "owner2": "Crear o editar productos, precios, proveedores y compras.",
+      "owner3": "Ver reportes, asistente tributario, auditoría, equipo y suscripción."
+    },
+    "directory": {
+      "tabs": {
+        "activeAndInvited": "Activos e invitados ({count})",
+        "deactivated": "Desactivados ({count})"
+      },
+      "columns": {
+        "member": "Miembro",
+        "status": "Estado",
+        "activity": "Actividad",
+        "actions": "Acciones"
+      },
+      "ownerNote": "Cuenta principal",
+      "activity": {
+        "lastLogin": "Último ingreso: {date}",
+        "since": "Desde el {date}",
+        "expiresOn": "Vence el {date}",
+        "expiredOn": "Venció el {date}",
+        "invitedOn": "Invitado el {date}"
+      },
+      "empty": {
+        "title": "Aún no tienes empleados en tu tienda",
+        "body": "Invita a quien te ayuda en el mostrador para que venda y cobre desde su propia cuenta.",
+        "upgradeHint": "Tu plan actual solo incluye tu cuenta. Mejora tu plan para sumar empleados."
+      },
+      "emptyDeactivated": "No tienes empleados desactivados."
     }
   },
   "Settings": {
@@ -1003,7 +1061,9 @@
     "usage": {
       "activeCreditCustomers": "Vecinos con fiado activo",
       "users": "Usuarios",
-      "products": "Productos"
+      "products": "Productos",
+      "receiptsPerMonth": "Comprobantes de compra del mes",
+      "aiQueriesPerMonth": "Consultas de IA del mes"
     },
     "usageOf": "{used} de {max}",
     "usageUnlimited": "{used} · sin límite",
@@ -1054,10 +1114,11 @@
       "methods": {
         "yape": "Yape",
         "card": "Tarjeta"
-      }
+      },
+      "emptyAction": "Ver planes"
     },
     "billingReceipt": {
-      "back": "Volver a ajustes",
+      "back": "Volver a suscripción",
       "title": "Comprobante de suscripción",
       "subtitle": "{store} · RUC/DNI {taxId}",
       "reference": "Operación MP",
@@ -1069,7 +1130,11 @@
       "periodRange": "Del {start} al {end}",
       "status": "Estado",
       "total": "Total",
-      "print": "Imprimir o guardar PDF"
+      "print": "Imprimir o guardar PDF",
+      "storeLabel": "Comercio",
+      "ownerLabel": "Titular",
+      "emailLabel": "Correo",
+      "addressLabel": "Dirección"
     },
     "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
     "payment": {
@@ -1100,7 +1165,11 @@
         "label": "Foto del QR de Yape o Plin",
         "hint": "JPG, PNG o WEBP de hasta 2 MB. Solo lo ven tus vecinos en su cuenta.",
         "currentAlt": "Código QR de cobro de la tienda",
-        "remove": "Quitar el QR"
+        "remove": "Quitar el QR",
+        "upload": "Subir imagen QR",
+        "change": "Cambiar imagen",
+        "keep": "Conservar QR",
+        "willRemove": "El QR actual se quitará al guardar."
       },
       "save": "Guardar datos de cobro",
       "saving": "Guardando…",
@@ -1126,7 +1195,26 @@
           "IMAGE_TYPE": "Sube una imagen JPG, PNG o WEBP.",
           "IMAGE_TOO_LARGE": "La imagen pesa más de 2 MB. Toma una captura más liviana."
         }
-      }
+      },
+      "sections": {
+        "wallets": "Billeteras digitales",
+        "bank": "Transferencia bancaria"
+      },
+      "preview": {
+        "title": "Vista previa del vecino",
+        "portalBadge": "Portal",
+        "portalHeading": "Cómo pagar",
+        "empty": "Tu tienda aún no cargó sus datos de cobro. Paga en el local.",
+        "qrAlt": "Código QR para pagarle a la tienda",
+        "fields": {
+          "yape": "Yape",
+          "plin": "Plin",
+          "bank": "Banco",
+          "account": "Número de cuenta",
+          "cci": "CCI"
+        }
+      },
+      "discard": "Descartar"
     },
     "tax": {
       "title": "Régimen tributario",
@@ -1145,8 +1233,79 @@
       "submit": "Guardar régimen",
       "submitting": "Guardando…",
       "saved": "Régimen guardado.",
-      "error": "No se pudo guardar. Intenta de nuevo."
-    }
+      "error": "No se pudo guardar. Intenta de nuevo.",
+      "taxIdPill": "{type}: {number}",
+      "comparison": {
+        "title": "Topes mensuales por categoría",
+        "monthSummary": "Este mes: {sales} en ventas · {purchases} en compras",
+        "selected": "Seleccionada",
+        "incomeLabel": "Ventas hasta",
+        "purchasesLabel": "Compras hasta",
+        "noCap": "Sin tope vigente registrado"
+      },
+      "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
+      "discard": "Descartar"
+    },
+    "storeIdentity": {
+      "taxId": "{type} {number}",
+      "defaultLocale": "Idioma de avisos: {locale}",
+      "locales": {
+        "es": "Castellano",
+        "en": "Inglés",
+        "qu": "Quechua"
+      }
+    },
+    "hub": {
+      "ariaLabel": "Accesos de la tienda",
+      "subscription": {
+        "label": "Suscripción",
+        "statuses": {
+          "active": "Activo",
+          "trial": "Prueba · {days} d",
+          "pastDue": "En gracia",
+          "canceling": "Por vencer",
+          "readOnly": "Solo lectura"
+        }
+      },
+      "team": {
+        "label": "Equipo",
+        "seats": "{used} de {max} usuarios",
+        "unlimited": "{used} · sin límite"
+      },
+      "audit": {
+        "label": "Auditoría",
+        "meta": "Historial de cambios"
+      },
+      "profile": {
+        "label": "Mi perfil",
+        "meta": "Clave e idioma"
+      }
+    },
+    "caseroHint": "Plan gratuito para llevar el fiado ordenado desde el mostrador.",
+    "overLimitItem": "{resource}: {used} de {max} permitidos",
+    "manageResource": {
+      "activeCreditCustomers": "Revisar vecinos",
+      "users": "Revisar equipo",
+      "products": "Revisar inventario"
+    },
+    "jumpToPlans": "Ver planes disponibles",
+    "billingReturn": {
+      "approved": "Pago recibido. Si tu plan aún no se actualiza, recarga en unos segundos mientras Mercado Pago confirma.",
+      "pending": "Tu pago está en proceso de confirmación. Te avisaremos en cuanto Mercado Pago lo apruebe.",
+      "rejected": "El pago no se completó. Puedes intentar nuevamente cuando estés listo."
+    },
+    "subscriptionStatus": {
+      "ACTIVE": "Activo",
+      "TRIALING": "En prueba",
+      "PAST_DUE": "En gracia",
+      "CANCELED": "Cancelado"
+    },
+    "monthlyQuotasTitle": "Cuotas del mes actual",
+    "monthlyQuotaLocked": "No incluido en este plan",
+    "recommended": "Recomendado",
+    "cancelOverLimitWarningTitle": "Al terminar tu periodo, tu tienda pasará a solo lectura",
+    "cancelOverLimitWarningBody": "Hoy superas los límites del Plan Casero. Si no renuevas antes del {date}, solo podrás cobrar deudas pendientes hasta ajustar tu uso:",
+    "cancelOverLimitItem": "{resource}: tienes {used} (Casero permite {max})"
   },
   "Platform": {
     "shellName": "Plataforma Quina",
@@ -1548,9 +1707,22 @@
       "noResults": "Ningún vecino coincide.",
       "optionCredit": "DNI {number} · con fiado",
       "optionNoCredit": "DNI {number} · sin fiado",
+      "optionAvailable": "DNI {number} · disp. {amount}",
+      "optionBlocked": "DNI {number} · {reason}",
+      "optionReasons": {
+        "ACCOUNT_SUSPENDED": "suspendido",
+        "ACCOUNT_BLOCKED": "bloqueado",
+        "ACCOUNT_OVERDUE": "ciclo vencido",
+        "USD_ACCOUNT": "cuenta en USD"
+      },
       "document": "DNI {number}",
       "clear": "Quitar a {name} de la venta",
+      "clearQuery": "Limpiar búsqueda de vecino",
+      "newCustomer": "Registrar vecino",
       "available": "Disponible <strong>{amount}</strong>",
+      "usedOfLimit": "Usa {used} de {limit}",
+      "nearLimit": "Límite cerca",
+      "afterSale": "Quedará {amount}",
       "blocked": {
         "NO_ACCOUNT": "Sin cuenta de fiado: solo contado.",
         "ACCOUNT_SUSPENDED": "Fiado suspendido por el dueño.",
@@ -1558,6 +1730,45 @@
         "ACCOUNT_OVERDUE": "Tiene un ciclo vencido: el fiado se reabre cuando lo pague.",
         "USD_ACCOUNT": "Su cuenta es en dólares: el fiado en el mostrador es solo en soles."
       }
+    },
+    "filters": {
+      "label": "Filtrar productos",
+      "all": "Todos",
+      "top": "Más vendidos",
+      "inCart": "En carrito",
+      "installments": "En cuotas"
+    },
+    "clearSearch": "Limpiar búsqueda",
+    "scanHint": "Con código de barras o resultado único, Enter lo suma al instante.",
+    "goToInventory": "Registrar primer producto",
+    "installmentsBadge": "Cuotas",
+    "clearCart": "Vaciar",
+    "clearCartAria": "Vaciar el carrito",
+    "itemsSummary": "{lines, plural, one {# producto} other {# productos}}",
+    "undo": "Deshacer",
+    "undoRemoved": "Quitaste {product}",
+    "undoCleared": "Carrito vaciado ({count})",
+    "exactAmount": "Exacto",
+    "todaySales": {
+      "button": "Ventas de hoy",
+      "buttonCount": "Ventas de hoy · {count}",
+      "title": "Ventas de hoy",
+      "description": "Resumen de caja al contado, fiados del día y detalle de cada venta en el mostrador.",
+      "close": "Cerrar ventas de hoy",
+      "cashBoxTitle": "Caja al contado",
+      "cashSalesCount": "{count, plural, one {# venta al contado} other {# ventas al contado}}",
+      "creditBoxTitle": "Fiado de hoy",
+      "creditSalesCount": "{count, plural, one {# venta al fiado} other {# ventas al fiado}}",
+      "recentTitle": "Últimas ventas del día",
+      "emptyTitle": "Aún no hay ventas hoy",
+      "empty": "Cada cobro al contado o fiado que registres en el mostrador aparecerá aquí.",
+      "walkIn": "Venta al paso",
+      "creditSingle": "Fiado · fecha de pago",
+      "creditInstallments": "Fiado · en cuotas",
+      "changeGiven": "Vuelto {amount}",
+      "repeatSale": "Cargar al carrito",
+      "repeatedToast": "Cargamos {count, plural, one {# producto} other {# productos}} al carrito",
+      "repeatedOutToast": "esos productos ya están agotados"
     },
     "modalityLabel": "¿Contado o fiado?",
     "modality": {
@@ -2045,7 +2256,21 @@
       "fromHint": "Fecha inicial en hora de Lima.",
       "toHint": "Fecha final en hora de Lima.",
       "userHint": "Filtra quién realizó la operación.",
-      "entityHint": "Filtra el módulo o tabla."
+      "entityHint": "Filtra el módulo o tabla.",
+      "action": "Acción",
+      "allActions": "Todas las acciones",
+      "search": "Buscar",
+      "searchPlaceholder": "Buscar por producto, vecino, IP, ID o detalle…",
+      "searchHint": "Busca en nombres, montos, IPs o identificadores.",
+      "actionHint": "Filtra un tipo exacto de evento.",
+      "moreFilters": "Más filtros",
+      "lessFilters": "Ocultar filtros",
+      "presetToday": "Hoy",
+      "preset7d": "Últimos 7 días",
+      "preset30d": "Últimos 30 días",
+      "invalidDateRange": "El rango de fechas no es válido: la fecha «Desde» debe ser anterior o igual a «Hasta».",
+      "resetDates": "Quitar fechas",
+      "categoryLabel": "Categoría"
     },
     "actions": {
       "CREATE_CASH_SALE": "Venta al contado",
@@ -2075,7 +2300,30 @@
       "CANCEL_SUBSCRIPTION_RENEWAL": "Cancelación de renovación de plan",
       "EXPIRE_TRIAL": "Fin de prueba Pro (pase a Casero)",
       "EXPIRE_GRACE_PERIOD": "Fin de periodo de gracia (pase a Casero)",
-      "COMPLETE_CANCELED_SUBSCRIPTION": "Fin de periodo pagado (pase a Casero)"
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Fin de periodo pagado (pase a Casero)",
+      "OBJECT_CHARGE": "Cargo observado",
+      "CHARGE_CONFIRMED": "Cargo confirmado",
+      "CHARGE_VOIDED": "Anulación de cargo",
+      "CREATE_CUSTOMER": "Alta de vecino",
+      "UPDATE_CUSTOMER": "Edición de vecino",
+      "REACTIVATE_CUSTOMER": "Reactivación de vecino",
+      "DEACTIVATE_CUSTOMER": "Baja de vecino",
+      "UPDATE_PRICE": "Cambio de precio",
+      "REACTIVATE_PRODUCT": "Reactivación de producto",
+      "CREATE_STORE": "Creación de tienda",
+      "REACTIVATE_STORE": "Reactivación de tienda",
+      "SUSPEND_STORE": "Suspensión de tienda",
+      "UPDATE_PAYMENT_DETAILS": "Actualización de medios de pago",
+      "UPDATE_TAX_SETTINGS": "Cambio de régimen tributario",
+      "INVITE_EMPLOYEE": "Invitación de empleado",
+      "CANCEL_INVITE": "Cancelación de invitación",
+      "REACTIVATE_EMPLOYEE": "Reactivación de empleado",
+      "DEACTIVATE_EMPLOYEE": "Baja de empleado",
+      "SET_PASSWORD": "Configuración de contraseña",
+      "START_SUBSCRIPTION_CHECKOUT": "Inicio de suscripción",
+      "SUBSCRIPTION_PAYMENT_APPROVED": "Pago de suscripción aprobado",
+      "SUBSCRIPTION_PAYMENT_REJECTED": "Pago de suscripción rechazado",
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Pago de suscripción devuelto"
     },
     "entities": {
       "sales": "Ventas",
@@ -2091,6 +2339,300 @@
       "stores": "Tienda",
       "store_subscriptions": "Suscripción",
       "subscription_payments": "Pagos de suscripción"
+    },
+    "summary": {
+      "sectionLabel": "Resumen de los últimos 7 días",
+      "totalLabel": "Eventos (7 días)",
+      "totalHint": "Ver toda la actividad reciente",
+      "salesCreditLabel": "Ventas y fiado (7 días)",
+      "salesCreditHint": "Ventas, cobros, cargos y vecinos",
+      "securityLabel": "Seguridad y accesos (7 días)",
+      "securityHintOk": "Sin alertas críticas recientes",
+      "securityHintAlert": "{count, plural, =1 {1 alerta de acceso} other {# alertas de acceso}}"
+    },
+    "categories": {
+      "all": "Todas",
+      "sales_credit": "Ventas y fiado",
+      "inventory": "Inventario",
+      "team_store": "Equipo y tienda",
+      "security": "Seguridad",
+      "billing": "Suscripción"
+    },
+    "table": {
+      "colDate": "Fecha y hora",
+      "colEvent": "Evento",
+      "colSummary": "Resumen",
+      "colActor": "Usuario",
+      "colDetail": "Detalle",
+      "viewDetail": "Ver detalle",
+      "paginationRange": "Mostrando {from}–{to} de {total}",
+      "prevPage": "Anterior",
+      "nextPage": "Siguiente"
+    },
+    "emptyStates": {
+      "noEventsTitle": "Aún no hay movimientos registrados",
+      "noEventsBody": "Cuando registres ventas, compras, cambios de precios o ajustes de equipo, aparecerán aquí.",
+      "goToCounter": "Ir al mostrador",
+      "clearFilters": "Limpiar filtros"
+    },
+    "detail": {
+      "title": "Detalle del evento",
+      "dateTime": "Fecha y hora (Lima)",
+      "actor": "Realizado por",
+      "entity": "Módulo",
+      "ip": "Dirección IP",
+      "device": "Dispositivo",
+      "entityId": "ID del registro",
+      "copyId": "Copiar ID",
+      "copiedId": "ID copiado",
+      "copyError": "No se pudo copiar el ID",
+      "openRecord": "Ir al registro",
+      "diffTitle": "Antes vs Después",
+      "fieldCol": "Campo",
+      "noDiffData": "Este evento no registró cambios de campos adicionales.",
+      "rawJsonSummary": "Datos técnicos (JSON)",
+      "close": "Cerrar"
+    },
+    "export": {
+      "successTitle": "{count, plural, =0 {CSV descargado (sin eventos)} =1 {CSV descargado con 1 evento} other {CSV descargado con # eventos}}",
+      "truncatedTitle": "Exportación limitada a 5,000 filas",
+      "truncatedDescription": "Ajusta las fechas o filtros para descargar el resto del historial.",
+      "errorTitle": "No pudimos exportar el CSV",
+      "errorDescription": "Intenta nuevamente en unos segundos."
+    },
+    "fields": {
+      "saleModality": "Modalidad",
+      "paymentMethod": "Medio de pago",
+      "totalAmount": "Monto total",
+      "customerId": "Vecino",
+      "itemsCount": "Cantidad de ítems",
+      "creditAccountId": "Cuenta de fiado",
+      "chargeId": "Cargo",
+      "installmentsCount": "Cuotas",
+      "balanceAfter": "Saldo después",
+      "receiptNumber": "N.° de recibo",
+      "settlementCycleId": "Ciclo",
+      "amountPaid": "Monto pagado",
+      "principalPaid": "Capital pagado",
+      "compensatoryInterestPaid": "Interés compensatorio",
+      "moratoryInterestPaid": "Interés moratorio",
+      "daysLate": "Días de atraso",
+      "note": "Nota",
+      "byCustomer": "Iniciado por el vecino",
+      "status": "Estado",
+      "consentStatus": "Conformidad",
+      "voidId": "ID de anulación",
+      "voidedAmount": "Monto anulado",
+      "reason": "Motivo",
+      "currency": "Moneda",
+      "creditLimit": "Límite de fiado",
+      "compensatory": "Tasa compensatoria",
+      "moratory": "Tasa moratoria",
+      "cutOffDay": "Día de corte",
+      "paymentDueDay": "Día de pago",
+      "maxInstallmentMonths": "Máximo de cuotas (meses)",
+      "documentType": "Tipo de documento",
+      "documentNumber": "Número de documento",
+      "firstName": "Nombres",
+      "lastName": "Apellidos",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "address": "Dirección",
+      "preferredLocale": "Idioma preferido",
+      "consentVersion": "Versión de consentimiento",
+      "isActive": "Activo",
+      "name": "Nombre",
+      "description": "Descripción",
+      "brand": "Marca",
+      "sku": "SKU",
+      "barcode": "Código de barras",
+      "unitId": "Unidad",
+      "defaultSupplierId": "Proveedor predeterminado",
+      "isService": "Es servicio",
+      "allowsInstallments": "Permite cuotas",
+      "cashPrice": "Precio al contado",
+      "creditPrice": "Precio al fiado",
+      "initialStock": "Stock inicial",
+      "currentStock": "Stock actual",
+      "wasteQuantity": "Cantidad de merma",
+      "taxIdNumber": "RUC / DNI",
+      "tradeName": "Razón social",
+      "supplierId": "Proveedor",
+      "series": "Serie",
+      "issueDate": "Fecha de emisión",
+      "linesCount": "Líneas",
+      "attachmentsCount": "Adjuntos",
+      "commercialName": "Nombre comercial",
+      "taxIdType": "Tipo de RUC / DNI",
+      "ownerEmail": "Correo del dueño",
+      "planTier": "Plan",
+      "by": "Origen",
+      "yapeNumber": "Número Yape",
+      "plinNumber": "Número Plin",
+      "bankName": "Banco",
+      "bankAccountNumber": "Cuenta bancaria",
+      "bankCci": "CCI",
+      "paymentQrPath": "Imagen QR",
+      "taxRegime": "Régimen tributario",
+      "rusCategory": "Categoría RUS",
+      "provider": "Proveedor de acceso",
+      "via": "Vía",
+      "version": "Versión",
+      "documents": "Documentos",
+      "failedLoginAttempts": "Intentos fallidos",
+      "lockedUntil": "Bloqueada hasta",
+      "billingInterval": "Periodo",
+      "amount": "Monto",
+      "mpPreapprovalId": "ID de suscripción MP",
+      "mpPaymentId": "ID de pago MP",
+      "paymentId": "ID de pago",
+      "currentPeriodEnd": "Fin del periodo",
+      "gracePeriodEndsAt": "Fin de gracia",
+      "cancelAtPeriodEnd": "Cancelar al finalizar",
+      "trialEndsAt": "Fin de prueba"
+    },
+    "values": {
+      "bool": {
+        "true": "Sí",
+        "false": "No"
+      },
+      "paymentMethod": {
+        "CASH": "Efectivo",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "CARD": "Tarjeta",
+        "CREDIT": "Fiado"
+      },
+      "saleModality": {
+        "CASH": "Contado",
+        "SINGLE_PAYMENT_CREDIT": "Fiado a un pago",
+        "INSTALLMENTS_CREDIT": "Fiado en cuotas"
+      },
+      "documentType": {
+        "DNI": "DNI",
+        "CE": "Carné de extranjería",
+        "RUC": "RUC",
+        "FACTURA": "Factura",
+        "BOLETA": "Boleta",
+        "NOTA_VENTA": "Nota de venta"
+      },
+      "planTier": {
+        "CASERO": "Casero",
+        "BODEGA_PRO": "Bodega Pro",
+        "NEGOCIO_PLUS": "Negocio Plus"
+      },
+      "billingInterval": {
+        "MONTHLY": "Mensual",
+        "YEARLY": "Anual"
+      },
+      "status": {
+        "ACTIVE": "Activa",
+        "TRIALING": "En prueba",
+        "PAST_DUE": "En gracia",
+        "CANCELED": "Cancelada",
+        "SUSPENDED": "Suspendida",
+        "BLOCKED": "Bloqueada",
+        "PENDING": "Pendiente",
+        "CONFIRMED": "Confirmado",
+        "VOIDED": "Anulado",
+        "OBJECTED": "Observado",
+        "DRAFT": "Borrador"
+      },
+      "consentStatus": {
+        "PENDING": "Pendiente",
+        "ACCEPTED": "Conforme",
+        "OBJECTED": "Observado",
+        "CONFIRMED": "Confirmado"
+      },
+      "taxRegime": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "Régimen Especial (RER)",
+        "MYPE": "MYPE Tributario",
+        "GENERAL": "Régimen General"
+      },
+      "rusCategory": {
+        "1": "Categoría 1",
+        "2": "Categoría 2"
+      },
+      "rateType": {
+        "EFFECTIVE": "Efectiva",
+        "NOMINAL": "Nominal"
+      },
+      "ratePeriod": {
+        "ANNUAL": "anual",
+        "MONTHLY": "mensual",
+        "DAILY": "diaria"
+      },
+      "rateEffective": "{type} {percent} % ({period})",
+      "rateNominal": "{type} {percent} % ({period}, cap. {cap})",
+      "via": {
+        "account-setup": "Invitación de cuenta",
+        "password-reset": "Restablecimiento"
+      },
+      "by": {
+        "PLATFORM_ADMIN": "Administración de plataforma"
+      },
+      "documents": {
+        "terms": "Términos y condiciones",
+        "privacy": "Política de privacidad"
+      },
+      "locale": {
+        "es": "Castellano",
+        "en": "Inglés",
+        "qu": "Quechua"
+      }
+    },
+    "summaries": {
+      "cashSale": "{amount} · {method} · {count, plural, =1 {1 producto} other {# productos}}",
+      "creditSaleSingle": "{amount} · Al fiado · Saldo {balance}",
+      "creditSaleInstallments": "{amount} · {installments} cuotas · Saldo {balance}",
+      "registerPayment": "Recibo {receipt} · {amount} ({method})",
+      "registerPaymentLate": "Recibo {receipt} · {amount} ({method}) · {days} días de mora",
+      "objectChargeCustomer": "Observado por el vecino · {note}",
+      "objectChargeStore": "Observado por la tienda · {note}",
+      "chargeConfirmed": "Cargo confirmado · {note}",
+      "chargeVoided": "Anulado {amount} · {reason}",
+      "openCreditAccount": "Límite {limit} · Corte día {cutOff} · Pago día {due}",
+      "updateCreditTerms": "Límite {limit} · Corte día {cutOff} · Pago día {due}",
+      "setCreditAccountStatus": "Estado: {before} → {after}",
+      "createCustomer": "{name} · {doc}",
+      "updateCustomer": "Datos actualizados: {fields}",
+      "reactivateCustomer": "Cuenta del vecino reactivada",
+      "deactivateCustomer": "Cuenta del vecino desactivada",
+      "createProduct": "{name} · Contado {cash} · Stock {stock}",
+      "updateProduct": "Campos actualizados: {fields}",
+      "updatePrice": "Contado {cash} · Fiado {credit}",
+      "reactivateProduct": "Producto reactivado en el catálogo",
+      "deactivateProduct": "Producto desactivado del catálogo",
+      "adjustStock": "Stock {before} → {after} · {reason}",
+      "recordWaste": "Merma de {waste} · Stock {before} → {after} · {reason}",
+      "createSupplier": "{name} · {taxId}",
+      "registerPurchase": "{doc} · {amount} · {count, plural, =1 {1 línea} other {# líneas}}",
+      "generateReplenishment": "Borrador generado con {count, plural, =1 {1 producto} other {# productos}}",
+      "discardPurchaseOrder": "Pedido borrador descartado",
+      "createStore": "{name} · Plan {plan}",
+      "reactivateStore": "Tienda reactivada",
+      "suspendStore": "Tienda suspendida",
+      "updatePaymentDetails": "Medios actualizados: {fields}",
+      "updateTaxSettings": "{before} → {after}",
+      "inviteEmployee": "{name} ({email})",
+      "cancelInvite": "Invitación cancelada ({email})",
+      "reactivateEmployee": "Acceso de empleado reactivado",
+      "deactivateEmployee": "Acceso de empleado desactivado",
+      "setPassword": "Contraseña configurada correctamente",
+      "acceptTerms": "Términos y privacidad aceptados (v{version})",
+      "loginFailed": "Intento fallido #{attempts}",
+      "loginBlocked": "Cuenta bloqueada hasta {until}",
+      "lockAccount": "Bloqueada tras {attempts} intentos hasta {until}",
+      "startCheckout": "Plan {plan} ({interval}) · {amount}",
+      "subscriptionPaymentApproved": "Plan {plan} · {amount} · Hasta {until}",
+      "subscriptionPaymentRejected": "Pago rechazado ({amount}) · Gracia hasta {until}",
+      "subscriptionPaymentRefunded": "Pago devuelto ({amount}) · Pase a Casero",
+      "cancelRenewal": "Renovación cancelada · Activo hasta {until}",
+      "expireTrial": "Fin de prueba Pro · Pase a Casero",
+      "expireGrace": "Fin de periodo de gracia · Pase a Casero",
+      "completeCanceled": "Fin de periodo pagado · Pase a Casero",
+      "noAdditionalDetails": "Evento registrado sin cambios adicionales"
     }
   },
   "Tax": {
@@ -2113,7 +2655,9 @@
         }
       },
       "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
-      "changeCategory": "Cambiar categoría"
+      "changeCategory": "Cambiar categoría",
+      "remaining": "Disponible: {amount}",
+      "exceededBy": "Excedido por: {amount}"
     }
   },
   "Portfolio": {
@@ -2140,13 +2684,40 @@
       "sortLabel": "Ordenar la cartera",
       "sort": {
         "debt": "Mayor deuda",
-        "score": "Menor puntaje"
+        "score": "Menor puntaje",
+        "utilization": "Mayor uso"
       },
       "debt": "Deuda",
       "limit": "Límite",
       "delinquent": "En mora",
       "suggestLower": "Dos cortes seguidos en Rojo: conviene bajarle el límite",
-      "empty": "Aún no tienes vecinos con fiado."
+      "empty": "Aún no tienes vecinos con fiado.",
+      "searchLabel": "Buscar vecino en cartera",
+      "searchPlaceholder": "Buscar por nombre o documento…",
+      "searchSubmit": "Buscar",
+      "filters": {
+        "all": "Todos",
+        "overdue": "En mora",
+        "dueSoon": "Por vencer",
+        "highUtilization": "Uso ≥ 85 %",
+        "suggestLower": "Bajar límite"
+      },
+      "count": "Mostrando {shown} de {total} vecinos",
+      "daysOverdue": "{days} d en mora",
+      "overdueLabel": "Vencido:",
+      "dueSoonLabel": "Por vencer:",
+      "utilizationValue": "{pct} % usado",
+      "nextDue": "Vence: {date}",
+      "colCustomer": "Vecino",
+      "colScore": "Puntaje",
+      "colLimitAndUse": "Límite y uso",
+      "colDue": "Vencimiento",
+      "colActions": "Acciones",
+      "emptyTitle": "Aún no hay cuentas de fiado",
+      "emptyAction": "Ir a Vecinos",
+      "filteredEmptyTitle": "Sin coincidencias",
+      "filteredEmpty": "Ningún vecino coincide con la búsqueda o filtros seleccionados.",
+      "clearFilters": "Limpiar filtros"
     },
     "score": {
       "value": "{score} · {band}",
@@ -2155,6 +2726,43 @@
         "GREEN": "Excelente",
         "YELLOW": "En riesgo",
         "RED": "Moroso crítico"
+      },
+      "breakdownTrigger": "Ver desglose del puntaje: {score} · {band}",
+      "breakdownTriggerNoHistory": "Ver desglose del puntaje: Sin historial",
+      "breakdown": {
+        "title": "Desglose del puntaje",
+        "onTimeCycles": "Cortes pagados a tiempo",
+        "lateCycles": "Cortes con atraso",
+        "daysLate": "Días acumulados de mora",
+        "formula": "Últimos 6 meses: base 100, −3 pts por día en mora, +5 pts por corte puntual.",
+        "noHistoryNote": "Aún no tiene cortes vencidos o pagados en los últimos 6 meses.",
+        "suggestLower": "Dos cortes seguidos en Rojo: conviene bajarle el límite."
+      }
+    },
+    "actions": {
+      "collections": "Cobranza",
+      "exportCsv": "Exportar CSV",
+      "collect": "Cobrar",
+      "adjustLimit": "Ajustar límite",
+      "viewProfile": "Ver ficha"
+    },
+    "health": {
+      "title": "Salud de la cartera",
+      "subtitle": "Toca una categoría o tramo para filtrar vecinos.",
+      "bandsTitle": "Distribución por puntaje",
+      "bands": {
+        "GREEN": "Excelente",
+        "YELLOW": "En riesgo",
+        "RED": "Moroso crítico",
+        "NO_HISTORY": "Sin historial"
+      },
+      "agingTitle": "Antigüedad de saldos",
+      "aging": {
+        "current": "Al día",
+        "dueSoon": "Por vencer ≤ 3 d",
+        "d1_15": "1–15 días",
+        "d16_30": "16–30 días",
+        "d31_plus": "31+ días"
       }
     }
   },
@@ -2192,6 +2800,134 @@
         "UNAVAILABLE": "La IA no respondió a tiempo. No se descontó la consulta; intenta de nuevo.",
         "NOT_IN_PLAN": "Tu plan actual no incluye recomendaciones con IA.",
         "RANGE_INVALID": "Revisa las fechas del reporte."
+      },
+      "upgradeLink": "Mejorar plan",
+      "prePrompt": "Pulsa \"Analizar con IA\" para recibir sugerencias prácticas según las ventas, el fiado y el margen de este período.",
+      "toasts": {
+        "success": "Análisis con IA listo."
+      }
+    },
+    "lockedTitle": "Desbloquea tus reportes avanzados con {plan}",
+    "previewFeatures": {
+      "charts": {
+        "title": "Evolución diaria y medios de pago",
+        "body": "Mira cómo cambian tus ventas, tu ganancia y tu flujo de caja día a día."
+      },
+      "products": {
+        "title": "Productos y categorías que más rinden",
+        "body": "Descubre qué artículos dejan más margen y cuáles mueven más caja."
+      },
+      "print": {
+        "title": "Resumen listo para imprimir o PDF",
+        "body": "Guarda o imprime el cierre del período en un solo clic."
+      },
+      "ai": {
+        "title": "Recomendaciones con IA",
+        "body": "Consejos concretos con los totales de tu tienda, sin exponer datos de vecinos."
+      }
+    },
+    "toolbar": {
+      "presetsAria": "Período rápido del reporte",
+      "presets": {
+        "today": "Hoy",
+        "7d": "7d",
+        "thisMonth": "Este mes",
+        "lastMonth": "Mes pasado",
+        "custom": "Personalizado"
+      },
+      "changeDates": "Cambiar fechas",
+      "sheetTitle": "Elegir fechas del reporte",
+      "sheetDescription": "Consulta ventas, flujo y márgenes en días de Lima.",
+      "close": "Cerrar",
+      "dateHint": "Días calendario de Lima (UTC-5).",
+      "limitHint": "Rango máximo de 366 días y \"Desde\" antes de \"Hasta\".",
+      "rangeError": "Revisa las fechas: \"Desde\" debe ir antes de \"Hasta\" y el rango máximo es de 366 días.",
+      "cancel": "Cancelar"
+    },
+    "hero": {
+      "totalSalesTitle": "Ventas totales",
+      "vsPrevious": "respecto al período anterior",
+      "cashShare": "Contado {pct} %",
+      "creditShare": "Fiado {pct} %",
+      "grossMarginTitle": "Ganancia bruta",
+      "costLine": "Costo: {cost}",
+      "cashFlowTitle": "Flujo de caja real",
+      "collectionsCount": "{count, plural, =0 {sin cobros} one {1 cobro} other {# cobros}}",
+      "inflowsLine": "Entradas: {amount}",
+      "purchasesLine": "Compras: {amount}"
+    },
+    "empty": {
+      "title": "Aún no hay ventas en este rango",
+      "body": "Cuando registres ventas en el mostrador, verás aquí tus gráficos y productos más vendidos.",
+      "cta": "Ir a vender"
+    },
+    "charts": {
+      "performance": {
+        "title": "Evolución del período",
+        "salesSubtitle": "Ventas totales frente a tu ganancia bruta",
+        "flowSubtitle": "Plata que entró (contado y cobranzas) frente a tus compras",
+        "groupedWeekly": "agrupado por semana",
+        "groupedMonthly": "agrupado por mes",
+        "modeAria": "Vista del gráfico de evolución",
+        "modes": {
+          "sales": "Ventas",
+          "flow": "Flujo"
+        },
+        "empty": "Todavía no hay movimientos en estas fechas.",
+        "caption": "Evolución de ventas, margen bruto y flujo de caja en el período",
+        "series": {
+          "sales": "Ventas",
+          "margin": "Margen bruto",
+          "inflows": "Entradas reales",
+          "purchases": "Compras"
+        },
+        "table": {
+          "period": "Período",
+          "netFlow": "Flujo neto"
+        }
+      },
+      "paymentMethods": {
+        "title": "Medios de pago",
+        "subtitle": "Cómo pagaron tus caseros en estas fechas",
+        "empty": "Todavía no hay ventas en este período.",
+        "caption": "Ventas por medio de pago en el período",
+        "methods": {
+          "CASH": "Efectivo",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Tarjeta",
+          "CREDIT": "Fiado"
+        },
+        "table": {
+          "method": "Medio",
+          "salesCount": "Ventas",
+          "amount": "Monto"
+        }
+      }
+    },
+    "products": {
+      "titleProducts": "Top 10 productos más vendidos",
+      "titleCategories": "Ventas por categoría",
+      "subtitleProducts": "Artículos ordenados por ingreso generado en estas fechas.",
+      "subtitleCategories": "Categorías ordenadas por ingreso generado en estas fechas.",
+      "viewAria": "Cambiar entre productos y categorías",
+      "tabs": {
+        "products": "Productos",
+        "categories": "Categorías"
+      },
+      "empty": "No se vendieron productos en este rango de fechas.",
+      "uncategorized": "Sin categoría",
+      "productsCount": "{count, plural, one {1 producto} other {# productos}}",
+      "unitsSold": "{qty} unid.",
+      "columns": {
+        "product": "Producto",
+        "quantity": "Cantidad",
+        "revenue": "Ingresos",
+        "cost": "Costo",
+        "margin": "Margen",
+        "category": "Categoría",
+        "products": "Productos",
+        "units": "Unidades"
       }
     }
   },
