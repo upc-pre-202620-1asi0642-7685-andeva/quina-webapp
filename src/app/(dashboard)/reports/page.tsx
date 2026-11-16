@@ -1,21 +1,27 @@
-import Form from 'next/form';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { LockIcon } from 'lucide-react';
+import { BarChart3Icon, LockIcon, PackageIcon, PrinterIcon, SparklesIcon } from 'lucide-react';
 import { quotaPeriod } from '@/core/application/analytics/analyze-report';
 import { PlanLimits } from '@/core/domain/billing/plan-limits';
+import { can } from '@/core/domain/identity/permissions';
 import { BusinessDate } from '@/core/domain/shared/business-date';
-import { loadReport } from '@/infrastructure/db/queries/reports';
+import { loadReport, loadReportAnalytics } from '@/infrastructure/db/queries/reports';
+import { loadRusStatus } from '@/infrastructure/db/queries/tax';
 import { DrizzleAIQuotaRepository } from '@/infrastructure/db/repositories/drizzle-ai-quota-repository';
 import { requireStoreUser } from '@/presentation/auth/guards';
-import { PrintButton } from '@/presentation/components/collections/print-button';
-import { Money } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { AiRecommendations } from '@/presentation/components/reports/ai-recommendations';
+import {
+  ReportPaymentMethodsChart,
+  ReportPerformanceChart,
+} from '@/presentation/components/reports/report-charts';
+import { ReportKpis } from '@/presentation/components/reports/report-kpis';
+import { ReportProductsSection } from '@/presentation/components/reports/report-products-section';
+import { ReportToolbar } from '@/presentation/components/reports/report-toolbar';
+import { RusCard } from '@/presentation/components/tax/rus-card';
 import { buttonVariants } from '@/presentation/components/ui/button';
-import { Input } from '@/presentation/components/ui/input';
 import { formatDate } from '@/presentation/lib/format-date';
-import { parseReportRange } from '@/presentation/lib/report-range';
+import { detectReportPreset, parseReportRange } from '@/presentation/lib/report-range';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
 // Las fechas del rango son días de Lima: se muestran al mediodía para no cruzar de día
@@ -27,12 +33,15 @@ export default async function ReportsPage({
   searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const user = await requireStoreUser('/reports', 'reports.view');
-  const t = await getTranslations('Reports');
-  const tPlans = await getTranslations('Plans');
-  const params = await searchParams;
+  const [t, tPlans, params, store] = await Promise.all([
+    getTranslations('Reports'),
+    getTranslations('Plans'),
+    searchParams,
+    loadStoreContext(user.storeId),
+  ]);
   const now = new Date();
-  const store = await loadStoreContext(user.storeId);
   const limits = PlanLimits.of(store.tier);
+  const canViewRus = can(user.role, 'rus.view');
 
   const header = (
     <header className="flex flex-col gap-1">
@@ -41,23 +50,72 @@ export default async function ReportsPage({
     </header>
   );
 
-  // D1: los reportes por rango son de Pro y Plus
+  // D1: los reportes por rango son de Pro y Plus; el asistente del Nuevo RUS sí se muestra en Casero
   if (!limits.features.reportsExport) {
+    const rusStatus = canViewRus ? await loadRusStatus(user.storeId, now) : null;
+    const proPlanName = tPlans(`names.${PlanLimits.featureTier('reportsExport')}`);
+    const previewFeatures = [
+      { key: 'charts', icon: BarChart3Icon },
+      { key: 'products', icon: PackageIcon },
+      { key: 'print', icon: PrinterIcon },
+      { key: 'ai', icon: SparklesIcon },
+    ] as const;
+
     return (
       <div className="flex flex-col gap-6">
         {header}
-        <section className="flex items-start gap-3 rounded-card border border-line bg-surface p-6 text-sm text-ink-soft">
-          <LockIcon aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
-          <p>
-            {t('locked', { plan: tPlans(`names.${PlanLimits.featureTier('reportsExport')}`) })}{' '}
-            <Link
-              href="/settings/subscription"
-              className="font-medium text-link-active hover:underline"
-            >
+
+        <section
+          aria-labelledby="reports-locked-title"
+          className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 sm:p-6"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden="true"
+                className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-ink-soft"
+              >
+                <LockIcon className="size-5" />
+              </span>
+              <div className="flex flex-col gap-1">
+                <h2 id="reports-locked-title" className="text-lg font-semibold text-ink">
+                  {t('lockedTitle', { plan: proPlanName })}
+                </h2>
+                <p className="text-sm text-ink-soft">{t('locked', { plan: proPlanName })}</p>
+              </div>
+            </div>
+
+            <Link href="/settings/subscription" className={buttonVariants({ variant: 'primary' })}>
               {t('seePlans')}
             </Link>
-          </p>
+          </div>
+
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {previewFeatures.map(({ key, icon: Icon }) => (
+              <li
+                key={key}
+                className="flex items-start gap-3 rounded-field border border-line bg-paper p-3.5"
+              >
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-soft text-soft-ink"
+                >
+                  <Icon className="size-4" />
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium text-ink">
+                    {t(`previewFeatures.${key}.title`)}
+                  </span>
+                  <span className="text-[13px] text-ink-soft">
+                    {t(`previewFeatures.${key}.body`)}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
+
+        {rusStatus ? <RusCard status={rusStatus} /> : null}
       </div>
     );
   }
@@ -67,106 +125,66 @@ export default async function ReportsPage({
   const range = asked ?? parseReportRange(undefined, undefined, now)!;
   const from = BusinessDate.toISO(range.from);
   const to = BusinessDate.toISO(range.to);
+  const activePreset = detectReportPreset(range, now);
   const maxQueries = limits.aiQueriesPerMonth ?? 0;
-  const [report, used] = await Promise.all([
+
+  const [report, analytics, used, rusStatus] = await Promise.all([
     loadReport(user.storeId, range.from, range.to),
+    loadReportAnalytics(user.storeId, range.from, range.to),
     limits.features.ai
       ? new DrizzleAIQuotaRepository().used(user.storeId, quotaPeriod(now))
       : Promise.resolve(0),
+    canViewRus ? loadRusStatus(user.storeId, now) : Promise.resolve(null),
   ]);
-
-  const figures = [
-    { key: 'cashSales', amount: report.cashSales },
-    { key: 'creditSales', amount: report.creditSales },
-    { key: 'compensatoryInterest', amount: report.compensatoryInterest },
-    { key: 'moratoryInterest', amount: report.moratoryInterest },
-    { key: 'costOfSales', amount: report.costOfSales },
-    { key: 'grossMargin', amount: report.grossMargin },
-  ] as const;
 
   return (
     <div className="flex flex-col gap-6">
       {header}
 
-      <Form action="" className="flex flex-wrap items-end gap-3 print:hidden">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="report-from" className="text-sm font-medium text-ink">
-            {t('from')}
-          </label>
-          <Input id="report-from" name="from" type="date" defaultValue={from} required />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="report-to" className="text-sm font-medium text-ink">
-            {t('to')}
-          </label>
-          <Input id="report-to" name="to" type="date" defaultValue={to} required />
-        </div>
-        <button type="submit" className={buttonVariants({ variant: 'secondary' })}>
-          {t('submit')}
-        </button>
-        <PrintButton label={t('print')} />
-      </Form>
+      <ReportToolbar from={from} to={to} activePreset={activePreset} printLabel={t('print')} />
+
       {invalid ? (
-        <Notice tone="warning">
+        <Notice tone="warning" className="print:hidden">
           <p>{t('rangeInvalid')}</p>
         </Notice>
       ) : null}
 
-      {/* US20 crit. 1 y 6: este bloque es el que se imprime o se guarda como PDF */}
-      <section
-        aria-labelledby="report-title"
-        className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6 print:border-0 print:p-0"
-      >
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="report-title" className="text-lg font-semibold text-ink">
-            {t('reportTitle', { store: store.name })}
-          </h2>
-          <p className="text-sm text-ink-soft">
-            {t('range', { from: dateOf(from), to: dateOf(to) })} ·{' '}
-            {t('salesCount', { count: report.salesCount })}
-          </p>
-        </div>
-        <dl className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          {figures.map((figure) => (
-            <div
-              key={figure.key}
-              className="flex break-inside-avoid flex-col gap-1 rounded-field bg-paper-deep px-3 py-2.5"
-            >
-              <dt className="text-[13px] text-ink-soft">{t(`figures.${figure.key}`)}</dt>
-              <dd>
-                <Money
-                  amount={figure.amount}
-                  currency="PEN"
-                  className="text-lg font-semibold text-ink"
-                />
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <p className="text-[13px] text-ink-soft">{t('note')}</p>
-      </section>
+      <ReportKpis
+        report={report}
+        analytics={analytics}
+        storeName={store.name}
+        fromFormatted={dateOf(from)}
+        toFormatted={dateOf(to)}
+        canSell={can(user.role, 'sales.create')}
+      />
 
-      <section
-        aria-labelledby="ai-title"
-        className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6 print:border-0 print:p-0"
-      >
-        <h2 id="ai-title" className="text-lg font-semibold text-ink">
-          {t('ai.title')}
-        </h2>
-        {limits.features.ai && maxQueries > 0 ? (
-          <AiRecommendations
-            key={`${from}:${to}`}
-            from={from}
-            to={to}
-            used={used}
-            max={maxQueries}
-          />
-        ) : (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <ReportPerformanceChart dailySeries={analytics.dailySeries} />
+        <ReportPaymentMethodsChart paymentMethods={analytics.paymentMethods} />
+      </div>
+
+      <ReportProductsSection
+        topProducts={analytics.topProducts}
+        byCategory={analytics.byCategory}
+      />
+
+      {limits.features.ai && maxQueries > 0 ? (
+        <AiRecommendations key={`${from}:${to}`} from={from} to={to} used={used} max={maxQueries} />
+      ) : (
+        <section
+          aria-labelledby="ai-title"
+          className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4 sm:p-6 print:hidden"
+        >
+          <h2 id="ai-title" className="text-lg font-semibold text-ink">
+            {t('ai.title')}
+          </h2>
           <p className="text-sm text-ink-soft">
             {t('ai.locked', { plan: tPlans(`names.${PlanLimits.featureTier('ai')}`) })}
           </p>
-        )}
-      </section>
+        </section>
+      )}
+
+      {rusStatus ? <RusCard status={rusStatus} /> : null}
     </div>
   );
 }

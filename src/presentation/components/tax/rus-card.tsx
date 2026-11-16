@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Money as MoneyValue } from '@/core/domain/shared/money';
 import { rusProgress, type RusLevel } from '@/core/domain/tax/rus';
 import type { RusStatus } from '@/infrastructure/db/queries/tax';
@@ -17,16 +17,34 @@ export async function RusCard({
   status: RusStatus;
   embedded?: boolean;
 }) {
-  const t = await getTranslations('Tax.rus');
+  const [t, locale] = await Promise.all([getTranslations('Tax.rus'), getLocale()]);
+  const intlLocale = locale === 'qu' ? 'es-PE' : locale;
+  const rawMonth = new Intl.DateTimeFormat(intlLocale, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'America/Lima',
+  }).format(new Date());
+  const monthLabel = rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1);
+
   const rows = status.caps
     ? (['sales', 'purchases'] as const).map((kind) => {
         const used = status[kind];
         const cap = kind === 'sales' ? status.caps!.income : status.caps!.purchases;
+        const usedMoney = MoneyValue.of(used, 'PEN');
+        const capMoney = MoneyValue.of(cap, 'PEN');
+        const diff = capMoney.minus(usedMoney);
+        const over = diff.isNegative();
+        const headroomAmount = formatMoney(
+          (over ? usedMoney.minus(capMoney) : diff).toFixed2(),
+          'PEN',
+        );
         return {
           kind,
           used,
           cap,
-          ...rusProgress(MoneyValue.of(used, 'PEN'), MoneyValue.of(cap, 'PEN')),
+          over,
+          headroomAmount,
+          ...rusProgress(usedMoney, capMoney),
         };
       })
     : [];
@@ -35,9 +53,12 @@ export async function RusCard({
   const body = (
     <>
       {embedded ? (
-        <span className="inline-flex w-fit rounded-full bg-paper-deep px-2.5 py-0.5 text-xs font-medium text-ink-soft">
-          {t('category', { category: status.category })}
-        </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex w-fit rounded-full bg-paper-deep px-2.5 py-0.5 text-xs font-medium text-ink-soft">
+            {t('category', { category: status.category })}
+          </span>
+          <span className="text-xs text-ink-soft tabular-nums">{monthLabel}</span>
+        </div>
       ) : null}
 
       {status.caps ? (
@@ -74,6 +95,20 @@ export async function RusCard({
                     style={{ width: `${Math.min(row.percent, 100)}%` }}
                   />
                 </div>
+                <p
+                  className={cn(
+                    'text-xs tabular-nums',
+                    row.over
+                      ? 'font-medium text-error-ink'
+                      : row.level === 'warning'
+                        ? 'font-medium text-amber-ink'
+                        : 'text-ink-soft',
+                  )}
+                >
+                  {row.over
+                    ? t('exceededBy', { amount: row.headroomAmount })
+                    : t('remaining', { amount: row.headroomAmount })}
+                </p>
               </li>
             ))}
           </ul>
@@ -96,15 +131,17 @@ export async function RusCard({
   return (
     <section
       aria-labelledby="rus-title"
-      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-6"
+      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="rus-title" className="text-lg font-semibold text-ink">
           {t('title')}
         </h2>
-        <span className="text-sm text-ink-soft">
-          {t('category', { category: status.category })}
-        </span>
+        <div className="flex flex-wrap items-baseline gap-2 text-sm text-ink-soft">
+          <span>{t('category', { category: status.category })}</span>
+          <span aria-hidden="true">·</span>
+          <span className="tabular-nums">{monthLabel}</span>
+        </div>
       </div>
       {body}
     </section>

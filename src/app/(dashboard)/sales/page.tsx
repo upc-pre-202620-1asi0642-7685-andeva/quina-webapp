@@ -1,24 +1,36 @@
 import { getTranslations } from 'next-intl/server';
+import { can } from '@/core/domain/identity/permissions';
 import { listProducts } from '@/infrastructure/db/queries/catalog';
-import { listCounterCustomers } from '@/infrastructure/db/queries/sales';
+import { loadTopProducts } from '@/infrastructure/db/queries/dashboard-analytics';
+import { listCounterCustomers, loadTodayCounterSales } from '@/infrastructure/db/queries/sales';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { Counter } from '@/presentation/components/sales/counter';
 
 export default async function SalesPage() {
   const user = await requireStoreUser('/sales', 'sales.create');
   const t = await getTranslations('Sales');
-  const [products, customers] = await Promise.all([
+  const now = new Date();
+  const [products, customers, topProducts, todaySummary] = await Promise.all([
     listProducts(user.storeId, '', { activeOnly: true }),
     listCounterCustomers(user.storeId),
+    loadTopProducts(user.storeId, now, 30, 12),
+    loadTodayCounterSales(user.storeId, now),
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('title')}</h1>
-        <p className="text-sm text-ink-soft">{t('subtitle')}</p>
-      </header>
-      <Counter products={products} customers={customers} />
-    </div>
+    <Counter
+      products={products}
+      customers={customers}
+      topProductIds={topProducts.map((p) => p.productId)}
+      todaySummary={todaySummary}
+      canManageCatalog={can(user.role, 'catalog.manage')}
+      canCreateCustomer={can(user.role, 'customers.create')}
+      heading={
+        <header className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('title')}</h1>
+          <p className="text-sm text-ink-soft">{t('subtitle')}</p>
+        </header>
+      }
+    />
   );
 }

@@ -99,15 +99,23 @@ test.describe('compras, costo promedio, reposici贸n, mermas y auditor铆a (US15鈥
     // 6. Consultar auditor铆a, filtrar y exportar CSV (US18)
     await page.goto('./audit');
     await expect(page.getByRole('heading', { name: 'Registro de auditor铆a' })).toBeVisible();
-    await expect(page.getByText('Registro de merma').first()).toBeVisible();
-    await expect(page.getByText('Registro de compra').first()).toBeVisible();
-    await expect(page.getByText('Generaci贸n de pedido de reposici贸n').first()).toBeVisible();
+    await expect(
+      page.getByText('Registro de merma').filter({ visible: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Registro de compra').filter({ visible: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Generaci贸n de pedido de reposici贸n').filter({ visible: true }).first(),
+    ).toBeVisible();
     await expectAccessible(page);
 
     await page.getByLabel('Entidad').selectOption('purchases');
     await page.getByRole('button', { name: 'Filtrar' }).click();
     await expect(page).toHaveURL(/entityName=purchases/);
-    await expect(page.getByText('Registro de compra').first()).toBeVisible();
+    await expect(
+      page.getByText('Registro de compra').filter({ visible: true }).first(),
+    ).toBeVisible();
 
     const csvResponse = await page.request.get('./api/audit/export?entityName=purchases');
     expect(csvResponse.status()).toBe(200);

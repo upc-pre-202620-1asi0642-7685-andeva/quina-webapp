@@ -1,7 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { closeDb } from '@/infrastructure/db/connection';
-import { loadPortfolio } from '@/infrastructure/db/queries/portfolio';
+import {
+  filterAndSortPortfolioRows,
+  loadPortfolio,
+  parsePortfolioQuery,
+} from '@/infrastructure/db/queries/portfolio';
 import { creditAccounts, debtPayments, settlementCycles } from '@/infrastructure/db/schema';
 import { withTenant } from '@/infrastructure/db/with-tenant';
 import { neighbor, storeWithOwner } from './support/seed';
@@ -79,7 +83,33 @@ describe('cartera y puntaje (US19) contra PostgreSQL', () => {
 
     const lateRow = portfolio.rows.find((r) => r.customerId === late.customerId);
     // 26/10 → 13/11 son 17 días en base 30/360: 100 − 51 = 49
-    expect(lateRow).toMatchObject({ score: 49, band: 'YELLOW', isDelinquent: true });
+    expect(lateRow).toMatchObject({
+      score: 49,
+      band: 'YELLOW',
+      isDelinquent: true,
+      overdueBalance: '100.00',
+      dueSoonBalance: '0.00',
+      maxDaysOverdue: 18,
+      payableCyclesCount: 1,
+      agingBucket: 'd16_30',
+      utilizationPct: 10,
+      isActiveCustomer: true,
+      documentType: 'DNI',
+      documentNumber: late.dni,
+      accountStatus: 'ACTIVE',
+      cutOffDay: 20,
+      paymentDueDay: 26,
+      scoreBreakdown: {
+        score: 49,
+        band: 'YELLOW',
+        hasHistory: true,
+        onTimeCycles: 0,
+        lateCycles: 1,
+        daysLate: 17,
+      },
+    });
+    expect(lateRow?.nextDueDate).toEqual(new Date('2026-10-27T04:59:59Z'));
+
     const punctualRow = portfolio.rows.find((r) => r.customerId === punctual.customerId);
     expect(punctualRow).toMatchObject({
       score: 100,
@@ -87,7 +117,51 @@ describe('cartera y puntaje (US19) contra PostgreSQL', () => {
       hasHistory: true,
       isDelinquent: false,
       suggestLowerLimit: false,
+      overdueBalance: '0.00',
+      dueSoonBalance: '0.00',
+      maxDaysOverdue: 0,
+      payableCyclesCount: 1,
+      agingBucket: 'current',
+      utilizationPct: 5,
+      scoreBreakdown: {
+        score: 100,
+        band: 'GREEN',
+        hasHistory: true,
+        onTimeCycles: 1,
+        lateCycles: 0,
+        daysLate: 0,
+      },
     });
+
+    expect(portfolio.aging).toEqual({
+      current: { count: 1, amount: '50.00' },
+      dueSoon: { count: 0, amount: '0.00' },
+      d1_15: { count: 0, amount: '0.00' },
+      d16_30: { count: 1, amount: '100.00' },
+      d31_plus: { count: 0, amount: '0.00' },
+    });
+    expect(portfolio.bands).toEqual({
+      GREEN: { count: 1, amount: '50.00' },
+      YELLOW: { count: 1, amount: '100.00' },
+      RED: { count: 0, amount: '0.00' },
+      NO_HISTORY: { count: 0, amount: '0.00' },
+    });
+
+    expect(
+      filterAndSortPortfolioRows(portfolio.rows, parsePortfolioQuery({ filter: 'overdue' })).map(
+        (r) => r.customerId,
+      ),
+    ).toEqual([late.customerId]);
+    expect(
+      filterAndSortPortfolioRows(portfolio.rows, parsePortfolioQuery({ band: 'GREEN' })).map(
+        (r) => r.customerId,
+      ),
+    ).toEqual([punctual.customerId]);
+    expect(
+      filterAndSortPortfolioRows(portfolio.rows, parsePortfolioQuery({ sort: 'utilization' })).map(
+        (r) => r.customerId,
+      ),
+    ).toEqual([late.customerId, punctual.customerId]);
 
     expect(portfolio.months.map((m) => m.period)).toEqual([
       '2026-06',

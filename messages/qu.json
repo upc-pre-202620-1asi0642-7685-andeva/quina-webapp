@@ -942,7 +942,8 @@
       "OWNER": "Dueño",
       "ACTIVE": "Activo",
       "INVITED": "Invitado",
-      "DEACTIVATED": "Desactivado"
+      "DEACTIVATED": "Desactivado",
+      "EXPIRED": "Minkay puchukarqun"
     },
     "invite": {
       "title": "Invitar a alguien",
@@ -961,7 +962,8 @@
         "emailTaken": "Ese correo ya tiene una cuenta en Quina. Usa otro.",
         "planLimit": "Llegaste al límite de usuarios de tu plan.",
         "generic": "No se pudo invitar. Intenta de nuevo."
-      }
+      },
+      "openButton": "Llamkaqta minkay"
     },
     "locked": {
       "caseroTitle": "El plan Casero es solo para ti",
@@ -984,8 +986,64 @@
         "resent": "Le enviamos un enlace nuevo; el anterior ya no sirve.",
         "mailFailed": "El correo no salió. Intenta de nuevo en un momento.",
         "planLimit": "No hay cupo en tu plan para reactivarle.",
-        "generic": "No se pudo completar. Intenta de nuevo."
-      }
+        "generic": "No se pudo completar. Intenta de nuevo.",
+        "canceled": "{name}pa minkaynin chinkachisqa.",
+        "deactivated": "{name} harkasqa karqan.",
+        "reactivated": "{name} musuqmanta llamkachkanñam."
+      },
+      "undo": "Kutichiy"
+    },
+    "subtitle": "Mostradorpi yanapaqkunata minkay hinaspa tiendaykiman yaykuqkunata qhaway.",
+    "close": "Wichqay",
+    "capacity": {
+      "planBadge": "{plan} plan",
+      "meterLabel": "Planpa llamkaqkuna tupuy",
+      "nearLimit": "Planpa llamkaqnin limitenman hichpaykuchkankim.",
+      "activeChip": "{count, plural, one {# llamkaq} other {# llamkaqkuna}}",
+      "invitedChip": "{count, plural, one {# minkasqa} other {# minkasqakuna}}",
+      "deactivatedChip": "{count, plural, one {# harkasqa} other {# harkasqakuna}}",
+      "readOnlyUsersTitle": "Tiendaykiqa ñawinchayllapaqmi kachkan",
+      "readOnlyUsersBody": "{seats} llamkaqniyki utaq minkasqayki kanmi, ichaqa {plan} planqa {max} kamallam chaskin. Huk minkayta chinkachiy utaq huk llamkaqta harkay kunanpacha cupota kicharinaykipaq, utaq huk planman tikray.",
+      "readOnlyOtherTitle": "Tiendaykiqa ñawinchayllapaqmi kachkan",
+      "readOnlyOtherBody": "Tiendaykiqa {plan} planpa huk kaqnin limitenta yallinmi. Chaykamaqa manam minkayta, musuqmanta kachayta nitaq llamkaqta kutichiyta atinkichu, ichaqa minkayta chinkachiyta utaq harkayta atinkim."
+    },
+    "roles": {
+      "toggleTitle": "¿Imakunatam mostradorpi llamkaq ruranman?",
+      "toggleSubtitle": "Llamkaqniykikunaqa sapa punchaw qhatuyta atenden; manu kamachiykunawan chaninkunaqa qampallam.",
+      "employeeHeading": "Mostradorpi llamkaq",
+      "employee1": "Qullqichawanpas manumanpas qhatuyta qillqay, hinaspa kutichiykunata chaskiy.",
+      "employee2": "Musuq llaqtamasikunata qillqay hinaspa hayka manu atisqankuta qhaway.",
+      "employee3": "Stockta qhaway, cargokunata qawachiy hinaspa makimanta yuyarichiykunata kachay.",
+      "ownerHeading": "Qam dueño sapallayki",
+      "owner1": "Manu limitekunata, tasakunata hinaspa paganapaq cuentakunata churay (Yape, Plin, banco).",
+      "owner2": "Rurukunata, chaninkunata, rantiqkunata hinaspa rantiykunata kamariy utaq allichay.",
+      "owner3": "Reportekunata, impuesto yanapaqta, auditoriata, llamkaqkunata hinaspa suscripcionta qhaway."
+    },
+    "directory": {
+      "tabs": {
+        "activeAndInvited": "Llamkaqkuna minkasqapas ({count})",
+        "deactivated": "Harkasqakuna ({count})"
+      },
+      "columns": {
+        "member": "Llamkaq",
+        "status": "Imayna kasqan",
+        "activity": "Llamkaynin",
+        "actions": "Ruraykuna"
+      },
+      "ownerNote": "Hatun cuenta",
+      "activity": {
+        "lastLogin": "Qhipa yaykusqan: {date}",
+        "since": "{date} p'unchawmanta",
+        "expiresOn": "{date} p'unchawpi puchukan",
+        "expiredOn": "{date} p'unchawpi puchukarqan",
+        "invitedOn": "{date} p'unchawpi minkasqa"
+      },
+      "empty": {
+        "title": "Manaraqmi tiendaykipi llamkaqniykikuna kanchu",
+        "body": "Mostradorpi yanapaqniykita minkay kikillanmanta qhatunanpaq hinaspa cobrayninkunata qillqananpaq.",
+        "upgradeHint": "Kunan planniykiqa qampa cuentallaykitam chaskin. Llamkaqkunata yapanaykipaq planikita yapay."
+      },
+      "emptyDeactivated": "Manam harkasqa llamkaqniykikuna kanchu."
     }
   },
   "Settings": {
@@ -1004,7 +1062,9 @@
     "usage": {
       "activeCreditCustomers": "Vecinos con fiado activo",
       "users": "Usuarios",
-      "products": "Productos"
+      "products": "Productos",
+      "receiptsPerMonth": "Kay killapi rantiy comprobantekuna",
+      "aiQueriesPerMonth": "Kay killapi IA tapukuykuna"
     },
     "usageOf": "{used} de {max}",
     "usageUnlimited": "{used} · sin límite",
@@ -1055,10 +1115,11 @@
       "methods": {
         "yape": "Yape",
         "card": "Tarjeta"
-      }
+      },
+      "emptyAction": "Planekunata rikuy"
     },
     "billingReceipt": {
-      "back": "Allichanakunaman kutiy",
+      "back": "Suscripciónman kutiy",
       "title": "Suscripción comprobante",
       "subtitle": "{store} · RUC/DNI {taxId}",
       "reference": "MP yupay",
@@ -1070,7 +1131,11 @@
       "periodRange": "{start} manta {end} kama",
       "status": "Kawsay",
       "total": "Llapan",
-      "print": "Imprimiy utaq PDF waqaychay"
+      "print": "Imprimiy utaq PDF waqaychay",
+      "storeLabel": "Tienda",
+      "ownerLabel": "Duyu",
+      "emailLabel": "Correo",
+      "addressLabel": "Tiyana"
     },
     "paymentSoon": "Muy pronto podrás cambiar de plan y pagar desde aquí.",
     "payment": {
@@ -1101,7 +1166,11 @@
         "label": "Yape utaq Plin QR fotoyki",
         "hint": "JPG, PNG utaq WEBP, 2 MB kama. Vecinoykikunalla cuentankupi qhawanku.",
         "currentAlt": "Tiendaq cobrana QR codigon",
-        "remove": "QR-ta qichuy"
+        "remove": "QR-ta qichuy",
+        "upload": "QR fotota churay",
+        "change": "Fotota tikray",
+        "keep": "QR-ta waqaychay",
+        "willRemove": "Waqaychaptiykiqa kunan QR qichusqa kanqa."
       },
       "save": "Cobrana datokunata waqaychay",
       "saving": "Waqaychachkan…",
@@ -1127,7 +1196,26 @@
           "IMAGE_TYPE": "JPG, PNG utaq WEBP imagenta churay.",
           "IMAGE_TOO_LARGE": "Imagenqa 2 MB-manta aswan llasaq. Aswan pisi llasaq capturata hurquy."
         }
-      }
+      },
+      "sections": {
+        "wallets": "Celular billeterakuna",
+        "bank": "Banco transferencia"
+      },
+      "preview": {
+        "title": "Vecinopaq qhawariy",
+        "portalBadge": "Portal",
+        "portalHeading": "Imaynata pagana",
+        "empty": "Tiendaykiqa manaraq cobrana datonkunata churarqanchu. Tiendapi pagay.",
+        "qrAlt": "Tiendaman paganapaq QR codigo",
+        "fields": {
+          "yape": "Yape",
+          "plin": "Plin",
+          "bank": "Banco",
+          "account": "Cuenta yupay",
+          "cci": "CCI"
+        }
+      },
+      "discard": "Saqiy"
     },
     "tax": {
       "title": "Impuesto régimen",
@@ -1146,8 +1234,79 @@
       "submit": "Régimenta waqaychay",
       "submitting": "Waqaychachkan…",
       "saved": "Régimenqa waqaychasqañam.",
-      "error": "Mana waqaychakuyta atikurqanchu. Huktawan kallpachay."
-    }
+      "error": "Mana waqaychakuyta atikurqanchu. Huktawan kallpachay.",
+      "taxIdPill": "{type}: {number}",
+      "comparison": {
+        "title": "Killapi topenkuna categoríaman hina",
+        "monthSummary": "Kay killapi: {sales} rantikuy · {purchases} rantiy",
+        "selected": "Akllasqa",
+        "incomeLabel": "Rantikuy kama",
+        "purchasesLabel": "Rantiy kama",
+        "noCap": "Manaraq tope kanchu"
+      },
+      "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
+      "discard": "Saqiy"
+    },
+    "storeIdentity": {
+      "taxId": "{type} {number}",
+      "defaultLocale": "Willay simi: {locale}",
+      "locales": {
+        "es": "Castilla simi",
+        "en": "Inglés simi",
+        "qu": "Runasimi"
+      }
+    },
+    "hub": {
+      "ariaLabel": "Tiendaq k’uchunkuna",
+      "subscription": {
+        "label": "Suscripción",
+        "statuses": {
+          "active": "Llamk’achkan",
+          "trial": "Prueba · {days} p'unchaw",
+          "pastDue": "Gracia pachapi",
+          "canceling": "Tukukunanpaq",
+          "readOnly": "Ñawinchanallapaq"
+        }
+      },
+      "team": {
+        "label": "Llamkaqkuna",
+        "seats": "{used} / {max} llamkaq",
+        "unlimited": "{used} · mana tupuyuq"
+      },
+      "audit": {
+        "label": "Qhawapayay",
+        "meta": "Tikray qillqa"
+      },
+      "profile": {
+        "label": "Perfilniy",
+        "meta": "Clavewan simi"
+      }
+    },
+    "caseroHint": "Qhatunaykipaq mana qullqiyuq plan, mostradorpi fiadota allichanaykipaq.",
+    "overLimitItem": "{resource}: {used} / {max} saqisqamanta",
+    "manageResource": {
+      "activeCreditCustomers": "Llaqtamasikunata qhaway",
+      "users": "Llamk'aqkunata qhaway",
+      "products": "Rurukunata qhaway"
+    },
+    "jumpToPlans": "Planekunata qhaway",
+    "billingReturn": {
+      "approved": "Qullqi chaskisqa. Planiyki manaraq musuqyakuptinqa, Mercado Pago takyachinankama huk ratu suyaspa musuqmanta kichay.",
+      "pending": "Qullqiykiqa takyachikuchkanmi. Mercado Pago chaskiptin willasqaykiku.",
+      "rejected": "Qullqiqa mana tukurqanchu. Munaspaykiqa wakmanta ruwayta atinki."
+    },
+    "subscriptionStatus": {
+      "ACTIVE": "Purichkan",
+      "TRIALING": "Pruebapi",
+      "PAST_DUE": "Graciapi",
+      "CANCELED": "Sayachisqa"
+    },
+    "monthlyQuotasTitle": "Kay killapa cuotankuna",
+    "monthlyQuotaLocked": "Kay planpiqa manam kanchu",
+    "recommended": "Allin akllasqa",
+    "cancelOverLimitWarningTitle": "Pacha tukukuptinqa tiendaykiqa ñawinchayllapaqmi kanqa",
+    "cancelOverLimitWarningBody": "Kunan llamk'ayniykiqa Plan Caseropa limitenta yallinmi. {date} manaraq chayamuchkaptin mana musuqchaptiykiqa, manu cobrayllatam atinki llamk'ayniykita allichanaykikama:",
+    "cancelOverLimitItem": "{resource}: {used} kapusunki (Caseroqa {max} saqin)"
   },
   "Platform": {
     "shellName": "Plataforma Quina",
@@ -1549,9 +1708,22 @@
       "noResults": "Mana ima llaqtamasipas tupanchu.",
       "optionCredit": "DNI {number} · fiadoyuq",
       "optionNoCredit": "DNI {number} · mana fiadoyuq",
+      "optionAvailable": "DNI {number} · kanraq {amount}",
+      "optionBlocked": "DNI {number} · {reason}",
+      "optionReasons": {
+        "ACCOUNT_SUSPENDED": "sayachisqa",
+        "ACCOUNT_BLOCKED": "wichqasqa",
+        "ACCOUNT_OVERDUE": "ciclo pasasqa",
+        "USD_ACCOUNT": "USD cuenta"
+      },
       "document": "DNI {number}",
       "clear": "{name} rantikuymanta qichuy",
+      "clearQuery": "Llaqtamasi maskayta pichay",
+      "newCustomer": "Musuq llaqtamasita qillqay",
       "available": "Kanraq <strong>{amount}</strong>",
+      "usedOfLimit": "{limit}manta {used} hap’in",
+      "nearLimit": "Límite qaylla",
+      "afterSale": "{amount} puchunqa",
       "blocked": {
         "NO_ACCOUNT": "Mana fiado cuentayuqchu: qullqillawan.",
         "ACCOUNT_SUSPENDED": "Dueño fiadota sayachirqan.",
@@ -1559,6 +1731,45 @@
         "ACCOUNT_OVERDUE": "Huk ciclo pasasqa kan: qullqichakuptin fiado kichakun.",
         "USD_ACCOUNT": "Cuentanqa dólarespim: mostradorpi fiadoqa solespillam."
       }
+    },
+    "filters": {
+      "label": "Rantinakunata akllay",
+      "all": "Llapan",
+      "top": "Aswan rantisqa",
+      "inCart": "Carritopi",
+      "installments": "Cuotaspi"
+    },
+    "clearSearch": "Maskayta pichay",
+    "scanHint": "Código tupaptin utaq huklla kaptin, Enter ñit’ispa yapakun.",
+    "goToInventory": "Ñawpaq rantinata qillqay",
+    "installmentsBadge": "Cuotas",
+    "clearCart": "Ch’usaqyachiy",
+    "clearCartAria": "Carritota ch’usaqyachiy",
+    "itemsSummary": "{lines, plural, one {# rantina} other {# rantinakuna}}",
+    "undo": "Kutichiy",
+    "undoRemoved": "{product} urqusqa",
+    "undoCleared": "Carrito ch’usaqyachisqa ({count})",
+    "exactAmount": "Kikin",
+    "todaySales": {
+      "button": "Kunan rantikuykuna",
+      "buttonCount": "Kunan rantikuykuna · {count}",
+      "title": "Kunan rantikuykuna",
+      "description": "Kunan p’unchaw qullqi chaskisqa, fiadokuna chaymanta sapa rantikuy.",
+      "close": "Kunan rantikuykunata wichqay",
+      "cashBoxTitle": "Qullqi caja",
+      "cashSalesCount": "{count, plural, one {# qullqiwan rantikuy} other {# qullqiwan rantikuykuna}}",
+      "creditBoxTitle": "Kunan fiado",
+      "creditSalesCount": "{count, plural, one {# fiado rantikuy} other {# fiado rantikuykuna}}",
+      "recentTitle": "Kunan qhipa rantikuykuna",
+      "emptyTitle": "Manaraq kunan rantikuy kanchu",
+      "empty": "Sapa qullqiwan utaq fiado rantikuy qillqasqayki kaypi rikhurinqa.",
+      "walkIn": "Purikuq rantikuy",
+      "creditSingle": "Fiado · qullqichana p’unchaw",
+      "creditInstallments": "Fiado · cuotaspi",
+      "changeGiven": "Vuelto {amount}",
+      "repeatSale": "Carritoman churay",
+      "repeatedToast": "{count, plural, one {# rantina} other {# rantinakuna}} carritoman churasqa",
+      "repeatedOutToast": "chay rantinakunaqa tukusqañam"
     },
     "modalityLabel": "¿Qullqiwanchu fiadochu?",
     "modality": {
@@ -2039,14 +2250,28 @@
       "to": "Kay p’unchawkama",
       "user": "Ruraq",
       "allUsers": "Llapan ruraqkuna",
-      "entity": "Laya",
+      "entity": "Entidad",
       "allEntities": "Llapan layakuna",
       "apply": "Akllay",
       "clear": "Pichay",
       "fromHint": "Qallariy p’unchaw.",
       "toHint": "Tukukuy p’unchaw.",
       "userHint": "Ruraqman hina akllay.",
-      "entityHint": "Layaman hina akllay."
+      "entityHint": "Layaman hina akllay.",
+      "action": "Ruray",
+      "allActions": "Llapan ruraykuna",
+      "search": "Maskhay",
+      "searchPlaceholder": "Ruru, wasi masi, IP, ID icha willaywan maskhay…",
+      "searchHint": "Sutikuna, qullqi, IP icha ID ukupi maskhay.",
+      "actionHint": "Huk ruray layallata akllay.",
+      "moreFilters": "Astawan akllanakuna",
+      "lessFilters": "Akllanakunata pakay",
+      "presetToday": "Kunan p'unchaw",
+      "preset7d": "Qhipa 7 p'unchaw",
+      "preset30d": "Qhipa 30 p'unchaw",
+      "invalidDateRange": "P'unchaw akllayqa pantasqam: qallariy p'unchawqa tukukuy p'unchawmanta ñawpaq kanan.",
+      "resetDates": "P'unchawkunata pichay",
+      "categoryLabel": "Rikch’ay"
     },
     "actions": {
       "CREATE_CASH_SALE": "Qullqiwan qhatuy",
@@ -2076,7 +2301,30 @@
       "CANCEL_SUBSCRIPTION_RENEWAL": "Plan musuqchay sayachiy",
       "EXPIRE_TRIAL": "Prueba Pro tukukuy (Caseroman)",
       "EXPIRE_GRACE_PERIOD": "Gracia pacha tukukuy (Caseroman)",
-      "COMPLETE_CANCELED_SUBSCRIPTION": "Pagasqa pacha tukukuy (Caseroman)"
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Pagasqa pacha tukukuy (Caseroman)",
+      "OBJECT_CHARGE": "Manu churay qhawasqa",
+      "CHARGE_CONFIRMED": "Manu churay chiqapchasqa",
+      "CHARGE_VOIDED": "Manu chinkachiy",
+      "CREATE_CUSTOMER": "Musuq wasi masi",
+      "UPDATE_CUSTOMER": "Wasi masi allichay",
+      "REACTIVATE_CUSTOMER": "Wasi masi kutichiy",
+      "DEACTIVATE_CUSTOMER": "Wasi masi sayachiy",
+      "UPDATE_PRICE": "Ruru chani t'ikray",
+      "REACTIVATE_PRODUCT": "Ruru kutichiy",
+      "CREATE_STORE": "Qhatu wasi kamay",
+      "REACTIVATE_STORE": "Qhatu wasi kutichiy",
+      "SUSPEND_STORE": "Qhatu wasi sayachiy",
+      "UPDATE_PAYMENT_DETAILS": "Qullqi chaskiy t'ikray",
+      "UPDATE_TAX_SETTINGS": "Impuesto kamachikuy t'ikray",
+      "INVITE_EMPLOYEE": "Yanapaq mink'ay",
+      "CANCEL_INVITE": "Mink'ay sayachiy",
+      "REACTIVATE_EMPLOYEE": "Yanapaq kutichiy",
+      "DEACTIVATE_EMPLOYEE": "Yanapaq sayachiy",
+      "SET_PASSWORD": "Yaykuna rimay churay",
+      "START_SUBSCRIPTION_CHECKOUT": "Suscripción qallariy",
+      "SUBSCRIPTION_PAYMENT_APPROVED": "Suscripción qullqi chaskisqa",
+      "SUBSCRIPTION_PAYMENT_REJECTED": "Suscripción qullqi mana chaskisqa",
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Suscripción qullqi kutichisqa"
     },
     "entities": {
       "sales": "Qhatuykuna",
@@ -2092,6 +2340,300 @@
       "stores": "Qhatu wasi",
       "store_subscriptions": "Suscripción",
       "subscription_payments": "Suscripción qullqikuna"
+    },
+    "summary": {
+      "sectionLabel": "Qhipa 7 p'unchawkunapi pisiyachiy",
+      "totalLabel": "Ruraykuna (7 p'unchaw)",
+      "totalHint": "Llapan musuq ruraykunata qhaway",
+      "salesCreditLabel": "Qhatuy, manupas (7 p'unchaw)",
+      "salesCreditHint": "Qhatuykuna, kutichiykuna, wasi masikuna",
+      "securityLabel": "Waqaychay, yaykuypas (7 p'unchaw)",
+      "securityHintOk": "Manam chika sasachakuy kanchu",
+      "securityHintAlert": "{count, plural, =1 {1 yaykuy willay} other {# yaykuy willaykuna}}"
+    },
+    "categories": {
+      "all": "Llapan",
+      "sales_credit": "Qhatuy, manupas",
+      "inventory": "Kapuqkuna",
+      "team_store": "Yanapaqkuna, qhatu wasi",
+      "security": "Waqaychay",
+      "billing": "Suscripción"
+    },
+    "table": {
+      "colDate": "P'unchaw, pacha",
+      "colEvent": "Ruray",
+      "colSummary": "Pisiyachiy",
+      "colActor": "Ruraq",
+      "colDetail": "Sut'inchay",
+      "viewDetail": "Sut'inta qhaway",
+      "paginationRange": "{total} ukhumanta {from}–{to} qhawachiy",
+      "prevPage": "Ñawpaq",
+      "nextPage": "Qhipa"
+    },
+    "emptyStates": {
+      "noEventsTitle": "Manaraqmi ruraykuna qillqakunchu",
+      "noEventsBody": "Qhatuykuna, rantiykuna, chani t'ikraykuna qillqakuptinqa, kaypim rikukunqa.",
+      "goToCounter": "Qhatuna wasiman riy",
+      "clearFilters": "Akllanakunata pichay"
+    },
+    "detail": {
+      "title": "Ruraypa sut'in",
+      "dateTime": "P'unchaw, pacha (Lima)",
+      "actor": "Ruraq",
+      "entity": "Laya",
+      "ip": "IP yupay",
+      "device": "Llamk'ana",
+      "entityId": "Qillqap ID",
+      "copyId": "ID mirachiy",
+      "copiedId": "ID mirachisqa",
+      "copyError": "Manam ID mirachikuyta atikunchu",
+      "openRecord": "Qillqaman riy",
+      "diffTitle": "Ñawpaq vs Musuq",
+      "fieldCol": "Suti",
+      "noDiffData": "Kay rurayqa manam huk tikraykunata qillqanchu.",
+      "rawJsonSummary": "Tikniku willay (JSON)",
+      "close": "Wichq'ay"
+    },
+    "export": {
+      "successTitle": "{count, plural, =0 {CSV uraykachisqa (mana rurayniyuq)} =1 {CSV uraykachisqa 1 ruraywan} other {CSV uraykachisqa # ruraykunawan}}",
+      "truncatedTitle": "5,000 siqikunallaman uraykachisqa",
+      "truncatedDescription": "Wakin willaykunata uraykachinaykipaq p'unchawkunata akllay.",
+      "errorTitle": "Manam CSV uraykachiyta atikunchu",
+      "errorDescription": "Huk iskay chhikamanta wakmanta malliy."
+    },
+    "fields": {
+      "saleModality": "Imayna qhatuy",
+      "paymentMethod": "Imayna pagay",
+      "totalAmount": "Tukuy qullqi",
+      "customerId": "Wasi masi",
+      "itemsCount": "Rurukuna yupay",
+      "creditAccountId": "Manu yupay",
+      "chargeId": "Manu churay",
+      "installmentsCount": "Rakikuna",
+      "balanceAfter": "Qhipa puchuq",
+      "receiptNumber": "Chaski yupay",
+      "settlementCycleId": "Muyu",
+      "amountPaid": "Pagasqa qullqi",
+      "principalPaid": "Qallariy qullqi",
+      "compensatoryInterestPaid": "Miray qullqi",
+      "moratoryInterestPaid": "Unay miray qullqi",
+      "daysLate": "Unay p'unchawkuna",
+      "note": "Qillqay",
+      "byCustomer": "Wasi masip rurasqan",
+      "status": "Kawsay",
+      "consentStatus": "Chaskisqa kawsay",
+      "voidId": "Chinkachiy ID",
+      "voidedAmount": "Chinkachisqa qullqi",
+      "reason": "Imarayku",
+      "currency": "Qullqi laya",
+      "creditLimit": "Manu tupuy",
+      "compensatory": "Miray tupuy",
+      "moratory": "Unay miray tupuy",
+      "cutOffDay": "Tupuy p'unchaw",
+      "paymentDueDay": "Pagay p'unchaw",
+      "maxInstallmentMonths": "Killa rakikuna",
+      "documentType": "Qillqa laya",
+      "documentNumber": "Qillqa yupay",
+      "firstName": "Suti",
+      "lastName": "Ayllu suti",
+      "phone": "Karu uyariy",
+      "email": "Chaski",
+      "address": "Tiyana",
+      "preferredLocale": "Munasqa simi",
+      "consentVersion": "Chaskiy versión",
+      "isActive": "Kawsachkaq",
+      "name": "Suti",
+      "description": "Sut'inchay",
+      "brand": "Marca",
+      "sku": "SKU",
+      "barcode": "Barra código",
+      "unitId": "Tupuy",
+      "defaultSupplierId": "Rantiq",
+      "isService": "Yanapay",
+      "allowsInstallments": "Rakikunapi",
+      "cashPrice": "Qullqiwan chani",
+      "creditPrice": "Manuwan chani",
+      "initialStock": "Qallariy kapuq",
+      "currentStock": "Kunan kapuq",
+      "wasteQuantity": "Chinkaq yupay",
+      "taxIdNumber": "RUC / DNI",
+      "tradeName": "Rantiq suti",
+      "supplierId": "Rantiq",
+      "series": "Serie",
+      "issueDate": "P'unchaw",
+      "linesCount": "Siqikuna",
+      "attachmentsCount": "Yapaykuna",
+      "commercialName": "Qhatu wasi suti",
+      "taxIdType": "RUC / DNI laya",
+      "ownerEmail": "Duenop chaskin",
+      "planTier": "Plan",
+      "by": "Maymanta",
+      "yapeNumber": "Yape yupay",
+      "plinNumber": "Plin yupay",
+      "bankName": "Banco",
+      "bankAccountNumber": "Banco yupay",
+      "bankCci": "CCI",
+      "paymentQrPath": "QR siq'i",
+      "taxRegime": "Impuesto kamachikuy",
+      "rusCategory": "RUS t'aqa",
+      "provider": "Yaykuna llikacha",
+      "via": "Ñan",
+      "version": "Versión",
+      "documents": "Qillqakuna",
+      "failedLoginAttempts": "Pantasqa yaykuykuna",
+      "lockedUntil": "Wichq'asqa kaykama",
+      "billingInterval": "Pacha",
+      "amount": "Qullqi",
+      "mpPreapprovalId": "MP suscripción ID",
+      "mpPaymentId": "MP pagay ID",
+      "paymentId": "Pagay ID",
+      "currentPeriodEnd": "Pacha tukukuy",
+      "gracePeriodEndsAt": "Gracia tukukuy",
+      "cancelAtPeriodEnd": "Tukukuptin sayachiy",
+      "trialEndsAt": "Prueba tukukuy"
+    },
+    "values": {
+      "bool": {
+        "true": "Arí",
+        "false": "Manam"
+      },
+      "paymentMethod": {
+        "CASH": "Qullqi",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "CARD": "Tarjeta",
+        "CREDIT": "Manu"
+      },
+      "saleModality": {
+        "CASH": "Qullqiwan",
+        "SINGLE_PAYMENT_CREDIT": "Huk pagay manu",
+        "INSTALLMENTS_CREDIT": "Rakikunapi manu"
+      },
+      "documentType": {
+        "DNI": "DNI",
+        "CE": "CE",
+        "RUC": "RUC",
+        "FACTURA": "Factura",
+        "BOLETA": "Boleta",
+        "NOTA_VENTA": "Qhatuy qillqa"
+      },
+      "planTier": {
+        "CASERO": "Casero",
+        "BODEGA_PRO": "Bodega Pro",
+        "NEGOCIO_PLUS": "Negocio Plus"
+      },
+      "billingInterval": {
+        "MONTHLY": "Killapi",
+        "YEARLY": "Watapi"
+      },
+      "status": {
+        "ACTIVE": "Kawsachkaq",
+        "TRIALING": "Pruebapi",
+        "PAST_DUE": "Graciapi",
+        "CANCELED": "Sayachisqa",
+        "SUSPENDED": "Samachisqa",
+        "BLOCKED": "Wichq'asqa",
+        "PENDING": "Suyachkaq",
+        "CONFIRMED": "Chiqapchasqa",
+        "VOIDED": "Chinkachisqa",
+        "OBJECTED": "Qhawasqa",
+        "DRAFT": "Wakichisqa"
+      },
+      "consentStatus": {
+        "PENDING": "Suyachkaq",
+        "ACCEPTED": "Chaskisqa",
+        "OBJECTED": "Qhawasqa",
+        "CONFIRMED": "Chiqapchasqa"
+      },
+      "taxRegime": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "RER",
+        "MYPE": "MYPE Tributario",
+        "GENERAL": "Régimen General"
+      },
+      "rusCategory": {
+        "1": "T'aqa 1",
+        "2": "T'aqa 2"
+      },
+      "rateType": {
+        "EFFECTIVE": "Efectiva",
+        "NOMINAL": "Nominal"
+      },
+      "ratePeriod": {
+        "ANNUAL": "watapi",
+        "MONTHLY": "killapi",
+        "DAILY": "p'unchawpi"
+      },
+      "rateEffective": "{type} {percent} % ({period})",
+      "rateNominal": "{type} {percent} % ({period}, cap. {cap})",
+      "via": {
+        "account-setup": "Mink'aywan",
+        "password-reset": "Musuqchaywan"
+      },
+      "by": {
+        "PLATFORM_ADMIN": "Plataforma kamachiq"
+      },
+      "documents": {
+        "terms": "Kamachikuykuna",
+        "privacy": "Pakasqa willakuy"
+      },
+      "locale": {
+        "es": "Castellano",
+        "en": "Inglés",
+        "qu": "Runasimi"
+      }
+    },
+    "summaries": {
+      "cashSale": "{amount} · {method} · {count, plural, =1 {1 ruru} other {# rurukuna}}",
+      "creditSaleSingle": "{amount} · Manu · Puchuq {balance}",
+      "creditSaleInstallments": "{amount} · {installments} raki · Puchuq {balance}",
+      "registerPayment": "Chaski {receipt} · {amount} ({method})",
+      "registerPaymentLate": "Chaski {receipt} · {amount} ({method}) · {days} p'unchaw unay",
+      "objectChargeCustomer": "Wasi masip qhawasqan · {note}",
+      "objectChargeStore": "Qhatu wasip qhawasqan · {note}",
+      "chargeConfirmed": "Chiqapchasqa · {note}",
+      "chargeVoided": "Chinkachisqa {amount} · {reason}",
+      "openCreditAccount": "Tupuy {limit} · Tupuy {cutOff} · Pagay {due}",
+      "updateCreditTerms": "Tupuy {limit} · Tupuy {cutOff} · Pagay {due}",
+      "setCreditAccountStatus": "Kawsay: {before} → {after}",
+      "createCustomer": "{name} · {doc}",
+      "updateCustomer": "Allichasqa: {fields}",
+      "reactivateCustomer": "Wasi masi kutichisqa",
+      "deactivateCustomer": "Wasi masi sayachisqa",
+      "createProduct": "{name} · Qullqiwan {cash} · Kapuq {stock}",
+      "updateProduct": "Allichasqa: {fields}",
+      "updatePrice": "Qullqiwan {cash} · Manuwan {credit}",
+      "reactivateProduct": "Ruru kutichisqa",
+      "deactivateProduct": "Ruru sayachisqa",
+      "adjustStock": "Kapuq {before} → {after} · {reason}",
+      "recordWaste": "Chinkay {waste} · Kapuq {before} → {after} · {reason}",
+      "createSupplier": "{name} · {taxId}",
+      "registerPurchase": "{doc} · {amount} · {count, plural, =1 {1 siqi} other {# siqikuna}}",
+      "generateReplenishment": "Wakichisqa {count, plural, =1 {1 ruruwan} other {# rurukunawan}}",
+      "discardPurchaseOrder": "Wakichisqa mañakuy wisch'usqa",
+      "createStore": "{name} · Plan {plan}",
+      "reactivateStore": "Qhatu wasi kutichisqa",
+      "suspendStore": "Qhatu wasi sayachisqa",
+      "updatePaymentDetails": "T'ikrasqa: {fields}",
+      "updateTaxSettings": "{before} → {after}",
+      "inviteEmployee": "{name} ({email})",
+      "cancelInvite": "Mink'ay sayachisqa ({email})",
+      "reactivateEmployee": "Yanapaq kutichisqa",
+      "deactivateEmployee": "Yanapaq sayachisqa",
+      "setPassword": "Yaykuna rimay churasqa",
+      "acceptTerms": "Kamachikuykuna chaskisqa (v{version})",
+      "loginFailed": "Pantasqa yaykuy #{attempts}",
+      "loginBlocked": "Wichq'asqa {until} kama",
+      "lockAccount": "{attempts} pantaymanta wichq'asqa {until} kama",
+      "startCheckout": "Plan {plan} ({interval}) · {amount}",
+      "subscriptionPaymentApproved": "Plan {plan} · {amount} · {until} kama",
+      "subscriptionPaymentRejected": "Mana chaskisqa ({amount}) · Gracia {until} kama",
+      "subscriptionPaymentRefunded": "Kutichisqa ({amount}) · Caseroman",
+      "cancelRenewal": "Musuqchay sayachisqa · {until} kama",
+      "expireTrial": "Prueba Pro tukukuy · Caseroman",
+      "expireGrace": "Gracia tukukuy · Caseroman",
+      "completeCanceled": "Pagasqa pacha tukukuy · Caseroman",
+      "noAdditionalDetails": "Ruray qillqasqa"
     }
   },
   "Tax": {
@@ -2114,7 +2656,9 @@
         }
       },
       "disclaimer": "Información referencial. Quina no constituye asesoría ni emite declaraciones ante SUNAT.",
-      "changeCategory": "Categoríata tikray"
+      "changeCategory": "Categoríata tikray",
+      "remaining": "Puchuqnin: {amount}",
+      "exceededBy": "Yallisqan: {amount}"
     }
   },
   "Portfolio": {
@@ -2141,13 +2685,40 @@
       "sortLabel": "Cartera ordenay",
       "sort": {
         "debt": "Aswan manu",
-        "score": "Aswan pisi puntaje"
+        "score": "Aswan pisi puntaje",
+        "utilization": "Aswan uso"
       },
       "debt": "Manu",
       "limit": "Límite",
       "delinquent": "Morapi",
       "suggestLower": "Iskay cortepi Puka: límiteta urayachiy allinmi",
-      "empty": "Manaraqmi fiadoyuq vecinoykikuna kanchu."
+      "empty": "Manaraqmi fiadoyuq vecinoykikuna kanchu.",
+      "searchLabel": "Carterapi vecinota maskhay",
+      "searchPlaceholder": "Sutiwan utaq documentowan maskhay…",
+      "searchSubmit": "Maskhay",
+      "filters": {
+        "all": "Llapallan",
+        "overdue": "Morapi",
+        "dueSoon": "Vencenqaña",
+        "highUtilization": "Uso ≥ 85 %",
+        "suggestLower": "Límiteta urayachiy"
+      },
+      "count": "{total} vecinokunamanta {shown} qhawachikuchkan",
+      "daysOverdue": "{days} p’unchaw morapi",
+      "overdueLabel": "Vencesqa:",
+      "dueSoonLabel": "Vencenqaña:",
+      "utilizationValue": "{pct} % llamk’achisqa",
+      "nextDue": "Vencenqa: {date}",
+      "colCustomer": "Vecino",
+      "colScore": "Puntaje",
+      "colLimitAndUse": "Límite, uso ima",
+      "colDue": "Vencimiento",
+      "colActions": "Ruwaykuna",
+      "emptyTitle": "Manaraqmi fiado cuentakuna kanchu",
+      "emptyAction": "Vecinokunaman riy",
+      "filteredEmptyTitle": "Mana tarisqachu",
+      "filteredEmpty": "Manam mayqin vecinopas maskhasqaykiwan tupanchu.",
+      "clearFilters": "Filtrokunata pichay"
     },
     "score": {
       "value": "{score} · {band}",
@@ -2156,6 +2727,43 @@
         "GREEN": "Allinpuni",
         "YELLOW": "Riesgopi",
         "RED": "Sinchi morapi"
+      },
+      "breakdownTrigger": "Puntaje rakiyninta qhaway: {score} · {band}",
+      "breakdownTriggerNoHistory": "Puntaje rakiyninta qhaway: Mana historialniyuq",
+      "breakdown": {
+        "title": "Puntaje rakiynin",
+        "onTimeCycles": "Tiemponpi pagasqa cortekuna",
+        "lateCycles": "Qhipasqa cortekuna",
+        "daysLate": "Morapi tukuy p’unchawkuna",
+        "formula": "Qhipa 6 killakuna: base 100, −3 pto sapa mora p’unchawmanta, +5 pto p’unchawninpi cortemanta.",
+        "noHistoryNote": "Manaraqmi qhipa 6 killakunapi vencesqa utaq pagasqa cortekuna kanchu.",
+        "suggestLower": "Iskay cortepi Puka: límiteta urayachiy allinmi."
+      }
+    },
+    "actions": {
+      "collections": "Cobranza",
+      "exportCsv": "CSV hurquy",
+      "collect": "Cobray",
+      "adjustLimit": "Límite allichay",
+      "viewProfile": "Fichata qhaway"
+    },
+    "health": {
+      "title": "Cartera allin kaynin",
+      "subtitle": "Huk categoríata utaq tiempota akllay vecinokunata filtranaykipaq.",
+      "bandsTitle": "Puntaje rakiynin",
+      "bands": {
+        "GREEN": "Allinpuni",
+        "YELLOW": "Riesgopi",
+        "RED": "Sinchi morapi",
+        "NO_HISTORY": "Mana historialniyuq"
+      },
+      "agingTitle": "Saldokuna unaynin",
+      "aging": {
+        "current": "P’unchawninpi",
+        "dueSoon": "Vencenqaña ≤ 3 p",
+        "d1_15": "1–15 p’unchaw",
+        "d16_30": "16–30 p’unchaw",
+        "d31_plus": "31+ p’unchaw"
       }
     }
   },
@@ -2193,6 +2801,134 @@
         "UNAVAILABLE": "IAqa mana p’unchawninpi kutichirqanchu. Mana yupakurqanchu; huktawan kallpachay.",
         "NOT_IN_PLAN": "Kunan planniykiqa mana IA yanapaykunayuqchu.",
         "RANGE_INVALID": "Willakuypa p’unchawninkunata qhaway."
+      },
+      "upgradeLink": "Planta allinchay",
+      "prePrompt": "\"IAwan qhawariy\" nisqapi ñit’iy, kay pachapa rantikuyninman, fiadonman, margenman hina yuyaychaykunata chaskiy.",
+      "toasts": {
+        "success": "IA qhawariy wakichisqaña."
+      }
+    },
+    "lockedTitle": "{plan} planwan hatun willakuykunata kichay",
+    "previewFeatures": {
+      "charts": {
+        "title": "Sapa p’unchaw puriywan pagaykuna",
+        "body": "Rantikuyniykita, gananciaykita, qullqi yaykuyniykita sapa p’unchaw qhaway."
+      },
+      "products": {
+        "title": "Aswan allin rantikuna categoríakunapas",
+        "body": "Mayqin rantikuna aswan gananciata qullqitapas apamusqanta yachay."
+      },
+      "print": {
+        "title": "Imprimiy utaq PDF waqaychaypaq wakichisqa",
+        "body": "Huk ñit’iyllapi p’unchawkunapa willakuyninta waqaychay."
+      },
+      "ai": {
+        "title": "IA yanapayninkuna",
+        "body": "Tiendaykipa tukuy yupayninkunawan yuyaychaykuna, mana vecinokunapa sutinkunata rikuchispa."
+      }
+    },
+    "toolbar": {
+      "presetsAria": "Usqhay p’unchaw akllana",
+      "presets": {
+        "today": "Kunan",
+        "7d": "7p",
+        "thisMonth": "Kay killa",
+        "lastMonth": "Qayna killa",
+        "custom": "Akllasqa"
+      },
+      "changeDates": "P’unchawkunata tikray",
+      "sheetTitle": "Willakuypa p’unchawninkunata akllay",
+      "sheetDescription": "Lima p’unchawkunapi rantikuyta, qullqi puriyninta gananciantapas qhaway.",
+      "close": "Wichqay",
+      "dateHint": "Lima calendario p’unchawkuna (UTC-5).",
+      "limitHint": "366 p’unchawkama, \"Kaymanta\" ñawpaqtam \"Kaykama\"manta.",
+      "rangeError": "P’unchawkunata qhaway: \"Kaymanta\" ñawpaqtam rin, 366 p’unchawkamallam.",
+      "cancel": "Sayachiy"
+    },
+    "hero": {
+      "totalSalesTitle": "Tukuy rantikuykuna",
+      "vsPrevious": "ñawpaq p’unchawkunawan tupachisqa",
+      "cashShare": "Qullqipi {pct} %",
+      "creditShare": "Fiadopi {pct} %",
+      "grossMarginTitle": "Qhipakuq ganancia",
+      "costLine": "Chanin: {cost}",
+      "cashFlowTitle": "Chiqap qullqi puriy",
+      "collectionsCount": "{count, plural, =0 {mana cobrasqayuq} one {1 cobro} other {# cobrokuna}}",
+      "inflowsLine": "Yaykuq: {amount}",
+      "purchasesLine": "Rantisqakuna: {amount}"
+    },
+    "empty": {
+      "title": "Kay p’unchawkunapi manaraq rantikuy kanchu",
+      "body": "Mostradorpi rantikuptiykiqa, kaypi gráficokuna aswan rantikusqa rantikunapas rikukunqa.",
+      "cta": "Rantikuq riy"
+    },
+    "charts": {
+      "performance": {
+        "title": "P’unchawkunapa puriynin",
+        "salesSubtitle": "Tukuy rantikuykuna qhipakuq gananciaykiwan",
+        "flowSubtitle": "Yaykuq qullqi (qullqipi cobrokunapas) rantisqaykikunawan",
+        "groupedWeekly": "semanankama huñusqa",
+        "groupedMonthly": "killankama huñusqa",
+        "modeAria": "Puriynin gráfico akllana",
+        "modes": {
+          "sales": "Rantikuy",
+          "flow": "Qullqi puriy"
+        },
+        "empty": "Kay p’unchawkunapi manaraq kuyuy kanchu.",
+        "caption": "Rantikuy, margen bruto, qullqi puriy ima kay p’unchawkunapi",
+        "series": {
+          "sales": "Rantikuykuna",
+          "margin": "Margen bruto",
+          "inflows": "Chiqap yaykuq",
+          "purchases": "Rantisqakuna"
+        },
+        "table": {
+          "period": "Pacha",
+          "netFlow": "Chuya puriy"
+        }
+      },
+      "paymentMethods": {
+        "title": "Pagay ñankuna",
+        "subtitle": "Imaynam caseroykikuna kay p’unchawkunapi pagarqanku",
+        "empty": "Kay pachapi manaraq rantikuy kanchu.",
+        "caption": "Pagay ñanninkama rantikuykuna",
+        "methods": {
+          "CASH": "Qullqi",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Tarjeta",
+          "CREDIT": "Fiado"
+        },
+        "table": {
+          "method": "Ñan",
+          "salesCount": "Rantikuykuna",
+          "amount": "Chani"
+        }
+      }
+    },
+    "products": {
+      "titleProducts": "Top 10 aswan rantikusqa rantikuna",
+      "titleCategories": "Categoríankama rantikuykuna",
+      "subtitleProducts": "Kay p’unchawkunapi qullqi apamusqanman hina ordenasqa.",
+      "subtitleCategories": "Kay p’unchawkunapi qullqi apamusqanman hina categoríakuna.",
+      "viewAria": "Rantikunawan categoríakunawan tikray",
+      "tabs": {
+        "products": "Rantikuna",
+        "categories": "Categoríakuna"
+      },
+      "empty": "Kay p’unchawkunapi mana rantikuy karqanchu.",
+      "uncategorized": "Mana categoríayuq",
+      "productsCount": "{count, plural, one {1 ranti} other {# rantikuna}}",
+      "unitsSold": "{qty} unid.",
+      "columns": {
+        "product": "Ranti",
+        "quantity": "Hayka",
+        "revenue": "Yaykuq",
+        "cost": "Chanin",
+        "margin": "Margen",
+        "category": "Categoría",
+        "products": "Rantikuna",
+        "units": "Unidades"
       }
     }
   },

@@ -941,7 +941,8 @@
       "OWNER": "Owner",
       "ACTIVE": "Active",
       "INVITED": "Invited",
-      "DEACTIVATED": "Deactivated"
+      "DEACTIVATED": "Deactivated",
+      "EXPIRED": "Invitation expired"
     },
     "invite": {
       "title": "Invite someone",
@@ -960,7 +961,8 @@
         "emailTaken": "That email already has a Quina account. Use another one.",
         "planLimit": "You reached your plan’s user limit.",
         "generic": "Could not send the invitation. Try again."
-      }
+      },
+      "openButton": "Invite employee"
     },
     "locked": {
       "caseroTitle": "The Casero plan is just for you",
@@ -983,8 +985,64 @@
         "resent": "We sent a new link; the previous one no longer works.",
         "mailFailed": "The email did not go out. Try again in a moment.",
         "planLimit": "Your plan has no room to reactivate them.",
-        "generic": "Could not complete it. Try again."
-      }
+        "generic": "Could not complete it. Try again.",
+        "canceled": "{name}’s invitation was canceled.",
+        "deactivated": "{name} was deactivated.",
+        "reactivated": "{name} is active again."
+      },
+      "undo": "Undo"
+    },
+    "subtitle": "Invite counter staff and control who has access to your store.",
+    "close": "Close",
+    "capacity": {
+      "planBadge": "{plan} plan",
+      "meterLabel": "Plan user seat usage",
+      "nearLimit": "You are close to your plan’s user limit.",
+      "activeChip": "{count, plural, one {# active} other {# active}}",
+      "invitedChip": "{count, plural, one {# invited} other {# invited}}",
+      "deactivatedChip": "{count, plural, one {# deactivated} other {# deactivated}}",
+      "readOnlyUsersTitle": "Your store is in read-only mode",
+      "readOnlyUsersBody": "You have {seats} active or invited users, while your {plan} plan allows up to {max}. Cancel a pending invitation or deactivate an employee to free a seat right away, or upgrade your plan.",
+      "readOnlyOtherTitle": "Your store is in read-only mode",
+      "readOnlyOtherBody": "Your store exceeded your {plan} plan’s limit on another resource. You cannot invite, resend, or reactivate employees right now, though you can still cancel invitations or deactivate members."
+    },
+    "roles": {
+      "toggleTitle": "What can a counter employee do?",
+      "toggleSubtitle": "Your team handles daily counter sales; credit terms and prices stay yours alone.",
+      "employeeHeading": "Counter employee",
+      "employee1": "Record cash and credit sales, and collect installment payments.",
+      "employee2": "Register new customers and check their available credit.",
+      "employee3": "Check stock levels, flag disputed charges, and send manual payment reminders.",
+      "ownerHeading": "Owner only",
+      "owner1": "Set credit limits, interest rates, and payout details (Yape, Plin, bank).",
+      "owner2": "Create or edit products, prices, suppliers, and purchases.",
+      "owner3": "View reports, tax assistant, audit log, team, and subscription."
+    },
+    "directory": {
+      "tabs": {
+        "activeAndInvited": "Active & invited ({count})",
+        "deactivated": "Deactivated ({count})"
+      },
+      "columns": {
+        "member": "Member",
+        "status": "Status",
+        "activity": "Activity",
+        "actions": "Actions"
+      },
+      "ownerNote": "Primary account",
+      "activity": {
+        "lastLogin": "Last sign-in: {date}",
+        "since": "Since {date}",
+        "expiresOn": "Expires {date}",
+        "expiredOn": "Expired {date}",
+        "invitedOn": "Invited {date}"
+      },
+      "empty": {
+        "title": "No employees in your store yet",
+        "body": "Invite whoever helps at the counter so they can sell and collect payments with their own account.",
+        "upgradeHint": "Your current plan only includes your own account. Upgrade your plan to add employees."
+      },
+      "emptyDeactivated": "You have no deactivated employees."
     }
   },
   "Settings": {
@@ -1003,7 +1061,9 @@
     "usage": {
       "activeCreditCustomers": "Customers with active credit",
       "users": "Users",
-      "products": "Products"
+      "products": "Products",
+      "receiptsPerMonth": "Purchase receipts this month",
+      "aiQueriesPerMonth": "AI queries this month"
     },
     "usageOf": "{used} of {max}",
     "usageUnlimited": "{used} · no limit",
@@ -1054,10 +1114,11 @@
       "methods": {
         "yape": "Yape",
         "card": "Card"
-      }
+      },
+      "emptyAction": "See plans"
     },
     "billingReceipt": {
-      "back": "Back to settings",
+      "back": "Back to subscription",
       "title": "Subscription receipt",
       "subtitle": "{store} · RUC/DNI {taxId}",
       "reference": "MP operation",
@@ -1069,7 +1130,11 @@
       "periodRange": "From {start} to {end}",
       "status": "Status",
       "total": "Total",
-      "print": "Print or save PDF"
+      "print": "Print or save PDF",
+      "storeLabel": "Store",
+      "ownerLabel": "Owner",
+      "emailLabel": "Email",
+      "addressLabel": "Address"
     },
     "paymentSoon": "Soon you will be able to change plans and pay from here.",
     "payment": {
@@ -1100,7 +1165,11 @@
         "label": "Picture of your Yape or Plin QR",
         "hint": "JPG, PNG or WEBP up to 2 MB. Only your customers see it in their account.",
         "currentAlt": "Store payment QR code",
-        "remove": "Remove the QR"
+        "remove": "Remove the QR",
+        "upload": "Upload QR image",
+        "change": "Change image",
+        "keep": "Keep QR",
+        "willRemove": "The current QR will be removed on save."
       },
       "save": "Save payment details",
       "saving": "Saving…",
@@ -1126,7 +1195,26 @@
           "IMAGE_TYPE": "Upload a JPG, PNG or WEBP image.",
           "IMAGE_TOO_LARGE": "The image is larger than 2 MB. Take a lighter screenshot."
         }
-      }
+      },
+      "sections": {
+        "wallets": "Digital wallets",
+        "bank": "Bank transfer"
+      },
+      "preview": {
+        "title": "Customer preview",
+        "portalBadge": "Portal",
+        "portalHeading": "How to pay",
+        "empty": "Your store has not added its payment details yet. Pay at the store.",
+        "qrAlt": "QR code to pay the store",
+        "fields": {
+          "yape": "Yape",
+          "plin": "Plin",
+          "bank": "Bank",
+          "account": "Account number",
+          "cci": "CCI"
+        }
+      },
+      "discard": "Discard"
     },
     "tax": {
       "title": "Tax regime",
@@ -1145,8 +1233,79 @@
       "submit": "Save regime",
       "submitting": "Saving…",
       "saved": "Regime saved.",
-      "error": "Could not save. Try again."
-    }
+      "error": "Could not save. Try again.",
+      "taxIdPill": "{type}: {number}",
+      "comparison": {
+        "title": "Monthly caps by category",
+        "monthSummary": "This month: {sales} in sales · {purchases} in purchases",
+        "selected": "Selected",
+        "incomeLabel": "Sales up to",
+        "purchasesLabel": "Purchases up to",
+        "noCap": "No active cap registered"
+      },
+      "disclaimer": "Reference information only. Quina does not provide tax advice or file returns with SUNAT.",
+      "discard": "Discard"
+    },
+    "storeIdentity": {
+      "taxId": "{type} {number}",
+      "defaultLocale": "Notice language: {locale}",
+      "locales": {
+        "es": "Spanish",
+        "en": "English",
+        "qu": "Quechua"
+      }
+    },
+    "hub": {
+      "ariaLabel": "Store navigation",
+      "subscription": {
+        "label": "Subscription",
+        "statuses": {
+          "active": "Active",
+          "trial": "Trial · {days} d",
+          "pastDue": "Grace period",
+          "canceling": "Ending",
+          "readOnly": "Read-only"
+        }
+      },
+      "team": {
+        "label": "Team",
+        "seats": "{used} of {max} seats",
+        "unlimited": "{used} · unlimited"
+      },
+      "audit": {
+        "label": "Audit log",
+        "meta": "Change history"
+      },
+      "profile": {
+        "label": "My profile",
+        "meta": "Password & language"
+      }
+    },
+    "caseroHint": "Free plan to keep your store credit organized from the counter.",
+    "overLimitItem": "{resource}: {used} of {max} allowed",
+    "manageResource": {
+      "activeCreditCustomers": "Review customers",
+      "users": "Review team",
+      "products": "Review inventory"
+    },
+    "jumpToPlans": "See available plans",
+    "billingReturn": {
+      "approved": "Payment received. If your plan has not updated yet, refresh in a few seconds while Mercado Pago confirms.",
+      "pending": "Your payment is being confirmed. We will notify you as soon as Mercado Pago approves it.",
+      "rejected": "The payment was not completed. You can try again whenever you are ready."
+    },
+    "subscriptionStatus": {
+      "ACTIVE": "Active",
+      "TRIALING": "Trialing",
+      "PAST_DUE": "In grace",
+      "CANCELED": "Canceled"
+    },
+    "monthlyQuotasTitle": "Current month quotas",
+    "monthlyQuotaLocked": "Not included in this plan",
+    "recommended": "Recommended",
+    "cancelOverLimitWarningTitle": "When your period ends, your store will become read-only",
+    "cancelOverLimitWarningBody": "Your current usage exceeds the Casero plan limits. Unless you renew before {date}, you will only be able to collect pending debts until you reduce usage:",
+    "cancelOverLimitItem": "{resource}: you have {used} (Casero allows {max})"
   },
   "Platform": {
     "shellName": "Quina Platform",
@@ -1548,9 +1707,22 @@
       "noResults": "No neighbor matches.",
       "optionCredit": "DNI {number} · has credit",
       "optionNoCredit": "DNI {number} · no credit",
+      "optionAvailable": "DNI {number} · avail. {amount}",
+      "optionBlocked": "DNI {number} · {reason}",
+      "optionReasons": {
+        "ACCOUNT_SUSPENDED": "suspended",
+        "ACCOUNT_BLOCKED": "blocked",
+        "ACCOUNT_OVERDUE": "overdue cycle",
+        "USD_ACCOUNT": "USD account"
+      },
       "document": "DNI {number}",
       "clear": "Remove {name} from the sale",
+      "clearQuery": "Clear neighbor search",
+      "newCustomer": "Register neighbor",
       "available": "Available <strong>{amount}</strong>",
+      "usedOfLimit": "Uses {used} of {limit}",
+      "nearLimit": "Near limit",
+      "afterSale": "Leaves {amount}",
       "blocked": {
         "NO_ACCOUNT": "No credit account: cash only.",
         "ACCOUNT_SUSPENDED": "Credit suspended by the owner.",
@@ -1558,6 +1730,45 @@
         "ACCOUNT_OVERDUE": "Has an overdue cycle: credit reopens once it is paid.",
         "USD_ACCOUNT": "Their account is in dollars: counter credit is soles only."
       }
+    },
+    "filters": {
+      "label": "Filter products",
+      "all": "All",
+      "top": "Top sellers",
+      "inCart": "In cart",
+      "installments": "Installments"
+    },
+    "clearSearch": "Clear search",
+    "scanHint": "With a barcode or a single match, press Enter to add it right away.",
+    "goToInventory": "Add first product",
+    "installmentsBadge": "Installments",
+    "clearCart": "Clear",
+    "clearCartAria": "Clear the cart",
+    "itemsSummary": "{lines, plural, one {# product} other {# products}}",
+    "undo": "Undo",
+    "undoRemoved": "Removed {product}",
+    "undoCleared": "Cart cleared ({count})",
+    "exactAmount": "Exact",
+    "todaySales": {
+      "button": "Today's sales",
+      "buttonCount": "Today's sales · {count}",
+      "title": "Today's sales",
+      "description": "Today's cash box, credit sales and the details of every counter sale.",
+      "close": "Close today's sales",
+      "cashBoxTitle": "Cash box",
+      "cashSalesCount": "{count, plural, one {# cash sale} other {# cash sales}}",
+      "creditBoxTitle": "Credit today",
+      "creditSalesCount": "{count, plural, one {# credit sale} other {# credit sales}}",
+      "recentTitle": "Latest sales today",
+      "emptyTitle": "No sales yet today",
+      "empty": "Every cash or credit sale you record at the counter will show up here.",
+      "walkIn": "Walk-in sale",
+      "creditSingle": "Credit · due date",
+      "creditInstallments": "Credit · installments",
+      "changeGiven": "Change {amount}",
+      "repeatSale": "Load into cart",
+      "repeatedToast": "Loaded {count, plural, one {# product} other {# products}} into the cart",
+      "repeatedOutToast": "those products are out of stock"
     },
     "modalityLabel": "Cash or credit?",
     "modality": {
@@ -2045,7 +2256,21 @@
       "fromHint": "Start date in Lima time.",
       "toHint": "End date in Lima time.",
       "userHint": "Filter by who performed the action.",
-      "entityHint": "Filter by module or table."
+      "entityHint": "Filter by module or table.",
+      "action": "Action",
+      "allActions": "All actions",
+      "search": "Search",
+      "searchPlaceholder": "Search by product, customer, IP, ID or detail…",
+      "searchHint": "Search across names, amounts, IPs or IDs.",
+      "actionHint": "Filter by a specific event type.",
+      "moreFilters": "More filters",
+      "lessFilters": "Hide filters",
+      "presetToday": "Today",
+      "preset7d": "Last 7 days",
+      "preset30d": "Last 30 days",
+      "invalidDateRange": "Invalid date range: \"From\" must be earlier than or equal to \"To\".",
+      "resetDates": "Clear dates",
+      "categoryLabel": "Category"
     },
     "actions": {
       "CREATE_CASH_SALE": "Cash sale",
@@ -2075,7 +2300,30 @@
       "CANCEL_SUBSCRIPTION_RENEWAL": "Subscription renewal canceled",
       "EXPIRE_TRIAL": "Pro trial ended (moved to Casero)",
       "EXPIRE_GRACE_PERIOD": "Grace period ended (moved to Casero)",
-      "COMPLETE_CANCELED_SUBSCRIPTION": "Paid period ended (moved to Casero)"
+      "COMPLETE_CANCELED_SUBSCRIPTION": "Paid period ended (moved to Casero)",
+      "OBJECT_CHARGE": "Charge objected",
+      "CHARGE_CONFIRMED": "Charge confirmed",
+      "CHARGE_VOIDED": "Charge voided",
+      "CREATE_CUSTOMER": "Customer created",
+      "UPDATE_CUSTOMER": "Customer updated",
+      "REACTIVATE_CUSTOMER": "Customer reactivated",
+      "DEACTIVATE_CUSTOMER": "Customer deactivated",
+      "UPDATE_PRICE": "Price updated",
+      "REACTIVATE_PRODUCT": "Product reactivated",
+      "CREATE_STORE": "Store created",
+      "REACTIVATE_STORE": "Store reactivated",
+      "SUSPEND_STORE": "Store suspended",
+      "UPDATE_PAYMENT_DETAILS": "Payment details updated",
+      "UPDATE_TAX_SETTINGS": "Tax settings updated",
+      "INVITE_EMPLOYEE": "Employee invited",
+      "CANCEL_INVITE": "Invite canceled",
+      "REACTIVATE_EMPLOYEE": "Employee reactivated",
+      "DEACTIVATE_EMPLOYEE": "Employee deactivated",
+      "SET_PASSWORD": "Password set",
+      "START_SUBSCRIPTION_CHECKOUT": "Subscription checkout started",
+      "SUBSCRIPTION_PAYMENT_APPROVED": "Subscription payment approved",
+      "SUBSCRIPTION_PAYMENT_REJECTED": "Subscription payment rejected",
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Subscription payment refunded"
     },
     "entities": {
       "sales": "Sales",
@@ -2091,6 +2339,300 @@
       "stores": "Store",
       "store_subscriptions": "Subscription",
       "subscription_payments": "Subscription payments"
+    },
+    "summary": {
+      "sectionLabel": "Last 7 days summary",
+      "totalLabel": "Events (7 days)",
+      "totalHint": "View all recent activity",
+      "salesCreditLabel": "Sales & credit (7 days)",
+      "salesCreditHint": "Sales, payments, charges and customers",
+      "securityLabel": "Security & access (7 days)",
+      "securityHintOk": "No recent critical alerts",
+      "securityHintAlert": "{count, plural, =1 {1 access alert} other {# access alerts}}"
+    },
+    "categories": {
+      "all": "All",
+      "sales_credit": "Sales & credit",
+      "inventory": "Inventory",
+      "team_store": "Team & store",
+      "security": "Security",
+      "billing": "Subscription"
+    },
+    "table": {
+      "colDate": "Date & time",
+      "colEvent": "Event",
+      "colSummary": "Summary",
+      "colActor": "User",
+      "colDetail": "Detail",
+      "viewDetail": "View detail",
+      "paginationRange": "Showing {from}–{to} of {total}",
+      "prevPage": "Previous",
+      "nextPage": "Next"
+    },
+    "emptyStates": {
+      "noEventsTitle": "No activity recorded yet",
+      "noEventsBody": "When you record sales, purchases, price changes or team updates, they will appear here.",
+      "goToCounter": "Go to counter",
+      "clearFilters": "Clear filters"
+    },
+    "detail": {
+      "title": "Event detail",
+      "dateTime": "Date & time (Lima)",
+      "actor": "Performed by",
+      "entity": "Module",
+      "ip": "IP address",
+      "device": "Device",
+      "entityId": "Record ID",
+      "copyId": "Copy ID",
+      "copiedId": "ID copied",
+      "copyError": "Could not copy ID",
+      "openRecord": "Go to record",
+      "diffTitle": "Before vs After",
+      "fieldCol": "Field",
+      "noDiffData": "This event did not record additional field changes.",
+      "rawJsonSummary": "Technical data (JSON)",
+      "close": "Close"
+    },
+    "export": {
+      "successTitle": "{count, plural, =0 {CSV downloaded (no events)} =1 {CSV downloaded with 1 event} other {CSV downloaded with # events}}",
+      "truncatedTitle": "Export capped at 5,000 rows",
+      "truncatedDescription": "Narrow the date range or filters to download the rest of the history.",
+      "errorTitle": "Could not export CSV",
+      "errorDescription": "Please try again in a few seconds."
+    },
+    "fields": {
+      "saleModality": "Modality",
+      "paymentMethod": "Payment method",
+      "totalAmount": "Total amount",
+      "customerId": "Customer",
+      "itemsCount": "Items count",
+      "creditAccountId": "Credit account",
+      "chargeId": "Charge",
+      "installmentsCount": "Installments",
+      "balanceAfter": "Balance after",
+      "receiptNumber": "Receipt #",
+      "settlementCycleId": "Cycle",
+      "amountPaid": "Amount paid",
+      "principalPaid": "Principal paid",
+      "compensatoryInterestPaid": "Compensatory interest",
+      "moratoryInterestPaid": "Moratory interest",
+      "daysLate": "Days late",
+      "note": "Note",
+      "byCustomer": "Initiated by customer",
+      "status": "Status",
+      "consentStatus": "Consent status",
+      "voidId": "Void ID",
+      "voidedAmount": "Voided amount",
+      "reason": "Reason",
+      "currency": "Currency",
+      "creditLimit": "Credit limit",
+      "compensatory": "Compensatory rate",
+      "moratory": "Moratory rate",
+      "cutOffDay": "Cut-off day",
+      "paymentDueDay": "Payment due day",
+      "maxInstallmentMonths": "Max installments (months)",
+      "documentType": "Document type",
+      "documentNumber": "Document number",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "preferredLocale": "Preferred language",
+      "consentVersion": "Consent version",
+      "isActive": "Active",
+      "name": "Name",
+      "description": "Description",
+      "brand": "Brand",
+      "sku": "SKU",
+      "barcode": "Barcode",
+      "unitId": "Unit",
+      "defaultSupplierId": "Default supplier",
+      "isService": "Is service",
+      "allowsInstallments": "Allows installments",
+      "cashPrice": "Cash price",
+      "creditPrice": "Credit price",
+      "initialStock": "Initial stock",
+      "currentStock": "Current stock",
+      "wasteQuantity": "Waste quantity",
+      "taxIdNumber": "Tax ID",
+      "tradeName": "Trade name",
+      "supplierId": "Supplier",
+      "series": "Series",
+      "issueDate": "Issue date",
+      "linesCount": "Lines",
+      "attachmentsCount": "Attachments",
+      "commercialName": "Store name",
+      "taxIdType": "Tax ID type",
+      "ownerEmail": "Owner email",
+      "planTier": "Plan",
+      "by": "Source",
+      "yapeNumber": "Yape number",
+      "plinNumber": "Plin number",
+      "bankName": "Bank",
+      "bankAccountNumber": "Bank account",
+      "bankCci": "CCI",
+      "paymentQrPath": "QR image",
+      "taxRegime": "Tax regime",
+      "rusCategory": "RUS category",
+      "provider": "Auth provider",
+      "via": "Method",
+      "version": "Version",
+      "documents": "Documents",
+      "failedLoginAttempts": "Failed attempts",
+      "lockedUntil": "Locked until",
+      "billingInterval": "Interval",
+      "amount": "Amount",
+      "mpPreapprovalId": "MP subscription ID",
+      "mpPaymentId": "MP payment ID",
+      "paymentId": "Payment ID",
+      "currentPeriodEnd": "Period end",
+      "gracePeriodEndsAt": "Grace end",
+      "cancelAtPeriodEnd": "Cancel at period end",
+      "trialEndsAt": "Trial end"
+    },
+    "values": {
+      "bool": {
+        "true": "Yes",
+        "false": "No"
+      },
+      "paymentMethod": {
+        "CASH": "Cash",
+        "YAPE": "Yape",
+        "PLIN": "Plin",
+        "CARD": "Card",
+        "CREDIT": "Credit"
+      },
+      "saleModality": {
+        "CASH": "Cash",
+        "SINGLE_PAYMENT_CREDIT": "Single-payment credit",
+        "INSTALLMENTS_CREDIT": "Installments credit"
+      },
+      "documentType": {
+        "DNI": "DNI",
+        "CE": "Foreigner ID",
+        "RUC": "RUC",
+        "FACTURA": "Invoice",
+        "BOLETA": "Receipt",
+        "NOTA_VENTA": "Sales note"
+      },
+      "planTier": {
+        "CASERO": "Casero",
+        "BODEGA_PRO": "Bodega Pro",
+        "NEGOCIO_PLUS": "Negocio Plus"
+      },
+      "billingInterval": {
+        "MONTHLY": "Monthly",
+        "YEARLY": "Yearly"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "TRIALING": "Trialing",
+        "PAST_DUE": "Grace period",
+        "CANCELED": "Canceled",
+        "SUSPENDED": "Suspended",
+        "BLOCKED": "Blocked",
+        "PENDING": "Pending",
+        "CONFIRMED": "Confirmed",
+        "VOIDED": "Voided",
+        "OBJECTED": "Objected",
+        "DRAFT": "Draft"
+      },
+      "consentStatus": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "OBJECTED": "Objected",
+        "CONFIRMED": "Confirmed"
+      },
+      "taxRegime": {
+        "NUEVO_RUS": "Nuevo RUS",
+        "RER": "Special Regime (RER)",
+        "MYPE": "MYPE Tax",
+        "GENERAL": "General Regime"
+      },
+      "rusCategory": {
+        "1": "Category 1",
+        "2": "Category 2"
+      },
+      "rateType": {
+        "EFFECTIVE": "Effective",
+        "NOMINAL": "Nominal"
+      },
+      "ratePeriod": {
+        "ANNUAL": "annual",
+        "MONTHLY": "monthly",
+        "DAILY": "daily"
+      },
+      "rateEffective": "{type} {percent}% ({period})",
+      "rateNominal": "{type} {percent}% ({period}, {cap} comp.)",
+      "via": {
+        "account-setup": "Account invitation",
+        "password-reset": "Password reset"
+      },
+      "by": {
+        "PLATFORM_ADMIN": "Platform admin"
+      },
+      "documents": {
+        "terms": "Terms & conditions",
+        "privacy": "Privacy policy"
+      },
+      "locale": {
+        "es": "Spanish",
+        "en": "English",
+        "qu": "Quechua"
+      }
+    },
+    "summaries": {
+      "cashSale": "{amount} · {method} · {count, plural, =1 {1 item} other {# items}}",
+      "creditSaleSingle": "{amount} · Credit · Balance {balance}",
+      "creditSaleInstallments": "{amount} · {installments} installments · Balance {balance}",
+      "registerPayment": "Receipt {receipt} · {amount} ({method})",
+      "registerPaymentLate": "Receipt {receipt} · {amount} ({method}) · {days} days late",
+      "objectChargeCustomer": "Objected by customer · {note}",
+      "objectChargeStore": "Objected by store · {note}",
+      "chargeConfirmed": "Charge confirmed · {note}",
+      "chargeVoided": "Voided {amount} · {reason}",
+      "openCreditAccount": "Limit {limit} · Cut-off day {cutOff} · Due day {due}",
+      "updateCreditTerms": "Limit {limit} · Cut-off day {cutOff} · Due day {due}",
+      "setCreditAccountStatus": "Status: {before} → {after}",
+      "createCustomer": "{name} · {doc}",
+      "updateCustomer": "Updated fields: {fields}",
+      "reactivateCustomer": "Customer account reactivated",
+      "deactivateCustomer": "Customer account deactivated",
+      "createProduct": "{name} · Cash {cash} · Stock {stock}",
+      "updateProduct": "Updated fields: {fields}",
+      "updatePrice": "Cash {cash} · Credit {credit}",
+      "reactivateProduct": "Product reactivated in catalog",
+      "deactivateProduct": "Product deactivated from catalog",
+      "adjustStock": "Stock {before} → {after} · {reason}",
+      "recordWaste": "Waste {waste} · Stock {before} → {after} · {reason}",
+      "createSupplier": "{name} · {taxId}",
+      "registerPurchase": "{doc} · {amount} · {count, plural, =1 {1 line} other {# lines}}",
+      "generateReplenishment": "Draft created with {count, plural, =1 {1 product} other {# products}}",
+      "discardPurchaseOrder": "Draft order discarded",
+      "createStore": "{name} · Plan {plan}",
+      "reactivateStore": "Store reactivated",
+      "suspendStore": "Store suspended",
+      "updatePaymentDetails": "Updated methods: {fields}",
+      "updateTaxSettings": "{before} → {after}",
+      "inviteEmployee": "{name} ({email})",
+      "cancelInvite": "Invite canceled ({email})",
+      "reactivateEmployee": "Employee access reactivated",
+      "deactivateEmployee": "Employee access deactivated",
+      "setPassword": "Password configured",
+      "acceptTerms": "Terms and privacy accepted (v{version})",
+      "loginFailed": "Failed attempt #{attempts}",
+      "loginBlocked": "Locked until {until}",
+      "lockAccount": "Locked after {attempts} attempts until {until}",
+      "startCheckout": "Plan {plan} ({interval}) · {amount}",
+      "subscriptionPaymentApproved": "Plan {plan} · {amount} · Until {until}",
+      "subscriptionPaymentRejected": "Payment rejected ({amount}) · Grace until {until}",
+      "subscriptionPaymentRefunded": "Payment refunded ({amount}) · Moved to Casero",
+      "cancelRenewal": "Renewal canceled · Active until {until}",
+      "expireTrial": "Pro trial ended · Moved to Casero",
+      "expireGrace": "Grace period ended · Moved to Casero",
+      "completeCanceled": "Paid period ended · Moved to Casero",
+      "noAdditionalDetails": "Event recorded without extra details"
     }
   },
   "Tax": {
@@ -2113,7 +2655,9 @@
         }
       },
       "disclaimer": "Reference information only. Quina does not provide tax advice or file returns with SUNAT.",
-      "changeCategory": "Change category"
+      "changeCategory": "Change category",
+      "remaining": "Available: {amount}",
+      "exceededBy": "Exceeded by: {amount}"
     }
   },
   "Portfolio": {
@@ -2140,13 +2684,40 @@
       "sortLabel": "Sort the portfolio",
       "sort": {
         "debt": "Highest debt",
-        "score": "Lowest score"
+        "score": "Lowest score",
+        "utilization": "Highest usage"
       },
       "debt": "Debt",
       "limit": "Limit",
       "delinquent": "In arrears",
       "suggestLower": "Red at two statements in a row: consider lowering the limit",
-      "empty": "You have no customers on credit yet."
+      "empty": "You have no customers on credit yet.",
+      "searchLabel": "Search customer in portfolio",
+      "searchPlaceholder": "Search by name or ID number…",
+      "searchSubmit": "Search",
+      "filters": {
+        "all": "All",
+        "overdue": "Overdue",
+        "dueSoon": "Due soon",
+        "highUtilization": "Usage ≥ 85%",
+        "suggestLower": "Lower limit"
+      },
+      "count": "Showing {shown} of {total} customers",
+      "daysOverdue": "{days} d overdue",
+      "overdueLabel": "Overdue:",
+      "dueSoonLabel": "Due soon:",
+      "utilizationValue": "{pct}% used",
+      "nextDue": "Due: {date}",
+      "colCustomer": "Customer",
+      "colScore": "Score",
+      "colLimitAndUse": "Limit & usage",
+      "colDue": "Due date",
+      "colActions": "Actions",
+      "emptyTitle": "No credit accounts yet",
+      "emptyAction": "Go to Customers",
+      "filteredEmptyTitle": "No matching customers",
+      "filteredEmpty": "No customers match your current search or filters.",
+      "clearFilters": "Clear filters"
     },
     "score": {
       "value": "{score} · {band}",
@@ -2155,6 +2726,43 @@
         "GREEN": "Excellent",
         "YELLOW": "At risk",
         "RED": "Critical"
+      },
+      "breakdownTrigger": "View score breakdown: {score} · {band}",
+      "breakdownTriggerNoHistory": "View score breakdown: No history",
+      "breakdown": {
+        "title": "Score breakdown",
+        "onTimeCycles": "Statements paid on time",
+        "lateCycles": "Late statements",
+        "daysLate": "Total days overdue",
+        "formula": "Last 6 months: base 100, −3 pts per day late, +5 pts per on-time statement.",
+        "noHistoryNote": "No statements due or paid in the last 6 months yet.",
+        "suggestLower": "Red at two statements in a row: consider lowering the limit."
+      }
+    },
+    "actions": {
+      "collections": "Collections",
+      "exportCsv": "Export CSV",
+      "collect": "Collect",
+      "adjustLimit": "Adjust limit",
+      "viewProfile": "View profile"
+    },
+    "health": {
+      "title": "Portfolio health",
+      "subtitle": "Select a score tier or aging bucket to filter customers.",
+      "bandsTitle": "Score distribution",
+      "bands": {
+        "GREEN": "Excellent",
+        "YELLOW": "At risk",
+        "RED": "Critical",
+        "NO_HISTORY": "No history"
+      },
+      "agingTitle": "Balance aging",
+      "aging": {
+        "current": "Current",
+        "dueSoon": "Due ≤ 3 d",
+        "d1_15": "1–15 days",
+        "d16_30": "16–30 days",
+        "d31_plus": "31+ days"
       }
     }
   },
@@ -2192,6 +2800,134 @@
         "UNAVAILABLE": "The AI did not answer in time. The query was not counted; try again.",
         "NOT_IN_PLAN": "Your current plan does not include AI recommendations.",
         "RANGE_INVALID": "Check the report dates."
+      },
+      "upgradeLink": "Upgrade plan",
+      "prePrompt": "Click \"Analyze with AI\" to get practical suggestions based on this period's sales, credit and margin.",
+      "toasts": {
+        "success": "AI analysis ready."
+      }
+    },
+    "lockedTitle": "Unlock advanced reports with {plan}",
+    "previewFeatures": {
+      "charts": {
+        "title": "Daily trends and payment methods",
+        "body": "Track how your sales, gross margin and cash flow move day by day."
+      },
+      "products": {
+        "title": "Top products and categories",
+        "body": "See which items bring the highest margin and the most revenue."
+      },
+      "print": {
+        "title": "Print or PDF-ready summary",
+        "body": "Save or print your period close in a single click."
+      },
+      "ai": {
+        "title": "AI recommendations",
+        "body": "Actionable tips from your store totals, never sharing customer names."
+      }
+    },
+    "toolbar": {
+      "presetsAria": "Quick report range",
+      "presets": {
+        "today": "Today",
+        "7d": "7d",
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "custom": "Custom"
+      },
+      "changeDates": "Change dates",
+      "sheetTitle": "Choose report dates",
+      "sheetDescription": "View sales, cash flow and margins in Lima calendar days.",
+      "close": "Close",
+      "dateHint": "Lima calendar days (UTC-5).",
+      "limitHint": "Maximum range of 366 days, with \"From\" before \"To\".",
+      "rangeError": "Check the dates: \"From\" must be before \"To\" and the maximum range is 366 days.",
+      "cancel": "Cancel"
+    },
+    "hero": {
+      "totalSalesTitle": "Total sales",
+      "vsPrevious": "vs. previous period",
+      "cashShare": "Cash {pct} %",
+      "creditShare": "Credit {pct} %",
+      "grossMarginTitle": "Gross profit",
+      "costLine": "Cost: {cost}",
+      "cashFlowTitle": "Real cash flow",
+      "collectionsCount": "{count, plural, =0 {no collections} one {1 collection} other {# collections}}",
+      "inflowsLine": "Inflows: {amount}",
+      "purchasesLine": "Purchases: {amount}"
+    },
+    "empty": {
+      "title": "No sales in this range yet",
+      "body": "Once you record sales at the counter, your charts and top products will appear here.",
+      "cta": "Go to counter"
+    },
+    "charts": {
+      "performance": {
+        "title": "Period trend",
+        "salesSubtitle": "Total sales compared to gross margin",
+        "flowSubtitle": "Money that came in (cash and collections) vs. purchases",
+        "groupedWeekly": "grouped by week",
+        "groupedMonthly": "grouped by month",
+        "modeAria": "Performance chart view",
+        "modes": {
+          "sales": "Sales",
+          "flow": "Cash flow"
+        },
+        "empty": "No activity in these dates yet.",
+        "caption": "Sales, gross margin and cash flow trend for the period",
+        "series": {
+          "sales": "Sales",
+          "margin": "Gross margin",
+          "inflows": "Real inflows",
+          "purchases": "Purchases"
+        },
+        "table": {
+          "period": "Period",
+          "netFlow": "Net flow"
+        }
+      },
+      "paymentMethods": {
+        "title": "Payment methods",
+        "subtitle": "How your customers paid in this range",
+        "empty": "No sales in this period yet.",
+        "caption": "Sales by payment method in the period",
+        "methods": {
+          "CASH": "Cash",
+          "YAPE": "Yape",
+          "PLIN": "Plin",
+          "CARD": "Card",
+          "CREDIT": "Credit"
+        },
+        "table": {
+          "method": "Method",
+          "salesCount": "Sales",
+          "amount": "Amount"
+        }
+      }
+    },
+    "products": {
+      "titleProducts": "Top 10 selling products",
+      "titleCategories": "Sales by category",
+      "subtitleProducts": "Items ranked by revenue in these dates.",
+      "subtitleCategories": "Categories ranked by revenue in these dates.",
+      "viewAria": "Switch between products and categories",
+      "tabs": {
+        "products": "Products",
+        "categories": "Categories"
+      },
+      "empty": "No products were sold in this date range.",
+      "uncategorized": "Uncategorized",
+      "productsCount": "{count, plural, one {1 product} other {# products}}",
+      "unitsSold": "{qty} units",
+      "columns": {
+        "product": "Product",
+        "quantity": "Quantity",
+        "revenue": "Revenue",
+        "cost": "Cost",
+        "margin": "Margin",
+        "category": "Category",
+        "products": "Products",
+        "units": "Units"
       }
     }
   },
