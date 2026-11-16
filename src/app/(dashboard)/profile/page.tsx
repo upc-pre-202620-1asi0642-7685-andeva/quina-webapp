@@ -1,18 +1,25 @@
-import { headers } from 'next/headers';
-import { getAuth } from '@/infrastructure/auth/auth';
 import { requireUser } from '@/presentation/auth/session';
-import { ProfileView } from './profile-view';
+import { EmailChangeCard } from '@/presentation/components/profile/email-change-card';
+import { PersonalInfoCard } from '@/presentation/components/profile/personal-info-card';
+import { SignOutCard } from '@/presentation/components/profile/sign-out-card';
+import { loadProfileSummary } from '@/presentation/queries/profile';
 
-export default async function ProfilePage() {
+export default async function ProfileAccountPage() {
   const user = await requireUser('/profile');
-  // Quien entró solo con Google no tiene cuenta `credential` todavía
-  const accounts = await getAuth().api.listUserAccounts({ headers: await headers() });
-  const hasPassword = accounts.some((account) => account.providerId === 'credential');
+  const summary = await loadProfileSummary(user);
+
   return (
-    <ProfileView
-      currentEmail={user.email}
-      currentLocale={user.preferredLocale}
-      hasPassword={hasPassword}
-    />
+    <>
+      <PersonalInfoCard
+        initialName={summary.user.name}
+        initialPhone={summary.user.phone}
+        isStoreOwner={summary.user.role === 'STORE_OWNER'}
+      />
+      <EmailChangeCard
+        currentEmail={summary.user.email}
+        emailVerified={summary.user.emailVerified}
+      />
+      <SignOutCard />
+    </>
   );
 }

@@ -485,44 +485,244 @@
     }
   },
   "Profile": {
-    "title": "Perfilniy",
-    "subtitle": "Simiykita, correoykita, pakasqa simiykitapas allichay.",
+    "title": "Ñuqapa perfilniy",
+    "subtitle": "Cuentaykita, waqaichayta, akllanakunata hinaspa permisokunata kamachiy.",
     "backToDashboard": "Mostradorman kutiy",
+    "backToPortal": "Cuentayman kutiy",
+    "subtitlePortal": "Simiykita, rikchayninta, yaykuna rimayta hinaspa tiyaykunata allichay.",
+    "roles": {
+      "PLATFORM_ADMIN": "Plataforma kamachiq",
+      "STORE_OWNER": "Qhatu kapuq",
+      "STORE_EMPLOYEE": "Mostrador yanapaq",
+      "CUSTOMER": "Vecino",
+      "PENDING_OWNER": "Chayraq qillqakuchkan"
+    },
+    "identity": {
+      "verified": "Cheqaqchasqa",
+      "lastLogin": "Qhipa yaykuy: {date}",
+      "memberSince": "Quinapi {date} pacha"
+    },
+    "nav": {
+      "ariaLabel": "Perfil rakikuna",
+      "account": {
+        "label": "Cuentay",
+        "hint": "Suti, celular hinaspa correo"
+      },
+      "security": {
+        "label": "Waqaichay hinaspa tiyaykuna",
+        "hint": "Yaykuna rimay, Google hinaspa dispositivokuna"
+      },
+      "preferences": {
+        "label": "Akllanakuna",
+        "hint": "Tema, simi hinaspa Qallariy rikchay"
+      },
+      "access": {
+        "label": "Llamkay hinaspa yaykuy",
+        "hint": "Llamkayniyki hinaspa permisokuna"
+      }
+    },
+    "personal": {
+      "title": "Sapan willakuykuna",
+      "subtitle": "Sutiykiqa barra lateral nisqapi, recibokunapi hinaspa auditoríapi rikurin.",
+      "subtitleOwner": "Sutiykiqa qhatu kapuqta Quinapi hinaspa recibokunapi riqsichin.",
+      "nameLabel": "Hunt'a suti",
+      "nameHint": "Llamkay letrallawan; espacio, apóstrofo (') hinaspa guion (-) atikunmi.",
+      "nameHintOwner": "Waqaychaptiykiqa qhatu kapuqpa sutinpas musuqyachikunmi.",
+      "phoneLabel": "Celular yupay (munaspaqa)",
+      "phoneHint": "9 yupaykuna 9wan qallariq, 987 654 321 hina. Ch'usaqta saqiy qichunapaq.",
+      "phonePlaceholder": "987 654 321",
+      "phoneInvalid": "9wan qallariq 9 yupayniyuq perú celularta qillqay (utaq ch'usaqta saqiy).",
+      "save": "T'ikraykunata waqaychay",
+      "saving": "Waqaychachkan...",
+      "undo": "Kutichiy",
+      "saved": "Sapan willakuykunaqa musuqyachisqañam."
+    },
+    "emailTitle": "Correo electrónico",
+    "currentEmail": "Kunan correo: {email}",
+    "newEmailLabel": "Musuq correo electrónico",
+    "newEmailHint": "Manaraq t'ikrachkaspa 6 yupayniyuq códigota musuq correoykiman apachisaqku.",
+    "sendChangeCode": "Musuq correoman códigota apachiy",
+    "emailCodeSent": "6 yupayniyuq códigota {email}man apachirqayku.",
+    "otpLabel": "{email}man apachisqa código",
+    "otpHint": "Musuq correoykiman chayaq 6 yupaykunata qillqay.",
+    "confirmEmailChange": "Musuq correota cheqaqchay",
+    "resendCode": "Códigota wakmanta mañay",
+    "resendIn": "Wakmanta {seconds} s ukhupi",
+    "cancelEmailChange": "Kutiy hinaspa correota allichay",
+    "emailChanged": "Correoykiqa musuqyachisqañam.",
+    "signOutSection": {
+      "title": "Kay dispositivopi tiyay",
+      "description": "Kaypi sesión wichqay hinaspa mana señalniyuq waqaychasqa p'anqakunata pichay."
+    },
+    "signOut": "Lloqsiy",
     "localeTitle": "Quinapa simin",
     "localeLabel": "Pantallakunapa hinaspa correokunapa simin",
-    "localeHint": "Pantallakunapa hinaspa chaskisqayki correokunapa siminta tikran.",
+    "localeHint": "Quina pantallakunapa hinaspa chaskisqayki correokunapa siminta t'ikran.",
     "locales": {
       "es": "Castellano",
       "en": "English",
       "qu": "Runasimi (borrador)"
     },
-    "saveLocale": "Simita waqaychay",
-    "localeSaved": "Simi musuqchasqa.",
-    "emailTitle": "Correo electrónicota tikray",
-    "currentEmail": "Kunan correo: {email}",
-    "newEmailLabel": "Musuq correo electrónico",
-    "newEmailHint": "Manaraq tikrachkaspa musuq correoman 6 yupayta apachisqaykiku.",
-    "sendChangeCode": "Musuq correoman yupayta apachiy",
-    "otpLabel": "{email} correoman apachisqa yupay",
-    "otpHint": "Musuq correoykiman chayaq 6 yupayta qillqay.",
-    "confirmEmailChange": "Musuq correota takyachiy",
-    "emailChanged": "Correoykiqa musuqchasqañam.",
-    "password": {
-      "title": "Pakasqa simi",
-      "lead": "Googlewanmi yaykurqanki. Pakasqa simita ruray correoykiwanpas yaykunaykipaq.",
-      "newLabel": "Musuq pakasqa simi",
-      "newHint": "8 sananchamanta aswan, huk hatun qillqayuq, huk yupayuq, huk unanchayuq.",
-      "confirmLabel": "Pakasqa simita kutichiy",
-      "confirmHint": "Hukmanta qillqay ama pantanaykipaq.",
-      "submit": "Pakasqa simita ruray",
-      "created": "Listo: kunanqa correoykiwan kay pakasqa simiwan yaykuyta atinki.",
-      "hasPassword": "Correoykiwan pakasqa simiykiwanmi yaykunki.",
-      "change": "Pakasqa simita tikray",
-      "leadPortal": "Munaspaqa, contraseñata ruway correoykiwanpas yaykunaykipaq."
+    "localeDescriptions": {
+      "es": "Mostradorpa hinaspa willakuykunapa ñawpaq simin.",
+      "en": "Llapan pantalla hinaspa correokuna inglés simipi.",
+      "qu": "Runasimipi llamk'achisqa borrador."
     },
-    "signOut": "Lluqsiy",
-    "backToPortal": "Cuentayman kutiy",
-    "subtitlePortal": "Simiykita, contraseñaykitapas allichay."
+    "saveLocale": "Simita waqaychay",
+    "localeSaved": "Simiqa musuqyachisqañam.",
+    "theme": {
+      "title": "Rikchaynin",
+      "subtitle": "Akllay imaynatachus Quina kay dispositivopi rikukunanta.",
+      "saved": "Rikchayninqa musuqyachisqañam.",
+      "options": {
+        "light": {
+          "label": "K'anchaq",
+          "hint": "P'unchaw k'anchaypaq allin rikukuq."
+        },
+        "dark": {
+          "label": "Tuta",
+          "hint": "Tuta llamk'aypaq ñawita samachin."
+        },
+        "system": {
+          "label": "Sistema hina",
+          "hint": "Dispositivoykipa rikchayninta qatin."
+        }
+      }
+    },
+    "workspace": {
+      "title": "Qallariy tablero rikchay",
+      "description": "Qallariy bloqekunata t'ikrarqanki chayqa, ñawpaq ordenninman kutichiyta atinki.",
+      "statusCustom": "T'ikrasqa",
+      "statusDefault": "Ñawpaq kaq",
+      "resetButton": "Qallariy rikchayta kutichiy",
+      "resetSuccess": "Qallariy tableroqa ñawpaq rikchayninman kutirqanñam.",
+      "resetError": "Mana kutichiyta atirqankuchu. Wakmanta ruray.",
+      "confirmTitle": "¿Qallariy rikchayta kutichiychu?",
+      "confirmBody": "Tarjetakunaqa llamk'ayniykipaq ñawpaq ordenninman kutinqaku.",
+      "confirmHint": "Qallariy rikchayllatam kutichin; rantiykuna hinaspa clientekunaqa kikillanmi qhipan.",
+      "confirmAction": "Arí, kutichiy",
+      "cancel": "Amaraq"
+    },
+    "password": {
+      "title": "Yaykuna rimay",
+      "statusConfigured": "Churasqa",
+      "statusNotSet": "Mana yaykuna rimayniyuq",
+      "lead": "Googlewan yaykurqanki. Huk yaykuna rimayta ruray correoykiwanpas yaykunaykipaq.",
+      "leadPortal": "Munaspaqa huk yaykuna rimayta ruray correoykiwanpas yaykunaykipaq.",
+      "hasPassword": "Yaykuna rimayniykita musuqyachiy utaq huk dispositivokunapi sesionta wichqay.",
+      "currentLabel": "Kunan yaykuna rimay",
+      "currentHint": "Kunan Quinaman yaykunapaq churakusqayki.",
+      "wrongCurrentPassword": "Kunan yaykuna rimayqa pantasqam. Qhawaspa wakmanta qillqay.",
+      "newLabel": "Musuq yaykuna rimay",
+      "newHint": "8 letrakunamanta aswan, huk hatun letra, huk yupay hinaspa huk símbolo.",
+      "confirmLabel": "Yaykuna rimayta wakmanta qillqay",
+      "confirmHint": "Pantay mana kananpaq wakmanta qillqay.",
+      "revokeOthersLabel": "Huk dispositivokunapi sesionta wichqay",
+      "revokeOthersHint": "Qhatupi huk celularta utaq tabletta rakinakunkichis chayqa allinmi.",
+      "submit": "Yaykuna rimayta ruray",
+      "changeSubmit": "Yaykuna rimayta musuqyachiy",
+      "forgotCurrent": "¿Kunan yaykuna rimayniykita qunqarqankichu?",
+      "created": "Allinmi: kunanqa correoykiwan hinaspa kay yaykuna rimaywan yaykuyta atinkiñam.",
+      "updated": "Yaykuna rimayniykiqa musuqyachisqañam.",
+      "change": "Yaykuna rimayta t'ikray"
+    },
+    "accounts": {
+      "title": "T'inkisqa yaykuna ñankuna",
+      "subtitle": "Cuentaykiman imayna yaykunaykita kamachiy.",
+      "credentialLabel": "Correo hinaspa yaykuna rimay",
+      "credentialActive": "Correoykiwan yaykuna rimayniykiwan yaykuyta atinki.",
+      "credentialInactive": "Manaraqmi yaykuna rimayta churankichu; wichaypi rurayta atinki.",
+      "googleLabel": "Google",
+      "googleActive": "Google cuentaykiqa huk tapuyllapi yaykunapaq t'inkisqam.",
+      "googleOnlyHint": "Google t'inkiyta qichunapaq ñawpaqta wichaypi yaykuna rimayta ruray.",
+      "googleAvailable": "Kay dispositivopi utqaylla yaykunapaq Googleta t'inkiy.",
+      "googleDisabled": "Kaypiqa Googlewan yaykuyqa mana llamk'anchu.",
+      "connected": "T'inkisqa",
+      "notConfigured": "Mana t'inkisqa",
+      "linkGoogle": "Googleta t'inkiy",
+      "unlinkGoogle": "T'inkiyta qichuy",
+      "linkError": "Mana Googlewan t'inkiyta qallariyta atirqankuchu.",
+      "unlinkError": "Mana Google cuentata qichuyta atirqankuchu.",
+      "freshSessionRequired": "Waqaichanapaq, sesionta wichqaspa wakmanta yaykuy Google qichunapaq.",
+      "unlinked": "Google cuentaykiqa qichusqañam.",
+      "unlinkConfirmTitle": "¿Google cuentata qichuyman?",
+      "unlinkConfirmBody": "Correoykiwan yaykuna rimayniykiwan hinallam yaykunki.",
+      "unlinkConfirmHint": "Munaspaykiqa kay pantallamanta wakmanta t'inkiyta atinki.",
+      "unlinkConfirmAction": "Arí, qichuy",
+      "cancel": "Amaraq"
+    },
+    "sessions": {
+      "title": "Kichasqa tiyaykuna hinaspa dispositivokuna",
+      "subtitle": "Maypi cuentayki kichasqa kasqanta qhaway hinaspa mana llamk'achisqayki ekipokunapi wichqay.",
+      "empty": "Kunanqa manam kichasqa tiyaykuna kanchu.",
+      "currentBadge": "Kunan tiyay",
+      "deviceWithOs": "{browser} · {os}",
+      "unknownDevice": "Web navegador",
+      "lastActive": "Qhipa llamk'ay: {date}",
+      "revokeOne": "Wichqay",
+      "revokeOthersButton": "Huk tiyaykunata wichqay",
+      "revokedOne": "Dispositivopa tiyayninqa wichqasqañam.",
+      "revokedOthers": "Llapan huk tiyaykunaqa wichqasqañam.",
+      "revokeError": "Mana tiyayta wichqayta atirqankuchu. Wakmanta ruray.",
+      "confirmOthersTitle": "¿{count} huk dispositivokunapi tiyayta wichqaychu?",
+      "confirmOthersBody": "Kay dispositivopi kunan tiyayniykiqa kichasqallam qhipanqa.",
+      "confirmOthersHint": "Huk ekipokunapi kichasqa kaqqa wakmanta yaykunan kanqa.",
+      "confirmOthersAction": "Hukkunata wichqay",
+      "cancel": "Amaraq"
+    },
+    "offline": {
+      "title": "Mana señalniyuq waqaychasqa kaypi",
+      "description": "Rakinakusqa celularta utaq PCta llamk'achkanki chayqa waqaychasqa p'anqakunata pichay.",
+      "emptyDescription": "Kay navegadorpiqa manam mana señalniyuq p'anqakuna waqaychasqa kanchu.",
+      "clearButton": "Mana señalniyuq cacheta pichay",
+      "cleared": "Mana señalniyuq waqaychasqa p'anqakunaqa pichasqañam."
+    },
+    "access": {
+      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
+      "taxRegimeLabel": "Tributario régimen",
+      "rusCategory": "Categoría {category}",
+      "teamSeatsLabel": "Equipo cupo",
+      "ownerLinksAria": "Qhatu kamachiy ñankuna",
+      "ownerScopeTitle": "Qhatuykipa permisokunan",
+      "ownerLinks": {
+        "settings": {
+          "label": "Qhatu allichay",
+          "meta": "Yape, Plin, banco hinaspa tributos"
+        },
+        "subscription": {
+          "label": "Suscripción hinaspa plan",
+          "meta": "Plan hinaspa killa llamk'ay"
+        },
+        "team": {
+          "label": "Mostrador equipo",
+          "meta": "Waqyakuykuna hinaspa yanapaqkuna"
+        },
+        "audit": {
+          "label": "Auditoría",
+          "meta": "Rurasqakuna qillqa"
+        }
+      },
+      "employeeTitle": "{store} qhatupi yanapaq",
+      "employeeSubtitle": "Yaykuyniykiqa sapa p'unchaw mostradorpi llamk'anallapaqmi. Preciokuna, fiado kamachiykuna hinaspa suscripciónqa qhatu kapuqllapaqmi.",
+      "employeeAllowedHeading": "Imakunata rurayta atinki",
+      "employeeRestrictedHeading": "Qhatu kapuqllapaq",
+      "platformTitle": "Plataforma Kamachiq",
+      "platformSubtitle": "Qhatukunapa alta/baja, BCRP topes hinaspa Nuevo RUS topes nisqakunata kamachinki.",
+      "platformLinksAria": "Plataforma ñankuna",
+      "platformLinks": {
+        "stores": "Qhatukuna",
+        "rateCaps": "BCRP Topes",
+        "rusCaps": "RUS Topes"
+      }
+    },
+    "portalTabs": {
+      "account": "Cuenta hinaspa simi",
+      "security": "Waqaichay hinaspa tiyaykuna"
+    },
+    "portalStores": {
+      "title": "Fiadoyuq qhatukuna",
+      "subtitle": "Correoykiqa kay qhatukunawan qhawanallapaq t'inkisunki."
+    }
   },
   "AuthAside": {
     "register": {
@@ -659,7 +859,10 @@
       "pay": "Cobray",
       "terms": "Condicionkuna",
       "cycle": "Ciclo",
-      "billing": "Pago"
+      "billing": "Pago",
+      "security": "Waqaichay hinaspa tiyaykuna",
+      "preferences": "Akllanakuna",
+      "access": "Llamkay hinaspa yaykuy"
     }
   },
   "Customers": {
@@ -2324,7 +2527,8 @@
       "START_SUBSCRIPTION_CHECKOUT": "Suscripción qallariy",
       "SUBSCRIPTION_PAYMENT_APPROVED": "Suscripción qullqi chaskisqa",
       "SUBSCRIPTION_PAYMENT_REJECTED": "Suscripción qullqi mana chaskisqa",
-      "SUBSCRIPTION_PAYMENT_REFUNDED": "Suscripción qullqi kutichisqa"
+      "SUBSCRIPTION_PAYMENT_REFUNDED": "Suscripción qullqi kutichisqa",
+      "UPDATE_PROFILE": "Perfil musuqyachisqa"
     },
     "entities": {
       "sales": "Qhatuykuna",

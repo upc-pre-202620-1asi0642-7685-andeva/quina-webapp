@@ -1,116 +1,150 @@
-import { randomUUID } from 'node:crypto';
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
-import { readLatestMail } from './support/outbox';
+import { expect, test } from '@playwright/test';
+import {
+  acceptInvite,
+  expectAccessible,
+  isolateRateLimitIp,
+  registerOwnerWithStore,
+  signIn,
+  STRONG_PASSWORD,
+  uniqueEmail,
+} from './support/flows';
 
-const STRONG_PASSWORD = 'Bodega#2026x';
-
-function uniqueEmail(prefix: string): string {
-  return `${prefix}-${randomUUID()}@example.com`;
-}
-
-function uniqueRuc(): string {
-  const nineDigits = String(Math.floor(Math.random() * 900_000_000) + 100_000_000);
-  return `20${nineDigits}`;
-}
-
-function randomIp(): string {
-  const b = () => Math.floor(Math.random() * 250) + 1;
-  return `198.51.${b()}.${b()}`;
-}
-
-async function isolateRateLimitIp(page: Page) {
-  await page.route('**/api/auth/**', async (route) => {
-    const headers = { ...route.request().headers(), 'x-forwarded-for': randomIp() };
-    await route.continue({ headers });
-  });
-}
-
-async function registerOwnerWithStore(page: Page) {
-  const email = uniqueEmail('owner');
-  const ruc = uniqueRuc();
-  const storeName = `Bodega ${ruc.slice(-4)}`;
-
-  await page.goto('./register');
-  await page.getByLabel('Tu nombre completo').fill('Carmen Rojas');
-  await page.getByLabel('Tu correo electrónico').fill(email);
-  await page.getByLabel('Crea una contraseña segura').fill(STRONG_PASSWORD);
-  await page.getByRole('checkbox', { name: /Acepto los Términos/ }).check();
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
-  await expect(page).toHaveURL(/\/app\/register\/verify/);
-
-  const { otp } = await readLatestMail(email, 'verification-otp');
-  await page.getByLabel('Dígito 1 de 6').fill(otp!);
-  await page.getByRole('button', { name: 'Confirmar código' }).click();
-  await expect(page).toHaveURL(/\/app\/register\/store/);
-
-  await page.getByLabel('Nombre comercial').fill(storeName);
-  await page.getByLabel('RUC o DNI del negocio').fill(ruc);
-  await page.getByRole('button', { name: 'Crear mi tienda' }).click();
-  await expect(page).toHaveURL(/\/app\/?$/);
-
-  return { email, storeName };
-}
-
-test.describe('perfil, selector de idioma y cierre de sesión (US02, US27)', () => {
+test.describe('módulo de perfil, subpantallas, RBAC y accesibilidad (US02, US05, US27)', () => {
   test.beforeEach(async ({ page }) => {
     await isolateRateLimitIp(page);
   });
 
-  test('cambia el idioma a inglés actualizando la interfaz y la cookie, y tras cerrar sesión el botón atrás no muestra el panel', async ({
+  test('edita datos personales con deshacer, cambia preferencias de tema e idioma, cambia contraseña y cierra sesión', async ({
     page,
   }) => {
-    const { storeName } = await registerOwnerWithStore(page);
+    test.setTimeout(150_000);
+    const { email, storeName } = await registerOwnerWithStore(page);
 
     await page.goto('./profile');
     await expect(page).toHaveURL(/\/app\/profile/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Carmen Rojas' })).toBeVisible();
 
-    // Cambiar idioma a inglés (en)
-    await page.getByLabel('Idioma de la interfaz y correos').selectOption('en');
-    await page.getByRole('button', { name: 'Guardar idioma' }).click();
+    // Deshacer cambios y guardar datos personales
+    const nameInput = page.getByLabel('Nombre completo');
+    const phoneInput = page.getByLabel('Celular de contacto (opcional)');
+    await nameInput.fill('Carmen Elena');
+    await phoneInput.fill('987654321');
+    await page.getByRole('button', { name: 'Deshacer cambios' }).click();
+    await expect(nameInput).toHaveValue('Carmen Rojas');
+    await expect(phoneInput).toHaveValue('');
 
+    await nameInput.fill('Carmen Elena');
+    await phoneInput.fill('987 654 321');
+    await page.getByRole('button', { name: 'Guardar cambios' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Carmen Elena' })).toBeVisible();
+
+    // Subpantalla Preferencias: tema + idioma
+    await page.goto('./profile/preferences');
+    await expect(page).toHaveURL(/\/app\/profile\/preferences/);
+    await page.getByRole('radio', { name: /Oscuro/ }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.getByRole('radio', { name: /Claro/ }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await page.getByRole('radio', { name: /English/ }).click();
+    await page
+      .getByRole('button', { name: 'Save language' })
+      .or(page.getByRole('button', { name: 'Guardar idioma' }))
+      .click();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByRole('heading', { level: 1, name: 'My profile' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Quina language' })).toBeVisible();
 
     const cookies = await page.context().cookies();
     expect(cookies.find((c) => c.name === 'quina-lang')?.value).toBe('en');
 
-    // Cerrar sesión y verificar que volver atrás no muestra el panel
+    // Subpantalla Seguridad y sesiones: cambio de contraseña inline + sesión actual
+    await page.goto('./profile/security');
+    await expect(page.getByRole('heading', { name: 'Password' })).toBeVisible();
+    await expect(page.getByText('Current session')).toBeVisible();
+
+    const nextPassword = 'Bodega#2027y';
+    await page.getByLabel('Current password').fill(STRONG_PASSWORD);
+    await page.getByLabel('New password').fill(nextPassword);
+    await page.getByLabel('Repeat password').fill(nextPassword);
+    await page.getByRole('button', { name: 'Update password' }).click();
+    await expect(page.getByText('Your password was updated.')).toBeVisible();
+
+    // Volver a /profile y cerrar sesión (el botón atrás no muestra el panel)
+    await page.goto('./profile');
     await page.getByRole('button', { name: 'Sign out' }).click();
     await expect(page).toHaveURL(/\/app\/login/);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/app\/login/);
     await expect(page.getByRole('heading', { name: storeName })).toHaveCount(0);
+
+    // Verificar que la nueva contraseña funciona
+    await signIn(page, email, nextPassword);
+    await expect(page).toHaveURL(/\/app\/?$/);
   });
 
-  test('una cuenta con correo y contraseña ve que ya tiene contraseña', async ({ page }) => {
-    await registerOwnerWithStore(page);
-    await page.goto('./profile');
-    await expect(page.getByRole('heading', { name: 'Contraseña' })).toBeVisible();
-    await expect(page.getByText('Ya ingresas con tu correo y contraseña.')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Cambiar contraseña' })).toHaveAttribute(
-      'href',
-      '/app/auth/forgot-password',
-    );
-    await expect(page.getByRole('button', { name: 'Crear contraseña' })).toHaveCount(0);
+  test('RBAC en /profile/access: el dueño ve gestión de tienda y el empleado solo permisos de mostrador', async ({
+    page,
+  }) => {
+    test.setTimeout(150_000);
+    const { storeName } = await registerOwnerWithStore(page);
+
+    // Dueño ve tienda, plan y enlaces administrativos
+    await page.goto('./profile/access');
+    await expect(page.getByRole('heading', { name: storeName })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Ajustes de la tienda/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Suscripción y plan/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Equipo de mostrador/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Auditoría/ })).toBeVisible();
+
+    // Invitar empleado
+    const employee = uniqueEmail('emp-prof');
+    await page.goto('./team');
+    await page.getByRole('button', { name: 'Invitar empleado' }).first().click();
+    await page.getByLabel('Nombre', { exact: true }).fill('Luis Vega');
+    await page.getByLabel('Correo', { exact: true }).fill(employee);
+    await page.getByRole('button', { name: 'Enviar invitación' }).click();
+    await expect(page.getByText(`Invitación enviada a ${employee}.`)).toBeVisible();
+
+    await page.context().clearCookies();
+    await acceptInvite(page, employee);
+    await signIn(page, employee);
+    await expect(page).toHaveURL(/\/app\/?$/);
+
+    // Empleado en /profile/access solo ve su rol y matriz de mostrador
+    await page.goto('./profile/access');
+    await expect(page.getByRole('heading', { name: `Empleado en ${storeName}` })).toBeVisible();
+    await expect(page.getByText('Lo que puedes hacer')).toBeVisible();
+    await expect(page.getByText('Reservado para el dueño')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Ajustes de la tienda/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Suscripción y plan/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Equipo de mostrador/ })).toHaveCount(0);
   });
 
-  for (const theme of ['light', 'dark'] as const) {
-    test(`accesibilidad WCAG 2.1 AA en panel y perfil (${theme})`, async ({ page }) => {
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+  for (const viewport of [
+    { width: 390, height: 844, label: 'mobile' },
+    { width: 1440, height: 900, label: 'desktop' },
+  ]) {
+    test(`accesibilidad WCAG 2.1 AA y sin desbordamiento horizontal en ${viewport.label}`, async ({
+      page,
+    }) => {
+      test.setTimeout(150_000);
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await registerOwnerWithStore(page);
 
-      const dashResults = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(dashResults.violations).toEqual([]);
-
-      await page.goto('./profile');
-      const profileResults = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-      expect(profileResults.violations).toEqual([]);
+      for (const route of [
+        './profile',
+        './profile/security',
+        './profile/preferences',
+        './profile/access',
+      ]) {
+        await page.goto(route);
+        const noOverflow = await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        );
+        expect(noOverflow, `overflow en ${route} (${viewport.label})`).toBe(true);
+        await expectAccessible(page);
+      }
     });
   }
 });

@@ -83,5 +83,8 @@ describe('nextRouteFor (guardia de rutas)', () => {
     expect(nextRouteFor(admin, '/platform')).toBeNull();
     expect(nextRouteFor(admin, '/platform/stores/new')).toBeNull();
     expect(nextRouteFor(admin, '/profile')).toBeNull();
+    expect(nextRouteFor(admin, '/profile/security')).toBeNull();
+    expect(nextRouteFor(admin, '/profile/preferences')).toBeNull();
+    expect(nextRouteFor(admin, '/profile/access')).toBeNull();
   });
 });

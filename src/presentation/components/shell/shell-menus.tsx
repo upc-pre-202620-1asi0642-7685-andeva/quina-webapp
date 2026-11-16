@@ -27,6 +27,13 @@ import {
 import { authClient } from '@/infrastructure/auth/auth-client';
 import { clearOfflinePages } from '@/presentation/components/pwa/pwa';
 import {
+  applyTheme,
+  readThemeChoice,
+  subscribeTheme,
+  THEME_CHOICES,
+  type ThemeChoice,
+} from '@/presentation/lib/theme';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -111,34 +118,6 @@ export function CreateMenu({
 
 /* ---------------------------------- Tema ---------------------------------- */
 
-type ThemeChoice = 'light' | 'dark' | 'system';
-
-function readThemeChoice(): ThemeChoice {
-  try {
-    const stored = localStorage.getItem('theme');
-    return stored === 'light' || stored === 'dark' ? stored : 'system';
-  } catch {
-    return 'system';
-  }
-}
-
-/** Mismo contrato que el script del <head>: `localStorage.theme` y `data-theme` en <html>. */
-function applyTheme(choice: ThemeChoice) {
-  try {
-    if (choice === 'system') localStorage.removeItem('theme');
-    else localStorage.setItem('theme', choice);
-  } catch {
-    // Sin almacenamiento (modo privado): el cambio vale solo para esta visita
-  }
-  const resolved =
-    choice === 'system'
-      ? matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-      : choice;
-  document.documentElement.setAttribute('data-theme', resolved);
-}
-
 export function Avatar({ name, className }: { name: string; className?: string }) {
   const initials = name
     .trim()
@@ -175,7 +154,11 @@ export function ProfileMenu({
   compact?: boolean;
 }) {
   const t = useTranslations('Shell.account');
-  const [theme, setTheme] = useState<ThemeChoice>('system');
+  const theme = useSyncExternalStore(
+    subscribeTheme,
+    readThemeChoice,
+    () => 'system' as ThemeChoice,
+  );
   const [signingOut, setSigningOut] = useState(false);
 
   async function signOut() {
@@ -191,7 +174,7 @@ export function ProfileMenu({
   }
 
   return (
-    <DropdownMenu onOpenChange={(open) => (open ? setTheme(readThemeChoice()) : null)}>
+    <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
           'flex min-w-0 items-center gap-3 rounded-card text-left text-sm hover:bg-surface-hover',
@@ -255,12 +238,10 @@ export function ProfileMenu({
             <DropdownMenuRadioGroup
               value={theme}
               onValueChange={(value) => {
-                const choice = value as ThemeChoice;
-                setTheme(choice);
-                applyTheme(choice);
+                applyTheme(value as ThemeChoice);
               }}
             >
-              {(['light', 'dark', 'system'] as const).map((choice) => (
+              {THEME_CHOICES.map((choice) => (
                 <DropdownMenuRadioItem
                   key={choice}
                   value={choice}
@@ -273,7 +254,7 @@ export function ProfileMenu({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuItem asChild className={itemClass}>
-          <Link href="/profile#locale">
+          <Link href="/profile/preferences">
             <LanguagesIcon aria-hidden="true" />
             {t('language')}
           </Link>
