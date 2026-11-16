@@ -12,7 +12,9 @@ import type {
   PurchaseRepository,
   RegisterPurchaseData,
   RegisterPurchaseResult,
+  SetSupplierActiveData,
   SupplierOption,
+  UpdateSupplierData,
 } from '@/core/domain/ports/purchase-repository';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { uniqueViolation } from '../errors';
@@ -134,6 +136,91 @@ export class DrizzlePurchaseRepository implements PurchaseRepository {
       if (uniqueViolation(error) === SUPPLIER_TAX_CONSTRAINT) return 'TAX_ID_TAKEN';
       throw error;
     }
+  }
+
+  async updateSupplier(data: UpdateSupplierData): Promise<'OK' | 'NOT_FOUND' | 'TAX_ID_TAKEN'> {
+    try {
+      return await withTenant(data.storeId, async (tx) => {
+        const [current] = await tx
+          .select({
+            id: suppliers.id,
+            taxIdNumber: suppliers.taxIdNumber,
+            tradeName: suppliers.tradeName,
+            contactName: suppliers.contactName,
+            phone: suppliers.phone,
+            email: suppliers.email,
+          })
+          .from(suppliers)
+          .where(and(eq(suppliers.id, data.supplierId), eq(suppliers.storeId, data.storeId)))
+          .for('update');
+        if (!current) return 'NOT_FOUND' as const;
+
+        await tx
+          .update(suppliers)
+          .set({
+            taxIdNumber: data.details.taxIdNumber,
+            tradeName: data.details.tradeName,
+            contactName: data.details.contactName,
+            phone: data.details.phone,
+            email: data.details.email,
+          })
+          .where(eq(suppliers.id, current.id));
+
+        await tx.insert(auditLogs).values({
+          storeId: data.storeId,
+          userId: data.actorId,
+          action: 'UPDATE_SUPPLIER',
+          entityName: 'suppliers',
+          entityId: current.id,
+          oldData: {
+            taxIdNumber: current.taxIdNumber,
+            tradeName: current.tradeName,
+            contactName: current.contactName,
+            phone: current.phone,
+            email: current.email,
+          },
+          newData: data.details,
+        });
+        return 'OK' as const;
+      });
+    } catch (error) {
+      if (uniqueViolation(error) === SUPPLIER_TAX_CONSTRAINT) return 'TAX_ID_TAKEN';
+      throw error;
+    }
+  }
+
+  async setSupplierActive(data: SetSupplierActiveData): Promise<'OK' | 'NOT_FOUND'> {
+    return withTenant(data.storeId, async (tx) => {
+      const [current] = await tx
+        .select({
+          id: suppliers.id,
+          tradeName: suppliers.tradeName,
+          taxIdNumber: suppliers.taxIdNumber,
+          isActive: suppliers.isActive,
+        })
+        .from(suppliers)
+        .where(and(eq(suppliers.id, data.supplierId), eq(suppliers.storeId, data.storeId)))
+        .for('update');
+      if (!current) return 'NOT_FOUND' as const;
+
+      if (current.isActive !== data.active) {
+        await tx
+          .update(suppliers)
+          .set({ isActive: data.active })
+          .where(eq(suppliers.id, current.id));
+
+        await tx.insert(auditLogs).values({
+          storeId: data.storeId,
+          userId: data.actorId,
+          action: data.active ? 'REACTIVATE_SUPPLIER' : 'DEACTIVATE_SUPPLIER',
+          entityName: 'suppliers',
+          entityId: current.id,
+          oldData: { isActive: current.isActive, tradeName: current.tradeName },
+          newData: { isActive: data.active, tradeName: current.tradeName },
+        });
+      }
+      return 'OK' as const;
+    });
   }
 
   async registerPurchase(data: RegisterPurchaseData): Promise<RegisterPurchaseResult> {

@@ -42,6 +42,7 @@ export function receiptsGuard(now: Date): AddReceiptsGuard {
 }
 
 export type CreateSupplierError = SupplierError | 'TAX_ID_TAKEN';
+export type UpdateSupplierError = SupplierError | 'TAX_ID_TAKEN' | 'NOT_FOUND';
 
 export class CreateSupplierUseCase {
   constructor(private readonly purchases: PurchaseRepository) {}
@@ -62,6 +63,44 @@ export class CreateSupplierUseCase {
     });
     if (created === 'TAX_ID_TAKEN') return err('TAX_ID_TAKEN');
     return ok(created.supplierId);
+  }
+}
+
+export class UpdateSupplierUseCase {
+  constructor(private readonly purchases: PurchaseRepository) {}
+
+  async execute(command: {
+    storeId: string;
+    actorId: string;
+    supplierId: string;
+    input: SupplierInput;
+    now: Date;
+  }): Promise<Result<void, UpdateSupplierError>> {
+    const details = parseSupplier(command.input);
+    if (!details.ok) return details;
+    const result = await this.purchases.updateSupplier({
+      storeId: command.storeId,
+      actorId: command.actorId,
+      supplierId: command.supplierId,
+      details: details.value,
+      now: command.now,
+    });
+    return result === 'OK' ? ok(undefined) : err(result);
+  }
+}
+
+export class SetSupplierActiveUseCase {
+  constructor(private readonly purchases: PurchaseRepository) {}
+
+  async execute(command: {
+    storeId: string;
+    actorId: string;
+    supplierId: string;
+    active: boolean;
+    now: Date;
+  }): Promise<Result<void, 'NOT_FOUND'>> {
+    const result = await this.purchases.setSupplierActive(command);
+    return result === 'OK' ? ok(undefined) : err(result);
   }
 }
 

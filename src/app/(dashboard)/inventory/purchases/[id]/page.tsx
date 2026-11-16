@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { getPurchaseDetail } from '@/infrastructure/db/queries/purchases';
 import { getPrivateFileStorage } from '@/infrastructure/storage/image-storage-factory';
 import { requireStoreUser } from '@/presentation/auth/guards';
-import { Money } from '@/presentation/components/money';
 import { FlashToast } from '@/presentation/components/feedback/flash-toast';
+import { Money } from '@/presentation/components/money';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatQuantity } from '@/presentation/lib/format-quantity';
 
@@ -48,7 +48,7 @@ export default async function PurchaseDetailPage({
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <Link
         href="/inventory/purchases"
-        className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />
         {t('backToPurchases')}
@@ -59,9 +59,14 @@ export default async function PurchaseDetailPage({
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight text-ink">
-            {purchase.supplierName}
+            <Link
+              href={`/inventory/purchases?supplierId=${purchase.supplierId}`}
+              className="underline-offset-4 hover:underline"
+            >
+              {purchase.supplierName}
+            </Link>
           </h1>
-          <p className="text-sm text-ink-soft">
+          <p className="text-sm text-ink-soft tabular-nums">
             {tDocs(purchase.documentType)}
             {docNumberLabel ? ` ${docNumberLabel}` : ''} · {purchase.issueDate}
           </p>
@@ -78,28 +83,58 @@ export default async function PurchaseDetailPage({
 
       <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-ink">{t('itemsTitle')}</h2>
-        <div className="overflow-x-auto">
+
+        {/* Celular: tarjetas por ítem (DESIGN.md §5) */}
+        <ul className="flex flex-col gap-2 lg:hidden">
+          {purchase.lines.map((item) => (
+            <li
+              key={item.id}
+              className="flex flex-col gap-1.5 rounded-field border border-line bg-paper p-3"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <Link
+                  href={`/inventory/${item.productId}`}
+                  className="font-medium text-ink underline-offset-4 hover:underline"
+                >
+                  {item.productName}
+                </Link>
+                <Money amount={item.subtotal} currency="PEN" className="font-semibold text-ink" />
+              </div>
+              <div className="flex items-center justify-between text-xs text-ink-soft tabular-nums">
+                <span>
+                  {formatQuantity(item.quantity)} {item.unitCode}
+                </span>
+                <span>
+                  {t('colUnitCost')}: S/ {item.unitCost}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Escritorio: tabla */}
+        <div className="hidden overflow-hidden rounded-field border border-line lg:block">
           <table className="w-full text-sm">
-            <thead className="border-b border-line text-left text-ink-soft">
+            <thead className="bg-paper-deep text-left text-ink-soft">
               <tr>
-                <th scope="col" className="pb-2 font-medium">
+                <th scope="col" className="px-4 py-2.5 font-medium">
                   {t('colProduct')}
                 </th>
-                <th scope="col" className="pb-2 text-right font-medium">
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   {t('colQuantity')}
                 </th>
-                <th scope="col" className="pb-2 text-right font-medium">
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   {t('colUnitCost')}
                 </th>
-                <th scope="col" className="pb-2 text-right font-medium">
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   {t('colSubtotal')}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {purchase.lines.map((item) => (
-                <tr key={item.id}>
-                  <td className="py-3 font-medium text-ink">
+                <tr key={item.id} className="hover:bg-surface-hover">
+                  <td className="px-4 py-3 font-medium text-ink">
                     <Link
                       href={`/inventory/${item.productId}`}
                       className="hover:underline focus-visible:outline-2 focus-visible:outline-link-active"
@@ -107,11 +142,11 @@ export default async function PurchaseDetailPage({
                       {item.productName}
                     </Link>
                   </td>
-                  <td className="py-3 text-right text-ink tabular-nums">
+                  <td className="px-4 py-3 text-right text-ink tabular-nums">
                     {formatQuantity(item.quantity)} {item.unitCode}
                   </td>
-                  <td className="py-3 text-right text-ink tabular-nums">S/ {item.unitCost}</td>
-                  <td className="py-3 text-right text-ink">
+                  <td className="px-4 py-3 text-right text-ink tabular-nums">S/ {item.unitCost}</td>
+                  <td className="px-4 py-3 text-right text-ink">
                     <Money amount={item.subtotal} currency="PEN" />
                   </td>
                 </tr>

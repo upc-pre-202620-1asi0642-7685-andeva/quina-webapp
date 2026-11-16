@@ -65,6 +65,7 @@ const ACTION_TONES: Record<string, AuditTone> = {
   ADJUST_STOCK: 'amber',
   DEACTIVATE_CUSTOMER: 'amber',
   DEACTIVATE_PRODUCT: 'amber',
+  DEACTIVATE_SUPPLIER: 'amber',
   UPDATE_TAX_SETTINGS: 'amber',
   LOGIN_FAILED: 'amber',
   SUBSCRIPTION_PAYMENT_REFUNDED: 'amber',
@@ -81,6 +82,7 @@ const ACTION_TONES: Record<string, AuditTone> = {
   REACTIVATE_PRODUCT: 'success',
   ACTIVATE_PRODUCT: 'success',
   CREATE_SUPPLIER: 'success',
+  REACTIVATE_SUPPLIER: 'success',
   REGISTER_PURCHASE: 'success',
   CREATE_STORE: 'success',
   REACTIVATE_STORE: 'success',
@@ -100,6 +102,7 @@ const ACTION_TONES: Record<string, AuditTone> = {
   // Neutro / edición rutinaria / descarte / fin de ciclo
   UPDATE_CUSTOMER: 'neutral',
   UPDATE_PRODUCT: 'neutral',
+  UPDATE_SUPPLIER: 'neutral',
   DISCARD_PURCHASE_ORDER: 'neutral',
   UPDATE_PAYMENT_DETAILS: 'neutral',
   CANCEL_INVITE: 'neutral',
@@ -295,6 +298,7 @@ export function resolveDeepLink(
   if (entityName === 'customers' && validEntityId) return `/customers/${validEntityId}`;
   if (entityName === 'products' && validEntityId) return `/inventory/${validEntityId}`;
   if (entityName === 'purchases' && validEntityId) return `/inventory/purchases/${validEntityId}`;
+  if (entityName === 'suppliers') return '/inventory/suppliers';
   if (entityName === 'debt_payments' && validEntityId) return `/payments/${validEntityId}`;
 
   if (entityName === 'sales' || entityName === 'credit_charges') {
@@ -556,6 +560,14 @@ export function buildAuditSummary(
       const taxId = strVal(newD, 'taxIdNumber') ?? '—';
       return tr(t, 'summaries.createSupplier', `${name} · ${taxId}`, { name, taxId });
     }
+    case 'UPDATE_SUPPLIER':
+      return tr(t, 'summaries.updateSupplier', changedFieldList(diffRows), {
+        fields: changedFieldList(diffRows) || '—',
+      });
+    case 'REACTIVATE_SUPPLIER':
+      return tr(t, 'summaries.reactivateSupplier', 'Proveedor reactivado');
+    case 'DEACTIVATE_SUPPLIER':
+      return tr(t, 'summaries.deactivateSupplier', 'Proveedor desactivado');
     case 'REGISTER_PURCHASE': {
       const docTypeRaw = strVal(newD, 'documentType') ?? '';
       const docType = docTypeRaw ? tr(t, `values.documentType.${docTypeRaw}`, docTypeRaw) : '';

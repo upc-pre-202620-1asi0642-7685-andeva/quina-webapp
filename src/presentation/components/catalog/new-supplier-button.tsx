@@ -6,11 +6,18 @@ import { PlusIcon } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/button';
 import { SupplierDialog } from './supplier-dialog';
 
-export function NewSupplierButton({ label }: { label: string }) {
+export function NewSupplierButton({
+  label,
+  disabled = false,
+}: {
+  label: string;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  // El acceso directo "Crear > Nuevo proveedor" llega con ?new=1 y abre el diálogo
-  const [open, setOpen] = useState(useSearchParams().get('new') === '1');
+  const searchParams = useSearchParams();
+  // El acceso directo "Crear > Nuevo proveedor" llega con ?new=1 y abre la hoja
+  const [open, setOpen] = useState(!disabled && searchParams.get('new') === '1');
 
   const change = (next: boolean) => {
     setOpen(next);
@@ -19,7 +26,7 @@ export function NewSupplierButton({ label }: { label: string }) {
 
   return (
     <>
-      <Button type="button" onClick={() => setOpen(true)}>
+      <Button type="button" disabled={disabled} onClick={() => setOpen(true)}>
         <PlusIcon aria-hidden="true" />
         {label}
       </Button>

@@ -4,6 +4,8 @@ import {
   CreateSupplierUseCase,
   GenerateReplenishmentOrdersUseCase,
   RegisterPurchaseUseCase,
+  SetSupplierActiveUseCase,
+  UpdateSupplierUseCase,
 } from '@/core/application/catalog/manage-purchases';
 import { parsePurchase, type PurchaseProductInfo } from '@/core/domain/catalog/purchase';
 import { PurchaseAttachment } from '@/core/domain/catalog/purchase-attachment';
@@ -23,7 +25,9 @@ import type {
   PurchaseRepository,
   RegisterPurchaseData,
   RegisterPurchaseResult,
+  SetSupplierActiveData,
   SupplierOption,
+  UpdateSupplierData,
 } from '@/core/domain/ports/purchase-repository';
 import { InMemoryCatalog } from '../../fakes/in-memory-catalog';
 
@@ -61,6 +65,34 @@ class FakePurchaseRepo implements PurchaseRepository {
       isActive: true,
     });
     return { supplierId: id };
+  }
+
+  async updateSupplier(data: UpdateSupplierData): Promise<'OK' | 'NOT_FOUND' | 'TAX_ID_TAKEN'> {
+    const idx = this.suppliersList.findIndex((s) => s.id === data.supplierId);
+    if (idx === -1) return 'NOT_FOUND';
+    if (
+      this.suppliersList.some(
+        (s) => s.id !== data.supplierId && s.taxIdNumber === data.details.taxIdNumber,
+      )
+    ) {
+      return 'TAX_ID_TAKEN';
+    }
+    this.suppliersList[idx] = {
+      ...this.suppliersList[idx]!,
+      taxIdNumber: data.details.taxIdNumber,
+      tradeName: data.details.tradeName,
+      contactName: data.details.contactName,
+      phone: data.details.phone,
+      email: data.details.email,
+    };
+    return 'OK';
+  }
+
+  async setSupplierActive(data: SetSupplierActiveData): Promise<'OK' | 'NOT_FOUND'> {
+    const idx = this.suppliersList.findIndex((s) => s.id === data.supplierId);
+    if (idx === -1) return 'NOT_FOUND';
+    this.suppliersList[idx] = { ...this.suppliersList[idx]!, isActive: data.active };
+    return 'OK';
   }
 
   async registerPurchase(data: RegisterPurchaseData): Promise<RegisterPurchaseResult> {
@@ -372,5 +404,72 @@ describe('Mermas (US16 crit. 3) y Reposición por proveedor (US17)', () => {
         items: [{ productId: 'p-2', quantity: '1.000' }],
       },
     ]);
+  });
+
+  it('edita, desactiva y reactiva proveedores evitando RUC duplicado', async () => {
+    const repo = new FakePurchaseRepo();
+    const create = new CreateSupplierUseCase(repo);
+    const s1 = await create.execute({
+      storeId: 'store-1',
+      actorId: 'owner-1',
+      input: { taxIdNumber: '20123456789', tradeName: 'Distribuidora Uno SAC' },
+      now: new Date(),
+    });
+    const s2 = await create.execute({
+      storeId: 'store-1',
+      actorId: 'owner-1',
+      input: { taxIdNumber: '20987654321', tradeName: 'Distribuidora Dos SAC' },
+      now: new Date(),
+    });
+    if (!s1.ok || !s2.ok) throw new Error('expected suppliers');
+
+    const update = new UpdateSupplierUseCase(repo);
+    expect(
+      await update.execute({
+        storeId: 'store-1',
+        actorId: 'owner-1',
+        supplierId: s1.value,
+        input: { taxIdNumber: '20987654321', tradeName: 'Distribuidora Uno SAC' },
+        now: new Date(),
+      }),
+    ).toEqual({ ok: false, error: 'TAX_ID_TAKEN' });
+
+    expect(
+      await update.execute({
+        storeId: 'store-1',
+        actorId: 'owner-1',
+        supplierId: s1.value,
+        input: {
+          taxIdNumber: '20123456789',
+          tradeName: 'Distribuidora Uno Renovada',
+          contactName: 'Luis Pérez',
+          phone: '987654321',
+          email: 'ventas@uno.pe',
+        },
+        now: new Date(),
+      }),
+    ).toEqual({ ok: true, value: undefined });
+
+    const toggle = new SetSupplierActiveUseCase(repo);
+    expect(
+      await toggle.execute({
+        storeId: 'store-1',
+        actorId: 'owner-1',
+        supplierId: s1.value,
+        active: false,
+        now: new Date(),
+      }),
+    ).toEqual({ ok: true, value: undefined });
+    expect(repo.suppliersList[0]?.isActive).toBe(false);
+
+    expect(
+      await toggle.execute({
+        storeId: 'store-1',
+        actorId: 'owner-1',
+        supplierId: 'missing',
+        active: true,
+        now: new Date(),
+      }),
+    ).toEqual({ ok: false, error: 'NOT_FOUND' });
   });
 });

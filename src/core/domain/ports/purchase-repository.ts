@@ -55,10 +55,28 @@ export type CreateSupplierData = {
   now: Date;
 };
 
+export type UpdateSupplierData = {
+  storeId: string;
+  actorId: string;
+  supplierId: string;
+  details: SupplierDetails;
+  now: Date;
+};
+
+export type SetSupplierActiveData = {
+  storeId: string;
+  actorId: string;
+  supplierId: string;
+  active: boolean;
+  now: Date;
+};
+
 export interface PurchaseRepository {
   suppliers(storeId: string): Promise<SupplierOption[]>;
   productsForPurchase(storeId: string): Promise<PurchaseProductInfo[]>;
   createSupplier(data: CreateSupplierData): Promise<{ supplierId: string } | 'TAX_ID_TAKEN'>;
+  updateSupplier(data: UpdateSupplierData): Promise<'OK' | 'NOT_FOUND' | 'TAX_ID_TAKEN'>;
+  setSupplierActive(data: SetSupplierActiveData): Promise<'OK' | 'NOT_FOUND'>;
   registerPurchase(data: RegisterPurchaseData): Promise<RegisterPurchaseResult>;
   generateReplenishmentOrders(data: {
     storeId: string;
