@@ -15,6 +15,7 @@ import { PayForm } from '@/presentation/components/collections/pay-form';
 import { Money } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { formatDate } from '@/presentation/lib/format-date';
+import { loadStoreContext } from '@/presentation/queries/store-context';
 
 export default async function PayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,12 +25,16 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
   if (!customer) notFound();
 
   const t = await getTranslations('Collections.pay');
+  const tList = await getTranslations('Customers.list');
   const now = new Date();
-  const preview = await new DrizzlePaymentRepository().preview({
-    storeId: user.storeId,
-    customerId: id,
-    now,
-  });
+  const [preview, store] = await Promise.all([
+    new DrizzlePaymentRepository().preview({
+      storeId: user.storeId,
+      customerId: id,
+      now,
+    }),
+    loadStoreContext(user.storeId),
+  ]);
   const name = `${customer.firstName} ${customer.lastName}`;
   const owner = can(user.role, 'charges.resolve');
 
@@ -37,13 +42,19 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <Link
         href={`/customers/${id}`}
-        className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />
         {t('back', { name: customer.firstName })}
       </Link>
 
       <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('title', { name })}</h1>
+
+      {store.isReadOnly ? (
+        <Notice tone="warning">
+          <p>{tList('readOnlyNotice')}</p>
+        </Notice>
+      ) : null}
 
       {!preview.ok ? (
         <p className="rounded-field bg-paper-deep p-4 text-sm text-ink-soft">
@@ -67,7 +78,7 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
                     {t('cycle', { date: formatDate(preview.value.cycle.cutOffDate) })}
                   </Link>
                 </h2>
-                <p className="text-sm text-ink-soft">
+                <p className="text-sm text-ink-soft tabular-nums">
                   {t('dueOn', { date: formatDate(preview.value.cycle.paymentDueDate) })}
                 </p>
               </div>
@@ -79,17 +90,27 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
                 )}
               />
             </div>
-            <dl className="flex flex-col gap-2 text-sm">
+
+            <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-4">
+              <span className="text-[13px] font-medium text-ink-soft">{t('amountDue')}</span>
+              <Money
+                amount={preview.value.amountDue}
+                currency={preview.value.currency}
+                className="text-amount font-bold tracking-tight text-ink"
+              />
+            </div>
+
+            <dl className="flex flex-col gap-2 border-t border-line pt-3 text-sm">
               <div className="flex items-center justify-between gap-3 text-ink-soft">
                 <dt>{t('totalDue')}</dt>
-                <dd className="text-ink">
+                <dd className="text-ink tabular-nums">
                   <Money amount={preview.value.totalDue} currency={preview.value.currency} />
                 </dd>
               </div>
               {preview.value.daysLate > 0 ? (
                 <div className="flex items-center justify-between gap-3 text-ink-soft">
                   <dt>{t('moratory', { days: preview.value.daysLate })}</dt>
-                  <dd className="text-error-ink">
+                  <dd className="text-error-ink tabular-nums">
                     <Money
                       amount={preview.value.moratoryInterest}
                       currency={preview.value.currency}
@@ -97,12 +118,6 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
                   </dd>
                 </div>
               ) : null}
-              <div className="flex items-center justify-between gap-3 border-t border-line pt-3 text-base font-semibold text-ink">
-                <dt>{t('amountDue')}</dt>
-                <dd>
-                  <Money amount={preview.value.amountDue} currency={preview.value.currency} />
-                </dd>
-              </div>
             </dl>
             {preview.value.laterCycles > 0 ? (
               <p className="text-[13px] text-ink-soft">
@@ -135,6 +150,7 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
               cycleId={preview.value.cycle.id}
               amountDue={preview.value.amountDue}
               currency={preview.value.currency}
+              isReadOnly={store.isReadOnly}
             />
           )}
         </>

@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { RotateCcwIcon, SparklesIcon } from 'lucide-react';
 import type { Currency } from '@/core/domain/shared/money';
 import type { TermsFormState } from '@/presentation/actions/customers';
 import { FormField } from '@/presentation/components/auth/form-field';
 import { NativeSelect } from '@/presentation/components/forms/native-select';
+import { formatMoney } from '@/presentation/components/money';
 import { Notice } from '@/presentation/components/notice';
 import { Button, buttonVariants } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -44,6 +46,16 @@ export type CapsByCurrency = Record<
 
 type Action = (state: TermsFormState, formData: FormData) => Promise<TermsFormState>;
 
+function safeFormatLimit(raw: string, currency: Currency): string {
+  const cleaned = raw.trim().replace(/[\s,]/g, '');
+  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return currency === 'PEN' ? 'S/ —' : 'US$ —';
+  try {
+    return formatMoney(cleaned, currency);
+  } catch {
+    return currency === 'PEN' ? 'S/ —' : 'US$ —';
+  }
+}
+
 export function TermsForm({
   action,
   initial,
@@ -51,6 +63,7 @@ export function TermsForm({
   isOpen,
   cancelHref,
   cashOnlyHref,
+  isReadOnly = false,
 }: {
   action: Action;
   initial: TermsFormValues;
@@ -60,8 +73,11 @@ export function TermsForm({
   cancelHref: string;
   /** Solo en el alta: el vecino queda al contado por ahora. */
   cashOnlyHref?: string;
+  isReadOnly?: boolean;
 }) {
   const t = useTranslations('Customers.terms');
+  const tForm = useTranslations('Customers.form');
+  const tList = useTranslations('Customers.list');
   const tPlans = useTranslations('Plans');
   const [state, formAction, pending] = useActionState(action, {});
   const [currency, setCurrency] = useState<Currency>(initial.currency);
@@ -86,6 +102,48 @@ export function TermsForm({
       ? t('errors.aboveCap', { cap: caps[currency][kind] ?? '—' })
       : t(`errors.${key}`);
   };
+
+  const isDirty =
+    isOpen &&
+    (currency !== initial.currency ||
+      creditLimit !== initial.creditLimit ||
+      days.cutOffDay !== initial.cutOffDay ||
+      days.paymentDueDay !== initial.paymentDueDay ||
+      days.maxInstallmentMonths !== initial.maxInstallmentMonths ||
+      JSON.stringify(rates) !==
+        JSON.stringify({
+          compensatory: initial.compensatory,
+          moratory: initial.moratory,
+        }));
+
+  function resetChanges() {
+    setCurrency(initial.currency);
+    setCreditLimit(initial.creditLimit);
+    setDays({
+      cutOffDay: initial.cutOffDay,
+      paymentDueDay: initial.paymentDueDay,
+      maxInstallmentMonths: initial.maxInstallmentMonths,
+    });
+    setRates({
+      compensatory: initial.compensatory,
+      moratory: initial.moratory,
+    });
+  }
+
+  function applyPreset(compPercent: string, morPercent: string) {
+    setRates({
+      compensatory: {
+        type: 'EFFECTIVE',
+        percent: compPercent,
+        period: 'ANNUAL',
+        capitalization: '',
+      },
+      moratory: { type: 'EFFECTIVE', percent: morPercent, period: 'ANNUAL', capitalization: '' },
+    });
+  }
+
+  const currentCaps = caps[currency];
+  const canApplyBcrpPreset = Boolean(currentCaps.compensatory && currentCaps.moratory);
 
   function rateFields(kind: 'compensatory' | 'moratory') {
     const rate = rates[kind];
@@ -194,6 +252,12 @@ export function TermsForm({
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-6">
+      {isReadOnly ? (
+        <Notice tone="warning">
+          <p>{tList('readOnlyNotice')}</p>
+        </Notice>
+      ) : null}
+
       {errors.form ? (
         <Notice tone={errors.form === 'planLimit' ? 'warning' : 'error'}>
           <p>{t(`errors.${errors.form}`)}</p>
@@ -257,6 +321,28 @@ export function TermsForm({
             </div>
           )}
         </FormField>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-[13px] font-medium text-ink-soft">{t('presetsLabel')}</span>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={() => applyPreset('0', '0')}>
+            <SparklesIcon aria-hidden="true" />
+            {t('presetZero')}
+          </Button>
+          {canApplyBcrpPreset ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                applyPreset(currentCaps.compensatory ?? '0', currentCaps.moratory ?? '0')
+              }
+            >
+              {t('presetBcrp')}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {rateFields('compensatory')}
@@ -328,14 +414,32 @@ export function TermsForm({
         </FormField>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-3.5 text-sm">
+        <span className="text-[13px] font-medium text-ink-soft">{t('previewTitle')}</span>
+        <p className="font-medium text-ink tabular-nums">
+          {t('previewBody', {
+            limit: safeFormatLimit(creditLimit, currency),
+            cutOff: days.cutOffDay,
+            payment: days.paymentDueDay,
+            months: days.maxInstallmentMonths,
+          })}
+        </p>
+      </div>
+
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-end">
+        {isDirty ? (
+          <Button type="button" variant="ghost" onClick={resetChanges} className="sm:mr-auto">
+            <RotateCcwIcon aria-hidden="true" />
+            {tForm('undoChanges')}
+          </Button>
+        ) : null}
         <Link
           href={cashOnlyHref ?? cancelHref}
           className={buttonVariants({ variant: 'secondary' })}
         >
           {cashOnlyHref ? t('cashOnly') : t('cancel')}
         </Link>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending || isReadOnly}>
           {pending ? t('submitting') : isOpen ? t('submitUpdate') : t('submitOpen')}
         </Button>
       </div>

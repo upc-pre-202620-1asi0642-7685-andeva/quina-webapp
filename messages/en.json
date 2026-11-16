@@ -881,7 +881,37 @@
       "colDocument": "Document",
       "colAvailable": "Available",
       "colStatus": "Status",
-      "count": "{count, plural, =1 {1 neighbor} other {# neighbors}}"
+      "count": "{count, plural, =1 {1 neighbor} other {# neighbors}}",
+      "summaryActive": "Active neighbors",
+      "summaryCredit": "With credit",
+      "summaryCollectable": "To collect",
+      "summaryOverdue": "Overdue",
+      "filtersLabel": "Filter neighbors",
+      "filters": {
+        "all": "All",
+        "collectable": "To collect",
+        "overdue": "Overdue",
+        "active": "Active credit",
+        "suspended": "Paused",
+        "cashOnly": "Cash only",
+        "inactive": "Inactive"
+      },
+      "sortLabel": "Sort by",
+      "sorts": {
+        "name": "Name (A–Z)",
+        "debt": "Highest balance",
+        "available": "Lowest available"
+      },
+      "noFilterResults": "No neighbors match this filter.",
+      "clearFilters": "Clear filters",
+      "colBalance": "Used / Limit",
+      "colActions": "Actions",
+      "dueBadge": "Due {amount}",
+      "overdueBadge": "Overdue {amount}",
+      "dueDateShort": "Due {date}",
+      "actionSell": "Sell on credit",
+      "actionCollect": "Collect",
+      "readOnlyNotice": "Read-only mode: upgrade your plan to add or edit neighbors."
     },
     "status": {
       "ACTIVE": "Credit active",
@@ -941,7 +971,13 @@
         "consentRequired": "Check the neighbor's consent to register them.",
         "notFound": "That neighbor doesn't exist in your store.",
         "generic": "We couldn't save. Try again."
-      }
+      },
+      "sectionIdentity": "Identity",
+      "sectionContact": "Contact & preferences",
+      "documentNumberHintDni": "8 digits for DNI.",
+      "documentNumberHintOther": "6 to 15 letters or numbers.",
+      "undoChanges": "Discard changes",
+      "backToCustomer": "Back to {name}"
     },
     "detail": {
       "back": "Back to customers",
@@ -986,6 +1022,45 @@
         "hasBalance": "They still owe money: their account must reach zero first.",
         "planLimit": "You reached your plan's limit of neighbors with active credit.",
         "generic": "We couldn't make the change. Try again."
+      },
+      "sellAction": "Sell on credit",
+      "collectAction": "Collect cycle",
+      "callAction": "Call",
+      "whatsappAction": "WhatsApp",
+      "moreActions": "More actions",
+      "manageTitle": "Account management",
+      "creditMeterLabel": "{percent}% of credit limit used",
+      "overLimitWarning": "Exceeds agreed credit limit.",
+      "payableTitle": "Due for collection",
+      "overdueTitle": "Has an overdue cycle",
+      "payableDueOn": "Due on {date}",
+      "payableMore": "{count, plural, =1 {and 1 more pending cycle} other {and # more pending cycles}}",
+      "tabsLabel": "Profile sections",
+      "tabs": {
+        "cycles": "Statements",
+        "installments": "Installments",
+        "payments": "Payments",
+        "info": "Details & privacy"
+      },
+      "paymentsTitle": "Recent payments",
+      "paymentsEmpty": "No payments recorded for {name} yet.",
+      "paymentCycle": "Cycle #{number} · {method}",
+      "paymentReceipt": "Receipt {number}",
+      "consentsTitle": "Recorded consents",
+      "consentsEmpty": "No consents recorded.",
+      "consentTypes": {
+        "DATA_PROTECTION_LAW_29733": "Data protection (Law 29733)",
+        "CREDIT_TERMS": "Credit terms"
+      },
+      "consentMeta": "Version {version} · {date}",
+      "inactiveDisabledBalance": "Cannot deactivate while balance is owed.",
+      "undo": "Undo",
+      "toast": {
+        "suspended": "{name}'s credit paused.",
+        "resumed": "{name}'s credit resumed.",
+        "deactivated": "{name} deactivated.",
+        "reactivated": "{name} reactivated.",
+        "undone": "Change undone."
       }
     },
     "terms": {
@@ -1062,7 +1137,15 @@
       },
       "historyTitle": "Credit terms change history",
       "historyBefore": "Before",
-      "historyAfter": "After"
+      "historyAfter": "After",
+      "presetsLabel": "Quick presets",
+      "presetZero": "Trusted neighbor (0% interest)",
+      "presetBcrp": "Legal cap rate (BCRP max)",
+      "previewTitle": "Summary of terms",
+      "previewBody": "Limit {limit} · Cut-off day {cutOff} · Due day {payment} · Up to {months, plural, =1 {1 installment} other {# installments}}",
+      "historyComp": "Compensatory",
+      "historyMora": "Moratory",
+      "historyLimit": "Limit {amount}"
     }
   },
   "Plans": {
@@ -2040,7 +2123,8 @@
       "installmentPurchasesHint": "They are paid in their installments, in the following cycles.",
       "paymentsTitle": "Payments",
       "receipt": "Receipt {number} · {date}",
-      "pay": "Collect"
+      "pay": "Collect",
+      "remaining": "Remaining balance"
     },
     "charge": {
       "purchase": "Purchase on {date}",
@@ -2088,7 +2172,18 @@
         "CHARGE_ALREADY_VOIDED": "This charge was already voided.",
         "CHARGE_HAS_PAYMENTS": "This charge was already paid and can't be voided.",
         "INSTALLMENT_ALREADY_BILLED": "An installment of this purchase already entered a cut-off; it can no longer be voided."
-      }
+      },
+      "quickReasons": {
+        "notMine": "Does not recognize purchase",
+        "wrongAmount": "Wrong amount",
+        "wrongItem": "Wrong item",
+        "confirmedWithNeighbor": "Confirmed with neighbor",
+        "receiptVerified": "Receipt verified",
+        "duplicateCharge": "Duplicate charge",
+        "returnedItems": "Returned items",
+        "pricingError": "Price or quantity error"
+      },
+      "noteHint": "Saved in the cycle audit trail."
     },
     "pay": {
       "back": "Back to {name}",
@@ -2131,7 +2226,9 @@
         "CURRENCY_MISMATCH": "The currency doesn't match the account's.",
         "RECEIVED_INVALID": "Enter the received amount, for example 50 or 50.50.",
         "RECEIVED_TOO_LOW": "The received amount is less than the total."
-      }
+      },
+      "exactChip": "Exact ({amount})",
+      "submitting": "Recording payment..."
     },
     "receipt": {
       "back": "Back to {name}",

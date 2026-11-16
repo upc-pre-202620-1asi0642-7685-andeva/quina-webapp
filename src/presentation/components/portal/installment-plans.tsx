@@ -13,11 +13,20 @@ const STATUS_STYLES: Record<string, string> = {
   OVERDUE: 'bg-error/12 text-error-ink',
 };
 
-function StatusBadge({ status, label }: { status: string; label: string }) {
+function StatusBadge({
+  status,
+  label,
+  compact = false,
+}: {
+  status: string;
+  label: string;
+  compact?: boolean;
+}) {
   return (
     <span
       className={cn(
-        'inline-flex rounded-full px-2.5 py-0.5 text-[15px] font-medium whitespace-nowrap',
+        'inline-flex rounded-full px-2.5 py-0.5 font-medium whitespace-nowrap',
+        compact ? 'text-[13px]' : 'text-[15px]',
         STATUS_STYLES[status] ?? STATUS_STYLES.PENDING,
       )}
     >
@@ -30,9 +39,11 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
 export async function InstallmentPlans({
   plans,
   currency,
+  compact = false,
 }: {
   plans: InstallmentPlan[];
   currency: Currency;
+  compact?: boolean;
 }) {
   const t = await getTranslations('Portal.installments');
   const statusLabel = (status: string) =>
@@ -40,9 +51,15 @@ export async function InstallmentPlans({
   return (
     <section
       aria-labelledby="installments-title"
-      className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6"
+      className={cn(
+        'flex flex-col gap-5 rounded-card border border-line bg-surface sm:p-6',
+        compact ? 'p-4' : 'p-5',
+      )}
     >
-      <h2 id="installments-title" className="text-xl font-semibold text-ink">
+      <h2
+        id="installments-title"
+        className={cn('font-semibold text-ink', compact ? 'text-lg' : 'text-xl')}
+      >
         {t('title')}
       </h2>
       {plans.map((plan) => {
@@ -62,7 +79,12 @@ export async function InstallmentPlans({
                     amount: formatMoney(plan.principal, currency),
                   })}
                 </h3>
-                <span className="text-base font-medium text-ink-soft tabular-nums">
+                <span
+                  className={cn(
+                    'font-medium text-ink-soft tabular-nums',
+                    compact ? 'text-sm' : 'text-base',
+                  )}
+                >
                   {t('progress', { paid, total })}
                 </span>
               </div>
@@ -80,7 +102,7 @@ export async function InstallmentPlans({
                 />
               </div>
               {nextRow ? (
-                <p className="text-base text-ink-soft">
+                <p className={cn('text-ink-soft', compact ? 'text-sm' : 'text-base')}>
                   {t('nextDue', {
                     number: nextRow.number,
                     date: formatDate(nextRow.dueDate),
@@ -90,12 +112,17 @@ export async function InstallmentPlans({
               ) : null}
             </div>
 
-            <InstallmentScheduleList rows={plan.rows} currency={currency} />
+            <InstallmentScheduleList rows={plan.rows} currency={currency} compact={compact} />
 
             <div className="hidden rounded-field border border-line sm:block">
-              <table className="w-full text-base">
+              <table className={cn('w-full', compact ? 'text-sm' : 'text-base')}>
                 <caption className="sr-only">{t('caption')}</caption>
-                <thead className="bg-paper-deep text-left text-[15px] text-ink-soft">
+                <thead
+                  className={cn(
+                    'bg-paper-deep text-left text-ink-soft',
+                    compact ? 'text-[13px]' : 'text-[15px]',
+                  )}
+                >
                   <tr>
                     <th scope="col" className="px-3 py-2 font-medium">
                       {t('number')}
@@ -134,7 +161,11 @@ export async function InstallmentPlans({
                         <Money amount={row.interest} currency={currency} />
                       </td>
                       <td className="px-3 py-2">
-                        <StatusBadge status={row.status} label={statusLabel(row.status)} />
+                        <StatusBadge
+                          status={row.status}
+                          label={statusLabel(row.status)}
+                          compact={compact}
+                        />
                       </td>
                     </tr>
                   ))}

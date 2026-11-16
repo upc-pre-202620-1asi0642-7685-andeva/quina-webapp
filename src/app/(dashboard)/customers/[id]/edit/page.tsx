@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { ArrowLeftIcon } from 'lucide-react';
 import { z } from 'zod';
 import type { DocumentType } from '@/core/domain/identity/document-id';
 import { getCustomer } from '@/infrastructure/db/queries/customers';
@@ -16,9 +18,17 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
   if (!customer) notFound();
   const store = await loadStoreContext(user.storeId);
   const t = await getTranslations('Customers.form');
+  const back = `/customers/${id}`;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      <Link
+        href={back}
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+      >
+        <ArrowLeftIcon aria-hidden="true" className="size-4" />
+        {t('backToCustomer', { name: customer.firstName })}
+      </Link>
       <h1 className="text-2xl font-semibold tracking-tight text-ink">
         {t('editTitle', { name: customer.firstName })}
       </h1>
@@ -28,7 +38,8 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
           action={updateCustomerAction.bind(null, id)}
           storeName={store.name}
           privacyHref={`/app/privacy/customers/${user.storeId}`}
-          cancelHref={`/customers/${id}`}
+          cancelHref={back}
+          isReadOnly={store.isReadOnly}
           initial={{
             documentType: customer.documentType as DocumentType,
             documentNumber: customer.documentNumber,

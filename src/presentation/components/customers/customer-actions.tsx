@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { PauseIcon, PlayIcon, UserRoundXIcon, UserRoundCheckIcon } from 'lucide-react';
+import { PauseIcon, PlayIcon, UserRoundCheckIcon, UserRoundXIcon } from 'lucide-react';
+import { sileo } from 'sileo';
 import {
   setCreditAccountStatusAction,
   setCustomerActiveAction,
@@ -12,13 +13,7 @@ import {
 } from '@/presentation/actions/customers';
 import { Notice } from '@/presentation/components/notice';
 import { Button } from '@/presentation/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from '@/presentation/components/ui/dialog';
+import { ResponsiveSheet } from '@/presentation/components/ui/responsive-sheet';
 
 type Pending = 'suspend' | 'deactivate' | null;
 
@@ -27,11 +22,19 @@ export function CustomerActions({
   name,
   isActive,
   accountStatus,
+  hasBalance,
+  canTerms,
+  canDeactivate,
+  isReadOnly,
 }: {
   customerId: string;
   name: string;
   isActive: boolean;
   accountStatus: string | null;
+  hasBalance: boolean;
+  canTerms: boolean;
+  canDeactivate: boolean;
+  isReadOnly: boolean;
 }) {
   const t = useTranslations('Customers.detail');
   const tPlans = useTranslations('Plans');
@@ -40,14 +43,53 @@ export function CustomerActions({
   const [error, setError] = useState<string | null>(null);
   const [busy, startTransition] = useTransition();
 
-  function run(task: () => Promise<CustomerActionResult>) {
+  function runWithUndo(
+    task: () => Promise<CustomerActionResult>,
+    undoTask: () => Promise<CustomerActionResult>,
+    toastTitle: string,
+  ) {
     setError(null);
     startTransition(async () => {
       const result = await task();
       setConfirm(null);
-      if (!result.ok) setError(result.error);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      sileo.clear();
+      sileo.success({
+        title: toastTitle,
+        duration: 6000,
+        autopilot: { expand: 0, collapse: 5800 },
+        button: isReadOnly
+          ? undefined
+          : {
+              title: t('undo'),
+              onClick: () => {
+                startTransition(async () => {
+                  const undoResult = await undoTask();
+                  if (!undoResult.ok) {
+                    setError(undoResult.error);
+                    return;
+                  }
+                  sileo.clear();
+                  sileo.info({ title: t('toast.undone') });
+                  router.refresh();
+                });
+              },
+            },
+      });
       router.refresh();
     });
+  }
+
+  const showSuspend = canTerms && isActive && accountStatus === 'ACTIVE';
+  const showResume = canTerms && isActive && accountStatus === 'SUSPENDED' && !isReadOnly;
+  const showDeactivate = canDeactivate && isActive;
+  const showReactivate = canDeactivate && !isActive && !isReadOnly;
+
+  if (!showSuspend && !showResume && !showDeactivate && !showReactivate) {
+    return null;
   }
 
   return (
@@ -67,67 +109,98 @@ export function CustomerActions({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        {isActive && accountStatus === 'ACTIVE' ? (
+        {showSuspend ? (
           <Button variant="secondary" onClick={() => setConfirm('suspend')} disabled={busy}>
             <PauseIcon aria-hidden="true" />
             {t('suspend')}
           </Button>
         ) : null}
-        {isActive && accountStatus === 'SUSPENDED' ? (
+        {showResume ? (
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={() => run(() => setCreditAccountStatusAction(customerId, 'ACTIVE'))}
+            onClick={() =>
+              runWithUndo(
+                () => setCreditAccountStatusAction(customerId, 'ACTIVE'),
+                () => setCreditAccountStatusAction(customerId, 'SUSPENDED'),
+                t('toast.resumed', { name }),
+              )
+            }
           >
             <PlayIcon aria-hidden="true" />
             {t('resume')}
           </Button>
         ) : null}
-        {isActive ? (
-          <Button variant="ghost" onClick={() => setConfirm('deactivate')} disabled={busy}>
+        {showDeactivate ? (
+          <Button
+            variant="ghost"
+            onClick={() => setConfirm('deactivate')}
+            disabled={busy || hasBalance}
+          >
             <UserRoundXIcon aria-hidden="true" />
             {t('deactivate')}
           </Button>
-        ) : (
+        ) : null}
+        {showReactivate ? (
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={() => run(() => setCustomerActiveAction(customerId, true))}
+            onClick={() =>
+              runWithUndo(
+                () => setCustomerActiveAction(customerId, true),
+                () => setCustomerActiveAction(customerId, false),
+                t('toast.reactivated', { name }),
+              )
+            }
           >
             <UserRoundCheckIcon aria-hidden="true" />
             {t('reactivate')}
           </Button>
-        )}
+        ) : null}
       </div>
 
-      <Dialog open={confirm !== null} onOpenChange={(open) => (open ? null : setConfirm(null))}>
-        <DialogContent showCloseButton={false} className="rounded-card border-line bg-surface">
-          <DialogTitle className="text-lg text-ink">
-            {confirm === 'suspend' ? t('suspendTitle', { name }) : t('deactivateTitle', { name })}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-ink-soft">
-            {confirm === 'suspend' ? t('suspendBody') : t('deactivateBody')}
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setConfirm(null)} disabled={busy}>
-              {t('cancel')}
-            </Button>
-            <Button
-              variant="destructive"
-              disabled={busy}
-              onClick={() =>
-                run(() =>
+      {showDeactivate && hasBalance ? (
+        <p className="text-[13px] text-ink-soft">{t('inactiveDisabledBalance')}</p>
+      ) : null}
+
+      <ResponsiveSheet
+        open={confirm !== null}
+        onOpenChange={(open) => (open ? null : setConfirm(null))}
+        closeLabel={t('cancel')}
+        title={confirm === 'suspend' ? t('suspendTitle', { name }) : t('deactivateTitle', { name })}
+        footer={
+          confirm ? (
+            <>
+              <Button variant="secondary" onClick={() => setConfirm(null)} disabled={busy}>
+                {t('cancel')}
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={busy}
+                onClick={() =>
                   confirm === 'suspend'
-                    ? setCreditAccountStatusAction(customerId, 'SUSPENDED')
-                    : setCustomerActiveAction(customerId, false),
-                )
-              }
-            >
-              {t('confirm')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                    ? runWithUndo(
+                        () => setCreditAccountStatusAction(customerId, 'SUSPENDED'),
+                        () => setCreditAccountStatusAction(customerId, 'ACTIVE'),
+                        t('toast.suspended', { name }),
+                      )
+                    : runWithUndo(
+                        () => setCustomerActiveAction(customerId, false),
+                        () => setCustomerActiveAction(customerId, true),
+                        t('toast.deactivated', { name }),
+                      )
+                }
+              >
+                {t('confirm')}
+              </Button>
+            </>
+          ) : null
+        }
+      >
+        <p className="text-sm text-ink-soft">
+          {confirm === 'suspend' ? t('suspendBody') : t('deactivateBody')}
+        </p>
+      </ResponsiveSheet>
     </div>
   );
 }
