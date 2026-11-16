@@ -8,6 +8,7 @@ import { getDraftPurchaseOrder } from '@/infrastructure/db/queries/purchases';
 import { DrizzlePurchaseRepository } from '@/infrastructure/db/repositories/drizzle-purchase-repository';
 import { requireStoreUser } from '@/presentation/auth/guards';
 import { PurchaseForm } from '@/presentation/components/catalog/purchase-form';
+import { Notice } from '@/presentation/components/notice';
 import { buttonVariants } from '@/presentation/components/ui/button';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
@@ -18,6 +19,7 @@ export default async function NewPurchasePage({
 }) {
   const user = await requireStoreUser('/inventory/purchases/new', 'purchases.manage');
   const t = await getTranslations('Purchases.form');
+  const tPurchases = await getTranslations('Purchases');
   const { orderId } = await searchParams;
   const validOrderId = orderId && z.uuid().safeParse(orderId).success ? orderId : null;
 
@@ -27,6 +29,8 @@ export default async function NewPurchasePage({
     loadStoreContext(user.storeId),
     validOrderId ? getDraftPurchaseOrder(user.storeId, validOrderId) : Promise.resolve(null),
   ]);
+
+  const activeSuppliers = suppliers.filter((s) => s.isActive || s.id === draftOrder?.supplierId);
 
   const physicalProducts = allProducts
     .filter((p) => !p.isService && p.isActive)
@@ -49,7 +53,7 @@ export default async function NewPurchasePage({
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <Link
         href="/inventory/purchases"
-        className="inline-flex items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-link-active hover:underline"
       >
         <ArrowLeftIcon aria-hidden="true" className="size-4" />
         {t('backToPurchases')}
@@ -60,7 +64,17 @@ export default async function NewPurchasePage({
         <p className="text-sm text-ink-soft">{t('subtitle')}</p>
       </header>
 
-      {physicalProducts.length === 0 ? (
+      {store.isReadOnly ? (
+        <Notice tone="warning">
+          <p>{tPurchases('readOnlyNotice')}</p>
+          <Link
+            href="/settings/subscription"
+            className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+          >
+            {tPurchases('seePlans')}
+          </Link>
+        </Notice>
+      ) : physicalProducts.length === 0 ? (
         <section className="flex flex-col items-center gap-3 rounded-card border border-line bg-surface px-6 py-10 text-center">
           <p className="text-sm text-ink-soft">{t('noPhysicalProducts')}</p>
           <Link href="/inventory/new" className={buttonVariants()}>
@@ -70,7 +84,7 @@ export default async function NewPurchasePage({
         </section>
       ) : (
         <PurchaseForm
-          suppliers={suppliers}
+          suppliers={activeSuppliers}
           products={physicalProducts}
           initialOrder={
             draftOrder
