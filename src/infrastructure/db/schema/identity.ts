@@ -141,6 +141,7 @@ export const users = pgTable(
     role: varchar('role', { length: 20 }).notNull(),
     phone: varchar('phone', { length: 20 }),
     preferredLocale: varchar('preferred_locale', { length: 2 }).notNull().default('es'),
+    preferredTheme: varchar('preferred_theme', { length: 6 }).notNull().default('system'),
     // Orden y visibilidad de los widgets de Inicio; null = diseño por defecto del rol
     dashboardLayout: jsonb('dashboard_layout'),
     isActive: boolean('is_active').notNull().default(true),
@@ -162,6 +163,7 @@ export const users = pgTable(
       ]),
     ),
     check('chk_users_preferred_locale', oneOf(t.preferredLocale, ['es', 'en', 'qu'])),
+    check('chk_users_preferred_theme', oneOf(t.preferredTheme, ['light', 'dark', 'system'])),
     check('chk_users_failed_login_attempts', sql`${t.failedLoginAttempts} >= 0`),
     check(
       'chk_users_store_role',
