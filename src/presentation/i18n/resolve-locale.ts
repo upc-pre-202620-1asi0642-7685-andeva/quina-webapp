@@ -12,7 +12,8 @@ export function isLocale(value: string | null | undefined): value is Locale {
 /**
  * Idioma de la interfaz, en el orden de AGENTS.md (sección 6): preferencia del
  * usuario con sesión, luego la cookie `quina-lang`, luego `Accept-Language` y,
- * por último, castellano. El idioma nunca va en la URL.
+ * por último, castellano. Cuando el navegador trae un idioma distinto de
+ * castellano o quechua (inglés, francés, portugués, etc.), usa inglés.
  */
 export function resolveLocale(input: {
   userPreference?: string | null;
@@ -42,5 +43,6 @@ function fromAcceptLanguage(header: string | null | undefined): Locale | undefin
     const base = tag.split('-')[0];
     if (isLocale(base)) return base;
   }
-  return undefined;
+
+  return ranked.some((entry) => entry.tag !== '*') ? 'en' : undefined;
 }

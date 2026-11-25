@@ -42,12 +42,12 @@ export async function AccountCycles({
           <p>{t('empty')}</p>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
+        <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-field border border-line bg-paper/40">
           {cycles.map((cycle) => (
             <li key={cycle.id}>
               <Link
                 href={`${hrefBase}/cycles/${cycle.id}`}
-                className="flex min-h-14 items-center gap-3 py-3 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-ring sm:px-2"
+                className="flex min-h-14 items-center gap-3 px-4 py-3.5 transition-colors duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring active:bg-surface-hover"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="font-medium text-ink">

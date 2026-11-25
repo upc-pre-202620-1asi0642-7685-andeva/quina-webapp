@@ -9,7 +9,6 @@ import {
   HistoryIcon,
   LockIcon,
   TriangleAlertIcon,
-  UserIcon,
   UsersIcon,
 } from 'lucide-react';
 import type { PlanTier, SubscriptionStatus } from '@/core/domain/billing/plan-limits';
@@ -144,17 +143,10 @@ export async function StoreHubLinks({
     });
   }
 
-  items.push({
-    href: '/profile',
-    label: t('profile.label'),
-    icon: UserIcon,
-    meta: <span>{t('profile.meta')}</span>,
-  });
-
   return (
     <nav
       aria-label={t('ariaLabel')}
-      className="divide-y divide-line rounded-card border border-line bg-surface lg:grid lg:auto-cols-fr lg:grid-flow-col lg:divide-x lg:divide-y-0"
+      className="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface lg:grid lg:auto-cols-fr lg:grid-flow-col lg:divide-x lg:divide-y-0"
     >
       {items.map(({ href, label, icon: Icon, meta }) => (
         <Link

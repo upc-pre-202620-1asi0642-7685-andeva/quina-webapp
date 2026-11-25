@@ -603,6 +603,33 @@
       "confirmAction": "Yes, reset layout",
       "cancel": "Cancel"
     },
+    "push": {
+      "title": "Alerts on this device",
+      "description": "Get alerts even when Quina is closed for overdue payments, upcoming due dates, low stock, or when a customer flags a charge.",
+      "statusChecking": "Checking",
+      "statusOn": "Enabled",
+      "statusOff": "Off",
+      "statusBlocked": "Blocked",
+      "statusNeedsInstall": "Install app",
+      "statusUnavailable": "Unavailable",
+      "devicesCount": "{count, plural, one {# device linked to your account} other {# devices linked to your account}}",
+      "enableButton": "Enable alerts",
+      "disableButton": "Turn off on this device",
+      "testButton": "Send test alert",
+      "enabledToast": "Alerts enabled on this device.",
+      "disabledToast": "Alerts turned off on this device.",
+      "deniedToast": "Notifications were blocked by the browser. Enable them in site permissions.",
+      "unsupportedToast": "This browser does not support push alerts.",
+      "notConfiguredError": "VAPID keys are not configured on the server.",
+      "enableError": "Could not enable alerts. Please try again.",
+      "disableError": "Could not turn off alerts.",
+      "testSent": "Sent a test alert to your device.",
+      "testError": "Could not send the test alert.",
+      "iosHomeScreenHint": "On iPhone or iPad, first tap Share and choose \"Add to Home Screen\", then open Quina from there to enable alerts.",
+      "blockedHint": "Alerts are blocked in this browser. Open site permissions next to the address bar and allow notifications.",
+      "missingVapidHint": "Server VAPID keys are not configured yet for push alerts.",
+      "unsupportedHint": "Your current browser does not support background push notifications."
+    },
     "password": {
       "title": "Password",
       "statusConfigured": "Configured",
@@ -678,30 +705,9 @@
       "cleared": "Offline cached pages were cleared."
     },
     "access": {
-      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
-      "taxRegimeLabel": "Tax regime",
-      "rusCategory": "Category {category}",
-      "teamSeatsLabel": "Team seats",
-      "ownerLinksAria": "Store management shortcuts",
-      "ownerScopeTitle": "Store permissions",
-      "ownerLinks": {
-        "settings": {
-          "label": "Store settings",
-          "meta": "Yape, Plin, bank, and taxes"
-        },
-        "subscription": {
-          "label": "Subscription & plan",
-          "meta": "Plan tier and monthly usage"
-        },
-        "team": {
-          "label": "Counter team",
-          "meta": "Invites and staff"
-        },
-        "audit": {
-          "label": "Audit log",
-          "meta": "Activity history"
-        }
-      },
+      "ownerTitle": "Owner at {store}",
+      "ownerSubtitle": "Your account manages this store: counter operations, prices, credit rules, team, and store configuration.",
+      "manageTeamLink": "Manage team",
       "employeeTitle": "Staff member at {store}",
       "employeeSubtitle": "Your access is focused on daily counter operations. Prices, credit rules, and billing remain owner-only.",
       "employeeAllowedHeading": "What you can do",
@@ -821,6 +827,7 @@
     "account": {
       "open": "Open your account menu",
       "profile": "My profile",
+      "myStores": "My stores",
       "settings": "Store settings",
       "theme": "Theme",
       "themes": {
@@ -850,7 +857,8 @@
       "dueSoonTitle": "Collect from {name}",
       "dueSoonBody": "{amount} · due {date}",
       "lowStockTitle": "Products running out",
-      "lowStockBody": "{count, plural, one {# product low on stock} other {# products low on stock}}"
+      "lowStockBody": "{count, plural, one {# product low on stock} other {# products low on stock}}",
+      "pushSettings": "Device alert settings"
     },
     "breadcrumb": {
       "label": "You are in",
@@ -1563,10 +1571,6 @@
       "audit": {
         "label": "Audit log",
         "meta": "Change history"
-      },
-      "profile": {
-        "label": "My profile",
-        "meta": "Password & language"
       }
     },
     "caseroHint": "Free plan to keep your store credit organized from the counter.",
@@ -2494,7 +2498,36 @@
     "shell": {
       "home": "My accounts",
       "logoAlt": "Quina",
-      "profile": "My profile"
+      "profile": "My profile",
+      "navLabel": "Portal navigation",
+      "nav": {
+        "home": "Home",
+        "cycles": "Cycles",
+        "pay": "How to pay",
+        "payMobile": "Pay",
+        "store": "Store",
+        "stores": "My stores",
+        "profile": "My profile"
+      },
+      "notificationsEmpty": "Here you will see your payment due reminders, purchases to confirm, and notes.",
+      "switchStore": "Switch store",
+      "storesCount": "{count, plural, =1 {1 store} other {# stores}}"
+    },
+    "notifications": {
+      "overdueTitle": "Overdue balance at {store}",
+      "overdueBody": "{amount} · due on {date}",
+      "dueSoonTitle": "Payment due soon at {store}",
+      "dueSoonBody": "{amount} · due on {date}",
+      "billedTitle": "Statement ready at {store}",
+      "billedBody": "{amount} · pay by {date}",
+      "pendingChargeTitle": "Purchase to review at {store}",
+      "pendingChargeBody": "{amount} · review window until {date}",
+      "objectedChargeTitle": "Note under review at {store}",
+      "objectedChargeBody": "{amount} · the store is reviewing it",
+      "blockedTitle": "Credit paused at {store}",
+      "blockedBody": "Talk to the store owner to resume credit.",
+      "bouncedTitle": "Email delivery failed at {store}",
+      "bouncedBody": "Ask the store to verify your registered email."
     },
     "home": {
       "title": "My store credit accounts",
@@ -2531,7 +2564,31 @@
       "blocked": "For now the store cannot give you more credit. Talk to the store owner.",
       "noCredit": "This store has not opened a credit account for you yet.",
       "callStore": "Call the store: {phone}",
-      "privacyLink": "Store privacy policy"
+      "privacyLink": "Store privacy policy",
+      "seeAllCycles": "See all cycles ({count})",
+      "storeInfoTitle": "Store details",
+      "storeInfoHint": "Address, phone and privacy"
+    },
+    "cycles": {
+      "title": "Cycles & payments",
+      "subtitle": "Review your monthly statements, purchases, and receipts.",
+      "filterLabel": "Filter cycles",
+      "filters": {
+        "all": "All",
+        "payable": "To pay",
+        "paid": "Paid"
+      }
+    },
+    "payPage": {
+      "title": "How to pay",
+      "subtitle": "Use the payment method you prefer and keep your receipt.",
+      "confirmHint": "After paying via Yape, Plin, or bank transfer, let the store know so they record your payment and issue your receipt."
+    },
+    "storePage": {
+      "subtitle": "Contact information and terms for your store credit account.",
+      "contactTitle": "Contact & privacy",
+      "noAddress": "This store has not added an address yet.",
+      "termsTitle": "Your credit terms"
     },
     "payment": {
       "title": "How to pay",
@@ -2577,7 +2634,7 @@
       "breakdown": "Principal {principal} · Interest {interest}"
     },
     "cycle": {
-      "back": "Back to my account",
+      "back": "Back to cycles",
       "subtitle": "Cycle {number}",
       "remaining": "Remaining to pay",
       "payNow": "How to pay",

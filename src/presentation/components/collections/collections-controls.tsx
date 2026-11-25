@@ -155,7 +155,7 @@ export function CollectionsControls({
                 aria-pressed={active}
                 onClick={() => navigate({ filter: key })}
                 className={cn(
-                  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-sm font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
+                  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-sm font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
                   active
                     ? 'bg-soft text-soft-ink'
                     : 'border border-line bg-surface text-ink-soft hover:bg-surface-hover hover:text-ink',
@@ -204,7 +204,7 @@ export function CollectionsControls({
                 aria-pressed={active}
                 onClick={() => navigate({ method: key as PaymentMethodFilter })}
                 className={cn(
-                  'inline-flex min-h-11 cursor-pointer items-center rounded-full px-3.5 text-sm font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
+                  'inline-flex min-h-11 cursor-pointer items-center rounded-full px-3.5 text-sm font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
                   active
                     ? 'bg-soft text-soft-ink'
                     : 'border border-line bg-surface text-ink-soft hover:bg-surface-hover hover:text-ink',

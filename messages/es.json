@@ -603,6 +603,33 @@
       "confirmAction": "Sí, restablecer",
       "cancel": "Cancelar"
     },
+    "push": {
+      "title": "Avisos en este celular",
+      "description": "Recibe alertas incluso con Quina cerrada cuando haya cobros vencidos o por vencer, stock bajo o un vecino observe un cargo.",
+      "statusChecking": "Revisando",
+      "statusOn": "Activados",
+      "statusOff": "Desactivados",
+      "statusBlocked": "Bloqueados",
+      "statusNeedsInstall": "Instalar app",
+      "statusUnavailable": "No disponible",
+      "devicesCount": "{count, plural, one {# equipo vinculado a tu cuenta} other {# equipos vinculados a tu cuenta}}",
+      "enableButton": "Activar avisos",
+      "disableButton": "Desactivar en este equipo",
+      "testButton": "Enviar aviso de prueba",
+      "enabledToast": "Avisos activados en este equipo.",
+      "disabledToast": "Avisos desactivados en este equipo.",
+      "deniedToast": "El navegador bloqueó los avisos. Puedes habilitarlos en los permisos del sitio.",
+      "unsupportedToast": "Este navegador no admite avisos push.",
+      "notConfiguredError": "Faltan las llaves VAPID en el servidor.",
+      "enableError": "No pudimos activar los avisos. Inténtalo de nuevo.",
+      "disableError": "No pudimos desactivar los avisos.",
+      "testSent": "Enviamos un aviso de prueba a tu equipo.",
+      "testError": "No pudimos enviar el aviso de prueba.",
+      "iosHomeScreenHint": "En iPhone o iPad primero toca Compartir y elige «Añadir a pantalla de inicio»; luego abre Quina desde ahí para activar los avisos.",
+      "blockedHint": "Bloqueaste los avisos en este navegador. Toca el ícono junto a la dirección web y permite las notificaciones.",
+      "missingVapidHint": "Falta configurar las llaves VAPID en el servidor para enviar avisos push.",
+      "unsupportedHint": "Tu navegador actual no admite notificaciones push en segundo plano."
+    },
     "password": {
       "title": "Contraseña",
       "statusConfigured": "Configurada",
@@ -678,30 +705,9 @@
       "cleared": "Se borraron las páginas guardadas sin conexión."
     },
     "access": {
-      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
-      "taxRegimeLabel": "Régimen tributario",
-      "rusCategory": "Categoría {category}",
-      "teamSeatsLabel": "Cupo de equipo",
-      "ownerLinksAria": "Accesos de gestión de la tienda",
-      "ownerScopeTitle": "Permisos de tu tienda",
-      "ownerLinks": {
-        "settings": {
-          "label": "Ajustes de la tienda",
-          "meta": "Yape, Plin, banco y tributos"
-        },
-        "subscription": {
-          "label": "Suscripción y plan",
-          "meta": "Plan y consumo mensual"
-        },
-        "team": {
-          "label": "Equipo de mostrador",
-          "meta": "Invitaciones y empleados"
-        },
-        "audit": {
-          "label": "Auditoría",
-          "meta": "Registro de movimientos"
-        }
-      },
+      "ownerTitle": "Dueño en {store}",
+      "ownerSubtitle": "Tu cuenta administra esta bodega: mostrador, precios, reglas de fiado, equipo y configuración del negocio.",
+      "manageTeamLink": "Gestionar equipo",
       "employeeTitle": "Empleado en {store}",
       "employeeSubtitle": "Tu acceso está enfocado en la atención diaria del mostrador. Los cambios de precios, reglas de fiado y suscripción los maneja el dueño.",
       "employeeAllowedHeading": "Lo que puedes hacer",
@@ -821,6 +827,7 @@
     "account": {
       "open": "Abrir el menú de tu cuenta",
       "profile": "Mi perfil",
+      "myStores": "Mis tiendas",
       "settings": "Ajustes de la tienda",
       "theme": "Tema",
       "themes": {
@@ -850,7 +857,8 @@
       "dueSoonTitle": "Cobra a {name}",
       "dueSoonBody": "{amount} · vence el {date}",
       "lowStockTitle": "Productos por agotarse",
-      "lowStockBody": "{count, plural, one {# producto con stock bajo} other {# productos con stock bajo}}"
+      "lowStockBody": "{count, plural, one {# producto con stock bajo} other {# productos con stock bajo}}",
+      "pushSettings": "Configurar avisos en el celular"
     },
     "breadcrumb": {
       "label": "Estás en",
@@ -1563,10 +1571,6 @@
       "audit": {
         "label": "Auditoría",
         "meta": "Historial de cambios"
-      },
-      "profile": {
-        "label": "Mi perfil",
-        "meta": "Clave e idioma"
       }
     },
     "caseroHint": "Plan gratuito para llevar el fiado ordenado desde el mostrador.",
@@ -2494,7 +2498,36 @@
     "shell": {
       "home": "Mis cuentas",
       "logoAlt": "Quina",
-      "profile": "Mi perfil"
+      "profile": "Mi perfil",
+      "navLabel": "Navegación del portal",
+      "nav": {
+        "home": "Inicio",
+        "cycles": "Ciclos",
+        "pay": "Cómo pagar",
+        "payMobile": "Pagar",
+        "store": "Tienda",
+        "stores": "Mis tiendas",
+        "profile": "Mi perfil"
+      },
+      "notificationsEmpty": "Aquí aparecerán tus avisos de fechas de pago, compras por confirmar y observaciones.",
+      "switchStore": "Cambiar de tienda",
+      "storesCount": "{count, plural, =1 {1 tienda} other {# tiendas}}"
+    },
+    "notifications": {
+      "overdueTitle": "Pago vencido en {store}",
+      "overdueBody": "{amount} · venció el {date}",
+      "dueSoonTitle": "Tu pago vence pronto en {store}",
+      "dueSoonBody": "{amount} · vence el {date}",
+      "billedTitle": "Estado de cuenta listo en {store}",
+      "billedBody": "{amount} · paga hasta el {date}",
+      "pendingChargeTitle": "Compra por confirmar en {store}",
+      "pendingChargeBody": "{amount} · puedes revisarla hasta el {date}",
+      "objectedChargeTitle": "Observación en revisión en {store}",
+      "objectedChargeBody": "{amount} · la tienda lo está revisando",
+      "blockedTitle": "Cuenta pausada en {store}",
+      "blockedBody": "Habla con tu casero para volver a fiar.",
+      "bouncedTitle": "Correo sin entrega en {store}",
+      "bouncedBody": "Pide a la tienda que revise tu correo registrado."
     },
     "home": {
       "title": "Mis cuentas de fiado",
@@ -2531,7 +2564,31 @@
       "blocked": "Por ahora la tienda no te puede fiar más. Habla con tu casero.",
       "noCredit": "Esta tienda todavía no te abrió una cuenta de fiado.",
       "callStore": "Llamar a la tienda: {phone}",
-      "privacyLink": "Política de privacidad de la tienda"
+      "privacyLink": "Política de privacidad de la tienda",
+      "seeAllCycles": "Ver todos los ciclos ({count})",
+      "storeInfoTitle": "Datos de la tienda",
+      "storeInfoHint": "Dirección, teléfono y privacidad"
+    },
+    "cycles": {
+      "title": "Ciclos y pagos",
+      "subtitle": "Revisa tus estados de cuenta por mes, tus compras y tus recibos.",
+      "filterLabel": "Filtrar ciclos",
+      "filters": {
+        "all": "Todos",
+        "payable": "Por pagar",
+        "paid": "Pagados"
+      }
+    },
+    "payPage": {
+      "title": "Cómo pagar",
+      "subtitle": "Usa el medio de pago que prefieras y guarda tu constancia.",
+      "confirmHint": "Después de hacer tu Yape, Plin o transferencia, avisa en la tienda para que registren tu pago y emitan tu recibo."
+    },
+    "storePage": {
+      "subtitle": "Información de contacto y condiciones de tu cuenta de fiado.",
+      "contactTitle": "Contacto y privacidad",
+      "noAddress": "Esta tienda aún no registró su dirección.",
+      "termsTitle": "Condiciones de tu fiado"
     },
     "payment": {
       "title": "Cómo pagar",
@@ -2577,7 +2634,7 @@
       "breakdown": "Capital {principal} · Interés {interest}"
     },
     "cycle": {
-      "back": "Volver a mi cuenta",
+      "back": "Volver a ciclos",
       "subtitle": "Ciclo {number}",
       "remaining": "Falta por pagar",
       "payNow": "Ver cómo pagar",

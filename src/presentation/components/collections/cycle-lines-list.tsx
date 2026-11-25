@@ -78,7 +78,7 @@ export function CycleLinesList({
                 aria-pressed={active}
                 onClick={() => setFilter(key)}
                 className={cn(
-                  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
+                  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
                   active
                     ? 'bg-soft text-soft-ink'
                     : 'border border-line bg-surface text-ink-soft hover:bg-surface-hover hover:text-ink',
@@ -97,7 +97,10 @@ export function CycleLinesList({
       ) : (
         <ul className="flex flex-col divide-y divide-line">
           {visible.map((line, index) => (
-            <li key={`${line.kind}-${line.chargeId}-${index}`} className="py-3">
+            <li
+              key={`${line.kind}-${line.chargeId}-${index}`}
+              className="py-4 first:pt-1 last:pb-1"
+            >
               <ChargeLine
                 line={line}
                 currency={currency}

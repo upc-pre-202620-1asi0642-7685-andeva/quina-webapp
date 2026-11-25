@@ -22,7 +22,7 @@ export default async function RusCapsPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-ink">{t('historyTitle')}</h2>
-        <ul className="divide-y divide-line rounded-card border border-line bg-surface">
+        <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
           {caps.map((cap) => (
             <li key={cap.id} className="flex flex-col gap-1 px-4 py-3 sm:px-6">
               <p className="font-medium text-ink">{t('category', { category: cap.category })}</p>

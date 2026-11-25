@@ -174,7 +174,11 @@ shadcn, no aceptar cambios a `globals.css`.
   - **Grilla Bento del Dashboard (escritorio):** en `xl` usa 3 columnas densas con
     tres anchos (`sm` Chico = 1 columna, `md` Mediano = 2 columnas y `lg` Grande =
     3 columnas) y 1 o 2 filas de alto; en celular todas se apilan en 1 columna.
-  - **Celular:** barra flotante en píldora (`shadow-float`) con Dashboard, Clientes,
+  - **Celular y tablet (< 1024 px):** cabecera superior translúcida
+    (`.chrome-translucent`) con el isologo enlazado a la izquierda, nombre de la
+    tienda desde `640 px` (tablet), y campana de notificaciones + avatar de perfil a
+    la derecha (`44×44 px` de toque). En la parte inferior, barra flotante en píldora
+    (`shadow-float`, acotada a `max-w-lg` en tablet) con Dashboard, Clientes,
     Cobranza y **Módulos**, y a su derecha el botón circular verde **Vender**.
     Módulos abre una hoja inferior con todos los grupos: desde el celular se llega
     a todo lo que hay en escritorio.
@@ -249,12 +253,13 @@ como el mostrador, con los mismos tokens, pero un escalón más grande:
   y "Compartir") usan el botón `lg` de 56 px. Todo botón de copiado rápido o
   enlace de cabecera conserva un mínimo de 44 × 44 px y respuesta inmediata al
   toque (`active:scale-[0.97]`).
-- **Marco:** `PortalShell`, una columna de 672 px como máximo, cabecera
-  translúcida (`backdrop-blur` con respaldo sólido ante
-  `prefers-reduced-transparency: reduce`) con el isologo (vuelve a "Mis cuentas")
-  y "Mi perfil" (tiendas, tema, idioma, contraseña, sesiones, caché sin conexión y
-  salir), además del aviso de sin señal (`OfflineBanner`) y espaciado inferior
-  seguro (`env(safe-area-inset-bottom)`). Sin la navegación del comerciante.
+- **Marco:** `PortalShell` comparte el mismo lenguaje visual que `AppShell` en la
+  bodega: barra lateral plegable en escritorio/laptop (`>= 1024 px`, con selector de
+  tienda, `Inicio`, `Ciclos`, `Cómo pagar`, `Tienda`, notificaciones y menú de
+  perfil al pie) y cabecera translúcida (`.chrome-translucent`) + barra inferior en
+  píldora (`max-w-lg` en tablet, con las 4 pestañas equilibradas y sin botón
+  circular primario) bajo `1024 px`. El contenido alcanza `max-w-5xl` con grilla de
+  2 columnas en escritorio y espaciado inferior seguro (`env(safe-area-inset-bottom)`).
 - **Ingreso:** `/portal/login` y `/portal/enter` usan `AuthShell` (§6.1) con el
   panel `aside="portal"`: el titular y la ficha le hablan al vecino ("Lo que
   debes"), no al bodeguero. En `/portal/enter` el token se canjea al tocar el

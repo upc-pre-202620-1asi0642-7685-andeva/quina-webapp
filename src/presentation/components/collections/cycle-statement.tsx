@@ -5,6 +5,7 @@ import type { CycleDetail } from '@/infrastructure/db/queries/collections';
 import { ChargeLine } from '@/presentation/components/collections/charge-line';
 import { CycleLinesList } from '@/presentation/components/collections/cycle-lines-list';
 import { Money } from '@/presentation/components/money';
+import { Notice } from '@/presentation/components/notice';
 import { formatDate } from '@/presentation/lib/format-date';
 import { cn } from '@/presentation/lib/utils';
 
@@ -37,14 +38,9 @@ export async function CycleStatement({
   return (
     <>
       {!billed ? (
-        <p
-          className={cn(
-            'rounded-field bg-paper-deep p-3 text-ink-soft',
-            large ? 'text-base' : 'text-sm',
-          )}
-        >
-          {t('cycle.openNotice', { date: formatDate(cycle.cutOffDate) })}
-        </p>
+        <Notice tone="info" className={large ? 'text-base' : 'text-sm'}>
+          <p>{t('cycle.openNotice', { date: formatDate(cycle.cutOffDate) })}</p>
+        </Notice>
       ) : null}
 
       <section
@@ -177,13 +173,13 @@ export async function CycleStatement({
           >
             {t('cycle.paymentsTitle')}
           </h2>
-          <ul className="flex flex-col divide-y divide-line">
+          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-field border border-line bg-paper/40">
             {cycle.payments.map((payment) => (
               <li key={payment.id}>
                 <Link
                   href={paymentHref(payment.id)}
                   className={cn(
-                    'flex min-h-14 items-center gap-3 rounded-field px-2 py-2.5 transition-[transform,background-color] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100',
+                    'flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring active:bg-surface-hover',
                     large ? 'text-lg' : 'text-sm',
                   )}
                 >

@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
-import { AlertTriangleIcon } from 'lucide-react';
 import { can } from '@/core/domain/identity/permissions';
 import type { Role } from '@/core/domain/identity/roles';
 import { AppToaster } from '@/presentation/components/feedback/app-toaster';
@@ -81,29 +80,29 @@ export async function AppShell({
       />
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between gap-2 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden print:hidden">
-          <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
-          <div className="flex min-w-0 items-center gap-2">
-            {lowStockCount > 0 ? (
-              <Link
-                href="/inventory?filter=low"
-                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber/12 px-2.5 py-1 text-xs font-medium text-amber-ink tabular-nums"
-              >
-                <AlertTriangleIcon aria-hidden="true" className="size-3.5" />
-                <span>{t('lowStockShort', { count: lowStockCount })}</span>
-              </Link>
-            ) : null}
-            <span className="truncate text-sm font-medium text-ink">{store.name}</span>
-            {/* En el celular avisos y cuenta quedan a un toque, como en escritorio */}
+        <header className="chrome-translucent sticky top-0 z-30 flex h-[calc(3.75rem+env(safe-area-inset-top,0px))] items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl supports-[backdrop-filter]:bg-surface/85 lg:hidden print:hidden">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link
+              href={isPlatform ? '/platform/stores' : '/'}
+              aria-label={t('nav.homeMobile')}
+              className="flex min-h-11 shrink-0 items-center rounded-full pr-1 transition-transform duration-150 ease-(--ease-out-expo) active:scale-[.97] motion-reduce:transition-none motion-reduce:active:scale-100"
+            >
+              <Image src={isologo} alt={t('logoAlt')} className="h-7 w-auto" />
+            </Link>
+            <span aria-hidden="true" className="hidden h-4 w-px bg-line sm:block" />
+            <span className="hidden truncate text-sm font-medium text-ink-soft sm:block">
+              {store.name}
+            </span>
+          </div>
+          {/* En el celular avisos y cuenta quedan a un toque, sin amontonarse con la marca */}
+          <div className="-mr-2 flex shrink-0 items-center gap-1">
             <NotificationsMenu items={notifications} compact />
-            <div className="-mr-1.5">
-              <ProfileMenu
-                user={user}
-                storeName={store.name}
-                canManageStore={can(user.role, 'settings.billing')}
-                compact
-              />
-            </div>
+            <ProfileMenu
+              user={user}
+              storeName={store.name}
+              canManageStore={can(user.role, 'settings.billing')}
+              compact
+            />
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:px-8 lg:pt-8 lg:pb-12">

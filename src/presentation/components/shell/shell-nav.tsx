@@ -386,6 +386,85 @@ export type SidebarUser = {
   homeHref: string;
 };
 
+function SidebarStoreCard({
+  store,
+  collapsed,
+  canManageStore,
+}: {
+  store: SidebarStore;
+  collapsed: boolean;
+  canManageStore: boolean;
+}) {
+  if (store.isPlatform) return null;
+  const initial = store.name.trim().charAt(0).toUpperCase();
+
+  if (collapsed) {
+    const className = cn(
+      'relative mx-auto flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-dark',
+      canManageStore && focusRing,
+    );
+    const badge = (
+      <>
+        {initial}
+        {store.statusTone === 'grace' ? (
+          <span className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-amber ring-2 ring-surface" />
+        ) : null}
+      </>
+    );
+    return (
+      <RailTip label={store.status ? `${store.name} · ${store.status}` : store.name}>
+        {canManageStore ? (
+          <Link href="/settings" aria-label={store.name} className={className}>
+            {badge}
+          </Link>
+        ) : (
+          <span aria-label={store.name} className={className}>
+            {badge}
+          </span>
+        )}
+      </RailTip>
+    );
+  }
+
+  const className = cn(
+    'flex items-center gap-3 rounded-card border border-line bg-paper px-3 py-2',
+    canManageStore && 'transition-colors hover:bg-surface-hover',
+    canManageStore && focusRing,
+  );
+  const content = (
+    <>
+      <span
+        aria-hidden="true"
+        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-dark"
+      >
+        {initial}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-sm font-semibold text-ink">{store.name}</span>
+        {store.status ? (
+          <span
+            className={cn(
+              'truncate text-xs',
+              store.statusTone === 'grace' ? 'font-medium text-amber-ink' : 'text-link-active',
+            )}
+          >
+            {store.status}
+          </span>
+        ) : null}
+      </span>
+    </>
+  );
+
+  return canManageStore ? (
+    // La tarjeta de la tienda lleva a Ajustes para el dueño; el empleado solo ve el contexto
+    <Link href="/settings" className={className}>
+      {content}
+    </Link>
+  ) : (
+    <div className={className}>{content}</div>
+  );
+}
+
 /**
  * Barra lateral de escritorio: se pliega a un riel de íconos (como Canva) y recuerda
  * la elección en una cookie, para que el servidor la pinte igual y no salte.
@@ -454,54 +533,11 @@ export function Sidebar({
           </RailTip>
         </div>
 
-        {store.isPlatform ? null : collapsed ? (
-          <RailTip label={store.status ? `${store.name} · ${store.status}` : store.name}>
-            <Link
-              href="/settings/subscription"
-              aria-label={store.name}
-              className={cn(
-                'relative mx-auto flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-dark',
-                focusRing,
-              )}
-            >
-              {store.name.trim().charAt(0).toUpperCase()}
-              {store.statusTone === 'grace' ? (
-                <span className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-amber ring-2 ring-surface" />
-              ) : null}
-            </Link>
-          </RailTip>
-        ) : (
-          // La prueba o la gracia van dentro de la tarjeta de la tienda: la barra cabe sin scroll
-          <Link
-            href="/settings/subscription"
-            className={cn(
-              'flex items-center gap-3 rounded-card border border-line bg-paper px-3 py-2 transition-colors hover:bg-surface-hover',
-              focusRing,
-            )}
-          >
-            <span
-              aria-hidden="true"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-dark"
-            >
-              {store.name.trim().charAt(0).toUpperCase()}
-            </span>
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate text-sm font-semibold text-ink">{store.name}</span>
-              {store.status ? (
-                <span
-                  className={cn(
-                    'truncate text-xs',
-                    store.statusTone === 'grace'
-                      ? 'font-medium text-amber-ink'
-                      : 'text-link-active',
-                  )}
-                >
-                  {store.status}
-                </span>
-              ) : null}
-            </span>
-          </Link>
-        )}
+        <SidebarStoreCard
+          store={store}
+          collapsed={collapsed}
+          canManageStore={user.canManageStore}
+        />
 
         {quick.length > 0 ? (
           <div className={collapsed ? 'flex justify-center' : ''}>
@@ -632,74 +668,76 @@ export function MobileNav({
     <>
       <nav
         aria-label={t('label')}
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden print:hidden"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden print:hidden"
       >
-        <ul className="pointer-events-auto relative flex h-16 flex-1 items-stretch rounded-full border border-line bg-surface p-1.5 shadow-float">
-          <li
-            aria-hidden="true"
-            className="--ease-out-expo pointer-events-none absolute inset-y-1.5 left-1.5 rounded-full bg-paper-deep transition-transform duration-250 motion-reduce:transition-none"
-            style={{
-              width: `calc((100% - 0.75rem) / ${slots})`,
-              transform: `translateX(${Math.max(0, indicatorIndex) * 100}%)`,
-              opacity: indicatorIndex === -1 ? 0 : 1,
-            }}
-          />
-          {tabs.map((item) => {
-            const Icon = item.key === 'home' ? HouseIcon : ICONS[item.key];
-            const label = item.key === 'home' ? t('homeMobile') : t(item.key);
-            const isActive = contains(item, active);
-            return (
-              <li key={item.key} className="relative flex flex-1">
-                <Link
-                  href={item.href}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={cn(
-                    'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-[0.6875rem] font-medium select-none',
-                    isActive ? 'text-ink' : 'text-ink-soft',
-                    focusRing,
-                    press,
-                  )}
-                >
-                  <Icon aria-hidden="true" className="size-5" strokeWidth={isActive ? 2.25 : 2} />
-                  {label}
-                </Link>
-              </li>
-            );
-          })}
-          <li className="relative flex flex-1">
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              aria-haspopup="dialog"
-              aria-expanded={open}
+        <div className="mx-auto flex w-full max-w-lg items-center gap-3">
+          <ul className="pointer-events-auto relative flex h-16 flex-1 items-stretch rounded-full border border-line bg-surface p-1.5 shadow-float">
+            <li
+              aria-hidden="true"
+              className="--ease-out-expo pointer-events-none absolute inset-y-1.5 left-1.5 rounded-full bg-paper-deep transition-transform duration-250 motion-reduce:transition-none"
+              style={{
+                width: `calc((100% - 0.75rem) / ${slots})`,
+                transform: `translateX(${Math.max(0, indicatorIndex) * 100}%)`,
+                opacity: indicatorIndex === -1 ? 0 : 1,
+              }}
+            />
+            {tabs.map((item) => {
+              const Icon = item.key === 'home' ? HouseIcon : ICONS[item.key];
+              const label = item.key === 'home' ? t('homeMobile') : t(item.key);
+              const isActive = contains(item, active);
+              return (
+                <li key={item.key} className="relative flex flex-1">
+                  <Link
+                    href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-[0.6875rem] font-medium select-none',
+                      isActive ? 'text-ink' : 'text-ink-soft',
+                      focusRing,
+                      press,
+                    )}
+                  >
+                    <Icon aria-hidden="true" className="size-5" strokeWidth={isActive ? 2.25 : 2} />
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+            <li className="relative flex flex-1">
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                className={cn(
+                  'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-[0.6875rem] font-medium select-none',
+                  modulesActive ? 'text-ink' : 'text-ink-soft',
+                  focusRing,
+                  press,
+                )}
+              >
+                <LayoutGridIcon aria-hidden="true" className="size-5" />
+                {t('modules')}
+              </button>
+            </li>
+          </ul>
+          {sell ? (
+            // DESIGN.md §5: "Vender" en verde, flotando a la derecha como acción principal
+            <Link
+              href={sell.href}
+              aria-current={active === sell.href ? 'page' : undefined}
+              aria-label={t('sell')}
               className={cn(
-                'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-[0.6875rem] font-medium select-none',
-                modulesActive ? 'text-ink' : 'text-ink-soft',
-                focusRing,
+                'pointer-events-auto flex size-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full bg-primary text-[0.6875rem] font-semibold text-primary-dark shadow-float select-none',
+                'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active',
                 press,
               )}
             >
-              <LayoutGridIcon aria-hidden="true" className="size-5" />
-              {t('modules')}
-            </button>
-          </li>
-        </ul>
-        {sell ? (
-          // DESIGN.md §5: "Vender" en verde, flotando a la derecha como acción principal
-          <Link
-            href={sell.href}
-            aria-current={active === sell.href ? 'page' : undefined}
-            aria-label={t('sell')}
-            className={cn(
-              'pointer-events-auto flex size-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full bg-primary text-[0.6875rem] font-semibold text-primary-dark shadow-float select-none',
-              'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active',
-              press,
-            )}
-          >
-            <ShoppingBasketIcon aria-hidden="true" className="size-6" />
-            <span aria-hidden="true">{t('sell')}</span>
-          </Link>
-        ) : null}
+              <ShoppingBasketIcon aria-hidden="true" className="size-6" />
+              <span aria-hidden="true">{t('sell')}</span>
+            </Link>
+          ) : null}
+        </div>
       </nav>
 
       <Sheet open={open} onOpenChange={setOpen}>

@@ -10,11 +10,13 @@ import { PasswordPolicy } from '@/core/domain/identity/password-policy';
 import { PersonName } from '@/core/domain/identity/person-name';
 import type { AuthMailer } from '@/core/domain/ports/auth-mailer';
 import type { Locale } from '@/core/domain/shared/locale';
+import type { ThemeChoice } from '@/core/domain/shared/theme';
 import { db as defaultDb, type Database } from '@/infrastructure/db/connection';
 import { createPortalDirectory } from '@/infrastructure/db/portal/drizzle-portal-directory';
 import * as schema from '@/infrastructure/db/schema';
 import { getAuthMailer } from '@/infrastructure/email/auth-mailer-factory';
-import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/presentation/i18n/resolve-locale';
+import { LOCALE_COOKIE, resolveLocale } from '@/presentation/i18n/resolve-locale';
+import { resolveTheme, THEME_COOKIE } from '@/presentation/lib/resolve-theme';
 import { CONSENT_COOKIE, LEGAL_TERMS_VERSION } from './consent';
 import { MAGIC_LINK_TTL_SECONDS, magicLinkToken } from './portal-link';
 import { createLockout, DISABLED_MESSAGE, LOCKED_MESSAGE } from './lockout-hooks';
@@ -118,6 +120,7 @@ export function createAuth(deps: AuthDeps) {
         role: { type: 'string', required: true, input: false, defaultValue: 'PENDING_OWNER' },
         phone: { type: 'string', required: false, input: false },
         preferredLocale: { type: 'string', required: false, input: false, defaultValue: 'es' },
+        preferredTheme: { type: 'string', required: false, input: false, defaultValue: 'system' },
         isActive: { type: 'boolean', required: false, input: false, defaultValue: true },
       },
     },
@@ -177,10 +180,12 @@ export function createAuth(deps: AuthDeps) {
                 message: 'Acepta los Términos y condiciones y la Política de privacidad.',
               });
             }
-            const cookie = readCookie(headers, LOCALE_COOKIE);
             const preferredLocale: Locale =
-              role === 'CUSTOMER' ? links[0]!.locale : isLocale(cookie) ? cookie : 'es';
-            return { data: { ...user, role, storeId: null, preferredLocale } };
+              role === 'CUSTOMER' ? links[0]!.locale : resolveLocale(localeHints(headers));
+            const preferredTheme: ThemeChoice = resolveTheme({
+              cookie: readCookie(headers, THEME_COOKIE),
+            });
+            return { data: { ...user, role, storeId: null, preferredLocale, preferredTheme } };
           },
           // Constancia inmutable de la aceptación, con IP y navegador. El vecino no
           // aceptó los términos del comerciante: su consentimiento está en la tienda (D3)

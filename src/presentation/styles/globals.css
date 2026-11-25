@@ -302,7 +302,8 @@ table.sr-only > caption {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .portal-chrome {
+  .portal-chrome,
+  .chrome-translucent {
     background-color: var(--color-surface);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

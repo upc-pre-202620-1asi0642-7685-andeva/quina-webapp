@@ -30,7 +30,7 @@ export function ObjectionsQueue({
 
   return (
     <>
-      <ul className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface">
+      <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
         {items.map((row) => (
           <li key={row.chargeId} className="flex flex-col gap-3 p-4 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">

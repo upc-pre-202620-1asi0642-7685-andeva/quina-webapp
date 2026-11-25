@@ -1,22 +1,17 @@
 import { cache } from 'react';
 import { headers } from 'next/headers';
 import { eq } from 'drizzle-orm';
-import {
-  PlanLimits,
-  type PlanTier,
-  type SubscriptionStatus,
-} from '@/core/domain/billing/plan-limits';
 import type { Role } from '@/core/domain/identity/roles';
 import type { Locale } from '@/core/domain/shared/locale';
-import type { BusinessTurn } from '@/presentation/validation/auth-schemas';
+import type { ThemeChoice } from '@/core/domain/shared/theme';
 import { getAuth } from '@/infrastructure/auth/auth';
 import { db } from '@/infrastructure/db/connection';
 import { stores, users } from '@/infrastructure/db/schema';
 import { withTenant } from '@/infrastructure/db/with-tenant';
 import type { SessionUser } from '@/presentation/auth/session';
 import { isLocale } from '@/presentation/i18n/resolve-locale';
+import { isThemeChoice } from '@/presentation/lib/resolve-theme';
 import { parseUserAgent, type ParsedUserAgent } from '@/presentation/lib/user-agent';
-import { loadStoreContext } from '@/presentation/queries/store-context';
 
 export type ProfileAccountMethod = {
   id: string;
@@ -38,18 +33,6 @@ export type ProfileSessionItem = {
 export type OwnerStoreAccess = {
   kind: 'owner';
   storeName: string;
-  businessTurn: BusinessTurn | string;
-  taxIdType: string;
-  taxIdNumber: string;
-  taxRegime: string;
-  rusCategory: number;
-  tier: PlanTier;
-  subscriptionStatus: SubscriptionStatus;
-  cancelAtPeriodEnd: boolean;
-  isReadOnly: boolean;
-  trialDaysRemaining: number | null;
-  usersUsed: number;
-  usersMax: number | null;
 };
 
 export type EmployeeStoreAccess = {
@@ -78,6 +61,7 @@ export type ProfileSummary = {
     image: string | null;
     role: Role;
     preferredLocale: Locale;
+    preferredTheme: ThemeChoice;
     hasCustomDashboard: boolean;
     createdAt: Date;
     lastLoginAt: Date | null;
@@ -110,6 +94,7 @@ export const loadProfileSummary = cache(
           image: users.image,
           role: users.role,
           preferredLocale: users.preferredLocale,
+          preferredTheme: users.preferredTheme,
           dashboardLayout: users.dashboardLayout,
           createdAt: users.createdAt,
           lastLoginAt: users.lastLoginAt,
@@ -141,41 +126,10 @@ export const loadProfileSummary = cache(
       });
 
     let access: ProfileAccessContext;
-    if (sessionUser.role === 'STORE_OWNER' && sessionUser.storeId) {
-      const [storeCtx, storeIdentity] = await Promise.all([
-        loadStoreContext(sessionUser.storeId),
-        withTenant(sessionUser.storeId, async (tx) => {
-          const [row] = await tx
-            .select({
-              businessTurn: stores.businessTurn,
-              taxIdType: stores.taxIdType,
-              taxIdNumber: stores.taxIdNumber,
-              taxRegime: stores.taxRegime,
-              rusCategory: stores.rusCategory,
-            })
-            .from(stores)
-            .where(eq(stores.id, sessionUser.storeId!));
-          return row ?? null;
-        }),
-      ]);
-
-      access = {
-        kind: 'owner',
-        storeName: storeCtx.name,
-        businessTurn: storeIdentity?.businessTurn ?? 'BODEGA',
-        taxIdType: storeIdentity?.taxIdType ?? 'RUC',
-        taxIdNumber: storeIdentity?.taxIdNumber ?? '',
-        taxRegime: storeIdentity?.taxRegime ?? 'NUEVO_RUS',
-        rusCategory: storeIdentity?.rusCategory ?? 1,
-        tier: storeCtx.tier,
-        subscriptionStatus: storeCtx.subscription.status,
-        cancelAtPeriodEnd: Boolean(storeCtx.subscription.cancelAtPeriodEnd),
-        isReadOnly: storeCtx.isReadOnly,
-        trialDaysRemaining: storeCtx.trialDaysRemaining,
-        usersUsed: storeCtx.usage.users,
-        usersMax: PlanLimits.of(storeCtx.tier).users,
-      };
-    } else if (sessionUser.role === 'STORE_EMPLOYEE' && sessionUser.storeId) {
+    if (
+      (sessionUser.role === 'STORE_OWNER' || sessionUser.role === 'STORE_EMPLOYEE') &&
+      sessionUser.storeId
+    ) {
       const row = await withTenant(sessionUser.storeId, async (tx) => {
         const [found] = await tx
           .select({ commercialName: stores.commercialName })
@@ -184,7 +138,7 @@ export const loadProfileSummary = cache(
         return found ?? null;
       });
       access = {
-        kind: 'employee',
+        kind: sessionUser.role === 'STORE_OWNER' ? 'owner' : 'employee',
         storeName: row?.commercialName ?? '',
       };
     } else if (sessionUser.role === 'PLATFORM_ADMIN') {
@@ -205,6 +159,9 @@ export const loadProfileSummary = cache(
         preferredLocale: isLocale(userRow?.preferredLocale)
           ? userRow.preferredLocale
           : sessionUser.preferredLocale,
+        preferredTheme: isThemeChoice(userRow?.preferredTheme)
+          ? userRow.preferredTheme
+          : sessionUser.preferredTheme,
         hasCustomDashboard: Boolean(userRow?.dashboardLayout),
         createdAt: userRow?.createdAt ? new Date(userRow.createdAt) : new Date(),
         lastLoginAt: userRow?.lastLoginAt ? new Date(userRow.lastLoginAt) : null,

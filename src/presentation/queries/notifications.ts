@@ -11,7 +11,15 @@ export type AppNotification = {
   /** Estable mientras el hecho no cambie: así "marcar como leídas" sobrevive a recargar. */
   id: string;
   tone: 'error' | 'warning' | 'info';
-  kind: 'overdue' | 'dueSoon' | 'lowStock' | 'plan';
+  kind:
+    | 'overdue'
+    | 'dueSoon'
+    | 'lowStock'
+    | 'plan'
+    | 'billed'
+    | 'pendingCharge'
+    | 'objectedCharge'
+    | 'accountAlert';
   title: string;
   body: string;
   href: string;

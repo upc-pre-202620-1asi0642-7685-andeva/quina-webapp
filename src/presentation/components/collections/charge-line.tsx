@@ -56,28 +56,32 @@ export function ChargeLine({
 
   if (line.kind === 'installment') {
     return (
-      <div className={cn('flex items-start justify-between gap-3', body)}>
-        <div className="flex flex-col gap-0.5">
+      <div className={cn('flex items-baseline justify-between gap-4', body)}>
+        <div className="flex min-w-0 flex-col gap-0.5">
           <span className="font-medium text-ink">
             {t('installment', { number: line.number, total: line.total })}
           </span>
-          <span className="text-ink-soft">
+          <span className={cn('text-ink-soft', small)}>
             {t('installmentBreakdown', {
               principal: formatMoney(line.principal, currency),
               interest: formatMoney(line.interest, currency),
             })}
           </span>
         </div>
-        <Money amount={line.amount} currency={currency} className="font-semibold text-ink" />
+        <Money
+          amount={line.amount}
+          currency={currency}
+          className="shrink-0 font-semibold text-ink"
+        />
       </div>
     );
   }
 
   if (line.kind === 'void') {
     return (
-      <div className={cn('flex items-start justify-between gap-3', body)}>
+      <div className={cn('flex items-baseline justify-between gap-4', body)}>
         <span className="font-medium text-ink">{t('voidLine')}</span>
-        <span className="font-semibold whitespace-nowrap text-ink">
+        <span className="shrink-0 font-semibold whitespace-nowrap text-ink">
           − <Money amount={line.amount} currency={currency} />
         </span>
       </div>
@@ -95,38 +99,51 @@ export function ChargeLine({
   const canResolve = permissions.resolve && open && line.consentStatus === 'OBJECTED';
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className={cn('flex items-start justify-between gap-3', body)}>
-        <div className="flex min-w-0 flex-col gap-1">
-          <span className={cn('font-medium text-ink', voided && 'line-through')}>
+    <div className="flex flex-col gap-3">
+      <div className={cn('flex items-baseline justify-between gap-4', body)}>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className={cn('font-semibold text-ink', voided && 'line-through')}>
             {t('purchase', { date: formatDate(line.date) })}
-            {installments ? ` · ${t('inInstallments', { count: installments })}` : ''}
           </span>
-          <ul className={cn('flex flex-col gap-0.5 text-ink-soft', large && 'text-base')}>
-            {line.items.map((item, index) => (
-              <li key={index} className="flex items-start justify-between gap-3">
-                <span className="line-clamp-2 min-w-0 flex-1">
-                  {item.quantity} × {item.name}
-                </span>
-                <Money amount={item.amount} currency={currency} className="shrink-0" />
-              </li>
-            ))}
-          </ul>
-          {line.days !== null && line.interest !== null ? (
-            <span className="text-ink-soft">
-              {t('interest', { days: line.days })}{' '}
-              <Money amount={line.interest} currency={currency} />
+          {installments ? (
+            <span className="rounded-full bg-paper-deep px-2.5 py-0.5 text-xs font-medium text-ink-soft">
+              {t('inInstallments', { count: installments })}
             </span>
           ) : null}
         </div>
         <Money
           amount={line.amount}
           currency={currency}
-          className={cn('font-semibold text-ink', voided && 'line-through')}
+          className={cn('shrink-0 font-semibold text-ink', voided && 'line-through')}
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      {line.items.length > 0 ? (
+        <ul
+          className={cn(
+            'flex flex-col gap-1.5 text-ink-soft',
+            large ? 'rounded-field bg-paper-deep/55 px-3.5 py-2.5 text-base' : 'text-sm',
+          )}
+        >
+          {line.items.map((item, index) => (
+            <li key={index} className="flex items-baseline justify-between gap-4">
+              <span className="min-w-0 flex-1">
+                {item.quantity} × {item.name}
+              </span>
+              <Money amount={item.amount} currency={currency} className="shrink-0 text-ink-soft" />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {line.days !== null && line.interest !== null ? (
+        <div className={cn('flex items-baseline justify-between gap-4 text-ink-soft', small)}>
+          <span>{t('interest', { days: line.days })}</span>
+          <Money amount={line.interest} currency={currency} className="shrink-0" />
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span
           className={cn(
             'inline-flex items-center rounded-full px-2.5 py-0.5 font-medium',
@@ -144,19 +161,41 @@ export function ChargeLine({
       </div>
 
       {line.objectionNote ? (
-        <p className={cn('text-ink-soft', note)}>
+        <p
+          className={cn(
+            'rounded-field border border-line bg-paper-deep px-3.5 py-2.5 text-ink-soft',
+            note,
+          )}
+        >
           {t('objectionNote', { note: line.objectionNote })}
         </p>
       ) : null}
       {line.voidReason ? (
-        <p className={cn('text-ink-soft', note)}>{t('voidReason', { note: line.voidReason })}</p>
+        <p
+          className={cn(
+            'rounded-field border border-line bg-paper-deep px-3.5 py-2.5 text-ink-soft',
+            note,
+          )}
+        >
+          {t('voidReason', { note: line.voidReason })}
+        </p>
       ) : line.resolutionNote ? (
-        <p className={cn('text-ink-soft', note)}>
+        <p
+          className={cn(
+            'rounded-field border border-line bg-paper-deep px-3.5 py-2.5 text-ink-soft',
+            note,
+          )}
+        >
           {t('resolutionNote', { note: line.resolutionNote })}
         </p>
       ) : null}
       {permissions.object && !permissions.resolve && open && line.consentStatus === 'OBJECTED' ? (
-        <p className={cn('text-ink-soft', note)}>
+        <p
+          className={cn(
+            'rounded-field border border-amber/25 bg-amber/12 px-3.5 py-2.5 text-amber-ink',
+            note,
+          )}
+        >
           {portalStoreId ? tPortal('waiting') : t('askOwner')}
         </p>
       ) : null}
