@@ -50,7 +50,7 @@ export default async function PortalHomePage() {
         <h1 className="text-3xl font-semibold tracking-tight text-ink">{t('title')}</h1>
         <p className="text-ink-soft">{t('subtitle')}</p>
       </header>
-      <ul className="flex flex-col gap-3">
+      <ul className="grid gap-3 md:grid-cols-2">
         {accounts.map((account) => {
           const payable = account.account?.payable;
           const badgeStatus = payable

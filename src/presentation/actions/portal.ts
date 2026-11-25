@@ -16,6 +16,7 @@ import { verifyTurnstile } from '@/infrastructure/auth/turnstile';
 import { db } from '@/infrastructure/db/connection';
 import { DrizzleChargeResolutionRepository } from '@/infrastructure/db/collections/drizzle-charge-resolution-repository';
 import { createPortalDirectory } from '@/infrastructure/db/portal/drizzle-portal-directory';
+import { notifyStoreChargeObjected } from '@/infrastructure/push/store-push-alerts';
 import type { ChargeActionResult } from '@/presentation/actions/collections';
 import { authorizePortal } from '@/presentation/auth/guards';
 
@@ -134,6 +135,13 @@ export async function objectChargeFromPortalAction(
       now: new Date(),
     });
     if (!result.ok) return { ok: false, error: result.error };
+    void notifyStoreChargeObjected(
+      access.link.storeId,
+      access.link.customerId,
+      parsed.data.cycleId,
+    ).catch((err) => {
+      console.error('[push] no se pudo avisar la observación del cargo', err);
+    });
     revalidatePath(`/portal/${parsed.data.storeId}/cycles/${parsed.data.cycleId}`);
     revalidatePath(`/customers/${access.link.customerId}/cycles/${parsed.data.cycleId}`);
     revalidatePath('/collections');

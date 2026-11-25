@@ -54,7 +54,7 @@ export async function PaymentInfo({
       ) : (
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           {rows.length > 0 ? (
-            <ul className="flex min-w-0 flex-1 flex-col divide-y divide-line rounded-field border border-line bg-paper/40">
+            <ul className="flex min-w-0 flex-1 flex-col divide-y divide-line overflow-hidden rounded-field border border-line bg-paper/40">
               {rows.map(({ key, value, copyable }) => {
                 const label = t(key);
                 return (

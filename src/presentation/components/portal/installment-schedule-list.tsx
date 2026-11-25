@@ -70,7 +70,7 @@ export function InstallmentScheduleList({
   return (
     <div className="flex flex-col gap-3 sm:hidden">
       {/* Seis columnas no caben en 390 px: en el celular cada cuota es una fila con su desglose */}
-      <ul className="flex flex-col divide-y divide-line rounded-field border border-line">
+      <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-field border border-line">
         {visibleRows.map((row, idx) => {
           const isNext = nextDueIndex !== -1 && rows[nextDueIndex]?.number === row.number;
           return (
