@@ -181,7 +181,7 @@ export function ProfileMenu({
   async function signOut() {
     setSigningOut(true);
     try {
-      if (!isPortal) await unsubscribePushOnSignOut();
+      await unsubscribePushOnSignOut();
       await authClient.signOut();
       // US22: lo guardado para leer sin señal no se queda en un celular compartido
       await clearOfflinePages();

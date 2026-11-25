@@ -628,7 +628,9 @@
       "iosHomeScreenHint": "On iPhone or iPad, first tap Share and choose \"Add to Home Screen\", then open Quina from there to enable alerts.",
       "blockedHint": "Alerts are blocked in this browser. Open site permissions next to the address bar and allow notifications.",
       "missingVapidHint": "Server VAPID keys are not configured yet for push alerts.",
-      "unsupportedHint": "Your current browser does not support background push notifications."
+      "unsupportedHint": "Your current browser does not support background push notifications.",
+      "portalDescription": "Get alerts even when Quina is closed for new credit purchases, closing statements, payment reminders, dispute updates, or confirmed payments.",
+      "noStoresHint": "Once a store links your email to a credit account, you can enable alerts here."
     },
     "password": {
       "title": "Password",

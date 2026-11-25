@@ -629,7 +629,9 @@
       "iosHomeScreenHint": "iPhone utaq iPadpiqa ñawpaqta Compartir ñit'ispa «Añadir a pantalla de inicio» akllay; chaymanta kicharispa willakuykunata kichariy.",
       "blockedHint": "Kay navegadorpi willakuykuna harkasqam kachkan. Dirección ñawpaqninpi permisokunata kichariy.",
       "missingVapidHint": "Servidorpi VAPID llavekuna manaraq churasqachu push willakuykunapaq.",
-      "unsupportedHint": "Kay navegadorqa mana qhipapi push willakuykunata chaskinchu."
+      "unsupportedHint": "Kay navegadorqa mana qhipapi push willakuykunata chaskinchu.",
+      "portalDescription": "Quina wichqasqa kaptinpas willakuykunata chaskiy: musuq fiado, cuenta estado, pagay yuyarichiy, ranti qhawasqa kutichiy utaq pagasqa recibo.",
+      "noStoresHint": "Huk qhatu correoykita fiadoykiwan t'inkiptin kaypi willakuykunata kichariyta atinki."
     },
     "password": {
       "title": "Yaykuna rimay",
