@@ -97,7 +97,7 @@ export default async function PortalAccountPage({
           {account ? (
             <section
               aria-labelledby="summary-title"
-              className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6"
+              className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 sm:p-6"
             >
               <h2 id="summary-title" className="sr-only">
                 {t('summaryTitle')}

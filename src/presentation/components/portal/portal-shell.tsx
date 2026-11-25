@@ -40,7 +40,9 @@ export function PortalShell({
         <PortalMobileHeader stores={stores} user={user} notifications={notifications} />
         <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] text-lg leading-relaxed lg:px-8 lg:pt-8 lg:pb-12 print:max-w-none print:p-0">
           <OfflineBanner />
-          <RouteBones>{children}</RouteBones>
+          <RouteBones>
+            <div className="flex flex-col gap-6">{children}</div>
+          </RouteBones>
         </main>
       </div>
 

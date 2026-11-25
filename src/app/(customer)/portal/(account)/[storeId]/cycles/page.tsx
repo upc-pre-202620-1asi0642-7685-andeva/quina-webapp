@@ -86,7 +86,7 @@ export default async function PortalCyclesPage({
                     }
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-base font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.97]',
+                      'inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold whitespace-nowrap transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.97] sm:text-base',
                       active
                         ? 'border-link-active bg-soft text-soft-ink'
                         : 'border-line bg-surface text-ink-soft hover:bg-surface-hover hover:text-ink',
@@ -95,7 +95,7 @@ export default async function PortalCyclesPage({
                     <span>{t(`filters.${key}`)}</span>
                     <span
                       className={cn(
-                        'rounded-full px-2 py-0.5 text-sm tabular-nums',
+                        'rounded-full px-2 py-0.5 text-xs tabular-nums sm:text-sm',
                         active ? 'bg-surface/80 text-soft-ink' : 'bg-paper-deep text-ink-soft',
                       )}
                     >

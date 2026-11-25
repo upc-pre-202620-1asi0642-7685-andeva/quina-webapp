@@ -51,10 +51,7 @@ export async function InstallmentPlans({
   return (
     <section
       aria-labelledby="installments-title"
-      className={cn(
-        'flex flex-col gap-5 rounded-card border border-line bg-surface sm:p-6',
-        compact ? 'p-4' : 'p-5',
-      )}
+      className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 sm:p-6"
     >
       <h2
         id="installments-title"
@@ -76,7 +73,7 @@ export async function InstallmentPlans({
                 <h3 className="font-semibold text-ink">
                   {t('purchase', {
                     date: formatDate(plan.purchaseDate),
-                    amount: formatMoney(plan.principal, currency),
+                    amount: formatMoney(plan.principal, currency).replace(' ', '\u00A0'),
                   })}
                 </h3>
                 <span
@@ -106,7 +103,7 @@ export async function InstallmentPlans({
                   {t('nextDue', {
                     number: nextRow.number,
                     date: formatDate(nextRow.dueDate),
-                    amount: formatMoney(nextRow.installment, currency),
+                    amount: formatMoney(nextRow.installment, currency).replace(' ', '\u00A0'),
                   })}
                 </p>
               ) : null}

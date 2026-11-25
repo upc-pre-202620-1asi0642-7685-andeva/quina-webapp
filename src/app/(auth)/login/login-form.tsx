@@ -209,11 +209,11 @@ export function LoginForm() {
       </form>
 
       {/* Plan 5, P6: el vecino entra por su propio ingreso, sin contraseña */}
-      <p className="text-sm text-ink-soft">
+      <p className="text-center text-sm text-ink-soft sm:text-left">
         {t('customerQuestion')}{' '}
         <Link
           href="/portal/login"
-          className="font-medium text-link-active underline-offset-4 hover:underline"
+          className="font-semibold text-link-active underline-offset-4 hover:underline"
         >
           {t('customerLink')}
         </Link>

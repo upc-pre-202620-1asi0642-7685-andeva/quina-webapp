@@ -44,7 +44,7 @@ export default async function PortalStorePage({
         ) : null}
       </header>
 
-      <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 sm:p-6">
+      <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-ink">{t('contactTitle')}</h2>
         {portal.storeAddress ? (
           <p className="flex items-start gap-3 text-base text-ink-soft">
@@ -84,7 +84,7 @@ export default async function PortalStorePage({
       </section>
 
       {account ? (
-        <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 sm:p-6">
+        <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
           <div className="flex items-center gap-2">
             <CalendarClockIcon aria-hidden="true" className="size-5 text-ink-soft" />
             <h2 className="text-xl font-semibold text-ink">{t('termsTitle')}</h2>
