@@ -39,22 +39,31 @@ export function PushNotificationsCard() {
   const t = useTranslations('Profile.push');
   const [server, setServer] = useState<ServerPushState | null>(null);
   const [browser, setBrowser] = useState<BrowserPushState | null>(null);
+  const [checking, setChecking] = useState(true);
   const [working, setWorking] = useState(false);
   const [testing, setTesting] = useState(false);
 
   const refresh = useCallback(async () => {
-    const next = await fetchPushState();
-    if (next.server) setServer(next.server);
-    setBrowser(next.browser);
+    try {
+      const next = await fetchPushState();
+      if (next.server) setServer(next.server);
+      setBrowser(next.browser);
+    } finally {
+      setChecking(false);
+    }
   }, []);
 
   useEffect(() => {
     let active = true;
-    void fetchPushState().then((next) => {
-      if (!active) return;
-      if (next.server) setServer(next.server);
-      setBrowser(next.browser);
-    });
+    void fetchPushState()
+      .then((next) => {
+        if (!active) return;
+        if (next.server) setServer(next.server);
+        setBrowser(next.browser);
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
     return () => {
       active = false;
     };
@@ -117,11 +126,12 @@ export function PushNotificationsCard() {
     }
   }
 
-  const loading = server === null || browser === null;
+  const loading = checking;
   const subscribed = Boolean(browser?.subscribedOnThisDevice);
   const blocked = browser?.permission === 'denied';
   const needsHomeScreen = browser?.support === 'needs-home-screen';
-  const unsupported = browser?.support === 'unsupported';
+  const unsupported = !checking && (!browser || browser.support === 'unsupported');
+  const serverUnavailable = !checking && server === null;
   const missingVapid = server !== null && (!server.configured || !server.vapidPublicKey);
 
   let statusLabel = t('statusOff');
@@ -137,12 +147,18 @@ export function PushNotificationsCard() {
   } else if (needsHomeScreen) {
     statusLabel = t('statusNeedsInstall');
     statusClass = 'bg-amber/12 text-amber-ink';
-  } else if (unsupported || missingVapid) {
+  } else if (unsupported || missingVapid || serverUnavailable) {
     statusLabel = t('statusUnavailable');
   }
 
   const canSubscribe =
-    !loading && !subscribed && !blocked && !needsHomeScreen && !unsupported && !missingVapid;
+    !loading &&
+    !subscribed &&
+    !blocked &&
+    !needsHomeScreen &&
+    !unsupported &&
+    !missingVapid &&
+    !serverUnavailable;
 
   return (
     <section
@@ -244,13 +260,17 @@ export function PushNotificationsCard() {
         <p role="status" className="text-xs text-error-ink">
           {t('blockedHint')}
         </p>
+      ) : unsupported ? (
+        <p role="status" className="text-xs text-ink-soft">
+          {t('unsupportedHint')}
+        </p>
       ) : missingVapid ? (
         <p role="status" className="text-xs text-ink-soft">
           {t('missingVapidHint')}
         </p>
-      ) : unsupported ? (
+      ) : serverUnavailable ? (
         <p role="status" className="text-xs text-ink-soft">
-          {t('unsupportedHint')}
+          {t('enableError')}
         </p>
       ) : null}
     </section>
