@@ -135,6 +135,7 @@ export async function notifyStoreChargeObjected(
   const subscriptions = await repo.listForStore(storeId);
   if (subscriptions.length === 0) return { sent: 0, failed: 0, expired: 0 };
 
+  const userIds = [...new Set(subscriptions.map((s) => s.userId))];
   const info = await withTenant(storeId, async (tx) => {
     const [store] = await tx
       .select({ name: stores.commercialName })
@@ -144,10 +145,24 @@ export async function notifyStoreChargeObjected(
       .select({ firstName: customers.firstName })
       .from(customers)
       .where(eq(customers.id, customerId));
-    return { storeName: store?.name, customerName: customer?.firstName };
+    // Solo personal activo de la tienda: las filas del vecino (`storeId = null`) no reciben avisos internos
+    const staffRows = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.storeId, storeId), eq(users.isActive, true), inArray(users.id, userIds)));
+    return {
+      storeName: store?.name,
+      customerName: customer?.firstName,
+      staffIds: new Set(staffRows.map((u) => u.id)),
+    };
   });
 
   if (!info.storeName || !info.customerName) {
+    return { sent: 0, failed: 0, expired: 0 };
+  }
+
+  const staffSubscriptions = subscriptions.filter((sub) => info.staffIds.has(sub.userId));
+  if (staffSubscriptions.length === 0) {
     return { sent: 0, failed: 0, expired: 0 };
   }
 
@@ -155,7 +170,7 @@ export async function notifyStoreChargeObjected(
     repo,
     notifier,
     storeId,
-    subscriptions,
+    staffSubscriptions,
     (sub) =>
       buildChargeObjectedPushPayload(sub.locale, {
         customerName: info.customerName!,

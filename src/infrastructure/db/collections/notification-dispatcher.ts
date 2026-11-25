@@ -13,6 +13,7 @@ import { Money, type Currency } from '@/core/domain/shared/money';
 import { getAuth } from '../../auth/auth';
 import { createPortalLink } from '../../auth/portal-link';
 import { getCollectionsMailer } from '../../email/collections-mailers';
+import { notifyPortalNotice } from '../../push/portal-push-alerts';
 import {
   creditAccounts,
   creditCharges,
@@ -170,6 +171,22 @@ export class NotificationDispatcher {
           .where(eq(notificationLogs.id, row.id));
         await built.onSent?.(tx, sentAt);
       });
+      if (row.customerId) {
+        await notifyPortalNotice(storeId, row.customerId, {
+          kind: built.mail.kind,
+          total: built.mail.total,
+          currency: built.mail.currency,
+          cycleId:
+            built.mail.kind === 'cycle-statement' ||
+            built.mail.kind === 'payment-reminder' ||
+            built.mail.kind === 'late-payment'
+              ? (row.referenceId ?? undefined)
+              : undefined,
+          paymentId:
+            built.mail.kind === 'payment-receipt' ? (row.referenceId ?? undefined) : undefined,
+          receiptNumber: built.mail.receiptNumber,
+        }).catch((err) => console.error('notifyPortalNotice', err));
+      }
       return 'SENT';
     } catch (error) {
       await mark(storeId, row.id, { status: 'FAILED', errorMessage: messageOf(error) });

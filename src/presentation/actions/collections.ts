@@ -10,6 +10,7 @@ import {
   queuePaymentReminders,
 } from '@/infrastructure/db/collections/drizzle-daily-process';
 import { NotificationDispatcher } from '@/infrastructure/db/collections/notification-dispatcher';
+import { notifyPortalChargeResolution } from '@/infrastructure/push/portal-push-alerts';
 import { authorizeStore } from '@/presentation/auth/guards';
 import { loadStoreContext } from '@/presentation/queries/store-context';
 
@@ -87,6 +88,12 @@ export async function confirmChargeAction(input: ChargeInput): Promise<ChargeAct
       now: new Date(),
     });
     if (!result.ok) return { ok: false, error: result.error };
+    await notifyPortalChargeResolution(
+      user.storeId,
+      parsed.data.customerId,
+      parsed.data.cycleId,
+      'confirmed',
+    ).catch((err) => console.error('notifyPortalChargeResolution', err));
     refresh(parsed.data);
     return { ok: true };
   } catch (error) {
@@ -110,6 +117,12 @@ export async function voidChargeAction(input: ChargeInput): Promise<ChargeAction
       now: new Date(),
     });
     if (!result.ok) return { ok: false, error: result.error };
+    await notifyPortalChargeResolution(
+      user.storeId,
+      parsed.data.customerId,
+      parsed.data.cycleId,
+      'voided',
+    ).catch((err) => console.error('notifyPortalChargeResolution', err));
     refresh(parsed.data);
     return { ok: true };
   } catch (error) {

@@ -1,5 +1,14 @@
 import type { PushPayload } from '../ports/push-notifier';
 import type { Locale } from '../shared/locale';
+import { Money, type Currency } from '../shared/money';
+
+const CURRENCY_SYMBOL: Record<Currency, string> = { PEN: 'S/', USD: 'US$' };
+
+function formatPushMoney(amount: string, currency: Currency): string {
+  const [integer = '0', decimals = '00'] = Money.of(amount, currency).toFixed2().split('.');
+  const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${CURRENCY_SYMBOL[currency]} ${grouped}.${decimals}`;
+}
 
 export type DailyPushAlerts = {
   storeName: string;
@@ -148,12 +157,16 @@ export function buildChargeObjectedPushPayload(
   };
 }
 
-export function buildTestPushPayload(locale: Locale, storeName: string): PushPayload {
+export function buildTestPushPayload(
+  locale: Locale,
+  storeName: string,
+  url = '/app/profile/preferences',
+): PushPayload {
   if (locale === 'en') {
     return {
       title: `Quina · ${storeName}`,
       body: 'Push alerts are active on this device.',
-      url: '/app/profile/preferences',
+      url,
       tag: 'quina-push-test',
     };
   }
@@ -161,14 +174,255 @@ export function buildTestPushPayload(locale: Locale, storeName: string): PushPay
     return {
       title: `Quina · ${storeName}`,
       body: "Kay celularpi willakuykunaqa llamk'achkanñam.",
-      url: '/app/profile/preferences',
+      url,
       tag: 'quina-push-test',
     };
   }
   return {
     title: `Quina · ${storeName}`,
     body: '¡Listo! Los avisos en este celular ya están activos.',
-    url: '/app/profile/preferences',
+    url,
     tag: 'quina-push-test',
+  };
+}
+
+export type PortalPushNoticeKind =
+  'charge-digest' | 'cycle-statement' | 'payment-reminder' | 'late-payment' | 'payment-receipt';
+
+export function buildPortalCreditSalePushPayload(
+  locale: Locale,
+  input: { storeName: string; storeId: string; saleId: string; total: string; currency: Currency },
+): PushPayload {
+  const amount = formatPushMoney(input.total, input.currency);
+  const url = `/app/portal/${input.storeId}`;
+  const tag = `quina-portal-sale-${input.saleId}`;
+  if (locale === 'en') {
+    return {
+      title: `Quina · New credit purchase (${input.storeName})`,
+      body: `Recorded ${amount} on your credit tab. Tap to review it in your portal.`,
+      url,
+      tag,
+    };
+  }
+  if (locale === 'qu') {
+    return {
+      title: `Quina · Musuq fiado (${input.storeName})`,
+      body: `${amount} rantikuyta qillqarqanku. Portalniykipi qhaway.`,
+      url,
+      tag,
+    };
+  }
+  return {
+    title: `Quina · Nuevo fiado en ${input.storeName}`,
+    body: `Se anotó una compra por ${amount}. Toca para revisarla en tu portal.`,
+    url,
+    tag,
+  };
+}
+
+export function buildPortalChargeResolutionPushPayload(
+  locale: Locale,
+  input: {
+    outcome: 'confirmed' | 'voided';
+    storeName: string;
+    storeId: string;
+    cycleId: string;
+  },
+): PushPayload {
+  const url = `/app/portal/${input.storeId}/cycles/${input.cycleId}`;
+  const tag = `quina-portal-resolution-${input.cycleId}`;
+  if (locale === 'en') {
+    return input.outcome === 'voided'
+      ? {
+          title: `Quina · Charge voided (${input.storeName})`,
+          body: 'The store accepted your report and removed that charge from your tab.',
+          url,
+          tag,
+        }
+      : {
+          title: `Quina · Report reviewed (${input.storeName})`,
+          body: 'The store reviewed your report and left a note on your statement.',
+          url,
+          tag,
+        };
+  }
+  if (locale === 'qu') {
+    return input.outcome === 'voided'
+      ? {
+          title: `Quina · Ranti qullusqa (${input.storeName})`,
+          body: 'Qhatuqa willakuyniykita chaskispa chay fiadota qullurqan.',
+          url,
+          tag,
+        }
+      : {
+          title: `Quina · Willakuy qhawasqa (${input.storeName})`,
+          body: 'Qhatuqa willakuyniykita qhawarqanñam. Estadoykipi qhaway.',
+          url,
+          tag,
+        };
+  }
+  return input.outcome === 'voided'
+    ? {
+        title: `Quina · Compra anulada (${input.storeName})`,
+        body: 'La tienda aceptó tu observación y descontó ese cargo de tu cuenta.',
+        url,
+        tag,
+      }
+    : {
+        title: `Quina · Observación revisada (${input.storeName})`,
+        body: 'La tienda revisó tu observación y dejó su respuesta en tu estado de cuenta.',
+        url,
+        tag,
+      };
+}
+
+export function buildPortalNoticePushPayload(
+  locale: Locale,
+  input: {
+    kind: PortalPushNoticeKind;
+    storeName: string;
+    storeId: string;
+    total: string;
+    currency: Currency;
+    cycleId?: string;
+    paymentId?: string;
+    receiptNumber?: string;
+  },
+): PushPayload {
+  const amount = formatPushMoney(input.total, input.currency);
+  const tag = `quina-portal-${input.kind}-${input.paymentId ?? input.cycleId ?? input.storeId}`;
+
+  if (input.kind === 'charge-digest') {
+    const url = `/app/portal/${input.storeId}`;
+    if (locale === 'en') {
+      return {
+        title: `Quina · Credit summary (${input.storeName})`,
+        body: `Your recent credit purchases total ${amount}. Review them in your portal.`,
+        url,
+        tag,
+      };
+    }
+    if (locale === 'qu') {
+      return {
+        title: `Quina · Fiado resumen (${input.storeName})`,
+        body: `${amount} rantikuykunaykiqa portalniykipi kachkanñam.`,
+        url,
+        tag,
+      };
+    }
+    return {
+      title: `Quina · Resumen de tu fiado (${input.storeName})`,
+      body: `Tus compras recientes suman ${amount}. Revísalas en tu portal.`,
+      url,
+      tag,
+    };
+  }
+
+  if (input.kind === 'cycle-statement') {
+    const url = input.cycleId
+      ? `/app/portal/${input.storeId}/cycles/${input.cycleId}`
+      : `/app/portal/${input.storeId}/cycles`;
+    if (locale === 'en') {
+      return {
+        title: `Quina · Statement ready (${input.storeName})`,
+        body: `Your cycle closed for ${amount}. Tap to see due date and payment options.`,
+        url,
+        tag,
+      };
+    }
+    if (locale === 'qu') {
+      return {
+        title: `Quina · Cuenta estado (${input.storeName})`,
+        body: `Cicloykiqa ${amount} qullqiwan wichqakun. Hayk'aq pagayta qhaway.`,
+        url,
+        tag,
+      };
+    }
+    return {
+      title: `Quina · Estado de cuenta (${input.storeName})`,
+      body: `Cerró tu ciclo por ${amount}. Mira la fecha de pago y cómo abonar.`,
+      url,
+      tag,
+    };
+  }
+
+  if (input.kind === 'payment-reminder') {
+    const url = `/app/portal/${input.storeId}/pay`;
+    if (locale === 'en') {
+      return {
+        title: `Quina · Payment reminder (${input.storeName})`,
+        body: `Your balance of ${amount} is due soon. Check payment details in Quina.`,
+        url,
+        tag,
+      };
+    }
+    if (locale === 'qu') {
+      return {
+        title: `Quina · Pagay yuyarichiy (${input.storeName})`,
+        body: `${amount} pagayniykiqa qayllamuchkanñam. Imayna pagayta qhaway.`,
+        url,
+        tag,
+      };
+    }
+    return {
+      title: `Quina · Recordatorio de pago (${input.storeName})`,
+      body: `Falta poco para la fecha de pago (${amount}). Revisa Yape, Plin o cuenta aquí.`,
+      url,
+      tag,
+    };
+  }
+
+  if (input.kind === 'late-payment') {
+    const url = `/app/portal/${input.storeId}/pay`;
+    if (locale === 'en') {
+      return {
+        title: `Quina · Overdue balance (${input.storeName})`,
+        body: `You have an overdue balance of ${amount}. Tap to see how to catch up.`,
+        url,
+        tag,
+      };
+    }
+    if (locale === 'qu') {
+      return {
+        title: `Quina · Pasasqa pagay (${input.storeName})`,
+        body: `${amount} pasasqa manuyki kachkan. Imayna pagayta qhaway.`,
+        url,
+        tag,
+      };
+    }
+    return {
+      title: `Quina · Pago vencido (${input.storeName})`,
+      body: `Tienes ${amount} pendiente de pago. Toca para ver los datos de cobro.`,
+      url,
+      tag,
+    };
+  }
+
+  // payment-receipt
+  const url = input.paymentId
+    ? `/app/portal/${input.storeId}/payments/${input.paymentId}`
+    : `/app/portal/${input.storeId}/cycles`;
+  const receipt = input.receiptNumber ? `${input.receiptNumber} · ` : '';
+  if (locale === 'en') {
+    return {
+      title: `Quina · Payment confirmed (${input.storeName})`,
+      body: `Receipt ${receipt}${amount} was recorded by the store.`,
+      url,
+      tag,
+    };
+  }
+  if (locale === 'qu') {
+    return {
+      title: `Quina · Pagay chaskisqa (${input.storeName})`,
+      body: `Recibo ${receipt}${amount} qhatupi qillqasqañam.`,
+      url,
+      tag,
+    };
+  }
+  return {
+    title: `Quina · Pago registrado (${input.storeName})`,
+    body: `La tienda confirmó tu abono (${receipt}${amount}). Toca para ver tu recibo.`,
+    url,
+    tag,
   };
 }
