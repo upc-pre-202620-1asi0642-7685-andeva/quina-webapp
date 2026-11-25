@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     ];
   },
   experimental: {
+    agentUpgrade: 'security',
     serverActions: {
       // El sitio público reenvía quina.andeva.tech/app/* con el Origin público.
       allowedOrigins: ['quina.andeva.tech'],
