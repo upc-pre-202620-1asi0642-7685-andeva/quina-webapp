@@ -6,6 +6,9 @@ import { deliverPushBatch } from '@/core/application/notifications/dispatch-stor
 import {
   buildChargeObjectedPushPayload,
   buildDailyPushPayload,
+  buildPortalChargeResolutionPushPayload,
+  buildPortalCreditSalePushPayload,
+  buildPortalNoticePushPayload,
   buildTestPushPayload,
 } from '@/core/domain/notifications/push-messages';
 import type {
@@ -156,6 +159,53 @@ describe('mensajes Web Push (es, en, qu)', () => {
     expect(objected.body).toContain('Rosa');
 
     expect(buildTestPushPayload('es', 'Bodega Sol').url).toBe('/app/profile/preferences');
+    expect(buildTestPushPayload('es', 'Bodega Sol', '/app/portal/profile').url).toBe(
+      '/app/portal/profile',
+    );
+  });
+
+  it('arma avisos Web Push del portal del vecino en los tres idiomas', () => {
+    const sale = buildPortalCreditSalePushPayload('es', {
+      storeName: 'Bodega Sol',
+      storeId: 'store-1',
+      saleId: 'sale-1',
+      total: '18.50',
+      currency: 'PEN',
+    });
+    expect(sale.url).toBe('/app/portal/store-1');
+    expect(sale.body).toContain('S/ 18.50');
+
+    const voided = buildPortalChargeResolutionPushPayload('en', {
+      outcome: 'voided',
+      storeName: 'Bodega Sol',
+      storeId: 'store-1',
+      cycleId: 'cyc-1',
+    });
+    expect(voided.url).toBe('/app/portal/store-1/cycles/cyc-1');
+    expect(voided.title).toContain('Charge voided');
+
+    const receipt = buildPortalNoticePushPayload('es', {
+      kind: 'payment-receipt',
+      storeName: 'Bodega Sol',
+      storeId: 'store-1',
+      total: '35.00',
+      currency: 'PEN',
+      paymentId: 'pay-1',
+      receiptNumber: 'R-000012',
+    });
+    expect(receipt.url).toBe('/app/portal/store-1/payments/pay-1');
+    expect(receipt.body).toContain('R-000012');
+
+    const overdue = buildPortalNoticePushPayload('qu', {
+      kind: 'late-payment',
+      storeName: 'Bodega Sol',
+      storeId: 'store-1',
+      total: '42.00',
+      currency: 'PEN',
+      cycleId: 'cyc-1',
+    });
+    expect(overdue.url).toBe('/app/portal/store-1/pay');
+    expect(overdue.body).toContain('S/ 42.00');
   });
 });
 

@@ -17,6 +17,7 @@ type ServerPushState = {
   configured: boolean;
   vapidPublicKey: string | null;
   activeCount: number;
+  noStores?: boolean;
 };
 
 async function fetchPushState(): Promise<{
@@ -35,7 +36,8 @@ async function fetchPushState(): Promise<{
   }
 }
 
-export function PushNotificationsCard() {
+export function PushNotificationsCard({ variant = 'store' }: { variant?: 'store' | 'portal' }) {
+  const portal = variant === 'portal';
   const t = useTranslations('Profile.push');
   const [server, setServer] = useState<ServerPushState | null>(null);
   const [browser, setBrowser] = useState<BrowserPushState | null>(null);
@@ -131,6 +133,7 @@ export function PushNotificationsCard() {
   const blocked = browser?.permission === 'denied';
   const needsHomeScreen = browser?.support === 'needs-home-screen';
   const unsupported = !checking && (!browser || browser.support === 'unsupported');
+  const noStores = !checking && Boolean(server?.noStores);
   const serverUnavailable = !checking && server === null;
   const missingVapid = server !== null && (!server.configured || !server.vapidPublicKey);
 
@@ -147,7 +150,7 @@ export function PushNotificationsCard() {
   } else if (needsHomeScreen) {
     statusLabel = t('statusNeedsInstall');
     statusClass = 'bg-amber/12 text-amber-ink';
-  } else if (unsupported || missingVapid || serverUnavailable) {
+  } else if (unsupported || missingVapid || serverUnavailable || noStores) {
     statusLabel = t('statusUnavailable');
   }
 
@@ -158,7 +161,8 @@ export function PushNotificationsCard() {
     !needsHomeScreen &&
     !unsupported &&
     !missingVapid &&
-    !serverUnavailable;
+    !serverUnavailable &&
+    !noStores;
 
   return (
     <section
@@ -181,14 +185,19 @@ export function PushNotificationsCard() {
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 id="profile-push-title" className="text-lg font-semibold text-ink">
+              <h2
+                id="profile-push-title"
+                className={cn('font-semibold text-ink', portal ? 'text-xl' : 'text-lg')}
+              >
                 {t('title')}
               </h2>
               <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium', statusClass)}>
                 {statusLabel}
               </span>
             </div>
-            <p className="text-sm text-ink-soft">{t('description')}</p>
+            <p className={cn('text-ink-soft', portal ? 'text-base' : 'text-sm')}>
+              {portal ? t('portalDescription') : t('description')}
+            </p>
             {server && server.activeCount > 0 ? (
               <p className="text-xs text-ink-soft tabular-nums">
                 {t('devicesCount', { count: server.activeCount })}
@@ -263,6 +272,10 @@ export function PushNotificationsCard() {
       ) : unsupported ? (
         <p role="status" className="text-xs text-ink-soft">
           {t('unsupportedHint')}
+        </p>
+      ) : noStores ? (
+        <p role="status" className="text-xs text-ink-soft">
+          {t('noStoresHint')}
         </p>
       ) : missingVapid ? (
         <p role="status" className="text-xs text-ink-soft">

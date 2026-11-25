@@ -15,6 +15,7 @@ import type { RegisteredCreditSale } from '@/core/domain/ports/sale-repository';
 import { CASH_PAYMENT_METHODS } from '@/core/domain/sales/cash-payment';
 import { MAX_CART_LINES } from '@/core/domain/sales/sale-pricing';
 import { DrizzleSaleRepository } from '@/infrastructure/db/repositories/drizzle-sale-repository';
+import { notifyPortalCreditSale } from '@/infrastructure/push/portal-push-alerts';
 import { authorizeStore } from '@/presentation/auth/guards';
 
 const cartSchema = z
@@ -100,6 +101,10 @@ export async function registerCreditSaleAction(
       now: new Date(),
     });
     if (!result.ok) return { ok: false, error: result.error };
+    await notifyPortalCreditSale(user.storeId, parsed.data.customerId, {
+      saleId: result.value.saleId,
+      total: result.value.total,
+    }).catch((err) => console.error('notifyPortalCreditSale', err));
     revalidatePath('/sales');
     revalidatePath('/inventory');
     revalidatePath('/customers');

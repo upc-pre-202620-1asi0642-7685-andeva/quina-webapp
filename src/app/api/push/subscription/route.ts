@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { DrizzlePushRepository } from '@/infrastructure/push/drizzle-push-repository';
+import { resolvePushActor } from '@/infrastructure/push/push-actor';
 import { getVapidPublicKey, isPushConfigured } from '@/infrastructure/push/push-gateway-factory';
-import { getSessionUser, nextRouteFor } from '@/presentation/auth/session';
 
 const subscriptionSchema = z.object({
   endpoint: z
@@ -19,38 +19,42 @@ const deleteSchema = z.object({
   endpoint: z.string().url().max(2048),
 });
 
-async function requireStoreSession() {
-  const user = await getSessionUser();
-  if (
-    !user?.storeId ||
-    (user.role !== 'STORE_OWNER' && user.role !== 'STORE_EMPLOYEE') ||
-    nextRouteFor(user, '/')
-  ) {
-    return null;
-  }
-  return { ...user, storeId: user.storeId };
-}
-
 export async function GET() {
-  const user = await requireStoreSession();
-  if (!user) return Response.json({ error: 'unauthorized' }, { status: 401 });
+  const actor = await resolvePushActor();
+  if (!actor) return Response.json({ error: 'unauthorized' }, { status: 401 });
 
-  const repo = new DrizzlePushRepository();
-  const activeCount = await repo.countForUser(user.storeId, user.id);
+  const noStores = actor.kind === 'portal' && actor.storeIds.length === 0;
+  let activeCount = 0;
+
+  if (!noStores) {
+    const repo = new DrizzlePushRepository();
+    if (actor.kind === 'store') {
+      activeCount = await repo.countForUser(actor.storeIds[0], actor.user.id);
+    } else {
+      const lists = await Promise.all(
+        actor.storeIds.map((storeId) => repo.listForUser(storeId, actor.user.id)),
+      );
+      activeCount = new Set(lists.flat().map((sub) => sub.endpoint)).size;
+    }
+  }
 
   return Response.json(
     {
       configured: isPushConfigured(),
       vapidPublicKey: getVapidPublicKey(),
       activeCount,
+      noStores,
     },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }
 
 export async function POST(request: Request) {
-  const user = await requireStoreSession();
-  if (!user) return Response.json({ error: 'unauthorized' }, { status: 401 });
+  const actor = await resolvePushActor();
+  if (!actor) return Response.json({ error: 'unauthorized' }, { status: 401 });
+  if (actor.storeIds.length === 0) {
+    return Response.json({ error: 'no_stores' }, { status: 400 });
+  }
   if (!isPushConfigured()) {
     return Response.json({ error: 'push_not_configured' }, { status: 503 });
   }
@@ -68,21 +72,26 @@ export async function POST(request: Request) {
   }
 
   const repo = new DrizzlePushRepository();
-  await repo.upsert({
-    storeId: user.storeId,
-    userId: user.id,
-    endpoint: parsed.data.endpoint,
-    keys: parsed.data.keys,
-    userAgent: request.headers.get('user-agent'),
-    locale: user.preferredLocale,
-  });
+  const userAgent = request.headers.get('user-agent');
+  await Promise.all(
+    actor.storeIds.map((storeId) =>
+      repo.upsert({
+        storeId,
+        userId: actor.user.id,
+        endpoint: parsed.data.endpoint,
+        keys: parsed.data.keys,
+        userAgent,
+        locale: actor.user.preferredLocale,
+      }),
+    ),
+  );
 
   return Response.json({ ok: true });
 }
 
 export async function DELETE(request: Request) {
-  const user = await requireStoreSession();
-  if (!user) return Response.json({ error: 'unauthorized' }, { status: 401 });
+  const actor = await resolvePushActor();
+  if (!actor) return Response.json({ error: 'unauthorized' }, { status: 401 });
 
   let body: unknown;
   try {
@@ -97,7 +106,11 @@ export async function DELETE(request: Request) {
   }
 
   const repo = new DrizzlePushRepository();
-  await repo.removeByEndpoint(user.storeId, user.id, parsed.data.endpoint);
+  await Promise.all(
+    actor.storeIds.map((storeId) =>
+      repo.removeByEndpoint(storeId, actor.user.id, parsed.data.endpoint),
+    ),
+  );
 
   return Response.json({ ok: true });
 }

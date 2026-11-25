@@ -628,7 +628,9 @@
       "iosHomeScreenHint": "En iPhone o iPad primero toca Compartir y elige «Añadir a pantalla de inicio»; luego abre Quina desde ahí para activar los avisos.",
       "blockedHint": "Bloqueaste los avisos en este navegador. Toca el ícono junto a la dirección web y permite las notificaciones.",
       "missingVapidHint": "Falta configurar las llaves VAPID en el servidor para enviar avisos push.",
-      "unsupportedHint": "Tu navegador actual no admite notificaciones push en segundo plano."
+      "unsupportedHint": "Tu navegador actual no admite notificaciones push en segundo plano.",
+      "portalDescription": "Recibe alertas incluso con Quina cerrada cuando anoten un fiado, emitan tu estado de cuenta, falte poco para pagar, respondan una observación o registren tu abono.",
+      "noStoresHint": "Cuando una bodega conecte tu correo con tu fiado podrás activar los avisos aquí."
     },
     "password": {
       "title": "Contraseña",
