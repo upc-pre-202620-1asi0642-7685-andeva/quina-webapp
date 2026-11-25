@@ -57,6 +57,15 @@ test.describe('módulo de perfil, subpantallas, RBAC y accesibilidad (US02, US05
     const cookies = await page.context().cookies();
     expect(cookies.find((c) => c.name === 'quina-lang')?.value).toBe('en');
 
+    // Cambiar las cookies del sitio después no pisa las preferencias guardadas de la webapp
+    await page.context().addCookies([
+      { name: 'quina-lang', value: 'es', url: 'http://localhost:3100' },
+      { name: 'quina-theme', value: 'dark', url: 'http://localhost:3100' },
+    ]);
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
     // Subpantalla Seguridad y sesiones: cambio de contraseña inline + sesión actual
     await page.goto('./profile/security');
     await expect(page.getByRole('heading', { name: 'Password' })).toBeVisible();
@@ -83,19 +92,30 @@ test.describe('módulo de perfil, subpantallas, RBAC y accesibilidad (US02, US05
     await expect(page).toHaveURL(/\/app\/?$/);
   });
 
-  test('RBAC en /profile/access: el dueño ve gestión de tienda y el empleado solo permisos de mostrador', async ({
-    page,
-  }) => {
+  test('RBAC en /profile/access y tarjeta de tienda en la barra lateral', async ({ page }) => {
     test.setTimeout(150_000);
     const { storeName } = await registerOwnerWithStore(page);
+    const isDesktop = (page.viewportSize()?.width ?? 0) >= 1024;
 
-    // Dueño ve tienda, plan y enlaces administrativos
+    if (isDesktop) {
+      await expect(
+        page.getByRole('complementary').getByRole('link', { name: new RegExp(storeName) }),
+      ).toHaveAttribute('href', /\/app\/settings$/);
+    }
+
+    // Dueño en /profile/access ve su rol y permisos sin duplicar Ajustes
     await page.goto('./profile/access');
-    await expect(page.getByRole('heading', { name: storeName })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Ajustes de la tienda/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Suscripción y plan/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Equipo de mostrador/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Auditoría/ })).toBeVisible();
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { name: `Dueño en ${storeName}` })).toBeVisible();
+    await expect(main.getByText('Solo tú como dueño')).toBeVisible();
+    await expect(main.getByText('Empleado de mostrador')).toBeVisible();
+    await expect(main.getByRole('link', { name: 'Gestionar equipo' })).toHaveAttribute(
+      'href',
+      /\/app\/team$/,
+    );
+    await expect(main.getByRole('link', { name: /Ajustes de la tienda/ })).toHaveCount(0);
+    await expect(main.getByRole('link', { name: /Suscripción/ })).toHaveCount(0);
+    await expect(main.getByRole('link', { name: /Auditoría/ })).toHaveCount(0);
 
     // Invitar empleado
     const employee = uniqueEmail('emp-prof');
@@ -111,14 +131,19 @@ test.describe('módulo de perfil, subpantallas, RBAC y accesibilidad (US02, US05
     await signIn(page, employee);
     await expect(page).toHaveURL(/\/app\/?$/);
 
+    if (isDesktop) {
+      await expect(
+        page.getByRole('complementary').getByRole('link', { name: new RegExp(storeName) }),
+      ).toHaveCount(0);
+      await expect(page.getByRole('complementary').getByText(storeName).first()).toBeVisible();
+    }
+
     // Empleado en /profile/access solo ve su rol y matriz de mostrador
     await page.goto('./profile/access');
-    await expect(page.getByRole('heading', { name: `Empleado en ${storeName}` })).toBeVisible();
-    await expect(page.getByText('Lo que puedes hacer')).toBeVisible();
-    await expect(page.getByText('Reservado para el dueño')).toBeVisible();
-    await expect(page.getByRole('link', { name: /Ajustes de la tienda/ })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: /Suscripción y plan/ })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: /Equipo de mostrador/ })).toHaveCount(0);
+    await expect(main.getByRole('heading', { name: `Empleado en ${storeName}` })).toBeVisible();
+    await expect(main.getByText('Lo que puedes hacer')).toBeVisible();
+    await expect(main.getByText('Reservado para el dueño')).toBeVisible();
+    await expect(main.getByRole('link', { name: 'Gestionar equipo' })).toHaveCount(0);
   });
 
   for (const viewport of [

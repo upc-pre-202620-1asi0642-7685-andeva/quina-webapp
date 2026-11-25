@@ -105,6 +105,7 @@ describe('updateProfileAction (RBAC, validación y sincronización de dueño)', 
       role: 'STORE_OWNER',
       storeId: 's-1',
       preferredLocale: 'es',
+      preferredTheme: 'system',
     });
 
     const fd = new FormData();
@@ -124,6 +125,7 @@ describe('updateProfileAction (RBAC, validación y sincronización de dueño)', 
       role: 'STORE_OWNER',
       storeId: 's-1',
       preferredLocale: 'es',
+      preferredTheme: 'system',
     });
     mocks.selectResult = [{ name: 'Carmen Rojas', phone: null }];
 
@@ -150,6 +152,7 @@ describe('updateProfileAction (RBAC, validación y sincronización de dueño)', 
       role: 'STORE_EMPLOYEE',
       storeId: 's-1',
       preferredLocale: 'es',
+      preferredTheme: 'system',
     });
     mocks.selectResult = [{ name: 'Luis Vega', phone: null }];
 
@@ -174,6 +177,7 @@ describe('updateProfileAction (RBAC, validación y sincronización de dueño)', 
       role: 'PLATFORM_ADMIN',
       storeId: null,
       preferredLocale: 'es',
+      preferredTheme: 'system',
     });
     mocks.selectResult = [{ name: 'Admin Quina', phone: null }];
 

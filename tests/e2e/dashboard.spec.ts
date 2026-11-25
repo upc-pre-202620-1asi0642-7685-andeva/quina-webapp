@@ -94,7 +94,9 @@ test.describe('Dashboard Bento con widgets personalizables', () => {
     }, testInfo) => {
       test.skip(testInfo.project.name !== 'mobile', 'Solo aplica al proyecto móvil');
       test.setTimeout(120_000);
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await page
+        .context()
+        .addCookies([{ name: 'quina-theme', value: theme, url: 'http://localhost:3100' }]);
       await registerOwnerWithStore(page);
       await page.goto('./');
 

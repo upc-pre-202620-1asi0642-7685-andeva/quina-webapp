@@ -27,6 +27,7 @@ const EXPECTED_TABLES = [
   'purchase_order_items',
   'purchase_orders',
   'purchases',
+  'push_subscriptions',
   'rate_limits',
   'rus_categories',
   'sale_items',
@@ -45,9 +46,9 @@ const EXPECTED_TABLES = [
 const tables = Object.values(schema).filter((value) => is(value, PgTable)) as PgTable[];
 
 describe('esquema Drizzle', () => {
-  it('define exactamente las 35 tablas del documento', () => {
+  it('define exactamente las 36 tablas del esquema', () => {
     const names = tables.map((table) => getTableConfig(table).name).sort();
-    expect(EXPECTED_TABLES).toHaveLength(35);
+    expect(EXPECTED_TABLES).toHaveLength(36);
     expect(names).toEqual(EXPECTED_TABLES);
   });
 

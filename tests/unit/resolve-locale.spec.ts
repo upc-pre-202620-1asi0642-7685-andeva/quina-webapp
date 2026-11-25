@@ -16,13 +16,20 @@ describe('resolveLocale', () => {
     expect(resolveLocale({ acceptLanguage: 'fr-FR,en;q=0.5,qu;q=0.8' })).toBe('qu');
   });
 
-  it('ignora valores desconocidos y vuelve al castellano', () => {
+  it('mantiene castellano para cualquier variante regional de español', () => {
+    expect(resolveLocale({ acceptLanguage: 'es-419,es;q=0.9' })).toBe('es');
+  });
+
+  it('cae a inglés cuando el navegador usa otros idiomas (francés, portugués, alemán)', () => {
+    expect(resolveLocale({ acceptLanguage: 'fr-FR,fr;q=0.9' })).toBe('en');
+    expect(resolveLocale({ acceptLanguage: 'pt-BR,pt;q=0.9' })).toBe('en');
     expect(resolveLocale({ userPreference: 'pt', cookie: 'xx', acceptLanguage: 'de-DE' })).toBe(
-      'es',
+      'en',
     );
   });
 
   it('usa castellano cuando no hay ninguna señal', () => {
     expect(resolveLocale({})).toBe('es');
+    expect(resolveLocale({ acceptLanguage: '*' })).toBe('es');
   });
 });

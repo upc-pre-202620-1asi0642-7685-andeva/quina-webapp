@@ -146,7 +146,7 @@ describe('aislamiento por tienda (RLS)', () => {
     ).resolves.toBeDefined();
   });
 
-  it('las 27 tablas con store_id tienen RLS forzado y política tenant_isolation', async () => {
+  it('las 28 tablas con store_id tienen RLS forzado y política tenant_isolation', async () => {
     const rows = await owner<{ table_name: string; forced: boolean; policies: number }[]>`
       SELECT c.relname AS table_name,
              c.relrowsecurity AND c.relforcerowsecurity AS forced,
@@ -161,7 +161,7 @@ describe('aislamiento por tienda (RLS)', () => {
                         AND col.column_name = 'store_id')
          AND c.relname <> 'users'
        ORDER BY c.relname`;
-    expect(rows).toHaveLength(27);
+    expect(rows).toHaveLength(28);
     expect(rows.filter((row) => !row.forced || row.policies !== 1)).toEqual([]);
   });
 });
