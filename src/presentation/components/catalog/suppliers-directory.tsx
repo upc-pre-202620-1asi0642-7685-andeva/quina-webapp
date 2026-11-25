@@ -148,7 +148,7 @@ export function SuppliersDirectory({
                   aria-pressed={active}
                   onClick={() => setFilter(key)}
                   className={cn(
-                    'inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-[transform,colors] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97]',
+                    'inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97]',
                     active
                       ? 'border-link-active bg-soft text-soft-ink'
                       : 'border-line bg-surface text-ink-soft hover:bg-surface-hover hover:text-ink',

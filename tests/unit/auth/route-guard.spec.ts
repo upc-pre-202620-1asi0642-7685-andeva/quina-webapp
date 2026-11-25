@@ -9,6 +9,7 @@ const baseUser: SessionUser = {
   role: 'STORE_OWNER',
   storeId: 's-1',
   preferredLocale: 'es',
+  preferredTheme: 'system',
 };
 
 describe('nextRouteFor (guardia de rutas)', () => {

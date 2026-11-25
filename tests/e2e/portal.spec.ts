@@ -74,7 +74,10 @@ test.describe('portal del vecino (US14)', () => {
     const mail = await latestCollectionsMail(rosa.email, 'charge-digest');
     expect(mail.portalUrl).toContain('/app/portal/enter?token=');
 
-    const neighbor = await browser.newContext();
+    const originalViewport = page.viewportSize();
+    const neighbor = await browser.newContext({
+      viewport: originalViewport ?? undefined,
+    });
     const portal = await neighbor.newPage();
     await isolateRateLimitIp(portal);
     await portal.goto(mail.portalUrl!.replace(/^.*\/app\//, './'));
@@ -94,6 +97,42 @@ test.describe('portal del vecino (US14)', () => {
     ).resolves.toBe(true);
     await expectAccessible(portal);
 
+    // Notificaciones y nuevas rutas del portal (Ciclos, Pagar, Tienda)
+    await portal
+      .getByRole('button', { name: /Notificaciones/ })
+      .first()
+      .click();
+    await expect(portal.getByRole('heading', { name: 'Notificaciones' })).toBeVisible();
+    await portal.keyboard.press('Escape');
+
+    await portal.getByRole('link', { name: 'Ciclos' }).first().click();
+    await expect(portal).toHaveURL(new RegExp(`/app/portal/${storeId}/cycles$`));
+    await expectAccessible(portal);
+
+    await portal
+      .getByRole('link', { name: /Pagar|Cómo pagar/ })
+      .first()
+      .click();
+    await expect(portal).toHaveURL(new RegExp(`/app/portal/${storeId}/pay$`));
+    await expect(portal.getByRole('button', { name: 'Copiar Yape' })).toBeVisible();
+    await expectAccessible(portal);
+
+    await portal.getByRole('link', { name: 'Tienda' }).first().click();
+    await expect(portal).toHaveURL(new RegExp(`/app/portal/${storeId}/store$`));
+    await expectAccessible(portal);
+
+    // Revisar sin desbordamiento en mobile (390px), tablet (768px), laptop (1024px) y desktop (1440px)
+    for (const width of [390, 768, 1024, 1440]) {
+      await portal.setViewportSize({ width, height: 844 });
+      await expect(
+        portal.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).resolves.toBe(true);
+    }
+    if (originalViewport) {
+      await portal.setViewportSize(originalViewport);
+    }
+
+    await portal.getByRole('link', { name: 'Ciclos' }).first().click();
     await portal
       .getByRole('link', { name: /Corte del/ })
       .first()
@@ -132,7 +171,10 @@ test.describe('portal del vecino (US14)', () => {
     await registerOwnerWithStore(page);
     const rosa = await addCreditNeighbor(page, 'Rosa', '100');
 
-    const neighbor = await browser.newContext();
+    const originalViewport = page.viewportSize();
+    const neighbor = await browser.newContext({
+      viewport: originalViewport ?? undefined,
+    });
     const portal = await neighbor.newPage();
     await isolateRateLimitIp(portal);
     await portal.goto('./portal/login');
@@ -147,7 +189,8 @@ test.describe('portal del vecino (US14)', () => {
     await portal.getByRole('button', { name: 'Ver mi cuenta' }).click();
     await expect(portal.getByText('Hola, Rosa')).toBeVisible();
 
-    await portal.getByRole('link', { name: 'Mi perfil' }).click();
+    await portal.getByRole('button', { name: /Abrir el menú de tu cuenta|Rosa/ }).click();
+    await portal.getByRole('menuitem', { name: 'Mi perfil' }).click();
     await expect(portal).toHaveURL(/\/app\/portal\/profile$/);
     await expect(portal.getByRole('tab', { name: 'Seguridad' })).toBeVisible();
     await expectAccessible(portal);

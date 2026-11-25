@@ -185,10 +185,10 @@ export default async function CollectionsPage({
         <Link
           href={collectionsHref(query, { tab: 'overdue', filter: 'all' })}
           className={cn(
-            'flex flex-col gap-1 rounded-card border p-4 transition-[transform,colors] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]',
+            'flex flex-col gap-1 rounded-card border p-4 transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]',
             hasOverdue
-              ? 'border-error/25 bg-error/12 text-error-ink'
-              : 'border-line bg-surface text-ink',
+              ? 'border-error/25 bg-error/12 text-error-ink hover:bg-error/18'
+              : 'border-line bg-surface text-ink hover:bg-surface-hover',
           )}
         >
           <span className={cn('text-[13px]', hasOverdue ? 'text-error-ink' : 'text-ink-soft')}>
@@ -210,10 +210,10 @@ export default async function CollectionsPage({
         <Link
           href={collectionsHref(query, { tab: 'due', filter: 'dueSoon' })}
           className={cn(
-            'flex flex-col gap-1 rounded-card border p-4 transition-[transform,colors] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]',
+            'flex flex-col gap-1 rounded-card border p-4 transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]',
             summary.dueSoonCount > 0
-              ? 'border-amber/30 bg-amber/12 text-amber-ink'
-              : 'border-line bg-surface text-ink',
+              ? 'border-amber/30 bg-amber/12 text-amber-ink hover:bg-amber/18'
+              : 'border-line bg-surface text-ink hover:bg-surface-hover',
           )}
         >
           <span
@@ -238,7 +238,7 @@ export default async function CollectionsPage({
         {hasObjections ? (
           <Link
             href={collectionsHref(query, { tab: 'objections', filter: 'all', q: '' })}
-            className="flex flex-col gap-1 rounded-card border border-amber/30 bg-amber/12 p-4 text-amber-ink transition-[transform,colors] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]"
+            className="flex flex-col gap-1 rounded-card border border-amber/30 bg-amber/12 p-4 text-amber-ink transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) hover:bg-amber/18 focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]"
           >
             <span className="text-[13px] text-amber-ink">{tPage('kpi.objections')}</span>
             <span className="text-xl font-semibold tabular-nums">{objected.length}</span>
@@ -249,7 +249,7 @@ export default async function CollectionsPage({
         ) : (
           <Link
             href={collectionsHref(query, { tab: 'payments', filter: 'all', q: '' })}
-            className="flex flex-col gap-1 rounded-card border border-line bg-surface p-4 text-ink transition-[transform,colors] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]"
+            className="flex flex-col gap-1 rounded-card border border-line bg-surface p-4 text-ink transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active active:scale-[0.98]"
           >
             <span className="text-[13px] text-ink-soft">{tPage('kpi.collectedToday')}</span>
             <span className="text-xl font-semibold text-ink">
@@ -276,7 +276,7 @@ export default async function CollectionsPage({
               href={collectionsHref(query, { tab: key, filter: 'all', method: 'all' })}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-field px-3.5 text-sm font-medium whitespace-nowrap transition-[transform,colors] duration-150 ease-(--ease-out-expo) active:scale-[0.98] sm:flex-1',
+                'flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-field px-3.5 text-sm font-medium whitespace-nowrap transition-[transform,color,background-color] duration-150 ease-(--ease-out-expo) active:scale-[0.98] sm:flex-1',
                 active ? 'bg-surface text-ink shadow-sm' : 'text-ink-soft hover:text-ink',
               )}
             >
@@ -306,7 +306,7 @@ export default async function CollectionsPage({
             {notices.length === 0 ? tPage('noNotices') : tPage('filteredEmpty')}
           </p>
         ) : (
-          <ul className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface">
+          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
             {shownNotices.map((n) => {
               const failed = n.status === 'BOUNCED' || n.status === 'FAILED';
               const customerHref = n.customerId
@@ -371,7 +371,7 @@ export default async function CollectionsPage({
           </div>
         ) : (
           <>
-            <div className="hidden overflow-hidden rounded-card border border-line bg-surface lg:block">
+            <div className="hidden overflow-hidden rounded-card border border-line bg-surface xl:block">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
@@ -433,12 +433,12 @@ export default async function CollectionsPage({
               </Table>
             </div>
 
-            <ul className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface lg:hidden">
+            <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-card border border-line bg-surface xl:hidden">
               {shownPayments.map((p) => (
                 <li key={p.id}>
                   <Link
                     href={`/payments/${p.id}`}
-                    className="flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-surface-hover"
+                    className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-link-active active:bg-surface-hover"
                   >
                     <ReceiptTextIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -478,7 +478,7 @@ export default async function CollectionsPage({
       ) : (
         <>
           {/* Escritorio: tabla operativa con acciones directas sin callejones sin salida */}
-          <div className="hidden overflow-hidden rounded-card border border-line bg-surface lg:block">
+          <div className="hidden overflow-hidden rounded-card border border-line bg-surface xl:block">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -615,8 +615,8 @@ export default async function CollectionsPage({
             </Table>
           </div>
 
-          {/* Celular: tarjetas táctiles sin scroll horizontal */}
-          <ul className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface lg:hidden">
+          {/* Celular, tablet y laptop compacta: tarjetas táctiles sin scroll horizontal */}
+          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-card border border-line bg-surface xl:hidden">
             {shownCycles.map((r) => {
               const delta = dueDeltaLabel(r.paymentDueDate);
               const blocked = r.objectedCount > 0;

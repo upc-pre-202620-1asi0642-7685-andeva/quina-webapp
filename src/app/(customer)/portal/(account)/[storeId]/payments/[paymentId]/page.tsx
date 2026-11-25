@@ -9,6 +9,7 @@ import { PrintButton } from '@/presentation/components/collections/print-button'
 import { ReceiptCard } from '@/presentation/components/collections/receipt-card';
 import { formatMoney } from '@/presentation/components/money';
 import { ShareReceiptButton } from '@/presentation/components/portal/share-receipt-button';
+import { buttonVariants } from '@/presentation/components/ui/button';
 import { formatDate } from '@/presentation/lib/format-date';
 
 /** US14.6: el vecino ve e imprime el recibo de cada pago que hizo. */
@@ -39,14 +40,14 @@ export default async function PortalReceiptPage({
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link
           href={`/portal/${storeId}/cycles/${receipt.cycle.id}`}
-          className="inline-flex min-h-11 items-center gap-2 text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+          className={buttonVariants({ variant: 'secondary', size: 'sm' })}
         >
-          <ArrowLeftIcon aria-hidden="true" className="size-5" />
+          <ArrowLeftIcon aria-hidden="true" className="size-4" />
           <span>{t('backToCycle')}</span>
         </Link>
         <Link
           href={`/portal/${storeId}`}
-          className="inline-flex min-h-11 items-center text-base font-medium text-ink-soft hover:text-ink hover:underline"
+          className={buttonVariants({ variant: 'ghost', size: 'sm' })}
         >
           {t('backToAccount')}
         </Link>

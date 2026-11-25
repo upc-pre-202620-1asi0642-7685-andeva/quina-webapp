@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Loader2Icon, LogOutIcon } from 'lucide-react';
 import { authClient } from '@/infrastructure/auth/auth-client';
 import { clearOfflinePages } from '@/presentation/components/pwa/pwa';
+import { unsubscribePushOnSignOut } from '@/presentation/components/pwa/push-client';
 import { Button } from '@/presentation/components/ui/button';
 import { cn } from '@/presentation/lib/utils';
 
@@ -16,6 +17,7 @@ export function SignOutCard({ variant = 'store' }: { variant?: 'store' | 'portal
   async function handleSignOut() {
     setSigningOut(true);
     try {
+      if (!portal) await unsubscribePushOnSignOut();
       await authClient.signOut();
       // US22: lo guardado para leer sin señal no se queda en un celular compartido
       await clearOfflinePages();

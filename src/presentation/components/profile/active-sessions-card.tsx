@@ -106,7 +106,7 @@ export function ActiveSessionsCard({
       {sessions.length === 0 ? (
         <p className="rounded-field bg-paper-deep p-4 text-sm text-ink-soft">{t('empty')}</p>
       ) : (
-        <ul className="divide-y divide-line rounded-field border border-line">
+        <ul className="divide-y divide-line overflow-hidden rounded-field border border-line">
           {sessions.map((session) => {
             const DeviceIcon = DEVICE_ICONS[session.device.deviceType];
             const deviceLabel =

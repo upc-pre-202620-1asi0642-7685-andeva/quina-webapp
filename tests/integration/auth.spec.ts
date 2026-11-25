@@ -63,13 +63,19 @@ function newEmail(tag: string): string {
   return `${tag}-${randomUUID()}@example.com`;
 }
 
-type PostOptions = { ip: string; cookie?: string; captcha?: boolean; origin?: string };
+type PostOptions = {
+  ip: string;
+  cookie?: string;
+  acceptLanguage?: string;
+  captcha?: boolean;
+  origin?: string;
+};
 
 function post(
   target: Auth,
   pathname: string,
   body: unknown,
-  { ip, cookie, captcha = true, origin = ORIGIN }: PostOptions,
+  { ip, cookie, acceptLanguage, captcha = true, origin = ORIGIN }: PostOptions,
 ): Promise<Response> {
   const headers = new Headers({
     'content-type': 'application/json',
@@ -78,6 +84,7 @@ function post(
   });
   if (captcha) headers.set('x-captcha-response', TURNSTILE_TEST_TOKEN);
   if (cookie) headers.set('cookie', cookie);
+  if (acceptLanguage) headers.set('accept-language', acceptLanguage);
   return target.handler(
     new Request(`${origin}/app/api/auth${pathname}`, {
       method: 'POST',
@@ -115,6 +122,7 @@ type UserRow = {
   email_verified: boolean;
   role: string;
   preferred_locale: string;
+  preferred_theme: string;
   failed_login_attempts: number;
   locked_until: Date | null;
   last_login_at: Date | null;
@@ -150,13 +158,13 @@ async function storeFor(userId: string, isActive = true): Promise<string> {
 }
 
 describe('registro con correo y contraseña', () => {
-  it('deja PENDING_OWNER sin verificar, con el idioma de la cookie y un hash Argon2id', async () => {
+  it('deja PENDING_OWNER sin verificar, con idioma/tema de las cookies y un hash Argon2id', async () => {
     const email = newEmail('registro');
     const response = await post(
       auth,
       '/sign-up/email',
       { name: 'Rosa Quispe', email, password: PASSWORD },
-      { ip: nextIp(), cookie: `quina-lang=qu; ${CONSENT}` },
+      { ip: nextIp(), cookie: `quina-lang=qu; quina-theme=dark; ${CONSENT}` },
     );
     expect(response.status).toBe(200);
 
@@ -165,6 +173,7 @@ describe('registro con correo y contraseña', () => {
       role: 'PENDING_OWNER',
       email_verified: false,
       preferred_locale: 'qu',
+      preferred_theme: 'dark',
       store_id: null,
       failed_login_attempts: 0,
     });
@@ -186,6 +195,23 @@ describe('registro con correo y contraseña', () => {
     const ttlMs = verification!.expires_at.getTime() - Date.now();
     expect(ttlMs).toBeGreaterThan(14 * 60_000);
     expect(ttlMs).toBeLessThanOrEqual(15 * 60_000);
+  });
+
+  it('sin cookie quina-lang detecta el navegador (otros idiomas caen a inglés) y deja tema system', async () => {
+    const email = newEmail('registro-browser');
+    const response = await post(
+      auth,
+      '/sign-up/email',
+      { name: 'Maria Silva', email, password: PASSWORD },
+      { ip: nextIp(), cookie: CONSENT, acceptLanguage: 'pt-BR,pt;q=0.9' },
+    );
+    expect(response.status).toBe(200);
+
+    const user = await userByEmail(email);
+    expect(user).toMatchObject({
+      preferred_locale: 'en',
+      preferred_theme: 'system',
+    });
   });
 
   it('sin token de Turnstile el registro se rechaza y no crea usuario', async () => {

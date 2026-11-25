@@ -1,13 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import {
-  ArrowLeftIcon,
-  CircleCheckIcon,
-  MapPinIcon,
-  PhoneIcon,
-  ShieldCheckIcon,
-} from 'lucide-react';
+import { ChevronRightIcon, CircleCheckIcon, StoreIcon } from 'lucide-react';
 import { z } from 'zod';
 import { listCycles } from '@/infrastructure/db/queries/collections';
 import { getInstallmentPlans, getPortalAccount } from '@/infrastructure/db/queries/portal';
@@ -29,6 +23,7 @@ import { cn } from '@/presentation/lib/utils';
 
 // La URL firmada del QR dura lo que una visita a la página
 const QR_URL_SECONDS = 15 * 60;
+const RECENT_CYCLES_LIMIT = 4;
 
 /** US14.6 y 14.7: lo que Doña Rosa debe en una tienda, cuándo y cómo pagarlo. */
 export default async function PortalAccountPage({
@@ -65,23 +60,24 @@ export default async function PortalAccountPage({
       )
     : null;
 
+  const recentCycles = cycles.slice(0, RECENT_CYCLES_LIMIT);
+  const hasMoreCycles = cycles.length > RECENT_CYCLES_LIMIT;
+
   return (
     <>
-      {links.length > 1 ? (
-        <Link
-          href="/portal"
-          className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
-        >
-          <ArrowLeftIcon aria-hidden="true" className="size-5" />
-          <span>{t('allStores')}</span>
-        </Link>
-      ) : null}
-
-      <header className="flex flex-col gap-1">
-        <p className="text-ink-soft">{t('hello', { name: portal.customerName })}</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-balance text-ink">
-          {portal.storeName}
-        </h1>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-base text-ink-soft">{t('hello', { name: portal.customerName })}</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-balance text-ink">
+            {portal.storeName}
+          </h1>
+        </div>
+        {links.length > 1 ? (
+          <Link href="/portal" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
+            <StoreIcon aria-hidden="true" className="size-4" />
+            <span>{t('allStores')}</span>
+          </Link>
+        ) : null}
       </header>
 
       {portal.emailBouncedAt ? (
@@ -96,214 +92,224 @@ export default async function PortalAccountPage({
         </Notice>
       ) : null}
 
-      {account ? (
-        <section
-          aria-labelledby="summary-title"
-          className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6"
-        >
-          <h2 id="summary-title" className="sr-only">
-            {t('summaryTitle')}
-          </h2>
-          <div className="flex flex-col gap-1">
-            <span className="text-base text-ink-soft">{t('balance')}</span>
-            <Money
-              amount={account.balance}
-              currency={account.currency}
-              className="text-amount font-bold tracking-tight text-ink"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div
-              role="meter"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={account.usedPercent}
-              aria-label={t('limitUsed', { percent: account.usedPercent })}
-              className="h-2 overflow-hidden rounded-full bg-paper-deep"
+      <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-7">
+          {account ? (
+            <section
+              aria-labelledby="summary-title"
+              className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6"
             >
-              <div
-                className={cn(
-                  'h-full rounded-full transition-[width] duration-250 ease-(--ease-out-expo)',
-                  account.overLimit || account.usedPercent >= 95
-                    ? 'bg-error'
-                    : account.usedPercent >= 85
-                      ? 'bg-amber'
-                      : 'bg-primary',
-                )}
-                style={{ width: `${account.usedPercent}%` }}
-              />
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-base tabular-nums">
-              <span
-                className={cn(account.overLimit ? 'font-medium text-error-ink' : 'text-ink-soft')}
-              >
-                {account.overLimit
-                  ? t('overLimit')
-                  : t('available', {
-                      amount: formatMoney(account.availableCredit, account.currency),
+              <h2 id="summary-title" className="sr-only">
+                {t('summaryTitle')}
+              </h2>
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-ink-soft">{t('balance')}</span>
+                <Money
+                  amount={account.balance}
+                  currency={account.currency}
+                  className="text-amount font-bold tracking-tight text-ink"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div
+                  role="meter"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={account.usedPercent}
+                  aria-label={t('limitUsed', { percent: account.usedPercent })}
+                  className="h-2.5 overflow-hidden rounded-full bg-paper-deep"
+                >
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-[width] duration-250 ease-(--ease-out-expo)',
+                      account.overLimit || account.usedPercent >= 95
+                        ? 'bg-error'
+                        : account.usedPercent >= 85
+                          ? 'bg-amber'
+                          : 'bg-primary',
+                    )}
+                    style={{ width: `${account.usedPercent}%` }}
+                  />
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-base tabular-nums">
+                  <span
+                    className={cn(
+                      account.overLimit ? 'font-medium text-error-ink' : 'text-ink-soft',
+                    )}
+                  >
+                    {account.overLimit
+                      ? t('overLimit')
+                      : t('available', {
+                          amount: formatMoney(account.availableCredit, account.currency),
+                        })}
+                  </span>
+                  <span className="text-ink-soft">
+                    {t('limitShort', {
+                      amount: formatMoney(account.creditLimit, account.currency),
                     })}
-              </span>
-              <span className="text-ink-soft">
-                {t('limitShort', {
-                  amount: formatMoney(account.creditLimit, account.currency),
-                })}
-              </span>
-            </div>
-          </div>
+                  </span>
+                </div>
+              </div>
 
-          {account.payable && payableBadge ? (
-            <div
-              className={cn(
-                'flex flex-col gap-3 rounded-field p-4 sm:p-5',
-                payableBadge === 'OVERDUE'
-                  ? 'bg-error/12'
-                  : payableBadge === 'DUE_SOON'
-                    ? 'bg-amber/12'
-                    : 'bg-soft',
+              {account.payable && payableBadge ? (
+                <div
+                  className={cn(
+                    'flex flex-col gap-3 rounded-field p-4 sm:p-5',
+                    payableBadge === 'OVERDUE'
+                      ? 'bg-error/12'
+                      : payableBadge === 'DUE_SOON'
+                        ? 'bg-amber/12'
+                        : 'bg-soft',
+                  )}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-semibold text-ink">{t('toPay')}</span>
+                    <CycleStatusBadge status={payableBadge} />
+                  </div>
+                  <Money
+                    amount={account.payable.totalDue}
+                    currency={account.currency}
+                    className="text-3xl font-bold tracking-tight text-ink"
+                  />
+                  <p
+                    className={cn(
+                      'text-base font-medium',
+                      payableBadge === 'OVERDUE'
+                        ? 'text-error-ink'
+                        : payableBadge === 'DUE_SOON'
+                          ? 'text-amber-ink'
+                          : 'text-soft-ink-2',
+                    )}
+                  >
+                    {t('payBy', { date: formatDate(account.payable.paymentDueDate) })}
+                  </p>
+                  <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
+                    <Link
+                      href={`/portal/${storeId}/cycles/${account.payable.cycleId}`}
+                      className={buttonVariants({
+                        variant: 'primary',
+                        size: 'lg',
+                        className: 'w-full sm:w-auto',
+                      })}
+                    >
+                      {t('seeStatement')}
+                    </Link>
+                    <Link
+                      href={`/portal/${storeId}/pay`}
+                      className={buttonVariants({
+                        variant: 'secondary',
+                        size: 'lg',
+                        className: 'w-full sm:w-auto',
+                      })}
+                    >
+                      {t('howToPay')}
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 rounded-field bg-paper-deep p-4 sm:p-5">
+                  <div className="flex items-center gap-2 font-semibold text-success-ink">
+                    <CircleCheckIcon aria-hidden="true" className="size-5 shrink-0" />
+                    <span>{t('allGood')}</span>
+                  </div>
+                  <p className="text-base text-ink-soft">{t('nothingDue')}</p>
+                  {account.openCycle && account.openCycle.amount !== '0.00' ? (
+                    <Link
+                      href={`/portal/${storeId}/cycles/${account.openCycle.cycleId}`}
+                      className={buttonVariants({
+                        variant: 'secondary',
+                        size: 'lg',
+                        className: 'w-full sm:w-auto sm:self-start',
+                      })}
+                    >
+                      {t('openCycleCta', {
+                        amount: formatMoney(account.openCycle.amount, account.currency),
+                      })}
+                    </Link>
+                  ) : null}
+                </div>
               )}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-semibold text-ink">{t('toPay')}</span>
-                <CycleStatusBadge status={payableBadge} />
-              </div>
-              <Money
-                amount={account.payable.totalDue}
-                currency={account.currency}
-                className="text-3xl font-bold tracking-tight text-ink"
-              />
-              <p
-                className={cn(
-                  'text-base font-medium',
-                  payableBadge === 'OVERDUE'
-                    ? 'text-error-ink'
-                    : payableBadge === 'DUE_SOON'
-                      ? 'text-amber-ink'
-                      : 'text-soft-ink-2',
-                )}
-              >
-                {t('payBy', { date: formatDate(account.payable.paymentDueDate) })}
-              </p>
-              <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
-                <Link
-                  href={`/portal/${storeId}/cycles/${account.payable.cycleId}`}
-                  className={buttonVariants({
-                    variant: 'primary',
-                    size: 'lg',
-                    className: 'w-full sm:w-auto',
-                  })}
-                >
-                  {t('seeStatement')}
-                </Link>
-                <a
-                  href="#payment-info"
-                  className={buttonVariants({
-                    variant: 'secondary',
-                    size: 'lg',
-                    className: 'w-full sm:w-auto',
-                  })}
-                >
-                  {t('howToPay')}
-                </a>
-              </div>
-            </div>
+
+              <dl className="grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-0.5 rounded-field bg-paper-deep px-4 py-3">
+                  <dt className="text-sm text-ink-soft">{t('nextCutOff')}</dt>
+                  <dd className="font-semibold text-ink tabular-nums">
+                    {formatDate(account.nextCutOffDate)}
+                  </dd>
+                </div>
+                <div className="flex flex-col gap-0.5 rounded-field bg-paper-deep px-4 py-3">
+                  <dt className="text-sm text-ink-soft">{t('paymentDayTitle')}</dt>
+                  <dd className="font-semibold text-ink tabular-nums">
+                    {t('paymentDay', { day: account.paymentDueDay })}
+                  </dd>
+                </div>
+              </dl>
+            </section>
           ) : (
-            <div className="flex flex-col gap-3 rounded-field bg-paper-deep p-4 sm:p-5">
-              <div className="flex items-center gap-2 font-semibold text-success-ink">
-                <CircleCheckIcon aria-hidden="true" className="size-5 shrink-0" />
-                <span>{t('allGood')}</span>
-              </div>
-              <p className="text-base text-ink-soft">{t('nothingDue')}</p>
-              {account.openCycle && account.openCycle.amount !== '0.00' ? (
+            <Notice tone="info" className="text-base">
+              <p>{t('noCredit')}</p>
+            </Notice>
+          )}
+
+          {account ? (
+            <div className="flex flex-col gap-3">
+              <AccountCycles
+                hrefBase={`/portal/${storeId}`}
+                cycles={recentCycles}
+                currency={account.currency}
+                now={now}
+                large
+              />
+              {hasMoreCycles ? (
                 <Link
-                  href={`/portal/${storeId}/cycles/${account.openCycle.cycleId}`}
+                  href={`/portal/${storeId}/cycles`}
                   className={buttonVariants({
                     variant: 'secondary',
                     size: 'lg',
-                    className: 'w-full sm:w-auto sm:self-start',
+                    className: 'w-full justify-between',
                   })}
                 >
-                  {t('openCycleCta', {
-                    amount: formatMoney(account.openCycle.amount, account.currency),
-                  })}
+                  <span>{t('seeAllCycles', { count: cycles.length })}</span>
+                  <ChevronRightIcon aria-hidden="true" className="size-5" />
                 </Link>
               ) : null}
             </div>
-          )}
-
-          <dl className="grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-0.5">
-              <dt className="text-base text-ink-soft">{t('nextCutOff')}</dt>
-              <dd className="font-semibold text-ink tabular-nums">
-                {formatDate(account.nextCutOffDate)}
-              </dd>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <dt className="text-base text-ink-soft">{t('paymentDayTitle')}</dt>
-              <dd className="font-semibold text-ink tabular-nums">
-                {t('paymentDay', { day: account.paymentDueDay })}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      ) : (
-        <p className="rounded-card border border-line bg-surface p-5 text-ink-soft">
-          {t('noCredit')}
-        </p>
-      )}
-
-      <PaymentInfo
-        payment={payment}
-        qrUrl={qrUrl}
-        storeName={portal.storeName}
-        suggestedAmount={account?.payable?.totalDue ?? null}
-        currency={account?.currency}
-      />
-
-      {account && plans.length > 0 ? (
-        <InstallmentPlans plans={plans} currency={account.currency} />
-      ) : null}
-
-      {account ? (
-        <AccountCycles
-          hrefBase={`/portal/${storeId}`}
-          cycles={cycles}
-          currency={account.currency}
-          now={now}
-          large
-        />
-      ) : null}
-
-      <footer className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:p-6">
-        {portal.storeAddress ? (
-          <p className="flex items-start gap-2.5 text-base text-ink-soft">
-            <MapPinIcon aria-hidden="true" className="mt-1 size-5 shrink-0" />
-            <span>{portal.storeAddress}</span>
-          </p>
-        ) : null}
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          {portal.storeContact ? (
-            <a
-              href={`tel:${portal.storeContact}`}
-              className={buttonVariants({
-                variant: 'secondary',
-                size: 'lg',
-                className: 'w-full sm:w-auto',
-              })}
-            >
-              <PhoneIcon aria-hidden="true" className="size-5" />
-              <span>{t('callStore', { phone: portal.storeContact })}</span>
-            </a>
           ) : null}
+
+          {account && plans.length > 0 ? (
+            <InstallmentPlans plans={plans} currency={account.currency} />
+          ) : null}
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-8 lg:col-span-5">
+          <PaymentInfo
+            payment={payment}
+            qrUrl={qrUrl}
+            storeName={portal.storeName}
+            suggestedAmount={account?.payable?.totalDue ?? null}
+            currency={account?.currency}
+          />
+
           <Link
-            href={`/privacy/customers/${storeId}`}
-            className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active hover:underline"
+            href={`/portal/${storeId}/store`}
+            className="flex min-h-16 items-center justify-between gap-3 rounded-card border border-line bg-surface p-4 transition-colors duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-link-active sm:p-5"
           >
-            <ShieldCheckIcon aria-hidden="true" className="size-5 shrink-0" />
-            <span>{t('privacyLink')}</span>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-ink-soft">
+                <StoreIcon aria-hidden="true" className="size-5" />
+              </span>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-base font-semibold text-ink">
+                  {t('storeInfoTitle')}
+                </span>
+                <span className="truncate text-sm text-ink-soft">{t('storeInfoHint')}</span>
+              </div>
+            </div>
+            <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
           </Link>
         </div>
-      </footer>
+      </div>
     </>
   );
 }

@@ -37,3 +37,19 @@ test('usa el idioma de la cookie quina-lang compartida con el sitio', async ({ p
     page.getByRole('heading', { level: 1, name: 'Sign in to your store' }),
   ).toBeVisible();
 });
+
+test('usa el tema de la cookie quina-theme compartida con el sitio', async ({ page, context }) => {
+  await context.addCookies([{ name: 'quina-theme', value: 'dark', url: 'http://localhost:3100' }]);
+  await page.goto('./login');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('sin cookie quina-lang usa inglés cuando el navegador está en otro idioma', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ locale: 'fr-FR' });
+  const page = await context.newPage();
+  await page.goto('http://localhost:3100/app/login');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await context.close();
+});

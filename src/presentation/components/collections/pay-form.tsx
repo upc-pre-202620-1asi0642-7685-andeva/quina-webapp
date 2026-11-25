@@ -184,7 +184,7 @@ export function PayForm({
               <label
                 key={value}
                 className={cn(
-                  'flex min-h-11 cursor-pointer items-center justify-center gap-1.5 rounded-field border px-2 text-sm font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) active:scale-[0.97] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-link-active',
+                  'flex min-h-11 cursor-pointer items-center justify-center gap-1.5 rounded-field border px-2 text-sm font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) active:scale-[0.97] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-link-active',
                   method === value
                     ? 'border-link-active bg-soft text-soft-ink'
                     : 'border-line bg-surface text-ink hover:bg-surface-hover',
@@ -320,7 +320,7 @@ export function PayForm({
             ) : null}
           </div>
           {digitalRows.length > 0 ? (
-            <ul className="flex flex-col divide-y divide-line rounded-field border border-line bg-surface">
+            <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-field border border-line bg-surface">
               {digitalRows.map((row) => (
                 <li key={row.key} className="flex items-center justify-between gap-2 px-3 py-2.5">
                   <div className="flex min-w-0 flex-col">

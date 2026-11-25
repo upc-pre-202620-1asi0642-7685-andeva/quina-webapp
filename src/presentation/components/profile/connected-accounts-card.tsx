@@ -75,7 +75,7 @@ export function ConnectedAccountsCard({
         <p className="text-sm text-ink-soft">{t('subtitle')}</p>
       </div>
 
-      <ul className="divide-y divide-line rounded-field border border-line bg-paper/40">
+      <ul className="divide-y divide-line overflow-hidden rounded-field border border-line bg-paper/40">
         {/* Método: Correo y contraseña */}
         <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5">
           <div className="flex min-w-0 items-center gap-3">

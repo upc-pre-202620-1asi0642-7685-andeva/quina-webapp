@@ -75,7 +75,7 @@ export function LocaleSelectorCard({
               <label
                 key={loc}
                 className={cn(
-                  'flex min-h-14 cursor-pointer items-start gap-3 rounded-field border p-3.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-link-active',
+                  'relative flex min-h-14 cursor-pointer items-start gap-3 rounded-field border p-3.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-link-active',
                   selected
                     ? 'border-link-active bg-soft/70 text-soft-ink'
                     : 'border-line bg-paper/40 text-ink hover:bg-surface-hover',
@@ -89,7 +89,7 @@ export function LocaleSelectorCard({
                   checked={selected}
                   disabled={isPending}
                   onChange={() => setSelectedLocale(loc)}
-                  className="sr-only"
+                  className="absolute inset-0 z-10 cursor-pointer opacity-0"
                 />
                 <span
                   aria-hidden="true"

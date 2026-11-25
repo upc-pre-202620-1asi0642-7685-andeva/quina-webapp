@@ -49,13 +49,16 @@ export default async function PortalCyclePage({
 
   return (
     <>
-      <Link
-        href={`/portal/${storeId}`}
-        className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
-      >
-        <ArrowLeftIcon aria-hidden="true" className="size-5" />
-        <span>{t('back')}</span>
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href={`/portal/${storeId}/cycles`}
+          className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+        >
+          <ArrowLeftIcon aria-hidden="true" className="size-4" />
+          <span>{t('back')}</span>
+        </Link>
+        <CycleStatusBadge status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)} />
+      </div>
 
       {notice === 'objected' ? (
         <Notice tone="success" className="text-base">
@@ -63,57 +66,60 @@ export default async function PortalCyclePage({
         </Notice>
       ) : null}
 
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col items-start gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-ink">
-            {tCollections('cycle.title', { date: formatDate(cycle.cutOffDate) })}
-          </h1>
-          <p className="text-base text-ink-soft">{t('subtitle', { number: cycle.cycleNumber })}</p>
-          <CycleStatusBadge status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)} />
-        </div>
-        {payable ? (
-          <Link
-            href={`/portal/${storeId}#payment-info`}
-            className={buttonVariants({
-              variant: 'primary',
-              size: 'lg',
-              className: 'w-full sm:w-auto',
-            })}
-          >
-            {t('payNow')}
-          </Link>
-        ) : null}
-      </header>
+      <section className="flex flex-col gap-5 rounded-card border border-line bg-surface p-5 sm:p-6">
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <p className="text-base text-ink-soft">
+              {t('subtitle', { number: cycle.cycleNumber })}
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight text-ink">
+              {tCollections('cycle.title', { date: formatDate(cycle.cutOffDate) })}
+            </h1>
+          </div>
+          {payable ? (
+            <Link
+              href={`/portal/${storeId}/pay`}
+              className={buttonVariants({
+                variant: 'primary',
+                size: 'lg',
+                className: 'w-full sm:w-auto',
+              })}
+            >
+              {t('payNow')}
+            </Link>
+          ) : null}
+        </header>
 
-      <dl className="grid grid-cols-2 gap-3">
-        <div className="col-span-2 flex flex-col gap-1 rounded-field bg-paper-deep p-4">
-          <dt className="text-base text-ink-soft">
-            {showRemaining
-              ? t('remaining')
-              : billed
-                ? tCollections('cycle.totalDue')
-                : tCollections('cycle.openTotal')}
-          </dt>
-          <dd className="text-3xl font-bold tracking-tight text-ink">
-            <Money
-              amount={showRemaining ? remaining.toFixed2() : cycle.totalDue}
-              currency={cycle.currency}
-            />
-          </dd>
-        </div>
-        <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-4">
-          <dt className="text-base text-ink-soft">{tCollections('cycle.dueDate')}</dt>
-          <dd className="font-semibold text-ink tabular-nums">
-            {formatDate(cycle.paymentDueDate)}
-          </dd>
-        </div>
-        <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-4">
-          <dt className="text-base text-ink-soft">{tCollections('cycle.paid')}</dt>
-          <dd className="font-semibold text-ink">
-            <Money amount={cycle.amountPaid} currency={cycle.currency} />
-          </dd>
-        </div>
-      </dl>
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="col-span-2 flex flex-col gap-1 rounded-field bg-paper-deep p-4 sm:col-span-1">
+            <dt className="text-sm text-ink-soft">
+              {showRemaining
+                ? t('remaining')
+                : billed
+                  ? tCollections('cycle.totalDue')
+                  : tCollections('cycle.openTotal')}
+            </dt>
+            <dd className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+              <Money
+                amount={showRemaining ? remaining.toFixed2() : cycle.totalDue}
+                currency={cycle.currency}
+              />
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-4">
+            <dt className="text-sm text-ink-soft">{tCollections('cycle.dueDate')}</dt>
+            <dd className="font-semibold text-ink tabular-nums">
+              {formatDate(cycle.paymentDueDate)}
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1 rounded-field bg-paper-deep p-4">
+            <dt className="text-sm text-ink-soft">{tCollections('cycle.paid')}</dt>
+            <dd className="font-semibold text-ink">
+              <Money amount={cycle.amountPaid} currency={cycle.currency} />
+            </dd>
+          </div>
+        </dl>
+      </section>
 
       <CycleStatement
         cycle={cycle}

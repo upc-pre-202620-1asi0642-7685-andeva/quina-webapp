@@ -311,7 +311,7 @@ function AdjustStockForm({
             key={preset}
             type="button"
             onClick={() => setReason(preset)}
-            className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-[transform,colors] duration-150 hover:bg-surface-hover hover:text-ink active:scale-[0.97]"
+            className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-[transform,color,background-color] duration-150 hover:bg-surface-hover hover:text-ink active:scale-[0.97]"
           >
             {preset}
           </button>
@@ -438,7 +438,7 @@ function RecordWasteForm({
             key={preset}
             type="button"
             onClick={() => setReason(preset)}
-            className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-[transform,colors] duration-150 hover:bg-surface-hover hover:text-ink active:scale-[0.97]"
+            className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-[transform,color,background-color] duration-150 hover:bg-surface-hover hover:text-ink active:scale-[0.97]"
           >
             {preset}
           </button>

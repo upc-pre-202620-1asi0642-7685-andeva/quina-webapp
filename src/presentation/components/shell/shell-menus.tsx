@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import {
   AlertTriangleIcon,
@@ -12,20 +13,28 @@ import {
   GemIcon,
   LanguagesIcon,
   LogOutIcon,
+  MessageSquareWarningIcon,
   PackageIcon,
   PackagePlusIcon,
   PlusIcon,
+  ReceiptTextIcon,
   SettingsIcon,
   ShoppingBasketIcon,
   ShoppingCartIcon,
+  StoreIcon,
   SunMoonIcon,
   TruckIcon,
   UserPlusIcon,
   UsersRoundIcon,
   type LucideIcon,
 } from 'lucide-react';
+import { sileo } from 'sileo';
+import { locales, type Locale } from '@/core/domain/shared/locale';
 import { authClient } from '@/infrastructure/auth/auth-client';
+import { setLocaleAction } from '@/presentation/actions/locale';
+import { setThemeAction } from '@/presentation/actions/theme';
 import { clearOfflinePages } from '@/presentation/components/pwa/pwa';
+import { unsubscribePushOnSignOut } from '@/presentation/components/pwa/push-client';
 import {
   applyTheme,
   readThemeChoice,
@@ -145,6 +154,8 @@ export function ProfileMenu({
   canManageStore,
   collapsed = false,
   compact = false,
+  mode = 'store',
+  stores,
 }: {
   user: { name: string; email: string };
   storeName: string;
@@ -152,8 +163,14 @@ export function ProfileMenu({
   collapsed?: boolean;
   /** Encabezado del celular: solo el avatar. */
   compact?: boolean;
+  mode?: 'store' | 'portal';
+  stores?: { storeId: string; storeName: string }[];
 }) {
   const t = useTranslations('Shell.account');
+  const tProfile = useTranslations('Profile');
+  const locale = useLocale() as Locale;
+  const router = useRouter();
+  const isPortal = mode === 'portal';
   const theme = useSyncExternalStore(
     subscribeTheme,
     readThemeChoice,
@@ -164,10 +181,11 @@ export function ProfileMenu({
   async function signOut() {
     setSigningOut(true);
     try {
+      if (!isPortal) await unsubscribePushOnSignOut();
       await authClient.signOut();
       // US22: lo guardado para leer sin señal no se queda en un celular compartido
       await clearOfflinePages();
-      window.location.replace('/app/login');
+      window.location.replace(isPortal ? '/app/portal/login' : '/app/login');
     } finally {
       setSigningOut(false);
     }
@@ -211,17 +229,25 @@ export function ProfileMenu({
           <div className="flex min-w-0 flex-col">
             <span className="truncate font-semibold text-ink">{user.name}</span>
             <span className="truncate text-xs text-ink-soft">{user.email}</span>
-            <span className="truncate text-xs text-ink-soft">{storeName}</span>
+            {storeName ? <span className="truncate text-xs text-ink-soft">{storeName}</span> : null}
           </div>
         </div>
         <DropdownMenuSeparator className="bg-line" />
         <DropdownMenuItem asChild className={itemClass}>
-          <Link href="/profile">
+          <Link href={isPortal ? '/portal/profile' : '/profile'}>
             <CircleUserRoundIcon aria-hidden="true" />
             {t('profile')}
           </Link>
         </DropdownMenuItem>
-        {canManageStore ? (
+        {isPortal && stores && stores.length > 1 ? (
+          <DropdownMenuItem asChild className={itemClass}>
+            <Link href="/portal">
+              <StoreIcon aria-hidden="true" />
+              {t('myStores')}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+        {!isPortal && canManageStore ? (
           <DropdownMenuItem asChild className={itemClass}>
             <Link href="/settings">
               <SettingsIcon aria-hidden="true" />
@@ -238,7 +264,13 @@ export function ProfileMenu({
             <DropdownMenuRadioGroup
               value={theme}
               onValueChange={(value) => {
-                applyTheme(value as ThemeChoice);
+                const choice = value as ThemeChoice;
+                if (choice === theme) return;
+                const previous = theme;
+                applyTheme(choice);
+                void setThemeAction(choice).then((res) => {
+                  if (!res.ok) applyTheme(previous);
+                });
               }}
             >
               {THEME_CHOICES.map((choice) => (
@@ -253,13 +285,47 @@ export function ProfileMenu({
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
-        <DropdownMenuItem asChild className={itemClass}>
-          <Link href="/profile/preferences">
-            <LanguagesIcon aria-hidden="true" />
-            {t('language')}
-          </Link>
-        </DropdownMenuItem>
-        {canManageStore ? (
+        {isPortal ? (
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className={itemClass}>
+              <LanguagesIcon aria-hidden="true" />
+              {t('language')}
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className={cn(layer, 'w-48')}>
+              <DropdownMenuRadioGroup
+                value={locale}
+                onValueChange={(value) => {
+                  const next = value as Locale;
+                  if (next === locale) return;
+                  void setLocaleAction(next).then((res) => {
+                    if (res.ok) {
+                      sileo.success({ title: tProfile('localeSaved') });
+                      router.refresh();
+                    }
+                  });
+                }}
+              >
+                {locales.map((loc) => (
+                  <DropdownMenuRadioItem
+                    key={loc}
+                    value={loc}
+                    className="h-10 rounded-field text-sm"
+                  >
+                    {tProfile(`locales.${loc}`)}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        ) : (
+          <DropdownMenuItem asChild className={itemClass}>
+            <Link href="/profile/preferences">
+              <LanguagesIcon aria-hidden="true" />
+              {t('language')}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {!isPortal && canManageStore ? (
           <DropdownMenuItem asChild className={itemClass}>
             <Link href="/settings/subscription">
               <GemIcon aria-hidden="true" />
@@ -286,35 +352,41 @@ export function ProfileMenu({
 
 /* ----------------------------- Notificaciones ----------------------------- */
 
-const READ_KEY = 'quina-notifications-read';
-const readListeners = new Set<() => void>();
+const readListenersByKey = new Map<string, Set<() => void>>();
 
-function readIds(): string {
+function readIds(storageKey: string): string {
   try {
-    return localStorage.getItem(READ_KEY) ?? '[]';
+    return localStorage.getItem(storageKey) ?? '[]';
   } catch {
     return '[]';
   }
 }
 
-function saveIds(ids: string[]) {
+function saveIds(storageKey: string, ids: string[]) {
   try {
     // Solo los avisos vigentes: la lista no crece sin fin
-    localStorage.setItem(READ_KEY, JSON.stringify(ids));
+    localStorage.setItem(storageKey, JSON.stringify(ids));
   } catch {
     // Sin almacenamiento: se vuelven a ver como nuevos en la próxima visita
   }
-  readListeners.forEach((listener) => listener());
+  readListenersByKey.get(storageKey)?.forEach((listener) => listener());
 }
 
 /** Lo leído es una comodidad de este navegador (no hace falta compartirlo entre equipos). */
-function useReadIds(): Set<string> {
+function useReadIds(storageKey: string): Set<string> {
   const raw = useSyncExternalStore(
     (onChange) => {
-      readListeners.add(onChange);
-      return () => readListeners.delete(onChange);
+      let set = readListenersByKey.get(storageKey);
+      if (!set) {
+        set = new Set();
+        readListenersByKey.set(storageKey, set);
+      }
+      set.add(onChange);
+      return () => {
+        set?.delete(onChange);
+      };
     },
-    readIds,
+    () => readIds(storageKey),
     () => '[]',
   );
   try {
@@ -326,55 +398,73 @@ function useReadIds(): Set<string> {
 
 /* Avisos en vivo: un solo sondeo compartido por las dos campanas (barra y celular) */
 const POLL_MS = 30_000;
-let liveItems: AppNotification[] | null = null;
-const liveListeners = new Set<() => void>();
-let pollTimer: ReturnType<typeof setInterval> | undefined;
+type PollEntry = {
+  items: AppNotification[] | null;
+  listeners: Set<() => void>;
+  timer?: ReturnType<typeof setInterval>;
+  onVisibility?: () => void;
+};
+const pollStores = new Map<string, PollEntry>();
 
-function emitLive() {
-  liveListeners.forEach((listener) => listener());
+function getPollEntry(pollUrl: string): PollEntry {
+  let entry = pollStores.get(pollUrl);
+  if (!entry) {
+    entry = { items: null, listeners: new Set() };
+    pollStores.set(pollUrl, entry);
+  }
+  return entry;
 }
 
-async function pollNotifications() {
+function emitLive(pollUrl: string) {
+  getPollEntry(pollUrl).listeners.forEach((listener) => listener());
+}
+
+async function pollNotifications(pollUrl: string) {
   // Pestaña oculta: no consulta; al volver a ella se pide de inmediato
   if (document.visibilityState !== 'visible') return;
   try {
-    const res = await fetch('/app/api/notifications', { cache: 'no-store' });
+    const res = await fetch(pollUrl, { cache: 'no-store' });
     if (!res.ok) return;
     const data = (await res.json()) as { items: AppNotification[] };
-    liveItems = data.items;
-    emitLive();
+    getPollEntry(pollUrl).items = data.items;
+    emitLive(pollUrl);
   } catch {
     // Sin conexión: se queda con lo último que llegó
   }
 }
 
-function subscribeLive(onChange: () => void) {
-  liveListeners.add(onChange);
-  if (liveListeners.size === 1) {
-    pollTimer = setInterval(pollNotifications, POLL_MS);
-    document.addEventListener('visibilitychange', pollNotifications);
+function subscribeLive(pollUrl: string, onChange: () => void) {
+  const entry = getPollEntry(pollUrl);
+  entry.listeners.add(onChange);
+  if (entry.listeners.size === 1) {
+    const trigger = () => void pollNotifications(pollUrl);
+    entry.onVisibility = trigger;
+    entry.timer = setInterval(trigger, POLL_MS);
+    document.addEventListener('visibilitychange', trigger);
   }
   return () => {
-    liveListeners.delete(onChange);
-    if (liveListeners.size === 0) {
-      clearInterval(pollTimer);
-      document.removeEventListener('visibilitychange', pollNotifications);
+    entry.listeners.delete(onChange);
+    if (entry.listeners.size === 0) {
+      if (entry.timer) clearInterval(entry.timer);
+      if (entry.onVisibility) document.removeEventListener('visibilitychange', entry.onVisibility);
+      entry.timer = undefined;
+      entry.onVisibility = undefined;
     }
   };
 }
 
 /** Lo del servidor al navegar y, entre navegaciones, lo que trae el sondeo. */
-function useLiveNotifications(initial: AppNotification[]): AppNotification[] {
+function useLiveNotifications(initial: AppNotification[], pollUrl: string): AppNotification[] {
   const live = useSyncExternalStore(
-    subscribeLive,
-    () => liveItems,
+    (onChange) => subscribeLive(pollUrl, onChange),
+    () => getPollEntry(pollUrl).items,
     () => null,
   );
   // El layout trae datos frescos en cada navegación: mandan sobre el último sondeo
   useEffect(() => {
-    liveItems = null;
-    emitLive();
-  }, [initial]);
+    getPollEntry(pollUrl).items = null;
+    emitLive(pollUrl);
+  }, [initial, pollUrl]);
   return live ?? initial;
 }
 
@@ -383,6 +473,10 @@ const KIND_ICON: Record<AppNotification['kind'], LucideIcon> = {
   dueSoon: CalendarClockIcon,
   lowStock: PackageIcon,
   plan: GemIcon,
+  billed: ReceiptTextIcon,
+  pendingCharge: ShoppingBasketIcon,
+  objectedCharge: MessageSquareWarningIcon,
+  accountAlert: AlertTriangleIcon,
 };
 
 const TONE: Record<AppNotification['tone'], string> = {
@@ -396,15 +490,23 @@ export function NotificationsMenu({
   items: initialItems,
   collapsed = false,
   compact = false,
+  pollUrl = '/app/api/notifications',
+  storageKey = 'quina-notifications-read',
+  footerHref = '/profile/preferences',
+  emptyText,
 }: {
   items: AppNotification[];
   collapsed?: boolean;
   compact?: boolean;
+  pollUrl?: string;
+  storageKey?: string;
+  footerHref?: string | null;
+  emptyText?: string;
 }) {
   const t = useTranslations('Shell.notifications');
   const row = !compact && !collapsed;
-  const items = useLiveNotifications(initialItems);
-  const read = useReadIds();
+  const items = useLiveNotifications(initialItems, pollUrl);
+  const read = useReadIds(storageKey);
   const [open, setOpen] = useState(false);
   const unread = items.filter((item) => !read.has(item.id)).length;
 
@@ -412,11 +514,15 @@ export function NotificationsMenu({
   useEffect(() => {
     const live = new Set(items.map((item) => item.id));
     const kept = [...read].filter((id) => live.has(id));
-    if (kept.length !== read.size) saveIds(kept);
-  }, [items, read]);
+    if (kept.length !== read.size) saveIds(storageKey, kept);
+  }, [items, read, storageKey]);
 
-  const markAll = () => saveIds(items.map((item) => item.id));
-  const markOne = (id: string) => saveIds([...new Set([...read, id])]);
+  const markAll = () =>
+    saveIds(
+      storageKey,
+      items.map((item) => item.id),
+    );
+  const markOne = (id: string) => saveIds(storageKey, [...new Set([...read, id])]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -482,7 +588,7 @@ export function NotificationsMenu({
               <BellIcon aria-hidden="true" className="size-9 text-soft-ink" />
               <span className="absolute top-3.5 right-3.5 size-4 rounded-full bg-primary ring-4 ring-surface" />
             </span>
-            <p className="max-w-56 text-sm text-ink-soft">{t('empty')}</p>
+            <p className="max-w-56 text-sm text-ink-soft">{emptyText ?? t('empty')}</p>
           </div>
         ) : (
           <ul className="flex flex-col overflow-y-auto overscroll-contain p-1.5">
@@ -533,6 +639,21 @@ export function NotificationsMenu({
             })}
           </ul>
         )}
+        {footerHref ? (
+          <footer className="border-t border-line p-1.5">
+            <Link
+              href={footerHref}
+              onClick={() => setOpen(false)}
+              className={cn(
+                'flex min-h-10 items-center justify-between rounded-field px-3 py-2 text-xs font-medium text-link-active hover:bg-surface-hover',
+                focusRing,
+              )}
+            >
+              <span>{t('pushSettings')}</span>
+              <ChevronRightIcon aria-hidden="true" className="size-4 shrink-0" />
+            </Link>
+          </footer>
+        ) : null}
       </PopoverContent>
     </Popover>
   );

@@ -67,7 +67,7 @@ export default async function PlatformStoresPage({
           )}
         </section>
       ) : (
-        <ul className="divide-y divide-line rounded-card border border-line bg-surface">
+        <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
           {stores.map((store) => (
             <li key={store.id}>
               <Link

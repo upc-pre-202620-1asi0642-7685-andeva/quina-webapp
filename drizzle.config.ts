@@ -1,5 +1,7 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
+
+config({ path: ['.env.local', '.env'] });
 
 // Drizzle Kit usa la conexión directa con el rol postgres (puerto 5432).
 // La aplicación nunca usa esta URL: se conecta como quina_app (DATABASE_URL).

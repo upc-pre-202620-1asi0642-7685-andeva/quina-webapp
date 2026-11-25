@@ -208,7 +208,7 @@ export function ChargeActionSheet({
                       setError(null);
                     }}
                     className={cn(
-                      'min-h-11 cursor-pointer rounded-full border px-3.5 py-2 text-sm font-medium transition-[transform,colors] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
+                      'min-h-11 cursor-pointer rounded-full border px-3.5 py-2 text-sm font-medium transition-[transform,color,background-color,border-color] duration-150 ease-(--ease-out-expo) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100',
                       selected
                         ? 'border-link-active bg-soft text-soft-ink'
                         : 'border-line bg-paper-deep/60 text-ink hover:bg-surface-hover',

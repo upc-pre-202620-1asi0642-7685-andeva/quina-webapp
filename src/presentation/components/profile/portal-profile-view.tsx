@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { ArrowLeftIcon, BadgeCheckIcon, ChevronRightIcon, StoreIcon } from 'lucide-react';
+import { BadgeCheckIcon, ChevronRightIcon, StoreIcon } from 'lucide-react';
 import { ActiveSessionsCard } from '@/presentation/components/profile/active-sessions-card';
 import { LocaleSelectorCard } from '@/presentation/components/profile/locale-selector-card';
 import { OfflineSafetyCard } from '@/presentation/components/profile/offline-safety-card';
@@ -36,20 +36,8 @@ export function PortalProfileView({
   const displayName =
     profile.user.name.trim() || fallbackName?.trim() || profile.user.email.split('@')[0] || '';
 
-  const backHref = stores.length === 1 ? `/portal/${stores[0]!.storeId}` : '/portal';
-  const backLabel =
-    stores.length === 1 ? t('backToStore', { store: stores[0]!.storeName }) : t('backToPortal');
-
   return (
     <>
-      <Link
-        href={backHref}
-        className="inline-flex min-h-11 items-center gap-2 self-start text-base font-medium text-link-active transition-transform duration-150 ease-(--ease-out-expo) hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link-active active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
-      >
-        <ArrowLeftIcon aria-hidden="true" className="size-5" />
-        <span>{backLabel}</span>
-      </Link>
-
       {/* Cabecera amigable del vecino (DESIGN.md §6.2: escala legible) */}
       <header className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:p-6">
         <div className="flex items-center gap-4">
@@ -74,7 +62,6 @@ export function PortalProfileView({
             </div>
           </div>
         </div>
-        <p className="text-base text-ink-soft">{t('subtitlePortal')}</p>
       </header>
 
       <Tabs defaultValue="account" className="flex flex-col gap-5">
@@ -105,7 +92,7 @@ export function PortalProfileView({
                 </h2>
                 <p className="text-base text-ink-soft">{t('portalStores.subtitle')}</p>
               </div>
-              <ul className="divide-y divide-line rounded-field border border-line">
+              <ul className="divide-y divide-line overflow-hidden rounded-field border border-line">
                 {stores.map((store) => (
                   <li key={store.storeId}>
                     <Link

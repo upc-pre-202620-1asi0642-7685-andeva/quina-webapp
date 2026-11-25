@@ -131,6 +131,7 @@ describe('nextRouteFor en el portal (D8)', () => {
     role: 'STORE_OWNER',
     storeId: 's-1',
     preferredLocale: 'es',
+    preferredTheme: 'system',
   };
   const customer: SessionUser = { ...owner, role: 'CUSTOMER', storeId: null };
 

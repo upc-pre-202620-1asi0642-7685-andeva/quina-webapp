@@ -604,6 +604,33 @@
       "confirmAction": "Arí, kutichiy",
       "cancel": "Amaraq"
     },
+    "push": {
+      "title": "Kay celularpi willakuykuna",
+      "description": "Quina wichqasqa kaptinpas willakuykunata chaskiy: cobrokuna pasasqa, qayllapi kaqkuna, pisi stock utaq ranti qhawasqa.",
+      "statusChecking": "Qhawachkan",
+      "statusOn": "Kicharisqa",
+      "statusOff": "Wichqasqa",
+      "statusBlocked": "Harkasqa",
+      "statusNeedsInstall": "Appta churay",
+      "statusUnavailable": "Mana kanchu",
+      "devicesCount": "{count, plural, one {# equipo yupayniykipaq} other {# equipokuna yupayniykipaq}}",
+      "enableButton": "Willakuykunata kichariy",
+      "disableButton": "Kay equipopi wichqay",
+      "testButton": "Pruebapaq willakuy kachay",
+      "enabledToast": "Kay equipopi willakuykuna kicharisqañam.",
+      "disabledToast": "Kay equipopi willakuykuna wichqasqañam.",
+      "deniedToast": "Navegadorqa willakuykunata harkarqan. Sitio permisokunapi kichariy.",
+      "unsupportedToast": "Kay navegadorqa mana push willakuykunata chaskinchu.",
+      "notConfiguredError": "Servidorpi VAPID llavekuna pisin.",
+      "enableError": "Mana kichariyta atirqankuchu. Wakmanta ruray.",
+      "disableError": "Mana wichqayta atirqankuchu.",
+      "testSent": "Pruebapaq willakuyqa equipoykiman kachasqañam.",
+      "testError": "Pruebapaq willakuyta mana kachayta atirqankuchu.",
+      "iosHomeScreenHint": "iPhone utaq iPadpiqa ñawpaqta Compartir ñit'ispa «Añadir a pantalla de inicio» akllay; chaymanta kicharispa willakuykunata kichariy.",
+      "blockedHint": "Kay navegadorpi willakuykuna harkasqam kachkan. Dirección ñawpaqninpi permisokunata kichariy.",
+      "missingVapidHint": "Servidorpi VAPID llavekuna manaraq churasqachu push willakuykunapaq.",
+      "unsupportedHint": "Kay navegadorqa mana qhipapi push willakuykunata chaskinchu."
+    },
     "password": {
       "title": "Yaykuna rimay",
       "statusConfigured": "Churasqa",
@@ -679,30 +706,9 @@
       "cleared": "Mana señalniyuq waqaychasqa p'anqakunaqa pichasqañam."
     },
     "access": {
-      "storeMeta": "{turn} · {taxIdType} {taxIdNumber}",
-      "taxRegimeLabel": "Tributario régimen",
-      "rusCategory": "Categoría {category}",
-      "teamSeatsLabel": "Equipo cupo",
-      "ownerLinksAria": "Qhatu kamachiy ñankuna",
-      "ownerScopeTitle": "Qhatuykipa permisokunan",
-      "ownerLinks": {
-        "settings": {
-          "label": "Qhatu allichay",
-          "meta": "Yape, Plin, banco hinaspa tributos"
-        },
-        "subscription": {
-          "label": "Suscripción hinaspa plan",
-          "meta": "Plan hinaspa killa llamk'ay"
-        },
-        "team": {
-          "label": "Mostrador equipo",
-          "meta": "Waqyakuykuna hinaspa yanapaqkuna"
-        },
-        "audit": {
-          "label": "Auditoría",
-          "meta": "Rurasqakuna qillqa"
-        }
-      },
+      "ownerTitle": "{store} qhatupi kapuq",
+      "ownerSubtitle": "Cuentaykiqa kay qhatuta kamachin: mostrador, chaninkuna, manu kamachiykuna, llamkaqkuna hinaspa qhatu allichay.",
+      "manageTeamLink": "Llamkaqkunata kamachiy",
       "employeeTitle": "{store} qhatupi yanapaq",
       "employeeSubtitle": "Yaykuyniykiqa sapa p'unchaw mostradorpi llamk'anallapaqmi. Preciokuna, fiado kamachiykuna hinaspa suscripciónqa qhatu kapuqllapaqmi.",
       "employeeAllowedHeading": "Imakunata rurayta atinki",
@@ -822,6 +828,7 @@
     "account": {
       "open": "Cuentayki menuta kichay",
       "profile": "Perfilniy",
+      "myStores": "Tiendaykuna",
       "settings": "Tiendaq allichanakuna",
       "theme": "Tema",
       "themes": {
@@ -851,7 +858,8 @@
       "dueSoonTitle": "{name}-manta cobray",
       "dueSoonBody": "{amount} · {date}",
       "lowStockTitle": "Tukukuq rantinakuna",
-      "lowStockBody": "{count} ranti pisi stockwan"
+      "lowStockBody": "{count} ranti pisi stockwan",
+      "pushSettings": "Celularpi willakuykunata kamachiy"
     },
     "breadcrumb": {
       "label": "Kaypi kachkanki",
@@ -1564,10 +1572,6 @@
       "audit": {
         "label": "Qhawapayay",
         "meta": "Tikray qillqa"
-      },
-      "profile": {
-        "label": "Perfilniy",
-        "meta": "Clavewan simi"
       }
     },
     "caseroHint": "Qhatunaykipaq mana qullqiyuq plan, mostradorpi fiadota allichanaykipaq.",
@@ -2495,7 +2499,36 @@
     "shell": {
       "home": "Cuentaykuna",
       "logoAlt": "Quina",
-      "profile": "Perfilniy"
+      "profile": "Perfilniy",
+      "navLabel": "Portal puririy",
+      "nav": {
+        "home": "Qallariy",
+        "cycles": "Ciclokuna",
+        "pay": "Imaynata pagana",
+        "payMobile": "Pagay",
+        "store": "Tienda",
+        "stores": "Tiendaykuna",
+        "profile": "Perfilniy"
+      },
+      "notificationsEmpty": "Kaypi pagana p'unchaw willakuykuna, rantisqaykikuna qhawanaykipaq rikhunqa.",
+      "switchStore": "Tiendata tikray",
+      "storesCount": "{count, plural, =1 {1 tienda} other {# tiendakuna}}"
+    },
+    "notifications": {
+      "overdueTitle": "{store} tiendapi pagay tukusqa",
+      "overdueBody": "{amount} · {date} p'unchaw tukukurqan",
+      "dueSoonTitle": "{store} tiendapi pagay chayamuchkanña",
+      "dueSoonBody": "{amount} · {date} tukukun",
+      "billedTitle": "{store} cuentayki wakichisqaña",
+      "billedBody": "{amount} · {date} kama pagay",
+      "pendingChargeTitle": "{store} rantiqta qhaway",
+      "pendingChargeBody": "{amount} · {date} kama qhawayta atinki",
+      "objectedChargeTitle": "{store} observacionta qhawachkan",
+      "objectedChargeBody": "{amount} · tienda qhawachkan",
+      "blockedTitle": "{store} cuentayki sayachisqa",
+      "blockedBody": "Caseroykiwan rimay musuqmanta fianankupaq.",
+      "bouncedTitle": "{store} correoyki mana chayanchu",
+      "bouncedBody": "Tiendata mañakuy correoykita qhawanankupaq."
     },
     "home": {
       "title": "Fiado cuentaykuna",
@@ -2532,7 +2565,31 @@
       "blocked": "Kunanqa tiendaqa manaña aswanta fiasunkichu. Caseroykiwan rimay.",
       "noCredit": "Kay tiendaqa manaraq fiado cuentata kicharqasunkichu.",
       "callStore": "Tiendaman waqyay: {phone}",
-      "privacyLink": "Tiendaq waqaychay kamachiynin"
+      "privacyLink": "Tiendaq waqaychay kamachiynin",
+      "seeAllCycles": "Llapan ciclokunata qhaway ({count})",
+      "storeInfoTitle": "Tiendaq willakuynin",
+      "storeInfoHint": "Maypi kasqan, waqyana, waqaychaypas"
+    },
+    "cycles": {
+      "title": "Ciclokuna pagaykunapas",
+      "subtitle": "Sapa killa cuentaykita, rantisqaykita, reciboykikunatapas qhaway.",
+      "filterLabel": "Ciclokunata akllay",
+      "filters": {
+        "all": "Llapan",
+        "payable": "Paganapaq",
+        "paid": "Pagasqa"
+      }
+    },
+    "payPage": {
+      "title": "Imaynata pagana",
+      "subtitle": "Munasqayki pagayta akllay hinaspa constanciaykita waqaychay.",
+      "confirmHint": "Yape, Plin utaq bancowan pagaspaqa tiendaman willay pagoykita qillqanankupaq reciboykitapas qunankupaq."
+    },
+    "storePage": {
+      "subtitle": "Fiado cuentaykimanta waqyana willakuykuna kamachiykunapas.",
+      "contactTitle": "Waqyana waqaychaypas",
+      "noAddress": "Kay tiendaqa manaraq maypi kasqanta churarqanchu.",
+      "termsTitle": "Fiado kamachiyniykikuna"
     },
     "payment": {
       "title": "Imaynata pagana",
@@ -2578,8 +2635,8 @@
       "breakdown": "Capital {principal} · Interés {interest}"
     },
     "cycle": {
-      "back": "Cuentayman kutiy",
-      "subtitle": "{number} kaq ciclo",
+      "back": "Ciclokunaman kutiy",
+      "subtitle": "Ciclo {number}",
       "remaining": "Paganaykipaq puchuq",
       "payNow": "Imaynata pagana",
       "objected": "Listo. Tiendaqa manaraq cobrasuchkaspa observacionniykita qhawanqa."

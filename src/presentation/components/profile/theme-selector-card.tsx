@@ -1,9 +1,10 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckIcon, MonitorIcon, MoonIcon, SunIcon, type LucideIcon } from 'lucide-react';
 import { sileo } from 'sileo';
+import { setThemeAction } from '@/presentation/actions/theme';
 import {
   applyTheme,
   readThemeChoice,
@@ -25,6 +26,8 @@ const press =
 export function ThemeSelectorCard({ variant = 'store' }: { variant?: 'store' | 'portal' }) {
   const portal = variant === 'portal';
   const t = useTranslations('Profile.theme');
+  const tErr = useTranslations('Auth.errors');
+  const [, startTransition] = useTransition();
   const currentTheme = useSyncExternalStore(
     subscribeTheme,
     readThemeChoice,
@@ -33,8 +36,17 @@ export function ThemeSelectorCard({ variant = 'store' }: { variant?: 'store' | '
 
   function handleSelect(choice: ThemeChoice) {
     if (choice === currentTheme) return;
+    const previous = currentTheme;
     applyTheme(choice);
-    sileo.success({ title: t('saved') });
+    startTransition(async () => {
+      const res = await setThemeAction(choice);
+      if (res.ok) {
+        sileo.success({ title: t('saved') });
+      } else {
+        applyTheme(previous);
+        sileo.error({ title: tErr('generic') });
+      }
+    });
   }
 
   return (

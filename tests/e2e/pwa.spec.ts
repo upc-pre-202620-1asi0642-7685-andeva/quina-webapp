@@ -28,9 +28,25 @@ test.describe('PWA instalable (US22)', () => {
       'href',
       '/app/manifest.webmanifest',
     );
-    // El service worker en /app/sw.js puede controlar también /app
+    // El service worker en /app/sw.js puede controlar también /app y escucha eventos push
     const sw = await request.get('./sw.js');
     expect(sw.headers()['service-worker-allowed']).toBe('/app');
+    const swSource = await sw.text();
+    expect(swSource).toContain("addEventListener('push'");
+    expect(swSource).toContain("addEventListener('notificationclick'");
+  });
+
+  test('la configuración de avisos push requiere sesión de tienda y muestra estado en preferencias', async ({
+    page,
+    request,
+  }) => {
+    const unauth = await request.get('./api/push/subscription');
+    expect(unauth.status()).toBe(401);
+
+    await isolateRateLimitIp(page);
+    await registerOwnerWithStore(page);
+    await page.goto('./profile/preferences');
+    await expect(page.getByRole('heading', { name: 'Avisos en este celular' })).toBeVisible();
   });
 
   test('la página sin conexión es pública y accesible', async ({ page }) => {

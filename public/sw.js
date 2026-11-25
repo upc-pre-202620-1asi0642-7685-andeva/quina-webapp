@@ -111,3 +111,51 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(staticAsset(request));
   }
 });
+
+// Web Push: muestra avisos del sistema aunque la webapp esté cerrada y abre la ruta al tocar.
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  let data;
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'Quina', body: event.data.text(), url: '/app' };
+  }
+  const title = typeof data.title === 'string' && data.title ? data.title : 'Quina';
+  const body = typeof data.body === 'string' ? data.body : '';
+  const url = typeof data.url === 'string' && data.url.startsWith('/app') ? data.url : '/app';
+  const tag = typeof data.tag === 'string' && data.tag ? data.tag : 'quina-alert';
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: '/app/brand/pwa-icon-192.png',
+      badge: '/app/brand/pwa-icon-192.png',
+      tag,
+      data: { url },
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const rawUrl = event.notification.data && event.notification.data.url;
+  const target = typeof rawUrl === 'string' && rawUrl.startsWith('/app') ? rawUrl : '/app';
+  const absoluteTarget = new URL(target, self.location.origin).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.startsWith(`${self.location.origin}/app`) && 'focus' in client) {
+          if ('navigate' in client) {
+            return client
+              .navigate(absoluteTarget)
+              .then((navigated) => (navigated ?? client).focus());
+          }
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(absoluteTarget);
+    }),
+  );
+});

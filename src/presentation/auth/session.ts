@@ -4,10 +4,12 @@ import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { isRole, type Role } from '@/core/domain/identity/roles';
 import type { Locale } from '@/core/domain/shared/locale';
+import type { ThemeChoice } from '@/core/domain/shared/theme';
 import { getAuth } from '@/infrastructure/auth/auth';
 import { db } from '@/infrastructure/db/connection';
 import { stores, users } from '@/infrastructure/db/schema';
 import { isLocale } from '@/presentation/i18n/resolve-locale';
+import { isThemeChoice } from '@/presentation/lib/resolve-theme';
 
 export type SessionUser = {
   id: string;
@@ -17,6 +19,7 @@ export type SessionUser = {
   role: Role;
   storeId: string | null;
   preferredLocale: Locale;
+  preferredTheme: ThemeChoice;
 };
 
 const PUBLIC_AUTH_PATHS = new Set([
@@ -111,6 +114,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
       role: users.role,
       storeId: users.storeId,
       preferredLocale: users.preferredLocale,
+      preferredTheme: users.preferredTheme,
       isActive: users.isActive,
       storeActive: stores.isActive,
     })
@@ -130,6 +134,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
     role: row.role,
     storeId: row.storeId,
     preferredLocale: isLocale(row.preferredLocale) ? row.preferredLocale : 'es',
+    preferredTheme: isThemeChoice(row.preferredTheme) ? row.preferredTheme : 'system',
   };
 });
 
