@@ -722,8 +722,10 @@
       }
     },
     "portalTabs": {
-      "account": "Account & language",
-      "security": "Security & sessions"
+      "account": "Account",
+      "accountHint": "Stores, theme, and language",
+      "security": "Security",
+      "securityHint": "Password, sessions, and offline"
     },
     "portalStores": {
       "title": "Stores linked to your account",
