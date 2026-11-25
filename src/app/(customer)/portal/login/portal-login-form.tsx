@@ -119,11 +119,7 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
       {step === 'document' ? (
         <>
           <div className="flex flex-col gap-4">
-            <GoogleButton
-              size="lg"
-              callbackURL="/app/portal"
-              errorCallbackURL="/app/portal/login"
-            />
+            <GoogleButton callbackURL="/app/portal" errorCallbackURL="/app/portal/login" />
             <div className="flex items-center gap-3 text-sm text-ink-soft">
               <span className="h-px flex-1 bg-line" />
               <span>{t('or')}</span>
@@ -180,17 +176,17 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
                 {t('errors.CAPTCHA_REQUIRED')}
               </p>
             ) : null}
-            <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
+            <Button type="submit" variant="primary" className="w-full" disabled={sending}>
               {sending ? <Loader2Icon aria-hidden="true" className="animate-spin" /> : null}
               <span>{sending ? t('sending') : t('send')}</span>
             </Button>
           </form>
 
-          <p className="text-base text-ink-soft">
+          <p className="text-center text-sm text-ink-soft sm:text-left">
             {t('passwordQuestion')}{' '}
             <Link
               href="/login"
-              className="font-medium text-link-active underline-offset-4 hover:underline"
+              className="font-semibold text-link-active underline-offset-4 hover:underline"
             >
               {t('passwordLink')}
             </Link>
@@ -230,7 +226,7 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
               </p>
             ) : null}
           </div>
-          <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
+          <Button type="submit" variant="primary" className="w-full" disabled={sending}>
             {sending ? <Loader2Icon aria-hidden="true" className="animate-spin" /> : null}
             <span>{sending ? t('verifying') : t('verify')}</span>
           </Button>
@@ -238,7 +234,6 @@ export function PortalLoginForm({ notice }: { notice: 'link' | 'google' | null }
           <Button
             type="button"
             variant="ghost"
-            size="lg"
             className="w-full"
             disabled={cooldown > 0}
             onClick={() => {

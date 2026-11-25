@@ -97,12 +97,15 @@ export async function WidgetCard({
     <section
       aria-labelledby={`widget-${id}`}
       className={cn(
-        'flex h-full flex-col gap-4 rounded-card border border-line bg-surface p-5',
+        'flex h-full min-w-0 flex-col gap-4 overflow-hidden rounded-card border border-line bg-surface p-5',
         className,
       )}
     >
       <header className="flex items-center justify-between gap-3">
-        <h2 id={`widget-${id}`} className="flex items-center gap-2 text-lg font-semibold text-ink">
+        <h2
+          id={`widget-${id}`}
+          className="flex min-w-0 items-center gap-2 text-lg font-semibold text-ink"
+        >
           <Icon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
           <span className="truncate">{t(`${id}.title`)}</span>
         </h2>

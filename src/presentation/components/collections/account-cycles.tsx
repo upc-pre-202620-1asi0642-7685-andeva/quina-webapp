@@ -28,10 +28,7 @@ export async function AccountCycles({
   return (
     <section
       aria-labelledby="cycles-title"
-      className={cn(
-        'flex flex-col gap-4 rounded-card border border-line bg-surface sm:p-6',
-        large ? 'p-5' : 'p-4',
-      )}
+      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
     >
       <h2 id="cycles-title" className={cn('font-semibold text-ink', large ? 'text-xl' : 'text-lg')}>
         {t('title')}
@@ -49,25 +46,27 @@ export async function AccountCycles({
                 href={`${hrefBase}/cycles/${cycle.id}`}
                 className="flex min-h-14 items-center gap-3 px-4 py-3.5 transition-colors duration-150 ease-(--ease-out-expo) hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring active:bg-surface-hover"
               >
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="font-medium text-ink">
-                    {t('cutOff', { date: formatDate(cycle.cutOffDate) })}
-                  </span>
-                  <span className={cn('text-ink-soft', large ? 'text-base' : 'text-[13px]')}>
-                    {cycle.status === 'OPEN'
-                      ? t('openHint')
-                      : t('dueOn', { date: formatDate(cycle.paymentDueDate) })}
-                  </span>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <Money
-                    amount={cycle.amount}
-                    currency={currency}
-                    className="font-semibold whitespace-nowrap text-ink"
-                  />
-                  <CycleStatusBadge
-                    status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)}
-                  />
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-medium text-ink">
+                      {t('cutOff', { date: formatDate(cycle.cutOffDate) })}
+                    </span>
+                    <Money
+                      amount={cycle.amount}
+                      currency={currency}
+                      className="font-semibold whitespace-nowrap text-ink"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className={cn('text-ink-soft', large ? 'text-base' : 'text-[13px]')}>
+                      {cycle.status === 'OPEN'
+                        ? t('openHint')
+                        : t('dueOn', { date: formatDate(cycle.paymentDueDate) })}
+                    </span>
+                    <CycleStatusBadge
+                      status={cycleBadgeStatus(cycle.status, cycle.paymentDueDate, now)}
+                    />
+                  </div>
                 </div>
                 <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-soft" />
               </Link>

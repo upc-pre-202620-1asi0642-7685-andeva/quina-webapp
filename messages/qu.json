@@ -723,8 +723,10 @@
       }
     },
     "portalTabs": {
-      "account": "Cuenta hinaspa simi",
-      "security": "Waqaichay hinaspa tiyaykuna"
+      "account": "Cuentay",
+      "accountHint": "Qhatukuna, tema, simipas",
+      "security": "Waqaichay",
+      "securityHint": "Yaykuna, tiyaykuna, waqaichaypas"
     },
     "portalStores": {
       "title": "Fiadoyuq qhatukuna",

@@ -58,7 +58,7 @@ export default async function PortalPayPage({ params }: { params: Promise<{ stor
       </header>
 
       {account?.payable && payableBadge ? (
-        <section className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface p-5 sm:p-6">
+        <section className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface p-4 sm:p-6">
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-medium text-ink-soft">{tAccount('toPay')}</span>
@@ -88,6 +88,7 @@ export default async function PortalPayPage({ params }: { params: Promise<{ stor
         storeName={portal.storeName}
         suggestedAmount={account?.payable?.totalDue ?? null}
         currency={account?.currency}
+        hideTitle
       />
 
       <Notice tone="info" className="text-base">

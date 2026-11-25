@@ -11,12 +11,14 @@ export async function PaymentInfo({
   storeName,
   suggestedAmount,
   currency,
+  hideTitle = false,
 }: {
   payment: StorePayment;
   qrUrl: string | null;
   storeName: string;
   suggestedAmount?: string | null;
   currency?: Currency;
+  hideTitle?: boolean;
 }) {
   const t = await getTranslations('Portal.payment');
   const rows = [
@@ -27,27 +29,34 @@ export async function PaymentInfo({
     { key: 'cci', value: payment.bankCci, copyable: true },
   ].filter((row): row is { key: string; value: string; copyable: boolean } => Boolean(row.value));
 
+  const showHeader = !hideTitle || Boolean(suggestedAmount && currency);
+
   return (
     <section
       id="payment-info"
-      aria-labelledby="payment-title"
-      className="flex scroll-mt-20 flex-col gap-4 rounded-card border border-line bg-surface p-5 sm:p-6"
+      aria-labelledby={hideTitle ? undefined : 'payment-title'}
+      aria-label={hideTitle ? t('title') : undefined}
+      className="flex scroll-mt-20 flex-col gap-4 rounded-card border border-line bg-surface p-4 sm:p-6"
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="payment-title" className="text-xl font-semibold text-ink">
-          {t('title')}
-        </h2>
-        {suggestedAmount && currency ? (
-          <span className="text-base text-ink-soft">
-            {t('suggested', { amount: '' })}
-            <Money
-              amount={suggestedAmount}
-              currency={currency}
-              className="font-semibold text-ink"
-            />
-          </span>
-        ) : null}
-      </div>
+      {showHeader ? (
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          {!hideTitle ? (
+            <h2 id="payment-title" className="text-xl font-semibold text-ink">
+              {t('title')}
+            </h2>
+          ) : null}
+          {suggestedAmount && currency ? (
+            <span className="text-base text-ink-soft">
+              {t('suggested', { amount: '' })}
+              <Money
+                amount={suggestedAmount}
+                currency={currency}
+                className="font-semibold text-ink"
+              />
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       {rows.length === 0 && !qrUrl ? (
         <p className="rounded-field bg-paper-deep p-4 text-base text-ink-soft">{t('empty')}</p>

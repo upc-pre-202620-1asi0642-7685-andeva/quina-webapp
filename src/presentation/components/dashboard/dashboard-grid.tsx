@@ -742,7 +742,7 @@ export function DashboardGrid({
                   else items.current.delete(id);
                 }}
                 className={cn(
-                  'relative',
+                  'relative min-w-0',
                   BENTO_SPAN_CLASS[size],
                   BENTO_ROW_CLASS[rows],
                   rows === 2 && 'xl:min-h-[28.5rem]',

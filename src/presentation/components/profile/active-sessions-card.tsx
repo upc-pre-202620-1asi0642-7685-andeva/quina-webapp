@@ -149,13 +149,15 @@ export function ActiveSessionsCard({
                         portal ? 'text-sm' : 'text-[13px]',
                       )}
                     >
-                      <span>
+                      <span className="whitespace-nowrap">
                         {t('lastActive', { date: formatDateTime(new Date(session.updatedAt)) })}
                       </span>
                       {session.ipAddress ? (
                         <>
-                          <span aria-hidden="true">·</span>
-                          <span>{session.ipAddress}</span>
+                          <span aria-hidden="true" className="hidden sm:inline">
+                            ·
+                          </span>
+                          <span className="whitespace-nowrap">{session.ipAddress}</span>
                         </>
                       ) : null}
                     </div>

@@ -26,7 +26,7 @@ function isStandaloneDisplay(): boolean {
 }
 
 export function detectBrowserPushSupport(): BrowserPushSupport {
-  if (typeof window === 'undefined') return 'unsupported';
+  if (typeof window === 'undefined' || !window.isSecureContext) return 'unsupported';
   if (isIosDevice() && !isStandaloneDisplay()) {
     return 'needs-home-screen';
   }
@@ -52,26 +52,55 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   return outputArray;
 }
 
+const SW_TIMEOUT_MS = 3_000;
+
+function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => {
+      setTimeout(() => resolve(fallback), SW_TIMEOUT_MS);
+    }),
+  ]);
+}
+
 export async function readBrowserPushState(): Promise<BrowserPushState> {
   const support = detectBrowserPushSupport();
+  const permission: NotificationPermission | 'unsupported' =
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported';
   if (support !== 'supported') {
     return {
       support,
-      permission: typeof Notification !== 'undefined' ? Notification.permission : 'unsupported',
+      permission,
       subscribedOnThisDevice: false,
       endpoint: null,
     };
   }
 
-  const registration = await navigator.serviceWorker.getRegistration('/app');
-  const subscription = registration ? await registration.pushManager.getSubscription() : null;
+  try {
+    const registration = await withTimeout(
+      navigator.serviceWorker
+        .getRegistration('/app')
+        .then((reg) => reg ?? navigator.serviceWorker.getRegistration()),
+      undefined,
+    );
+    const subscription = registration
+      ? await withTimeout(registration.pushManager.getSubscription(), null)
+      : null;
 
-  return {
-    support,
-    permission: Notification.permission,
-    subscribedOnThisDevice: Boolean(subscription),
-    endpoint: subscription?.endpoint ?? null,
-  };
+    return {
+      support,
+      permission,
+      subscribedOnThisDevice: Boolean(subscription),
+      endpoint: subscription?.endpoint ?? null,
+    };
+  } catch {
+    return {
+      support: 'unsupported',
+      permission,
+      subscribedOnThisDevice: false,
+      endpoint: null,
+    };
+  }
 }
 
 export type SubscribePushResult =

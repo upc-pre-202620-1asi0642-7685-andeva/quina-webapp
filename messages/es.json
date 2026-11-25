@@ -722,8 +722,10 @@
       }
     },
     "portalTabs": {
-      "account": "Cuenta e idioma",
-      "security": "Seguridad y sesiones"
+      "account": "Mi cuenta",
+      "accountHint": "Tiendas, tema e idioma",
+      "security": "Seguridad",
+      "securityHint": "Contraseña, sesiones y copias"
     },
     "portalStores": {
       "title": "Tiendas donde tienes fiado",

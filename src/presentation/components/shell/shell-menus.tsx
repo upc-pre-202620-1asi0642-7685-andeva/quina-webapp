@@ -8,6 +8,7 @@ import {
   AlertTriangleIcon,
   BellIcon,
   CalendarClockIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   CircleUserRoundIcon,
   GemIcon,
@@ -50,9 +51,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/presentation/components/ui/popover';
@@ -176,6 +174,8 @@ export function ProfileMenu({
     readThemeChoice,
     () => 'system' as ThemeChoice,
   );
+  const [open, setOpen] = useState(false);
+  const [subMenu, setSubMenu] = useState<'root' | 'theme' | 'language'>('root');
   const [signingOut, setSigningOut] = useState(false);
 
   async function signOut() {
@@ -192,7 +192,13 @@ export function ProfileMenu({
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setSubMenu('root');
+      }}
+    >
       <DropdownMenuTrigger
         className={cn(
           'flex min-w-0 items-center gap-3 rounded-card text-left text-sm hover:bg-surface-hover',
@@ -224,43 +230,19 @@ export function ProfileMenu({
         sideOffset={compact ? 8 : 12}
         className={cn(layer, 'w-72')}
       >
-        <div className="flex items-center gap-3 px-3 pt-2 pb-3">
-          <Avatar name={user.name} className="size-11 text-base" />
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate font-semibold text-ink">{user.name}</span>
-            <span className="truncate text-xs text-ink-soft">{user.email}</span>
-            {storeName ? <span className="truncate text-xs text-ink-soft">{storeName}</span> : null}
-          </div>
-        </div>
-        <DropdownMenuSeparator className="bg-line" />
-        <DropdownMenuItem asChild className={itemClass}>
-          <Link href={isPortal ? '/portal/profile' : '/profile'}>
-            <CircleUserRoundIcon aria-hidden="true" />
-            {t('profile')}
-          </Link>
-        </DropdownMenuItem>
-        {isPortal && stores && stores.length > 1 ? (
-          <DropdownMenuItem asChild className={itemClass}>
-            <Link href="/portal">
-              <StoreIcon aria-hidden="true" />
-              {t('myStores')}
-            </Link>
-          </DropdownMenuItem>
-        ) : null}
-        {!isPortal && canManageStore ? (
-          <DropdownMenuItem asChild className={itemClass}>
-            <Link href="/settings">
-              <SettingsIcon aria-hidden="true" />
-              {t('settings')}
-            </Link>
-          </DropdownMenuItem>
-        ) : null}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className={itemClass}>
-            <SunMoonIcon aria-hidden="true" />
-            {t('theme')}
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className={cn(layer, 'w-44')}>
+        {subMenu === 'theme' ? (
+          <>
+            <DropdownMenuItem
+              className={itemClass}
+              onSelect={(event) => {
+                event.preventDefault();
+                setSubMenu('root');
+              }}
+            >
+              <ChevronLeftIcon aria-hidden="true" />
+              <span className="font-semibold text-ink">{t('theme')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-line" />
             <DropdownMenuRadioGroup
               value={theme}
               onValueChange={(value) => {
@@ -283,68 +265,138 @@ export function ProfileMenu({
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        {isPortal ? (
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className={itemClass}>
-              <LanguagesIcon aria-hidden="true" />
-              {t('language')}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className={cn(layer, 'w-48')}>
-              <DropdownMenuRadioGroup
-                value={locale}
-                onValueChange={(value) => {
-                  const next = value as Locale;
-                  if (next === locale) return;
-                  void setLocaleAction(next).then((res) => {
-                    if (res.ok) {
-                      sileo.success({ title: tProfile('localeSaved') });
-                      router.refresh();
-                    }
-                  });
+          </>
+        ) : subMenu === 'language' ? (
+          <>
+            <DropdownMenuItem
+              className={itemClass}
+              onSelect={(event) => {
+                event.preventDefault();
+                setSubMenu('root');
+              }}
+            >
+              <ChevronLeftIcon aria-hidden="true" />
+              <span className="font-semibold text-ink">{t('language')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-line" />
+            <DropdownMenuRadioGroup
+              value={locale}
+              onValueChange={(value) => {
+                const next = value as Locale;
+                if (next === locale) return;
+                void setLocaleAction(next).then((res) => {
+                  if (res.ok) {
+                    sileo.success({ title: tProfile('localeSaved') });
+                    router.refresh();
+                  }
+                });
+              }}
+            >
+              {locales.map((loc) => (
+                <DropdownMenuRadioItem key={loc} value={loc} className="h-10 rounded-field text-sm">
+                  {tProfile(`locales.${loc}`)}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 px-3 pt-2 pb-3">
+              <Avatar name={user.name} className="size-11 text-base" />
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate font-semibold text-ink">{user.name}</span>
+                <span className="truncate text-xs text-ink-soft">{user.email}</span>
+                {storeName ? (
+                  <span className="truncate text-xs text-ink-soft">{storeName}</span>
+                ) : null}
+              </div>
+            </div>
+            <DropdownMenuSeparator className="bg-line" />
+            <DropdownMenuItem asChild className={itemClass}>
+              <Link href={isPortal ? '/portal/profile' : '/profile'}>
+                <CircleUserRoundIcon aria-hidden="true" />
+                {t('profile')}
+              </Link>
+            </DropdownMenuItem>
+            {isPortal && stores && stores.length > 1 ? (
+              <DropdownMenuItem asChild className={itemClass}>
+                <Link href="/portal">
+                  <StoreIcon aria-hidden="true" />
+                  {t('myStores')}
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
+            {!isPortal && canManageStore ? (
+              <DropdownMenuItem asChild className={itemClass}>
+                <Link href="/settings">
+                  <SettingsIcon aria-hidden="true" />
+                  {t('settings')}
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem
+              className={cn(itemClass, 'justify-between')}
+              onSelect={(event) => {
+                event.preventDefault();
+                setSubMenu('theme');
+              }}
+            >
+              <span className="flex items-center gap-3">
+                <SunMoonIcon aria-hidden="true" />
+                <span>{t('theme')}</span>
+              </span>
+              <span className="flex items-center gap-1 text-xs text-ink-soft">
+                <span>{t(`themes.${theme}`)}</span>
+                <ChevronRightIcon aria-hidden="true" className="size-4" />
+              </span>
+            </DropdownMenuItem>
+            {isPortal ? (
+              <DropdownMenuItem
+                className={cn(itemClass, 'justify-between')}
+                onSelect={(event) => {
+                  event.preventDefault();
+                  setSubMenu('language');
                 }}
               >
-                {locales.map((loc) => (
-                  <DropdownMenuRadioItem
-                    key={loc}
-                    value={loc}
-                    className="h-10 rounded-field text-sm"
-                  >
-                    {tProfile(`locales.${loc}`)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-        ) : (
-          <DropdownMenuItem asChild className={itemClass}>
-            <Link href="/profile/preferences">
-              <LanguagesIcon aria-hidden="true" />
-              {t('language')}
-            </Link>
-          </DropdownMenuItem>
+                <span className="flex items-center gap-3">
+                  <LanguagesIcon aria-hidden="true" />
+                  <span>{t('language')}</span>
+                </span>
+                <span className="flex items-center gap-1 text-xs text-ink-soft">
+                  <span>{tProfile(`locales.${locale}`)}</span>
+                  <ChevronRightIcon aria-hidden="true" className="size-4" />
+                </span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem asChild className={itemClass}>
+                <Link href="/profile/preferences">
+                  <LanguagesIcon aria-hidden="true" />
+                  {t('language')}
+                </Link>
+              </DropdownMenuItem>
+            )}
+            {!isPortal && canManageStore ? (
+              <DropdownMenuItem asChild className={itemClass}>
+                <Link href="/settings/subscription">
+                  <GemIcon aria-hidden="true" />
+                  {t('plans')}
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuSeparator className="bg-line" />
+            <DropdownMenuItem
+              className={itemClass}
+              disabled={signingOut}
+              onSelect={(event) => {
+                event.preventDefault();
+                void signOut();
+              }}
+            >
+              <LogOutIcon aria-hidden="true" />
+              {t('signOut')}
+            </DropdownMenuItem>
+          </>
         )}
-        {!isPortal && canManageStore ? (
-          <DropdownMenuItem asChild className={itemClass}>
-            <Link href="/settings/subscription">
-              <GemIcon aria-hidden="true" />
-              {t('plans')}
-            </Link>
-          </DropdownMenuItem>
-        ) : null}
-        <DropdownMenuSeparator className="bg-line" />
-        <DropdownMenuItem
-          className={itemClass}
-          disabled={signingOut}
-          onSelect={(event) => {
-            event.preventDefault();
-            void signOut();
-          }}
-        >
-          <LogOutIcon aria-hidden="true" />
-          {t('signOut')}
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

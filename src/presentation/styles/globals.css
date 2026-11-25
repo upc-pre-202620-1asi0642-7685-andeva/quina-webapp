@@ -289,6 +289,13 @@ html[data-offline] form :is(button[type='submit'], button:not([type])) {
   text-wrap: pretty;
 }
 
+/* En celular y tablet (< 1024 px) Sileo baja debajo de la barra superior fija para no tapar notificaciones ni usuario */
+@media (max-width: 1023px) {
+  body:has([data-mobile-header]) [data-sileo-viewport][data-position^='top'] {
+    top: calc(3.75rem + env(safe-area-inset-top, 0px));
+  }
+}
+
 /* En Chromium/Blink un <table class="sr-only"> con display:table no recorta su <caption> */
 .sr-only table,
 .sr-only caption,
