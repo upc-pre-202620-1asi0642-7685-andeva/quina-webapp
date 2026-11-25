@@ -1,4 +1,5 @@
 import type { Subscription } from '../billing/plan-limits';
+import type { PushDeliverySummary } from './push-notifier';
 
 /** Tienda activa que recorre el proceso diario (`stores` no tiene RLS). */
 export type DailyStore = { id: string; subscription: Subscription };
@@ -33,4 +34,6 @@ export interface DailyProcessGateway {
   queuePaymentReminders(storeId: string, now: Date): Promise<StepCount>;
   /** Envía los correos en cola o fallidos hasta `deadline` (D10). */
   dispatchPending(storeId: string, now: Date, deadline: Date): Promise<DispatchResult>;
+  /** Envía un resumen matutino por Web Push a los dispositivos suscritos de la tienda. */
+  dispatchPush?(storeId: string, now: Date, deadline: Date): Promise<PushDeliverySummary>;
 }

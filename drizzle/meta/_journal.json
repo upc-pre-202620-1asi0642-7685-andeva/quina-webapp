@@ -50,6 +50,20 @@
       "when": 1794694877208,
       "tag": "0006_dashboard_layout",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795567761852,
+      "tag": "0007_push_subscriptions",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795568379294,
+      "tag": "0008_preferred_theme",
+      "breakpoints": true
     }
   ]
 }

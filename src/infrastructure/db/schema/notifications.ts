@@ -1,5 +1,15 @@
 import { sql } from 'drizzle-orm';
-import { check, date, index, pgTable, text, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  check,
+  date,
+  index,
+  pgTable,
+  text,
+  unique,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { createdAt, oneOf, tstz, updatedAt, uuidPk } from './columns';
 import { customers } from './credit';
 import { stores, users } from './identity';
@@ -62,5 +72,34 @@ export const notificationLogs = pgTable(
     uniqueIndex('uq_notifications_cycle_once')
       .on(t.notificationType, t.referenceId)
       .where(sql`${t.notificationType} IN ('PAYMENT_REMINDER', 'CYCLE_STATEMENT', 'LATE_PAYMENT')`),
+  ],
+);
+
+/** Suscripciones Web Push (VAPID) de los dispositivos del dueño o empleado de cada tienda. */
+export const pushSubscriptions = pgTable(
+  'push_subscriptions',
+  {
+    id: uuidPk(),
+    storeId: uuid('store_id')
+      .notNull()
+      .references(() => stores.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    endpoint: text('endpoint').notNull(),
+    p256dh: text('p256dh').notNull(),
+    auth: text('auth').notNull(),
+    userAgent: varchar('user_agent', { length: 255 }),
+    locale: varchar('locale', { length: 2 }).notNull().default('es'),
+    lastError: text('last_error'),
+    lastSentAt: tstz('last_sent_at'),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    check('chk_push_subscriptions_locale', oneOf(t.locale, ['es', 'en', 'qu'])),
+    unique('uq_push_subscriptions_store_endpoint').on(t.storeId, t.endpoint),
+    index('idx_push_subscriptions_store').on(t.storeId),
+    index('idx_push_subscriptions_user').on(t.userId),
   ],
 );

@@ -7,11 +7,13 @@ import type {
   DailyStore,
   DispatchResult,
 } from '@/core/domain/ports/daily-process';
+import type { PushDeliverySummary } from '@/core/domain/ports/push-notifier';
 import type { NotificationMailer } from '@/core/domain/ports/notification-mailer';
 import { BusinessDate } from '@/core/domain/shared/business-date';
 import { isLocale } from '@/presentation/i18n/resolve-locale';
 import { Money, type Currency } from '@/core/domain/shared/money';
 import { getNotificationMailer } from '../../email/auth-mailer-factory';
+import { dispatchDailyStorePush } from '../../push/store-push-alerts';
 import { db } from '../connection';
 import { selectSubscription } from '../repositories/drizzle-subscription-repository';
 import {
@@ -377,6 +379,10 @@ export class DrizzleDailyProcess implements DailyProcessGateway {
 
   dispatchPending(storeId: string, now: Date, deadline: Date): Promise<DispatchResult> {
     return this.dispatcher.dispatchStore(storeId, now, deadline);
+  }
+
+  dispatchPush(storeId: string, now: Date, deadline: Date): Promise<PushDeliverySummary> {
+    return dispatchDailyStorePush(storeId, now, deadline);
   }
 }
 

@@ -4,6 +4,7 @@ import type {
   DailyStore,
   DispatchResult,
 } from '@/core/domain/ports/daily-process';
+import type { PushDeliverySummary } from '@/core/domain/ports/push-notifier';
 
 export type DailyStepName =
   'consent' | 'cutoff' | 'overdue' | 'digest' | 'reminder' | 'subscription';
@@ -12,7 +13,8 @@ export type DailyProcessSummary = {
   stores: number;
   steps: Record<DailyStepName, number>;
   mail: DispatchResult;
-  errors: { storeId: string; step: DailyStepName | 'dispatch'; message: string }[];
+  push: PushDeliverySummary;
+  errors: { storeId: string; step: DailyStepName | 'dispatch' | 'push'; message: string }[];
 };
 
 type DailyStep = {
@@ -66,6 +68,7 @@ export class RunDailyProcessUseCase {
       stores: stores.length,
       steps: { consent: 0, cutoff: 0, overdue: 0, digest: 0, reminder: 0, subscription: 0 },
       mail: { sent: 0, failed: 0, pending: 0 },
+      push: { sent: 0, failed: 0, expired: 0 },
       errors: [],
     };
 
@@ -89,6 +92,16 @@ export class RunDailyProcessUseCase {
         summary.mail.pending += result.pending;
       } catch (error) {
         summary.errors.push({ storeId: store.id, step: 'dispatch', message: messageOf(error) });
+      }
+      if (this.gateway.dispatchPush) {
+        try {
+          const push = await this.gateway.dispatchPush(store.id, now, deadline);
+          summary.push.sent += push.sent;
+          summary.push.failed += push.failed;
+          summary.push.expired += push.expired;
+        } catch (error) {
+          summary.errors.push({ storeId: store.id, step: 'push', message: messageOf(error) });
+        }
       }
     }
     return summary;
